@@ -1,0 +1,43 @@
+---
+import Base from "@/layouts/Base.astro";
+import { siteConfig } from "@/site.config";
+---
+
+<Base meta={{ title: "Library", description: "Collection of resources and references" }}>
+	<main class="prose prose-lg">
+		<h1>Library</h1>
+		<p>A curated collection of resources, references, and useful information.</p>
+		
+		<div class="grid gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
+				<h3 class="text-lg font-semibold mb-2">Documentation</h3>
+				<p class="text-sm text-accent/70 mb-4">Technical documentation and guides.</p>
+				<ul class="text-sm space-y-1">
+					<li>• API References</li>
+					<li>• User Guides</li>
+					<li>• Best Practices</li>
+				</ul>
+			</div>
+			
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
+				<h3 class="text-lg font-semibold mb-2">Resources</h3>
+				<p class="text-sm text-accent/70 mb-4">Helpful links and external resources.</p>
+				<ul class="text-sm space-y-1">
+					<li>• Tutorials</li>
+					<li>• Templates</li>
+					<li>• References</li>
+				</ul>
+			</div>
+			
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
+				<h3 class="text-lg font-semibold mb-2">Collections</h3>
+				<p class="text-sm text-accent/70 mb-4">Organized collections of content.</p>
+				<ul class="text-sm space-y-1">
+					<li>• Bookmarked Items</li>
+					<li>• Favorites</li>
+					<li>• Archives</li>
+				</ul>
+			</div>
+		</div>
+	</main>
+</Base> 

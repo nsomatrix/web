@@ -1,0 +1,37 @@
+---
+import Base from "@/layouts/Base.astro";
+import { siteConfig } from "@/site.config";
+---
+
+<Base meta={{ title: "Tools", description: "Useful tools and utilities" }}>
+	<main class="prose prose-lg">
+		<h1>Tools</h1>
+		<p>A collection of useful tools and utilities to help you with various tasks.</p>
+		
+		<div class="grid gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+				<h3 class="text-lg font-semibold mb-2">Calculator</h3>
+				<p class="text-sm text-accent/70 mb-4">Advanced calculator with multiple functions.</p>
+				<button class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors">
+					Open Tool
+				</button>
+			</div>
+			
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+				<h3 class="text-lg font-semibold mb-2">Converter</h3>
+				<p class="text-sm text-accent/70 mb-4">Convert between different units and formats.</p>
+				<button class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors">
+					Open Tool
+				</button>
+			</div>
+			
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+				<h3 class="text-lg font-semibold mb-2">Generator</h3>
+				<p class="text-sm text-accent/70 mb-4">Generate passwords, codes, and more.</p>
+				<button class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors">
+					Open Tool
+				</button>
+			</div>
+		</div>
+	</main>
+</Base> 

@@ -1,0 +1,28 @@
+---
+import Base from "@/layouts/Base.astro";
+import { siteConfig } from "@/site.config";
+---
+
+<Base meta={{ title: "Dashboard", description: "Dashboard overview" }}>
+	<main class="prose prose-lg">
+		<h1>Dashboard</h1>
+		<p>Welcome to your dashboard. This is where you can get an overview of your activities and important information.</p>
+		
+		<div class="grid gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
+				<h3 class="text-lg font-semibold mb-2">Quick Stats</h3>
+				<p class="text-sm text-accent/70">Your key metrics and statistics will appear here.</p>
+			</div>
+			
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
+				<h3 class="text-lg font-semibold mb-2">Recent Activity</h3>
+				<p class="text-sm text-accent/70">Your latest activities and updates.</p>
+			</div>
+			
+			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
+				<h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
+				<p class="text-sm text-accent/70">Common tasks and shortcuts.</p>
+			</div>
+		</div>
+	</main>
+</Base> 
