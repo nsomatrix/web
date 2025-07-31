@@ -48,11 +48,15 @@ import {siteConfig} from "../../site.config";
 					menuLinks.map((link) => (
 						<a
 							aria-current={Astro.url.pathname === link.path ? "page" : false}
-							class="text-accent underline-offset-2 hover:underline transition-all duration-200"
+							class="nav-link relative text-accent transition-all duration-300 group"
 							data-astro-prefetch
 							href={link.path}
 						>
 							{link.title}
+							<div class="nav-link-lines">
+								<div class="nav-line nav-line-top"></div>
+								<div class="nav-line nav-line-bottom"></div>
+							</div>
 						</a>
 					))
 				}
@@ -115,11 +119,15 @@ import {siteConfig} from "../../site.config";
 					menuLinks.map((link) => (
 						<a
 							aria-current={Astro.url.pathname === link.path ? "page" : false}
-							class="px-4 py-2 text-accent underline-offset-2 hover:underline hover:bg-accent/5 rounded-md transition-all duration-200"
+							class="nav-link-mobile relative px-4 py-2 text-accent hover:bg-accent/5 rounded-md transition-all duration-300 group"
 							data-astro-prefetch
 							href={link.path}
 						>
 							{link.title}
+							<div class="nav-link-lines-mobile">
+								<div class="nav-line nav-line-top"></div>
+								<div class="nav-line nav-line-bottom"></div>
+							</div>
 						</a>
 					))
 				}

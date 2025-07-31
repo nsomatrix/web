@@ -69,6 +69,82 @@
 	.title {
 		@apply text-accent-2 text-2xl font-semibold;
 	}
+
+	/* Dual Line Hover Effect for Navigation Links */
+	.nav-link {
+		@apply relative;
+	}
+
+	.nav-link-lines {
+		@apply absolute inset-0 pointer-events-none;
+	}
+
+	.nav-line {
+		@apply absolute left-0 right-0 h-0.5 bg-accent transform scale-x-0 transition-transform duration-300 ease-out;
+	}
+
+	.nav-line-top {
+		@apply top-0;
+	}
+
+	.nav-line-bottom {
+		@apply bottom-0;
+	}
+
+	/* Hover effects for desktop navigation */
+	.nav-link:hover .nav-line-top {
+		@apply scale-x-100;
+		transform: scaleX(1) translateY(-2px);
+	}
+
+	.nav-link:hover .nav-line-bottom {
+		@apply scale-x-100;
+		transform: scaleX(1) translateY(2px);
+	}
+
+	/* Active state for current page */
+	.nav-link[aria-current="page"] .nav-line-top,
+	.nav-link[aria-current="page"] .nav-line-bottom {
+		@apply scale-x-100;
+	}
+
+	/* Mobile navigation styles */
+	.nav-link-mobile {
+		@apply relative;
+	}
+
+	.nav-link-lines-mobile {
+		@apply absolute inset-0 pointer-events-none;
+	}
+
+	.nav-link-mobile .nav-line {
+		@apply absolute left-4 right-4 h-0.5 bg-accent transform scale-x-0 transition-transform duration-300 ease-out;
+	}
+
+	.nav-link-mobile .nav-line-top {
+		@apply top-2;
+	}
+
+	.nav-link-mobile .nav-line-bottom {
+		@apply bottom-2;
+	}
+
+	/* Hover effects for mobile navigation */
+	.nav-link-mobile:hover .nav-line-top {
+		@apply scale-x-100;
+		transform: scaleX(1) translateY(-1px);
+	}
+
+	.nav-link-mobile:hover .nav-line-bottom {
+		@apply scale-x-100;
+		transform: scaleX(1) translateY(1px);
+	}
+
+	/* Active state for current page on mobile */
+	.nav-link-mobile[aria-current="page"] .nav-line-top,
+	.nav-link-mobile[aria-current="page"] .nav-line-bottom {
+		@apply scale-x-100;
+	}
 }
 
 @utility prose {
