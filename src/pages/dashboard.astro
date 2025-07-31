@@ -6,23 +6,134 @@ import { siteConfig } from "@/site.config";
 <Base meta={{ title: "Dashboard", description: "Dashboard overview" }}>
 	<main class="prose prose-lg">
 		<h1>Dashboard</h1>
-		<p>Welcome to your dashboard. This is where you can get an overview of your activities and important information.</p>
+		<p class="text-lg text-accent/80">Welcome to your dashboard. Get an overview of your activities and important information at a glance.</p>
 		
-		<div class="grid gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
-			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
-				<h3 class="text-lg font-semibold mb-2">Quick Stats</h3>
-				<p class="text-sm text-accent/70">Your key metrics and statistics will appear here.</p>
+		<!-- Quick Stats Section -->
+		<section class="mt-8">
+			<h2 class="text-xl font-semibold mb-4">Quick Stats</h2>
+			<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+				<div class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-sm text-accent/70">Total Posts</p>
+							<p class="text-2xl font-bold text-accent">24</p>
+						</div>
+						<svg class="w-8 h-8 text-accent/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+						</svg>
+					</div>
+				</div>
+				
+				<div class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-sm text-accent/70">Notes</p>
+							<p class="text-2xl font-bold text-accent">12</p>
+						</div>
+						<svg class="w-8 h-8 text-accent/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+						</svg>
+					</div>
+				</div>
+				
+				<div class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-sm text-accent/70">Tools</p>
+							<p class="text-2xl font-bold text-accent">8</p>
+						</div>
+						<svg class="w-8 h-8 text-accent/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+						</svg>
+					</div>
+				</div>
+				
+				<div class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors">
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-sm text-accent/70">Resources</p>
+							<p class="text-2xl font-bold text-accent">15</p>
+						</div>
+						<svg class="w-8 h-8 text-accent/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+						</svg>
+					</div>
+				</div>
 			</div>
-			
-			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
-				<h3 class="text-lg font-semibold mb-2">Recent Activity</h3>
-				<p class="text-sm text-accent/70">Your latest activities and updates.</p>
+		</section>
+
+		<!-- Recent Activity Section -->
+		<section class="mt-8">
+			<h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+			<div class="bg-accent/5 rounded-lg border border-accent/10 p-6">
+				<div class="space-y-4">
+					<div class="flex items-center space-x-3">
+						<div class="w-2 h-2 bg-green-500 rounded-full"></div>
+						<div class="flex-1">
+							<p class="text-sm font-medium">New post published</p>
+							<p class="text-xs text-accent/70">"Getting Started with Astro" - 2 hours ago</p>
+						</div>
+					</div>
+					<div class="flex items-center space-x-3">
+						<div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+						<div class="flex-1">
+							<p class="text-sm font-medium">Tool added</p>
+							<p class="text-xs text-accent/70">"Color Palette Generator" - 1 day ago</p>
+						</div>
+					</div>
+					<div class="flex items-center space-x-3">
+						<div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+						<div class="flex-1">
+							<p class="text-sm font-medium">Note updated</p>
+							<p class="text-xs text-accent/70">"Project Ideas" - 3 days ago</p>
+						</div>
+					</div>
+				</div>
 			</div>
-			
-			<div class="p-6 bg-accent/5 rounded-lg border border-accent/10">
-				<h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
-				<p class="text-sm text-accent/70">Common tasks and shortcuts.</p>
+		</section>
+
+		<!-- Quick Actions Section -->
+		<section class="mt-8">
+			<h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+			<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<a href="/posts/" class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors group">
+					<div class="flex items-center space-x-3">
+						<svg class="w-6 h-6 text-accent group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+						</svg>
+						<div>
+							<p class="font-medium">View Posts</p>
+							<p class="text-sm text-accent/70">Browse all published posts</p>
+						</div>
+					</div>
+				</a>
+				
+				<a href="/tools/" class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors group">
+					<div class="flex items-center space-x-3">
+						<svg class="w-6 h-6 text-accent group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+						</svg>
+						<div>
+							<p class="font-medium">Use Tools</p>
+							<p class="text-sm text-accent/70">Access helpful utilities</p>
+						</div>
+					</div>
+				</a>
+				
+				<a href="/library/" class="p-4 bg-accent/5 rounded-lg border border-accent/10 hover:bg-accent/10 transition-colors group">
+					<div class="flex items-center space-x-3">
+						<svg class="w-6 h-6 text-accent group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+						</svg>
+						<div>
+							<p class="font-medium">Browse Library</p>
+							<p class="text-sm text-accent/70">Explore resources</p>
+						</div>
+					</div>
+				</a>
 			</div>
-		</div>
+		</section>
 	</main>
 </Base> 

@@ -27,7 +27,7 @@ export const siteConfig: SiteConfig = {
 	*/
 	title: "Astro Cactus",
 	// ! Please remember to replace the following site property with your own domain, used in astro.config.ts
-	url: "https://nsomatrix.github.io/web/",
+	url: process.env.NODE_ENV === 'production' ? "https://nsomatrix.github.io/web/" : "http://localhost:4321",
 };
 
 // Used to generate links in both the Header & Footer.
@@ -37,15 +37,15 @@ export const menuLinks: { path: string; title: string }[] = [
 		title: "Home",
 	},
 	{
-		path: "/dashboard/",
+		path: "/dashboard",
 		title: "Dashboard",
 	},
 	{
-		path: "/tools/",
+		path: "/tools",
 		title: "Tools",
 	},
 	{
-		path: "/library/",
+		path: "/library",
 		title: "Library",
 	},
 ];
