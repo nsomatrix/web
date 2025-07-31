@@ -1,0 +1,495 @@
+---
+// This component will be enhanced with client-side JavaScript
+---
+
+<div class="auth-form-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="/mtx.png" alt="MTX Logo" class="w-8 h-8" />
+      </div>
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-subtitle">Sign in to your account to continue</p>
+    </div>
+
+    <form id="loginForm" class="auth-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email address</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+          </svg>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            class="form-input"
+            placeholder="Enter your email address"
+            autocomplete="email"
+          />
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            class="form-input"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          />
+        </div>
+      </div>
+      
+      <button 
+        type="submit" 
+        class="submit-button"
+      >
+        <span class="button-text">Sign in</span>
+        <svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+      </button>
+    </form>
+    
+    <div id="loginMessage" class="message hidden"></div>
+    
+    <div class="auth-footer">
+      <p class="auth-switch-text">
+        Don't have an account? 
+        <button type="button" id="showSignupBtn" class="auth-switch-link">
+          Sign up for free
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .auth-form-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    min-height: 100vh;
+  }
+
+  @media (min-width: 768px) {
+    .auth-form-wrapper {
+      align-items: center;
+      padding: 4rem 2rem;
+    }
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 28rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+
+  :global([data-theme="dark"]) .auth-card {
+    background: #1a1a1a;
+    border-color: #333333;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .auth-header {
+    text-align: center;
+    padding: 2.5rem 2rem 2rem 2rem;
+    position: relative;
+  }
+
+  @media (max-width: 640px) {
+    .auth-header {
+      padding: 2rem 1.5rem 1.5rem 1.5rem;
+    }
+  }
+
+  .auth-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    background: linear-gradient(135deg, 
+      hsl(var(--color-accent) / 0.15) 0%, 
+      hsl(var(--color-accent) / 0.08) 100%);
+    color: hsl(var(--color-accent));
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 
+      0 4px 12px hsl(var(--color-accent) / 0.15),
+      inset 0 1px 0 hsl(var(--color-accent) / 0.2);
+    border: 1px solid hsl(var(--color-accent) / 0.2);
+  }
+
+  .auth-logo img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+  }
+
+  .auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.025em;
+  }
+
+  :global([data-theme="dark"]) .auth-title {
+    color: #ffffff;
+  }
+
+  .auth-subtitle {
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  :global([data-theme="dark"]) .auth-subtitle {
+    color: #cccccc;
+  }
+
+  .auth-form {
+    padding: 0 2rem 2rem 2rem;
+  }
+
+  @media (max-width: 640px) {
+    .auth-form {
+      padding: 0 1.5rem 1.5rem 1.5rem;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: hsl(var(--color-global-text));
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.025em;
+  }
+
+  .input-wrapper {
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .input-wrapper:hover {
+    transform: translateY(-1px);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: hsl(var(--color-global-text) / 0.5);
+    transition: color 0.2s ease;
+    z-index: 2;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: white;
+    color: #111827;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  :global([data-theme="dark"]) .form-input {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #ffffff;
+  }
+
+  .form-input::placeholder {
+    color: #6b7280;
+    font-weight: 400;
+  }
+
+  :global([data-theme="dark"]) .form-input::placeholder {
+    color: #999999;
+  }
+
+  .form-input:hover {
+    border-color: #9ca3af;
+  }
+
+  :global([data-theme="dark"]) .form-input:hover {
+    border-color: #555555;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+
+  :global([data-theme="dark"]) .form-input:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+  }
+
+  .submit-button {
+    width: 100%;
+    background: linear-gradient(135deg, 
+      hsl(var(--color-accent)) 0%, 
+      hsl(var(--color-accent) / 0.9) 100%);
+    color: hsl(var(--color-accent-2));
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 
+      0 8px 20px hsl(var(--color-accent) / 0.3),
+      0 2px 4px hsl(var(--color-accent) / 0.2),
+      inset 0 1px 0 hsl(var(--color-accent) / 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      hsl(var(--color-accent-2) / 0.1) 50%, 
+      transparent 100%);
+    transition: left 0.5s ease;
+  }
+
+  .submit-button:hover {
+    background: linear-gradient(135deg, 
+      hsl(var(--color-accent) / 0.95) 0%, 
+      hsl(var(--color-accent) / 0.85) 100%);
+    box-shadow: 
+      0 12px 30px hsl(var(--color-accent) / 0.4),
+      0 4px 8px hsl(var(--color-accent) / 0.3),
+      inset 0 1px 0 hsl(var(--color-accent) / 0.2);
+    transform: translateY(-2px);
+  }
+
+  .submit-button:hover::before {
+    left: 100%;
+  }
+
+  .submit-button:focus {
+    outline: none;
+    box-shadow: 
+      0 0 0 4px hsl(var(--color-accent) / 0.2),
+      0 12px 30px hsl(var(--color-accent) / 0.4),
+      0 4px 8px hsl(var(--color-accent) / 0.3),
+      inset 0 1px 0 hsl(var(--color-accent) / 0.2);
+  }
+
+  .submit-button:active {
+    transform: translateY(0);
+    box-shadow: 
+      0 4px 12px hsl(var(--color-accent) / 0.3),
+      0 2px 4px hsl(var(--color-accent) / 0.2),
+      inset 0 1px 0 hsl(var(--color-accent) / 0.2);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .button-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  .button-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .message {
+    margin: 0 2rem 1.5rem 2rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+
+  @media (max-width: 640px) {
+    .message {
+      margin: 0 1.5rem 1rem 1.5rem;
+    }
+  }
+
+  .message.success {
+    background: linear-gradient(135deg, 
+      hsl(142 76% 36% / 0.1) 0%, 
+      hsl(142 76% 36% / 0.05) 100%);
+    color: hsl(142 76% 36%);
+    border-color: hsl(142 76% 36% / 0.2);
+    box-shadow: 0 2px 8px hsl(142 76% 36% / 0.1);
+  }
+
+  .message.error {
+    background: linear-gradient(135deg, 
+      hsl(0 84% 60% / 0.1) 0%, 
+      hsl(0 84% 60% / 0.05) 100%);
+    color: hsl(0 84% 60%);
+    border-color: hsl(0 84% 60% / 0.2);
+    box-shadow: 0 2px 8px hsl(0 84% 60% / 0.1);
+  }
+
+  .auth-footer {
+    padding: 1.75rem 2rem;
+    border-top: 1px solid hsl(var(--color-accent) / 0.1);
+    text-align: center;
+    background: linear-gradient(135deg, 
+      hsl(var(--color-global-bg) / 0.5) 0%, 
+      hsl(var(--color-global-bg) / 0.3) 100%);
+  }
+
+  @media (max-width: 640px) {
+    .auth-footer {
+      padding: 1.25rem 1.5rem;
+    }
+  }
+
+  .auth-switch-text {
+    font-size: 0.9rem;
+    color: hsl(var(--color-global-text) / 0.7);
+    line-height: 1.5;
+  }
+
+  .auth-switch-link {
+    color: hsl(var(--color-accent));
+    font-weight: 600;
+    transition: all 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    text-decoration-color: hsl(var(--color-accent) / 0.3);
+    text-underline-offset: 2px;
+  }
+
+  .auth-switch-link:hover {
+    color: hsl(var(--color-accent) / 0.8);
+    text-decoration-color: hsl(var(--color-accent) / 0.6);
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  import { auth } from '@/lib/supabase';
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm') as HTMLFormElement;
+    const loginMessage = document.getElementById('loginMessage') as HTMLDivElement;
+    const showSignupBtn = document.getElementById('showSignupBtn') as HTMLButtonElement;
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(loginForm);
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+        
+        // Show loading state
+        const submitBtn = loginForm.querySelector('.submit-button') as HTMLButtonElement;
+        const buttonText = submitBtn.querySelector('.button-text') as HTMLSpanElement;
+        const buttonIcon = submitBtn.querySelector('.button-icon') as SVGElement;
+        
+        const originalText = buttonText.textContent;
+        const originalIcon = buttonIcon.innerHTML;
+        
+        buttonText.textContent = 'Signing in...';
+        buttonIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>';
+        submitBtn.disabled = true;
+        
+        try {
+          const { data, error } = await auth.signIn(email, password);
+          
+          if (error) {
+            showMessage(loginMessage, error.message, 'error');
+          } else {
+            showMessage(loginMessage, 'Sign in successful!', 'success');
+            // Clear the message after a short delay
+            setTimeout(() => {
+              loginMessage.classList.add('hidden');
+            }, 2000);
+          }
+        } catch (error) {
+          showMessage(loginMessage, 'An unexpected error occurred', 'error');
+        } finally {
+          buttonText.textContent = originalText;
+          buttonIcon.innerHTML = originalIcon;
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    if (showSignupBtn) {
+      showSignupBtn.addEventListener('click', function() {
+        // Hide login form and show signup form
+        const loginWrapper = document.querySelector('.auth-form-wrapper');
+        const signupWrapper = document.querySelector('.signup-form-wrapper');
+        
+        if (loginWrapper && signupWrapper) {
+          loginWrapper.classList.add('hidden');
+          signupWrapper.classList.remove('hidden');
+        }
+      });
+    }
+
+    function showMessage(element: HTMLElement, message: string, type: 'success' | 'error') {
+      element.textContent = message;
+      element.className = `message ${type}`;
+      element.classList.remove('hidden');
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        element.classList.add('hidden');
+      }, 5000);
+    }
+  });
+</script> 

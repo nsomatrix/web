@@ -1,0 +1,145 @@
+---
+import LoginForm from "./LoginForm.astro";
+import SignupForm from "./SignupForm.astro";
+---
+
+<div id="authWrapper" class="w-full">
+  <!-- Loading state -->
+  <div id="authLoading" class="flex items-center justify-center min-h-[400px]">
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center w-12 h-12 bg-accent/10 text-accent rounded-lg mb-4">
+        <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </div>
+      <p class="text-sm text-gray-600 dark:text-gray-400">Checking authentication...</p>
+    </div>
+  </div>
+
+  <!-- Authentication forms (shown when not logged in) -->
+  <div id="authForms" class="hidden">
+    <LoginForm />
+    <SignupForm />
+  </div>
+
+  <!-- Dashboard content (shown when logged in) -->
+  <div id="dashboardContent" class="hidden">
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-accent/10 text-accent rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">Welcome back!</h3>
+            <p id="userEmail" class="text-sm text-gray-600 dark:text-gray-400"></p>
+          </div>
+        </div>
+        <button 
+          id="logoutBtn" 
+          class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 text-sm font-medium"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span>Sign out</span>
+        </button>
+      </div>
+      
+      <div class="flex items-center space-x-4 text-sm">
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+          <span id="userStatus" class="text-gray-600 dark:text-gray-400"></span>
+        </div>
+        <div class="text-gray-400">•</div>
+        <span class="text-gray-600 dark:text-gray-400">Ready to get started</span>
+      </div>
+    </div>
+
+    <!-- Dashboard content slot -->
+    <slot />
+  </div>
+</div>
+
+<script>
+  import { auth } from '@/lib/supabase';
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const authWrapper = document.getElementById('authWrapper');
+    const authLoading = document.getElementById('authLoading');
+    const authForms = document.getElementById('authForms');
+    const dashboardContent = document.getElementById('dashboardContent');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userEmail = document.getElementById('userEmail');
+    const userStatus = document.getElementById('userStatus');
+
+    // Check initial auth state immediately
+    checkAuthState();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session);
+      handleAuthStateChange(event, session);
+    });
+
+    // Logout button
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async function() {
+        try {
+          const { error } = await auth.signOut();
+          if (error) {
+            console.error('Logout error:', error);
+          } else {
+            console.log('Logged out successfully');
+          }
+        } catch (error) {
+          console.error('Logout error:', error);
+        }
+      });
+    }
+
+    async function checkAuthState() {
+      try {
+        const { user, error } = await auth.getCurrentUser();
+        if (error) {
+          console.error('Error getting current user:', error);
+          showAuthForms();
+        } else if (user) {
+          showDashboard(user);
+        } else {
+          showAuthForms();
+        }
+      } catch (error) {
+        console.error('Error checking auth state:', error);
+        showAuthForms();
+      }
+    }
+
+    function handleAuthStateChange(event: string, session: any) {
+      console.log('Auth state changed:', event, session);
+      if (event === 'SIGNED_IN' && session?.user) {
+        showDashboard(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        showAuthForms();
+      }
+    }
+
+    function showDashboard(user: any) {
+      if (authLoading) authLoading.classList.add('hidden');
+      if (authForms) authForms.classList.add('hidden');
+      if (dashboardContent) dashboardContent.classList.remove('hidden');
+      
+      // Update user info
+      if (userEmail) userEmail.textContent = user.email;
+      if (userStatus) userStatus.textContent = user.email_confirmed_at ? 'Email verified' : 'Account active';
+    }
+
+    function showAuthForms() {
+      if (authLoading) authLoading.classList.add('hidden');
+      if (authForms) authForms.classList.remove('hidden');
+      if (dashboardContent) dashboardContent.classList.add('hidden');
+    }
+  });
+</script> 

@@ -1,13 +1,11 @@
 ---
 import Base from "@/layouts/Base.astro";
+import AuthWrapper from "@/components/auth/AuthWrapper.astro";
 import { siteConfig } from "@/site.config";
 ---
 
 <Base meta={{ title: "Dashboard", description: "Dashboard overview" }}>
-	<main class="prose prose-lg">
-		<h1>Dashboard</h1>
-		<p class="text-lg text-accent/80">Welcome to your dashboard. Get an overview of your activities and important information at a glance.</p>
-		
+	<AuthWrapper>
 		<!-- Quick Stats Section -->
 		<section class="mt-8">
 			<h2 class="text-xl font-semibold mb-4">Quick Stats</h2>
@@ -135,5 +133,5 @@ import { siteConfig } from "@/site.config";
 				</a>
 			</div>
 		</section>
-	</main>
+	</AuthWrapper>
 </Base> 
