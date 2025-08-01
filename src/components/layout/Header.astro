@@ -2,6 +2,9 @@
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import { menuLinks } from "@/site.config";
 import {siteConfig} from "../../site.config";
+
+// Get the base URL for proper path construction
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <header class="sticky top-0 z-50 w-full bg-global-bg/70 backdrop-blur-md border-b border-accent/10 shadow-sm" id="main-header">
@@ -12,7 +15,7 @@ import {siteConfig} from "../../site.config";
 				<a
 					aria-current={Astro.url.pathname === "/" ? "page" : false}
 					class="flex items-center grayscale hover:filter-none transition-all duration-200"
-					href="/"
+					href={baseUrl}
 				>
 					<svg
 						aria-hidden="true"
@@ -50,7 +53,7 @@ import {siteConfig} from "../../site.config";
 							aria-current={Astro.url.pathname === link.path ? "page" : false}
 							class="nav-link relative text-accent transition-all duration-300 group"
 							data-astro-prefetch
-							href={link.path}
+							href={`${baseUrl}${link.path.replace(/^\//, '')}`}
 						>
 							{link.title}
 							<div class="nav-link-lines">
@@ -66,7 +69,7 @@ import {siteConfig} from "../../site.config";
 			<div class="flex items-center space-x-4">
 				<!-- Accounts Icon -->
 				<a
-					href="/accounts"
+					href={`${baseUrl}accounts`}
 					class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-accent/10 transition-colors duration-200"
 					aria-label="Accounts"
 				>
@@ -121,7 +124,7 @@ import {siteConfig} from "../../site.config";
 							aria-current={Astro.url.pathname === link.path ? "page" : false}
 							class="nav-link-mobile relative px-4 py-2 text-accent hover:bg-accent/5 rounded-md transition-all duration-300 group"
 							data-astro-prefetch
-							href={link.path}
+							href={`${baseUrl}${link.path.replace(/^\//, '')}`}
 						>
 							{link.title}
 							<div class="nav-link-lines-mobile">
