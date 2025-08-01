@@ -102,6 +102,13 @@ import SignupForm from "./SignupForm.astro";
 
     async function checkAuthState() {
       try {
+        // Check if Supabase is available
+        if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
+          console.warn('Supabase not configured, showing auth forms');
+          showAuthForms();
+          return;
+        }
+
         const { user, error } = await auth.getCurrentUser();
         if (error) {
           console.error('Error getting current user:', error);
