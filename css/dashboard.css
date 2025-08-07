@@ -1,0 +1,622 @@
+/* dashboard.css */
+
+/* ========================================= */
+/* Global CSS Variables (Custom Properties)  */
+/* Define your theme colors, spacing, etc. here for easy updates */
+/* ========================================= */
+:root {
+    /* Colors - Keeping existing for now as user's latest CSS doesn't use these widely for new elements */
+    --color-background-dark: #1A1A1A;
+    --color-text-light: #e2e8f0; /* Default text color */
+    --color-accent-blue: #60a5fa;
+    --color-card-background: rgba(15, 15, 15, 0.7);
+    --color-modal-background: rgba(15, 15, 15, 0.9); /* From user's latest CSS */
+    --color-border-dark: #333; /* Used in old ephemeral, re-evaluate */
+    --color-list-background: #2a2a2a; /* Specific background for file list */
+
+    /* Spacing */
+    --spacing-xs: 5px;
+    --spacing-sm: 8px;
+    --spacing-md: 10px;
+    --spacing-lg: 15px;
+    --spacing-xl: 30px;
+
+    /* Border Radius - Aligning to user's latest values */
+    --border-radius-sm: 0.375rem; /* Consistent with form-control, nav-btn */
+    --border-radius-md: 0.5rem; /* Consistent with general buttons */
+    --border-radius-lg: 0.75rem; /* Consistent with cards/modals */
+
+    /* Font */
+    --font-size-sm: 0.8em; /* For timestamps */
+}
+
+/* General body and text styling for a modern dark theme */
+body {
+  background-color: #1A1A1A; /* User's specified dark background */
+  color: #e2e8f0; /* Light grey text */
+  font-family: 'Inter', inherit; /* Modern sans-serif font */
+}
+
+/* Main sections (setup and dashboard) as smooth cards */
+#setup-section, #main-dashboard {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px 24px; /* Increased top/bottom padding for more vertical space */
+  background-color: rgba(15, 15, 15, 0.7); /* Semi-transparent dark background */
+  border: none; /* Remove explicit border */
+  border-radius: var(--border-radius-lg); /* Large border-radius for smooth cards */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+  display: flex; /* Ensure flex for column layout */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center items horizontally within the card */
+}
+
+/* Header styling */
+h2, h3 {
+  color: #60a5fa; /* Modern blue accent for headers */
+  text-align: center;
+  margin-bottom: 30px; /* Increased margin-bottom for headers for more separation */
+}
+
+/* Input field styling for modern look */
+.form-control {
+  background-color: #2b3a4a; /* Darker grey for input background, slightly lighter than card */
+  border: 1px solid #475569; /* Subtle border */
+  color: #e2e8f0; /* Light text for input */
+  text-align: center;
+  padding: 12px 16px; /* Slightly more vertical padding for better touch targets */
+  width: 100%;
+  border-radius: var(--border-radius-sm); /* Rounded corners for input */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+  margin-bottom: 20px; /* Ensure good spacing below the input field */
+}
+.form-control::placeholder {
+  color: #94a3b8; /* Lighter placeholder color for better contrast */
+}
+
+/* Avatar Selector Styling */
+.avatar-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px; /* Slightly reduced gap for compactness, especially on mobile */
+  margin: 30px 0; /* Adjusted vertical margin for better spacing */
+  width: 100%; /* Ensure it takes full width of its parent */
+}
+
+/* Avatar Wrapper Styling */
+.avatar-wrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 0.5rem; /* Slightly rounded square */
+  border: none; /* No border */
+  background-color: transparent; /* Changed to transparent */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: none;
+  flex-shrink: 0; /* Prevent it from shrinking too much on small screens */
+}
+
+/* Selected state for the wrapper - blue background and border removed */
+.avatar-wrapper.selected {
+  box-shadow: none;
+}
+
+/* Avatar Image Styling (inside the wrapper) */
+.avatar-display {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image fills the space, potentially cropping */
+  object-position: center; /* Centers the image content */
+  image-rendering: pixelated; /* Keep for pixel art avatars */
+}
+
+/* Navigation Buttons */
+.nav-btn {
+  background-color: #2b3a4a; /* Darker grey background, same as input/avatar wrapper */
+  color: #e2e8f0; /* Light text */
+  border: none; /* No border */
+  padding: 10px 15px; /* Adjusted padding for better touch targets */
+  cursor: pointer;
+  font-size: 1.5em; /* Slightly smaller arrows for better fit */
+  line-height: 1;
+  border-radius: var(--border-radius-sm); /* Rounded corners */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  flex-shrink: 0; /* Prevent from shrinking */
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-out, box-shadow 0.2s ease-in-out;
+}
+.nav-btn:hover {
+  background-color: #60a5fa; /* Blue background on hover */
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(96, 165, 250, 0.2), 0 2px 4px -1px rgba(96, 165, 250, 0.1);
+}
+.nav-btn:active {
+  transform: translateY(1px);
+}
+
+/* Bootstrap button overrides for modern look */
+.btn {
+  border-radius: var(--border-radius-md); /* Rounded corners for all buttons */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Subtle shadow */
+  text-shadow: none;
+  padding: 10px 20px;
+  margin: 8px; /* Adjusted margin */
+  transition: all 0.2s ease-in-out;
+  color: white; /* Ensure all buttons have white text by default */
+}
+
+.btn-primary, .btn-success {
+  background-color: #2563eb; /* Blue */
+  border-color: transparent;
+  color: white;
+}
+.btn-primary:hover, .btn-success:hover {
+  background-color: #1d4ed8; /* Darker blue on hover */
+  box-shadow: 0 6px 10px -2px rgba(37, 99, 235, 0.3), 0 3px 5px -1px rgba(37, 99, 235, 0.2);
+}
+
+.btn-warning {
+  background-color: #f97316; /* Orange-red for warning, closer to progress bar */
+  border-color: transparent;
+  color: white;
+}
+.btn-warning:hover {
+  background-color: #ea580c; /* Darker orange-red on hover */
+  box-shadow: 0 6px 10px -2px rgba(249, 115, 22, 0.3), 0 3px 5px -1px rgba(249, 115, 22, 0.2);
+}
+
+.btn-danger {
+  background-color: #ef4444; /* Red */
+  border-color: transparent;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #dc2626; /* Darker red on hover */
+  box-shadow: 0 6px 10px -2px rgba(239, 68, 68, 0.3), 0 3px 5px -1px rgba(239, 68, 68, 0.2);
+}
+
+.btn-secondary { /* Style for Notes, Ephemeral, Password Manager buttons */
+    background-color: #475569; /* Slate grey */
+    border-color: transparent;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #334155; /* Darker slate grey */
+    box-shadow: 0 6px 10px -2px rgba(71, 85, 105, 0.3), 0 3px 5px -1px rgba(71, 85, 105, 0.2);
+}
+
+/* Removed .btn-info styling as it was for the speedtest button */
+
+
+/* Main Dashboard elements */
+#main-dashboard h2, #main-dashboard p {
+  color: #60a5fa; /* Blue for main dashboard text */
+}
+
+.last-login-display {
+    text-align: center;
+    color: #94a3b8; /* Lighter grey color */
+    font-size: 0.9em;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.user-avatar-display {
+  width: 100px;
+  height: 100px;
+  border-radius: 0.5rem; /* Rounded square for main avatar */
+  border: none; /* No border */
+  image-rendering: pixelated; /* Keep for pixel art avatars */
+  object-fit: cover; /* Ensures image fills the space, potentially cropping */
+  object-position: center; /* Centers the image content */
+  margin: 16px auto; /* Adjusted margin and centered */
+  display: block; /* Make it a block element to center with margin: auto */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Subtle shadow */
+}
+
+.dashboard-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Allow buttons to wrap to next line on small screens */
+    justify-content: center; /* Center buttons horizontally */
+    margin-top: 20px;
+}
+
+/* Removed Speedtest Results Display Styling */
+
+/* Modal Styles */
+.modal {
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--color-modal-background); /* Using variable */
+    margin: auto;
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    width: 90%; /* Responsive width */
+    max-width: 400px; /* Max width for desktop */
+    position: relative;
+    z-index: 1000;
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #60a5fa;
+}
+
+.close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* NEW RULE: Ensure button text is white within delete confirmation modals */
+#deleteFileConfirmModal .modal-content button,
+#deleteAccountConfirmModal .modal-content button,
+#deleteNoteConfirmModal .modal-content button, /* NEW */
+#deletePmEntryConfirmModal .modal-content button /* NEW */
+{
+    color: white;
+}
+
+/* NEW RULE: Ensure paragraph text is white within delete confirmation modals */
+#deleteFileConfirmModal .modal-content p,
+#deleteAccountConfirmModal .modal-content p,
+#deleteNoteConfirmModal .modal-content p, /* NEW */
+#deletePmEntryConfirmModal .modal-content p /* NEW */
+{
+    color: white;
+}
+
+
+/* --- Ephemeral Files Section Styling (Magic Design) --- */
+
+/* Custom File Upload Input Wrapper */
+/* This now contains the "Choose File" button, file name display, and "Upload File" button */
+.custom-file-upload {
+    display: flex;
+    flex-direction: column; /* CHANGE: Force column layout for stacking */
+    flex-wrap: wrap; /* Allow items to wrap if needed, although column should prevent this for now */
+    align-items: center; /* Center items horizontally within the column */
+    justify-content: center; /* Vertically center content if there's extra space */
+    gap: 10px; /* Reduced gap for stacked items */
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 30px auto; /* Center container and add bottom margin */
+}
+
+/* Hide the default file input visually */
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+/* Custom "Choose File" button styling - aligned with btn-secondary */
+.custom-file-upload-button {
+    display: inline-block; /* Treat as inline-block to respect flex rules */
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    background-color: #475569;
+    color: white;
+    border: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    flex-shrink: 0; /* Prevent from shrinking */
+    width: 100%; /* Make it take full width of the flex container */
+    max-width: 250px; /* Optional: limit max width even if 100% */
+}
+
+.custom-file-upload-button:hover {
+    background-color: #334155;
+    box-shadow: 0 6px 10px -2px rgba(71, 85, 105, 0.3), 0 3px 5px -1px rgba(71, 85, 105, 0.2);
+}
+
+.custom-file-upload-button:active {
+    transform: translateY(1px);
+}
+
+/* Display for selected file name */
+.file-name-display {
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 5px;
+    min-width: 50px;
+    width: 100%; /* Make it take full width of the flex container */
+    max-width: 250px; /* Optional: limit max width */
+    text-align: center; /* Center text within this element */
+    flex-shrink: 1; /* Allow it to shrink if necessary */
+}
+
+/* The Upload File Button - now a flex item within .custom-file-upload */
+#uploadFileBtn {
+    flex-shrink: 0; /* Prevent from shrinking */
+    width: 100%; /* Make it take full width of the flex container */
+    max-width: 250px; /* Optional: limit max width */
+}
+
+
+/* Styles for the Ephemeral Files List Container */
+#fileListDisplay {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #475569;
+    padding: 15px;
+    border-radius: 0.375rem;
+    background-color: #1f2937;
+    margin-top: 20px;
+    list-style: none;
+    padding-left: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Styling for individual file items (the div.file-item) */
+#fileListDisplay .file-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center; /* Vertically center items */
+    padding: 8px 0;
+    border-bottom: 1px solid #2b3a4a;
+    justify-content: flex-start; /* Align all items to the left */
+}
+
+/* Remove border from the last file item */
+#fileListDisplay .file-item:last-child {
+    border-bottom: none;
+}
+
+/* File name within the list item */
+#fileListDisplay .file-name {
+    color: #a78bfa;
+    flex-grow: 1; /* Allows it to take available space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* File timestamp within the list item */
+#fileListDisplay .file-timestamp {
+    font-size: var(--font-size-sm);
+    color: #94a3b8;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+/* Container for download/delete buttons */
+#fileListDisplay .file-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Specific styling for download button */
+.download-file-action-btn {
+    background-color: #2563eb;
+    border-color: transparent;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.8em;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.download-file-action-btn:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 2px 4px -1px rgba(37, 99, 235, 0.2);
+}
+
+/* Specific styling for delete button */
+.delete-file-btn {
+    background-color: #ef4444;
+    border-color: transparent;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.8em;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.delete-file-btn:hover {
+    background-color: #dc2626;
+    box-shadow: 0 2px 4px -1px rgba(239, 68, 68, 0.2);
+}
+
+/* Notes & Password Manager & Ephemeral File List Display */
+.saved-notes-display, .file-list-display {
+    background-color: #1f2937;
+    border-radius: 0.375rem;
+    padding: 15px;
+    margin-top: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #475569;
+}
+.saved-notes-display p, .file-list-display div {
+    padding: 8px 0;
+    border-bottom: 1px solid #2b3a4a;
+    color: #e2e8f0;
+    word-wrap: break-word;
+}
+.saved-notes-display p:last-child, .file-list-display div:last-child {
+    border-bottom: none;
+}
+.saved-notes-display p strong, .file-list-display div strong {
+    color: #a78bfa;
+}
+.file-list-display button {
+    margin-left: 10px;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+.file-list-display button:hover {
+    background-color: #dc2626;
+}
+
+/* Custom Message Box */
+.custom-message-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    z-index: 10000;
+    text-align: center;
+    font-family: inherit;
+    font-size: 1.1em;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  /* ... (other responsive styles) ... */
+
+  /* Responsive for ephemeral file list items */
+  #fileListDisplay .file-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 8px 0;
+      gap: 5px;
+      justify-items: start;
+  }
+  /* Ensure the filename takes full width and aligns left when stacked */
+  #fileListDisplay .file-name {
+      width: 100%;
+      text-align: left;
+  }
+  /* Align timestamp to the left when stacked */
+  #fileListDisplay .file-timestamp {
+      margin-left: 0;
+      align-self: flex-start;
+  }
+  /* Align action buttons to the left when stacked */
+  #fileListDisplay .file-actions {
+      width: 100%;
+      justify-content: flex-start;
+  }
+
+  /* Responsive for ephemeral file upload - force column layout on smaller screens */
+  .custom-file-upload {
+      flex-direction: column; /* Force column layout on small screens */
+      gap: 10px; /* Reduced gap for stacked items */
+  }
+  .custom-file-upload-button,
+  .file-name-display,
+  #uploadFileBtn { /* Apply width to all elements within the flex container */
+      width: 100%; /* Make them take full width when stacked */
+      text-align: center; /* Center text within these elements when stacked */
+      max-width: none; /* Remove max-width constraint for full width */
+  }
+  .file-name-display {
+    text-align: center; /* Ensure text is centered when stacked */
+  }
+}
+
+/* #fullScreenPenEffect styling (from previous CSS) */
+#fullScreenPenEffect {
+    position: fixed; /* Fixed to the viewport */
+    top: 0;
+    left: 0;
+    width: 100vw; /* 100% of viewport width */
+    height: 100vh; /* 100% of viewport height */
+    z-index: -1; /* Place it behind other content */
+    border: none; /* Remove default iframe border */
+    background-color: #000; /* Fallback background for iframe */
+    pointer-events: none; /* CRUCIAL: Allows clicks/interactions to pass through to elements below */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Hide any overflow from within the iframe's bounds */
+}
+
+/* #deleteAccountConfirmModal .modal-content p styling (from previous CSS) */
+#deleteAccountConfirmModal .modal-content p {
+    color: #ffffff; /* Sets the text color to white */
+}
+
+/* Styles for the language selector to ensure visibility and position (from previous CSS) */
+.language-selector label {
+    color: white; /* Sets the text color to white */
+}
+
+.language-selector select {
+    background-color: #2b3a4a; /* Darker grey from theme, consistent with form-control */
+    border: 1px solid #475569; /* Use a consistent border color */
+    color: #e2e8f0; /* Ensure text is light grey for contrast */
+    padding: 8px 12px; /* Add some padding */
+    border-radius: 0.375rem; /* Rounded corners */
+}
+
+/* Ensure options are readable when the dropdown is open (from previous CSS) */
+.language-selector select option {
+    background-color: #2b3a4a; /* Set option background to match select */
+    color: #e2e8f0; /* Set option text to light grey for readability */
+}
+
+/* Add to dashboard.css if not using Tailwind directly */
+#fileUploadProgressBarContainer {
+    width: 100%; /* Ensure it takes full width within its flex column */
+    max-width: 250px; /* Match other elements' max-width for consistency */
+    display: none; /* Hidden by default */
+}
+#fileUploadProgressBar {
+    height: 100%;
+    width: 0%;
+    background-color: #3b82f6; /* A blue color */
+    border-radius: 9999px; /* Fully rounded */
+    transition: width 0.1s linear; /* Smooth transition for progress */
+}
+#fileUploadProgressText {
+    display: none; /* Hidden by default */
+    text-align: center;
+    color: #94a3b8; /* Light gray text */
+    font-size: 0.875rem; /* Text-sm equivalent */
+    margin-top: 4px; /* mt-1 equivalent */
+}
+
+.confirm-file-deletion-message select option {
+    color : white;
+}

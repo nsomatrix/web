@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>NinjaBase - MODs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/mods.css" rel="stylesheet"> <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/essentials.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <center>
+  <div class="container">
+    <span class="label label-danger">
+      MODs Repository
+    </span>
+    </center>
+
+    <div class="well">
+      <label for="searchInput">Search:</label>
+      <input type="text" id="searchInput" class="form-control" placeholder="Type to filter MODs">
+    </div>
+
+    <div class="alert alert-info">
+      <h4 class="alert-heading">
+        Working MODs are published here. Obsolete MODs will be moved to
+        <a href="https://cloudkore.github.io/matrix/library.html" style="color: red;">Archives</a>
+      </h4>
+    </div>
+
+    <ul id="fileList" class="loading">
+        <li>Loading MODs... <span class="braille-spinner"></span></li>
+    </ul>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/braille-spinner.js"></script> <script src="js/fileList.js"></script>      </body>
+</html>

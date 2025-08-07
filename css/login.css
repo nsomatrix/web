@@ -1,0 +1,178 @@
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+body {
+    display: flex;
+    flex-direction: column; /* Stack children (navbar, main-content, footer) vertically */
+    justify-content: flex-start; /* Align content to the start of the flex container */
+    align-items: stretch; /* Stretch children to fill width */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    background: #111; /* Fallback background, might be covered by iframe */
+    width: 100%;
+    position: relative; /* Establishes a stacking context for its children */
+    z-index: 0; /* Base z-index for the body and its direct children */
+}
+
+/* Full-screen Pen Effect Iframe */
+#fullScreenPenEffect {
+    position: fixed; /* Fixed to the viewport */
+    top: 0;
+    left: 0;
+    width: 100vw; /* 100% of viewport width */
+    height: 100vh; /* 100% of viewport height */
+    z-index: -1; /* Place it behind other content */
+    border: none; /* Remove default iframe border */
+    background-color: #000; /* Fallback background for iframe */
+    pointer-events: none; /* CRUCIAL: Allows clicks/interactions to pass through to elements below */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Hide any overflow from within the iframe's bounds */
+}
+
+/* Ensure navbar is always above the background iframe */
+#navbar-placeholder {
+    position: relative; /* Create a stacking context */
+    z-index: 10; /* Place it above the iframe and main content */
+    /* Add specific styling for the navbar area if not handled by essentials.js */
+}
+
+/* Main content wrapper to center the login form */
+#main-content {
+    flex-grow: 1; /* Allows this div to take up all available vertical space */
+    display: flex;
+    justify-content: center; /* Center the .login form horizontally */
+    align-items: center; /* Center the .login form vertically */
+    width: 100%; /* Ensure it takes full width */
+    padding: 20px 0; /* Add some vertical padding to ensure space for navbar/footer */
+    box-sizing: border-box; /* Include padding in width/height calculations */
+    position: relative; /* Create a stacking context */
+    z-index: 5; /* Place it above the iframe but potentially below navbar/footer */
+    overflow: hidden; /* Hide any content overflow within main-content */
+}
+
+/* Ensure footer is always above the background iframe */
+#footer-placeholder {
+    position: relative; /* Create a stacking context */
+    z-index: 10; /* Place it above the iframe and main content */
+    /* Add specific styling for the footer area if not handled by essentials.js */
+}
+
+.login {
+    width: 90%; /* Make login form responsive */
+    max-width: 380px; /* Max width for desktop, consistent with former ring size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px 20px; /* Increased padding for a better card-like feel */
+    box-sizing: border-box;
+    background: rgba(15, 15, 15, 0.8); /* Made semi-transparent (0.8 opacity) */
+    border-radius: 15px; /* Rounded corners for the login form */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
+}
+
+.login h2 {
+    font-size: 2em;
+    color: #fff;
+    margin-bottom: 10px; /* Add some space below the heading */
+}
+
+.login .inputBx {
+    position: relative;
+    width: 100%;
+}
+
+.login .inputBx input {
+    position: relative;
+    width: 100%;
+    padding: 12px 20px;
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 40px;
+    font-size: 1.2em;
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+}
+
+.password-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-container input {
+    padding-right: 50px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.2em;
+    z-index: 2;
+    -webkit-tap-highlight-color: transparent; /* Remove black box on touch */
+}
+
+
+.login .inputBx button {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 40px;
+    font-size: 1.2em;
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.login .inputBx button#loginBtn {
+    background: linear-gradient(45deg, grey, black);
+}
+
+.login .inputBx button#signupBtn {
+    background: linear-gradient(45deg, red, black);
+    margin-top: 10px;
+}
+
+.login .inputBx button:hover {
+    opacity: 0.9;
+}
+
+.login .inputBx input::placeholder {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.login .links {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin-top: 10px;
+}
+
+.login .links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.braille-spinner {
+    display: inline-block;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.d-none {
+    display: none !important;
+}
