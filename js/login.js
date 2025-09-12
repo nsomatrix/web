@@ -144,6 +144,13 @@ async function handleLogin() {
             console.warn("User data (salt/masterPasswordHash) missing for login. Encryption features might require manual unlock.");
         }
 
+        // Set navbar login state
+        if (typeof setNavbarLoginState === 'function') {
+            setNavbarLoginState(true);
+        } else {
+            localStorage.setItem('userLoggedIn', 'true');
+        }
+
         window.location.href = "dashboard.html";
     } catch (err) {
         showMessageBox(err.message, 'error');
@@ -209,6 +216,14 @@ signupBtn.onclick = async () => {
         sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
 
         showMessageBox("Account created successfully! Redirecting to dashboard...", 'success');
+        
+        // Set navbar login state
+        if (typeof setNavbarLoginState === 'function') {
+            setNavbarLoginState(true);
+        } else {
+            localStorage.setItem('userLoggedIn', 'true');
+        }
+        
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1500);
