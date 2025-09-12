@@ -1,0 +1,226 @@
+/* Modern Navbar Styles */
+.navbar {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    min-height: 60px;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+.brand-logo {
+    height: 40px;
+    width: auto;
+    max-width: 120px;
+    filter: drop-shadow(0 0 10px rgba(224, 0, 0, 0.5));
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover .brand-logo {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+}
+
+.navbar-nav > li > a {
+    color: #bbb !important;
+    padding: 20px 15px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+}
+
+.navbar-nav > li > a:hover,
+.navbar-nav > li > a:focus {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.navbar-nav > li.active > a {
+    color: #e00000 !important;
+    background-color: rgba(224, 0, 0, 0.1);
+    text-shadow: 0 0 10px rgba(224, 0, 0, 0.5);
+}
+
+/* Dashboard link special styling */
+.dashboard-link {
+    color: #e00000 !important;
+    font-weight: bold;
+}
+
+.dashboard-link:hover {
+    color: #fff !important;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+/* Dropdown styles */
+.dropdown-menu {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    margin-top: 5px;
+}
+
+.dropdown-menu > li > a {
+    color: #bbb !important;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu > li > a:hover {
+    color: #fff !important;
+    background-color: rgba(224, 0, 0, 0.2);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.dropdown-menu .divider {
+    background-color: #444;
+    margin: 8px 0;
+}
+
+/* Mobile hamburger button */
+.navbar-toggle {
+    border: none;
+    background: transparent;
+    padding: 9px 10px;
+    margin-top: 13px;
+    margin-right: 15px;
+}
+
+.navbar-toggle .icon-bar {
+    background-color: #e00000;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggle:hover .icon-bar {
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.navbar-toggle:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Login link styling */
+.login-link {
+    background: linear-gradient(135deg, #e00000 0%, #ff4444 100%);
+    color: #fff !important;
+    border-radius: 20px;
+    margin: 10px 5px;
+    padding: 8px 16px !important;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.login-link:hover {
+    background: linear-gradient(135deg, #ff4444 0%, #e00000 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(224, 0, 0, 0.4);
+}
+
+
+/* Icons */
+.navbar-nav .fa {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        padding: 10px 15px;
+    }
+    
+    .brand-logo {
+        height: 35px;
+        max-width: 100px;
+    }
+    
+    .navbar-nav > li > a {
+        padding: 15px 20px;
+        border-bottom: 1px solid #333;
+    }
+    
+    .dropdown-menu {
+        position: static;
+        float: none;
+        width: 100%;
+        margin-top: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    .dropdown-menu > li > a {
+        padding: 15px 40px;
+        color: #ccc !important;
+    }
+    
+    .navbar-nav.navbar-right {
+        margin-top: 10px;
+        border-top: 1px solid #333;
+    }
+    
+    .login-link {
+        margin: 5px 20px;
+        text-align: center;
+    }
+}
+
+/* Active page highlighting */
+.navbar-nav > li > a[href*="index.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="dashboard.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="emulators.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="mods.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="gallery.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="library.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="archives.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="docs.html"]:not(.dropdown-toggle),
+.navbar-nav > li > a[href*="login.html"]:not(.dropdown-toggle) {
+    position: relative;
+}
+
+.navbar-nav > li > a[href*="index.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="dashboard.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="emulators.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="mods.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="gallery.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="library.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="archives.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="docs.html"]:not(.dropdown-toggle):after,
+.navbar-nav > li > a[href*="login.html"]:not(.dropdown-toggle):after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #e00000, #ff4444);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar-nav > li > a[href*="index.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="dashboard.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="emulators.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="mods.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="gallery.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="library.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="archives.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="docs.html"]:not(.dropdown-toggle):hover:after,
+.navbar-nav > li > a[href*="login.html"]:not(.dropdown-toggle):hover:after {
+    width: 80%;
+}
