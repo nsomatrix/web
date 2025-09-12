@@ -1,0 +1,183 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #121212; /* Very dark background */
+  color: #E0E0E0; /* Light grey text */
+}
+
+.container {
+  flex: 1;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  background-color: #2E2E2E; /* Primary grey container */
+}
+
+#footer-placeholder {
+  height: 40px;
+  background-color: #121212; /* Match dark background */
+}
+
+/* Danger label - Red accent */
+.label-danger {
+  background-color: #E57373; /* Medium red */
+  padding: 10px 0;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  color: #FFF0F0; /* very light red tinted text */
+}
+
+/* Success label - Green accent */
+.label-success {
+  background-color: #81C784; /* Medium green */
+  padding: 10px 0;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  color: #EDF7ED; /* very light green tinted text */
+}
+
+/* Search bar styling */
+.well {
+  background-color: #4A4A4A; /* Secondary grey background */
+  border: 1px solid #2E2E2E; /* Primary grey border */
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(15, 12, 15, 0.6); /* subtle dark shadow */
+}
+
+.form-control {
+  background-color: #2E2E2E; /* Primary grey */
+  color: #E0E0E0; /* Light text */
+  border: 1px solid #4A4A4A; /* Secondary grey border */
+  border-radius: 5px;
+}
+
+.form-control::placeholder {
+  color: #A0A0A0; /* Muted grey placeholder */
+}
+
+/* Alert Info styling */
+.alert-info {
+  background-color: #2E2E2E; /* Primary grey */
+  border: 1px solid #4A4A4A; /* Secondary grey border */
+  color: #B4B4B4; /* lighter grey text */
+  border-radius: 8px;
+  margin-top: 20px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(15, 12, 15, 0.5);
+}
+
+.alert-heading {
+  color: #E0E0E0; /* Light grey heading */
+  margin-bottom: 10px;
+}
+
+.alert-info a {
+  color: #E57373; /* Red accent link */
+  font-weight: bold;
+}
+
+.alert-info a:hover {
+  color: #B71C1C; /* Dark red on hover */
+}
+
+/* MOD File List styling */
+#fileList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.mod-item {
+  background-color: #2E2E2E; /* Primary grey card */
+  border: 1px solid #4A4A4A; /* Secondary grey border */
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 5px rgba(15, 12, 15, 0.3);
+}
+
+.mod-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(229, 115, 115, 0.5); /* Soft red glow */
+}
+
+.mod-item a {
+  display: block;
+  color: #E0E0E0; /* Light text */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  word-wrap: break-word;
+  outline: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.mod-item a:hover {
+  text-decoration: underline;
+  color: #E57373; /* Red accent on hover */
+}
+
+/* Loading state styling */
+#fileList.loading {
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2em;
+  color: #E57373; /* Red accent loading text */
+}
+
+/* Spinner styling */
+.braille-spinner {
+  font-family: monospace;
+  font-size: 20px;
+  color: #E57373; /* Spinner in red */
+  display: inline-block;
+  white-space: pre;
+  margin-left: 10px;
+  visibility: hidden;
+  width: 20px;
+  text-align: left;
+}
+
+/* When parent is loading, make spinner visible */
+#fileList.loading .braille-spinner {
+  visibility: visible;
+}
+
+/* Spinner in individual download links */
+.mod-item a.downloading .braille-spinner {
+  visibility: visible;
+}
+
+/* Downloading state styling */
+.mod-item a.downloading {
+  background-color: #121212; /* Solid very dark */
+  box-shadow: none;
+}
+
+/* Active click feedback */
+.mod-item a:active {
+  background-color: #121212;
+  box-shadow: none;
+}
+
+/* Success state for links, e.g. after download success */
+.mod-item a.success {
+  background-color: #81C784; /* green accent background */
+  color: #121212; /* dark text for contrast */
+  box-shadow: 0 0 8px #2E7D32; /* subtle green glow */
+}
+
+.mod-item a.success:hover {
+  background-color: #2E7D32; /* dark green hover */
+  color: #E0E0E0; /* light text */
+}

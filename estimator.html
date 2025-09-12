@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NinjaBase Estimators</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/estimator.css" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="tabbable">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#kinsEstimator" data-toggle="tab">KINS ESTIMATOR</a></li>
+            <li><a href="#levelEstimator" data-toggle="tab">LEVEL ESTIMATOR</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="kinsEstimator">
+                <div class="container">
+                    <div class="form-group">
+                        <label for="kinsPerHour">Kins per hour:</label>
+                        <input type="text" id="kinsPerHour" placeholder="Enter Kins per hour">
+                    </div>
+                    <div class="form-group">
+                        <label for="span">Span (days):</label>
+                        <input type="text" id="span" placeholder="Enter span in days">
+                    </div>
+                    <button id="calculateKins" class="btn btn-primary">Calculate</button>
+                    <div class="spinner-container" id="kinsSpinner">
+                        <div class="braille-spinner"></div>
+                    </div>
+                    <div id="kinsResult" class="result-display"></div>
+                </div>
+            </div>
+            <div class="tab-pane" id="levelEstimator">
+                <div class="container">
+                    <div class="form-group">
+                        <label for="currentLevel">Current Level:</label>
+                        <input type="number" id="currentLevel" placeholder="Enter current level">
+                    </div>
+                    <div class="form-group">
+                        <label for="currentExperience">Current Experience (%):</label>
+                        <input type="number" id="currentExperience" placeholder="Enter current experience (%)">
+                    </div>
+                    <div class="form-group">
+                        <label for="experiencePerHour">Experience per Hour (%):</label>
+                        <input type="number" id="experiencePerHour" placeholder="Enter experience per hour (%)">
+                        </div>
+                    <button id="calculateLevel" class="btn btn-primary">Calculate</button>
+                    <div class="spinner-container" id="levelSpinner">
+                        <div class="braille-spinner"></div>
+                    </div>
+                    <div id="levelResult" class="result-display"></div>
+                    <div id="countdownTimer" class="countdown-display"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/essentials.js"></script>
+    <script src="js/estimator.js"></script>
+</body>
+</html>

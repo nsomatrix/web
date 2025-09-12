@@ -1,0 +1,103 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #000000; /* True black background */
+  color: #b33c3c; /* muted dark red text for contrast */
+}
+
+.container {
+  flex: 1;
+  padding-bottom: 60px;
+}
+
+#footer-placeholder {
+  height: 40px;
+  background-color: #000000; /* True black footer */
+}
+
+/* Black frame -> pure black bg, muted red text */
+.black-frame {
+  background-color: #000000;
+  color: #b33c3c;  /* muted dark red */
+  padding: 15px;
+  border-radius: 12px;
+}
+
+/* Emulator card - nearly black bg, subtle dark red borders */
+.emulator-card {
+  background-color: #1a0a0a; /* very dark red-black */
+  color: #cc4c4c;
+  border: 1px solid #660000; /* dark red border */
+  border-radius: 10px;
+  padding: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.emulator-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 12px #a83333; /* subtle glowing red on hover */
+}
+
+/* Info section */
+.emulator-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.emulator-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  filter: drop-shadow(0 0 2px #b33c3c); /* slight red glow shadow */
+}
+
+.emulator-title {
+  font-weight: bold;
+  font-size: 16px;
+  color: #ffffff; /* bright red for title */
+}
+
+.emulator-version {
+  font-size: 13px;
+  color: #a83333; /* darker red */
+}
+
+/* Download button */
+.btn-download {
+  display: inline-block;
+  background-color: #660000; /* dark red */
+  color: #ffb3b3; /* pale red */
+  padding: 5px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 0 5px #660000;
+}
+
+.btn-download:hover {
+  background-color: #330000; /* almost black red */
+  color: #ffb3b3;
+  box-shadow: 0 0 10px #aa2222;
+}
+
+./* Braille spinner */
+.braille-spinner {
+  font-family: monospace;
+  font-size: 20px;
+  color: #000000; /* black - invisible on black bg */
+  display: inline-block;
+  white-space: pre;
+  margin-left: 10px;
+  visibility: hidden;
+  width: 20px;
+  text-align: left;
+}
+
+/* Spinner visible when loading */
+.btn-download.loading .braille-spinner {
+  visibility: visible;
+  color: #ffffff;  /* bright red/pink so visible on black */
+}
