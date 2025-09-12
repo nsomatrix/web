@@ -63,6 +63,19 @@
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
+/* Navbar right alignment */
+.navbar-nav.navbar-right {
+    display: flex !important;
+    align-items: center !important;
+    height: 50px !important;
+}
+
+.navbar-nav.navbar-right > li {
+    display: flex !important;
+    align-items: center !important;
+    height: 50px !important;
+}
+
 .navbar-nav > li.active > a {
     color: #e00000 !important;
     background-color: rgba(224, 0, 0, 0.1);
@@ -137,10 +150,16 @@
     background: linear-gradient(135deg, #e00000 0%, #ff4444 100%);
     color: #fff !important;
     border-radius: 20px;
-    margin: 10px 5px;
+    margin: 0 !important;
     padding: 8px 16px !important;
     font-weight: bold;
     transition: all 0.3s ease;
+    line-height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 34px !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
 }
 
 .login-link:hover {
@@ -183,6 +202,13 @@
     .navbar-collapse {
         height: auto !important;
         max-height: none !important;
+    }
+    
+    .login-link {
+        margin: 5px 20px;
+        text-align: center;
+        justify-content: center !important;
+        height: 40px !important;
     }
     
     .dropdown-menu {
