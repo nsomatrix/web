@@ -86,10 +86,10 @@ $('.login-link').click(function() {
 if ($(window).width() > 768) {
     $('.dropdown').hover(
         function() {
-            $(this).find('.dropdown-menu').stop(true, true).slideDown(200);
+            $(this).addClass('open');
         },
         function() {
-            $(this).find('.dropdown-menu').stop(true, true).slideUp(200);
+            $(this).removeClass('open');
         }
     );
 }

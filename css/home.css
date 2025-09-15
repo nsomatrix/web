@@ -124,10 +124,14 @@ body {
 
 .social-icon-link {
     display: inline-block; /* Allows spacing between icons if more are added */
+}
+
+.social-icon {
     transition: transform 0.2s ease-in-out;
 }
 
 .social-icon-link:hover {
+.social-icon-link:hover .social-icon {
     transform: translateY(-3px); /* Lift effect on hover */
 }
 
