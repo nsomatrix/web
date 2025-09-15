@@ -98,7 +98,7 @@ function setButtonLoading(button, isLoading, originalText) {
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"></circle>
                 <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
             </svg>
-            <span style="margin-left: 8px;">${originalText === 'Sign in' ? 'Signing in...' : 'Signing up...'}</span>
+            <span style="margin-left: 8px;">${originalText === 'Sign in' ? 'Signing in' : 'Signing up'}</span>
         `;
         button.disabled = true;
     } else {
@@ -163,7 +163,7 @@ async function handleLogin() {
             localStorage.setItem('userLoggedIn', 'true');
         }
 
-        showMessageBox('Login successful! Redirecting...', 'success');
+        showMessageBox('Login successful! Redirecting', 'success');
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
@@ -237,7 +237,7 @@ signupBtn.onclick = async () => {
         const derivedEncryptionKey = await deriveKey(password, userSalt);
         sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
 
-        showMessageBox('Account created successfully! Redirecting...', 'success');
+        showMessageBox('Account created successfully! Redirecting', 'success');
         
         if (typeof setNavbarLoginState === 'function') {
             setNavbarLoginState(true);
