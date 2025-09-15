@@ -99,7 +99,19 @@
     border: 1px solid #444;
     border-radius: 8px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-    margin-top: 5px;
+    margin-top: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.dropdown.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .dropdown-menu > li > a {

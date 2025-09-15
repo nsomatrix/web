@@ -43,7 +43,15 @@ function initSmoothScrolling() {
 
 function initMobileMenuClose() {
     // Close mobile menu when clicking on a link
-    $('.navbar-nav > li > a').click(function() {
+    $('.navbar-nav > li > a:not(.dropdown-toggle)').click(function() {
+        if ($(window).width() < 768) {
+            $('.navbar-collapse').collapse('hide');
+        }
+    });
+    
+    // Close dropdown when clicking dropdown item
+    $('.dropdown-menu > li > a').click(function() {
+        $('.dropdown').removeClass('open');
         if ($(window).width() < 768) {
             $('.navbar-collapse').collapse('hide');
         }
@@ -82,14 +90,33 @@ $('.login-link').click(function() {
     }, 2000);
 });
 
-// Dropdown hover effect for desktop
+// Industry standard dropdown behavior
 if ($(window).width() > 768) {
+    let hoverTimeout;
+    
     $('.dropdown').hover(
         function() {
+            clearTimeout(hoverTimeout);
             $(this).addClass('open');
         },
         function() {
-            $(this).removeClass('open');
+            const $dropdown = $(this);
+            hoverTimeout = setTimeout(function() {
+                $dropdown.removeClass('open');
+            }, 300);
+        }
+    );
+    
+    // Keep dropdown open when hovering over menu items
+    $('.dropdown-menu').hover(
+        function() {
+            clearTimeout(hoverTimeout);
+        },
+        function() {
+            const $dropdown = $(this).closest('.dropdown');
+            hoverTimeout = setTimeout(function() {
+                $dropdown.removeClass('open');
+            }, 300);
         }
     );
 }
