@@ -91,35 +91,43 @@ $('.login-link').click(function() {
 });
 
 // Industry standard dropdown behavior
-if ($(window).width() > 768) {
-    let hoverTimeout;
-    
-    $('.dropdown').hover(
-        function() {
-            clearTimeout(hoverTimeout);
-            $(this).addClass('open');
-        },
-        function() {
-            const $dropdown = $(this);
-            hoverTimeout = setTimeout(function() {
-                $dropdown.removeClass('open');
-            }, 300);
-        }
-    );
-    
-    // Keep dropdown open when hovering over menu items
-    $('.dropdown-menu').hover(
-        function() {
-            clearTimeout(hoverTimeout);
-        },
-        function() {
-            const $dropdown = $(this).closest('.dropdown');
-            hoverTimeout = setTimeout(function() {
-                $dropdown.removeClass('open');
-            }, 300);
-        }
-    );
+function initDropdownHover() {
+    if ($(window).width() > 768) {
+        let hoverTimeout;
+        
+        $('.dropdown').off('mouseenter mouseleave').hover(
+            function() {
+                clearTimeout(hoverTimeout);
+                $('.dropdown').removeClass('open');
+                $(this).addClass('open');
+            },
+            function() {
+                const $dropdown = $(this);
+                hoverTimeout = setTimeout(function() {
+                    $dropdown.removeClass('open');
+                }, 300);
+            }
+        );
+        
+        $('.dropdown-menu').off('mouseenter mouseleave').hover(
+            function() {
+                clearTimeout(hoverTimeout);
+            },
+            function() {
+                const $dropdown = $(this).closest('.dropdown');
+                hoverTimeout = setTimeout(function() {
+                    $dropdown.removeClass('open');
+                }, 300);
+            }
+        );
+    } else {
+        $('.dropdown').off('mouseenter mouseleave');
+        $('.dropdown-menu').off('mouseenter mouseleave');
+    }
 }
+
+initDropdownHover();
+$(window).resize(initDropdownHover);
 
 // Add navbar padding to body to account for fixed navbar
 $(document).ready(function() {
