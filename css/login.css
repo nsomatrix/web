@@ -1,4 +1,4 @@
-{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -7,14 +7,14 @@
 
 body {
     display: flex;
-    flex-direction: column; /* Stack children (navbar, main-content, footer) vertically */
-    justify-content: flex-start; /* Align content to the start of the flex container */
-    align-items: stretch; /* Stretch children to fill width */
-    min-height: 100vh; /* Ensure body takes full viewport height */
-    background: #111; /* Fallback background, might be covered by iframe */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     width: 100%;
-    position: relative; /* Establishes a stacking context for its children */
-    z-index: 0; /* Base z-index for the body and its direct children */
+    position: relative;
+    z-index: 0;
 }
 
 /* Full-screen Pen Effect Iframe */
@@ -62,24 +62,41 @@ body {
 }
 
 .login {
-    width: 90%; /* Make login form responsive */
-    max-width: 380px; /* Max width for desktop, consistent with former ring size */
+    width: 90%;
+    max-width: 420px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap: 20px;
-    padding: 40px 20px; /* Increased padding for a better card-like feel */
+    gap: 24px;
+    padding: 48px 32px;
     box-sizing: border-box;
-    background: rgba(15, 15, 15, 0.8); /* Made semi-transparent (0.8 opacity) */
-    border-radius: 15px; /* Rounded corners for the login form */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .login h2 {
-    font-size: 2em;
-    color: #fff;
-    margin-bottom: 10px; /* Add some space below the heading */
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-align: center;
+    letter-spacing: -0.025em;
 }
 
 .login .inputBx {
@@ -90,14 +107,25 @@ body {
 .login .inputBx input {
     position: relative;
     width: 100%;
-    padding: 12px 20px;
-    background: transparent;
-    border: 2px solid #fff;
-    border-radius: 40px;
-    font-size: 1.2em;
-    color: #fff;
-    box-shadow: none;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #ffffff;
     outline: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.login .inputBx input:focus {
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.login .inputBx input:hover {
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .password-input-container {
@@ -111,45 +139,86 @@ body {
 
 .toggle-password {
     position: absolute;
-    right: 15px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 1.2em;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
     z-index: 2;
-    -webkit-tap-highlight-color: transparent; /* Remove black box on touch */
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.toggle-password:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 
 .login .inputBx button {
     width: 100%;
-    padding: 12px 20px;
-    border-radius: 40px;
-    font-size: 1.2em;
-    color: #fff;
-    box-shadow: none;
-    outline: none;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    outline: none;
 }
 
 .login .inputBx button#loginBtn {
-    background: linear-gradient(45deg, grey, black);
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.login .inputBx button#loginBtn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+
+.login .inputBx button#loginBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
 .login .inputBx button#signupBtn {
-    background: linear-gradient(45deg, red, black);
-    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    margin-top: 12px;
+    box-shadow: none;
 }
 
-.login .inputBx button:hover {
-    opacity: 0.9;
+.login .inputBx button#signupBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login .inputBx button#signupBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login .inputBx button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .login .inputBx input::placeholder {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
 }
 
 .login .links {
@@ -157,14 +226,21 @@ body {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    margin-top: 10px;
+    justify-content: center;
+    margin-top: 8px;
 }
 
 .login .links a {
-    color: #fff;
+    color: #3b82f6;
     text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.login .links a:hover {
+    color: #2563eb;
+    text-decoration: underline;
 }
 
 .braille-spinner {
@@ -175,4 +251,73 @@ body {
 
 .d-none {
     display: none !important;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Message box animations */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Form validation styles */
+.login .inputBx input.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.login .inputBx input.error:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+    .login {
+        width: 95%;
+        padding: 32px 24px;
+        gap: 20px;
+    }
+    
+    .login h2 {
+        font-size: 1.875rem;
+    }
+    
+    .login .inputBx input {
+        padding: 14px 16px;
+    }
+    
+    .login .inputBx button {
+        padding: 14px 20px;
+    }
 }

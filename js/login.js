@@ -37,7 +37,7 @@ if (togglePassword) {
 }
 
 // --- Utility Functions (for messages and spinners) ---
-function showMessageBox(message, type = 'info', duration = 3000) {
+function showMessageBox(message, type = 'info', duration = 4000) {
     let messageBox = document.getElementById('customMessageBox');
     let messageText = document.getElementById('messageBoxText');
 
@@ -46,19 +46,21 @@ function showMessageBox(message, type = 'info', duration = 3000) {
         messageBox.id = 'customMessageBox';
         messageBox.style.cssText = `
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            top: 20px;
+            right: 20px;
+            background-color: #ffffff;
+            color: #374151;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
             z-index: 10000;
-            text-align: center;
             font-family: inherit;
-            font-size: 1.1em;
-            display: none; /* Hide by default */
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: none;
+            min-width: 300px;
+            border-left: 4px solid #3b82f6;
+            animation: slideInRight 0.3s ease-out;
         `;
         messageText = document.createElement('p');
         messageText.id = 'messageBoxText';
@@ -69,34 +71,40 @@ function showMessageBox(message, type = 'info', duration = 3000) {
     messageText.innerText = message;
     messageBox.style.display = 'block';
 
-    messageBox.style.backgroundColor = '#333';
-    messageBox.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.5)';
     if (type === 'error') {
-        messageBox.style.backgroundColor = '#ef4444';
-        messageBox.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
+        messageBox.style.borderLeftColor = '#ef4444';
+        messageBox.style.color = '#dc2626';
     } else if (type === 'success') {
-        messageBox.style.backgroundColor = '#22c55e';
-        messageBox.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.5)';
+        messageBox.style.borderLeftColor = '#10b981';
+        messageBox.style.color = '#059669';
+    } else {
+        messageBox.style.borderLeftColor = '#3b82f6';
+        messageBox.style.color = '#374151';
     }
 
     setTimeout(() => {
-        messageBox.style.display = 'none';
+        messageBox.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+            messageBox.style.animation = 'slideInRight 0.3s ease-out';
+        }, 300);
     }, duration);
 }
 
-function startBrailleSpinner(span) {
-    const brailleFrames = ['⠁', '⠃', '⠇', '⠧', '⠷', '⠿'];
-    let i = 0;
-    span.style.display = 'inline-block';
-    return setInterval(() => {
-        span.textContent = brailleFrames[i++ % brailleFrames.length];
-    }, 120);
-}
-
-function stopBrailleSpinner(span, intervalId) {
-    clearInterval(intervalId);
-    span.style.display = 'none';
-    span.textContent = '';
+function setButtonLoading(button, isLoading, originalText) {
+    if (isLoading) {
+        button.innerHTML = `
+            <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"></circle>
+                <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+            </svg>
+            <span style="margin-left: 8px;">${originalText === 'Sign in' ? 'Signing in...' : 'Signing up...'}</span>
+        `;
+        button.disabled = true;
+    } else {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
 }
 
 // --- Key Derivation Functions (for Master Password) ---
@@ -117,16 +125,21 @@ async function deriveKey(masterPassword, salt) {
 
 // --- Login Functionality ---
 async function handleLogin() {
-    const spinnerSpan = document.createElement("span");
-    spinnerSpan.className = "braille-spinner";
-    loginBtn.innerHTML = "Logging in ";
-    loginBtn.appendChild(spinnerSpan);
-    loginBtn.disabled = true;
-
-    const intervalId = startBrailleSpinner(spinnerSpan);
-
-    const email = emailInput.value;
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
+
+    // Basic validation
+    if (!email || !password) {
+        showMessageBox('Please fill in all fields', 'error');
+        return;
+    }
+
+    if (!email.includes('@')) {
+        showMessageBox('Please enter a valid email address', 'error');
+        return;
+    }
+
+    setButtonLoading(loginBtn, true, 'Sign in');
 
     try {
         const userCred = await auth.signInWithEmailAndPassword(email, password);
@@ -138,7 +151,6 @@ async function handleLogin() {
 
         if (playerData && playerData.salt && playerData.masterPasswordHash) {
             const derivedEncryptionKey = await deriveKey(password, playerData.salt);
-            // Store the derived key in sessionStorage (dashboard.js will not rely on it for this version)
             sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
         } else {
             console.warn("User data (salt/masterPasswordHash) missing for login. Encryption features might require manual unlock.");
@@ -151,13 +163,22 @@ async function handleLogin() {
             localStorage.setItem('userLoggedIn', 'true');
         }
 
-        window.location.href = "dashboard.html";
+        showMessageBox('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1000);
     } catch (err) {
-        showMessageBox(err.message, 'error');
+        let errorMessage = 'Login failed. Please try again.';
+        if (err.code === 'auth/user-not-found') {
+            errorMessage = 'No account found with this email.';
+        } else if (err.code === 'auth/wrong-password') {
+            errorMessage = 'Incorrect password.';
+        } else if (err.code === 'auth/invalid-email') {
+            errorMessage = 'Invalid email address.';
+        }
+        showMessageBox(errorMessage, 'error');
     } finally {
-        stopBrailleSpinner(spinnerSpan, intervalId);
-        loginBtn.innerHTML = "Sign in";
-        loginBtn.disabled = false;
+        setButtonLoading(loginBtn, false, 'Sign in');
     }
 }
 
@@ -179,24 +200,26 @@ passwordInput.addEventListener("keydown", (event) => {
 
 // --- Signup Functionality ---
 signupBtn.onclick = async () => {
-    const spinnerSpan = document.createElement("span");
-    spinnerSpan.className = "braille-spinner";
-    signupBtn.innerHTML = "Signing up ";
-    signupBtn.appendChild(spinnerSpan);
-    signupBtn.disabled = true;
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
-    const intervalId = startBrailleSpinner(spinnerSpan);
-
-    const email = emailInput.value;
-    const password = passwordInput.value; // This will be the master password
-
-    if (password.length < 8) {
-        showMessageBox("Password must be at least 8 characters long.", "error");
-        stopBrailleSpinner(spinnerSpan, intervalId);
-        signupBtn.innerHTML = "Sign Up";
-        signupBtn.disabled = false;
+    // Validation
+    if (!email || !password) {
+        showMessageBox('Please fill in all fields', 'error');
         return;
     }
+
+    if (!email.includes('@')) {
+        showMessageBox('Please enter a valid email address', 'error');
+        return;
+    }
+
+    if (password.length < 8) {
+        showMessageBox('Password must be at least 8 characters long', 'error');
+        return;
+    }
+
+    setButtonLoading(signupBtn, true, 'Sign Up');
 
     try {
         const userCred = await auth.createUserWithEmailAndPassword(email, password);
@@ -211,13 +234,11 @@ signupBtn.onclick = async () => {
             masterPasswordHash: masterPasswordHash
         });
 
-        // Store the derived key in sessionStorage (dashboard.js will not rely on it for this version)
         const derivedEncryptionKey = await deriveKey(password, userSalt);
         sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
 
-        showMessageBox("Account created successfully! Redirecting to dashboard...", 'success');
+        showMessageBox('Account created successfully! Redirecting...', 'success');
         
-        // Set navbar login state
         if (typeof setNavbarLoginState === 'function') {
             setNavbarLoginState(true);
         } else {
@@ -229,12 +250,17 @@ signupBtn.onclick = async () => {
         }, 1500);
 
     } catch (err) {
-        showMessageBox(err.message, 'error');
-        console.error("Signup error:", err);
+        let errorMessage = 'Account creation failed. Please try again.';
+        if (err.code === 'auth/email-already-in-use') {
+            errorMessage = 'An account with this email already exists.';
+        } else if (err.code === 'auth/weak-password') {
+            errorMessage = 'Password is too weak. Please choose a stronger password.';
+        } else if (err.code === 'auth/invalid-email') {
+            errorMessage = 'Invalid email address.';
+        }
+        showMessageBox(errorMessage, 'error');
     } finally {
-        stopBrailleSpinner(spinnerSpan, intervalId);
-        signupBtn.innerHTML = "Sign Up";
-        signupBtn.disabled = false;
+        setButtonLoading(signupBtn, false, 'Sign Up');
     }
 };
 
