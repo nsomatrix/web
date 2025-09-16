@@ -11,16 +11,38 @@ if(navToggle){
 }
 
 /*=============== REMOVE MENU MOBILE ===============*/
-const navLink = document.querySelectorAll('.nav__link')
+const navLinks = document.querySelectorAll('.nav__link:not(.dropdown-toggle), .dropdown-link')
 
-const linkAction = () =>{
+const closeMenu = () => {
     const navMenu = document.getElementById('nav-menu')
     const navToggle = document.getElementById('nav-toggle')
-    // When we click on each nav__link, we remove the show-menu class
     navMenu.classList.remove('show-menu')
     navToggle.classList.remove('active')
+    dropdowns.forEach(dropdown => dropdown.classList.remove('active'))
 }
-navLink.forEach(n => n.addEventListener('click', linkAction))
+
+navLinks.forEach(link => {
+    link.addEventListener('click', closeMenu)
+})
+
+/*=============== DROPDOWN FUNCTIONALITY ===============*/
+const dropdowns = document.querySelectorAll('.dropdown')
+
+dropdowns.forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle')
+    
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault()
+        dropdown.classList.toggle('active')
+        
+        // Close other dropdowns
+        dropdowns.forEach(other => {
+            if (other !== dropdown) {
+                other.classList.remove('active')
+            }
+        })
+    })
+})
 
 /*=============== ADD BLUR HEADER ===============*/
 const blurHeader = () =>{
@@ -55,13 +77,21 @@ window.addEventListener('scroll', scrollActive)
 /*=============== PAGE-BASED ACTIVE LINK ===============*/
 const setActiveLink = () => {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html'
-    const navLinks = document.querySelectorAll('.nav__link')
+    const navLinks = document.querySelectorAll('.nav__link, .dropdown-link')
+    const dropdowns = document.querySelectorAll('.dropdown')
     
     navLinks.forEach(link => {
         link.classList.remove('active-link')
         const href = link.getAttribute('href')
         if (href === currentPage || (currentPage === '' && href === 'index.html')) {
             link.classList.add('active-link')
+            
+            // If it's a dropdown link, also highlight the parent dropdown
+            const parentDropdown = link.closest('.dropdown')
+            if (parentDropdown) {
+                const dropdownToggle = parentDropdown.querySelector('.dropdown-toggle')
+                dropdownToggle.classList.add('active-link')
+            }
         }
     })
 }

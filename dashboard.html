@@ -14,8 +14,10 @@
     <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
         <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/navbar.css">
 </head>
 <body>
+    <div id="navbar-container"></div>
 
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
 
@@ -180,5 +182,15 @@
     <script type="module" src="js/dashboard-modular.js"></script>
     <script src="js/fileChooser.js"></script>
     <script src="js/footer.js"></script>
+    <script>
+        fetch('assets/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+                const script = document.createElement('script');
+                script.src = 'js/navbar.js';
+                document.head.appendChild(script);
+            });
+    </script>
 </body>
 </html>

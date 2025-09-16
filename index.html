@@ -21,9 +21,11 @@
     <script src="js/essentials.js"></script>
     <script src="js/ut.js"></script>
     <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/navbar.css">
 
 </head>
 <body>
+    <div id="navbar-container"></div>
 
 <div id="bootScreen" class="bootscreen-container">
   <div id="particles-background" class="vertical-centered-box"></div>
@@ -77,5 +79,15 @@
     <script src="js/boot.js"></script>
     <script src="js/challenge-logic.js"></script>
     <script src="js/footer.js"></script>
+    <script>
+        fetch('assets/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+                const script = document.createElement('script');
+                script.src = 'js/navbar.js';
+                document.head.appendChild(script);
+            });
+    </script>
 </body>
 </html>
