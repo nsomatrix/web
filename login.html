@@ -22,13 +22,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/lib-typedarrays.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/pbkdf2.min.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0",
+            authDomain: "nsomatrix-web.firebaseapp.com",
+            projectId: "nsomatrix-web",
+            storageBucket: "nsomatrix-web.firebasestorage.app",
+            messagingSenderId: "320519296982",
+            appId: "1:320519296982:web:1ab1b009aeaf7755b13677",
+            measurementId: "G-GK3J5PZW85"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
+        
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseAnalytics = analytics;
+        window.firebaseConfig = firebaseConfig;
+        
+        // Signal that Firebase is ready
+        window.firebaseReady = true;
+        document.dispatchEvent(new Event('firebaseReady'));
+    </script>
+    <script src="js/env-loader.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
 
     <link rel="stylesheet" href="css/footer.css">
+    <style>
+        #navbar-placeholder {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            min-height: 50px;
+        }
+    </style>
 </head>
 <body>
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
@@ -64,7 +101,7 @@
     <div id="footer-placeholder"></div>
 
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/login.js"></script>
+    <script type="module" src="js/login.js"></script>
     <script src="js/footer.js"></script>
 </body>
 </html>

@@ -1,15 +1,21 @@
 // Navbar Authentication State Management
 let authButton, authIcon, authText;
+let initialized = false;
 
 function initializeNavbarAuth() {
+    if (initialized) return;
+    
     authButton = document.getElementById('auth-button');
     authIcon = document.getElementById('auth-icon');
     authText = document.getElementById('auth-text');
     
     if (!authButton || !authIcon || !authText) {
-        console.warn('Navbar auth elements not found');
+        // Retry after a short delay if elements not found
+        setTimeout(initializeNavbarAuth, 50);
         return;
     }
+    
+    initialized = true;
     
     // Set up click handler
     authButton.addEventListener('click', handleAuthClick);
@@ -20,9 +26,11 @@ function initializeNavbarAuth() {
 
 function checkAuthState() {
     // Check if Firebase is available and user is logged in
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().onAuthStateChanged(function(user) {
-            updateNavbarAuthState(!!user);
+    if (typeof window.firebaseAuth !== 'undefined') {
+        import('https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js').then(({ onAuthStateChanged }) => {
+            onAuthStateChanged(window.firebaseAuth, function(user) {
+                updateNavbarAuthState(!!user);
+            });
         });
     } else {
         // Fallback: check localStorage for auth state
@@ -65,23 +73,25 @@ function handleAuthClick(event) {
 }
 
 function performLogout() {
-    if (typeof firebase !== 'undefined' && firebase.auth) {
+    if (typeof window.firebaseAuth !== 'undefined') {
         // Use Firebase logout
-        firebase.auth().signOut().then(function() {
-            console.log('User signed out successfully');
-            updateNavbarAuthState(false);
-            // Clear any stored auth data
-            localStorage.removeItem('userLoggedIn');
-            sessionStorage.clear();
-            
-            // Redirect to home page
-            window.location.href = 'index.html';
-        }).catch(function(error) {
-            console.error('Error signing out:', error);
-            // Still update UI even if Firebase logout fails
-            updateNavbarAuthState(false);
-            localStorage.removeItem('userLoggedIn');
-            window.location.href = 'index.html';
+        import('https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js').then(({ signOut }) => {
+            signOut(window.firebaseAuth).then(function() {
+                console.log('User signed out successfully');
+                updateNavbarAuthState(false);
+                // Clear any stored auth data
+                localStorage.removeItem('userLoggedIn');
+                sessionStorage.clear();
+                
+                // Redirect to home page
+                window.location.href = 'index.html';
+            }).catch(function(error) {
+                console.error('Error signing out:', error);
+                // Still update UI even if Firebase logout fails
+                updateNavbarAuthState(false);
+                localStorage.removeItem('userLoggedIn');
+                window.location.href = 'index.html';
+            });
         });
     } else {
         // Fallback logout

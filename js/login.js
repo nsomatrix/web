@@ -1,16 +1,22 @@
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyCwEZaP_Oc7MRwfxIXyq0k7sH4LQBEc3YY",
-    authDomain: "matrix-nso.firebaseapp.com",
-    projectId: "matrix-nso",
-    storageBucket: "matrix-nso.firebasestorage.app",
-    messagingSenderId: "32108162722",
-    appId: "1:32108162722:web:7c80d154d4120111c271fb"
-};
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Wait for Firebase to be ready
+let auth, db;
+
+function initializeFirebase() {
+    if (window.firebaseReady && window.firebaseAuth && window.firebaseDb) {
+        auth = window.firebaseAuth;
+        db = window.firebaseDb;
+        return true;
+    }
+    return false;
+}
+
+// Initialize immediately or wait for ready event
+if (!initializeFirebase()) {
+    document.addEventListener('firebaseReady', initializeFirebase);
+}
 
 const loginBtn = document.getElementById("loginBtn");
 const signupBtn = document.getElementById("signupBtn");
@@ -139,14 +145,20 @@ async function handleLogin() {
         return;
     }
 
+    // Ensure Firebase is ready
+    if (!auth || !db) {
+        showMessageBox('Firebase not ready, please try again', 'error');
+        return;
+    }
+
     setButtonLoading(loginBtn, true, 'Sign in');
 
     try {
-        const userCred = await auth.signInWithEmailAndPassword(email, password);
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
 
         // Fetch user's salt to derive encryption key
-        const playerDoc = await db.collection("players").doc(user.uid).get();
+        const playerDoc = await getDoc(doc(db, "players", user.uid));
         const playerData = playerDoc.data();
 
         if (playerData && playerData.salt && playerData.masterPasswordHash) {
@@ -168,6 +180,7 @@ async function handleLogin() {
             window.location.href = "dashboard.html";
         }, 1000);
     } catch (err) {
+        console.error('Login error:', err);
         let errorMessage = 'Login failed. Please try again.';
         if (err.code === 'auth/user-not-found') {
             errorMessage = 'No account found with this email.';
@@ -175,6 +188,13 @@ async function handleLogin() {
             errorMessage = 'Incorrect password.';
         } else if (err.code === 'auth/invalid-email') {
             errorMessage = 'Invalid email address.';
+        } else if (err.code === 'auth/operation-not-allowed') {
+            errorMessage = 'Email/password authentication is not enabled.';
+        } else if (err.code === 'auth/invalid-credential') {
+            errorMessage = 'Invalid credentials. Check your email and password.';
+        } else {
+            console.error('Login error details:', err);
+            errorMessage = 'Login failed. Please check your credentials and try again.';
         }
         showMessageBox(errorMessage, 'error');
     } finally {
@@ -209,7 +229,7 @@ signupBtn.onclick = async () => {
         return;
     }
 
-    if (!email.includes('@')) {
+    if (!email.includes('@') || email.length > 254) {
         showMessageBox('Please enter a valid email address', 'error');
         return;
     }
@@ -219,16 +239,22 @@ signupBtn.onclick = async () => {
         return;
     }
 
+    // Ensure Firebase is ready
+    if (!auth || !db) {
+        showMessageBox('Service not ready, please try again', 'error');
+        return;
+    }
+
     setButtonLoading(signupBtn, true, 'Sign Up');
 
     try {
-        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
 
         const userSalt = generateSalt();
         const masterPasswordHash = (await deriveKey(password, userSalt)).toString(CryptoJS.enc.Hex);
 
-        await db.collection("players").doc(user.uid).set({
+        await setDoc(doc(db, "players", user.uid), {
             level: 1,
             salt: userSalt,
             masterPasswordHash: masterPasswordHash
@@ -250,6 +276,7 @@ signupBtn.onclick = async () => {
         }, 1500);
 
     } catch (err) {
+        console.error('Signup error:', err);
         let errorMessage = 'Account creation failed. Please try again.';
         if (err.code === 'auth/email-already-in-use') {
             errorMessage = 'An account with this email already exists.';
@@ -257,6 +284,11 @@ signupBtn.onclick = async () => {
             errorMessage = 'Password is too weak. Please choose a stronger password.';
         } else if (err.code === 'auth/invalid-email') {
             errorMessage = 'Invalid email address.';
+        } else if (err.code === 'auth/operation-not-allowed') {
+            errorMessage = 'Email/password authentication is not enabled.';
+        } else {
+            console.error('Signup error details:', err);
+            errorMessage = 'Account creation failed. Please try again.';
         }
         showMessageBox(errorMessage, 'error');
     } finally {
@@ -275,15 +307,21 @@ forgotPasswordLink.onclick = (e) => {
         return;
     }
 
+    // Basic email validation
+    if (!email.includes('@') || email.length > 254) {
+        showMessageBox("Please enter a valid email address.", 'error');
+        return;
+    }
+
     showMessageBox("Sending password reset email...");
 
-    auth.sendPasswordResetEmail(email)
+    sendPasswordResetEmail(auth, email)
         .then(() => {
             showMessageBox("Password reset email sent! Check your inbox.", 'success');
             emailInput.value = '';
         })
         .catch((error) => {
-            showMessageBox(`Error: ${error.message}`, 'error');
             console.error("Password reset error:", error);
+            showMessageBox("Failed to send password reset email. Please try again.", 'error');
         });
 };
