@@ -15,8 +15,8 @@ const db = firebase.firestore();
 const storage = firebase.storage(); // Firebase Storage is still here but won't be used for user files
 
 // --- Supabase Configuration ---
-const SUPABASE_URL = 'https://pshuqmmkxmwgmvhuaujn.supabase.co'; // e.g., 'https://abcdefghijk.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaHVxbW1reG13Z212aHVauWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNzI4NDIsImV4cCI6MjA2NDg0ODg0Mn0.SiJ9fEjW-e-x8DOREhuS1snrAe-IuBeE5r3tNzjtPFw'; // e.g., 'eyJ... (public key)'
+const SUPABASE_URL = window.ENV?.SUPABASE_URL || '{{SUPABASE_URL}}';
+const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || '{{SUPABASE_ANON_KEY}}';
 
 // CORRECTED LINE: Access the global 'supabase' object from the window
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
