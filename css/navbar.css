@@ -16,7 +16,7 @@
   --accent-hover: #ff4444;
 
   /*========== Font and typography ==========*/
-  --body-font: "Montserrat Alternates", sans-serif;
+  --body-font: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
   --h1-font-size: 1.5rem;
   --normal-font-size: 0.938rem;
 
@@ -45,8 +45,8 @@
 }
 
 body {
-  font-family: var(--body-font);
-  font-size: var(--normal-font-size);
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 18px;
   font-weight: var(--font-regular);
   padding-top: var(--header-height);
 }
@@ -195,8 +195,9 @@ body {
 .nav__link {
   position: relative;
   color: var(--white-color);
-  font-size: var(--h1-font-size);
+  font-size: 18px;
   font-weight: var(--font-medium);
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
   display: inline-flex;
   align-items: center;
   text-decoration: none;
@@ -358,7 +359,8 @@ body {
   padding: 12px 20px;
   color: var(--white-color);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 18px;
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
   transition: background 0.2s ease;
   min-height: 44px;
 }
