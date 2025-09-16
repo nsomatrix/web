@@ -1,62 +1,60 @@
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="index.html">
-        <img src="data/Pictures/matrix.png" alt="Matrix" class="brand-logo">
-      </a>
+<!--=============== HEADER & NAV ===============-->
+<header class="header" id="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav__logo">
+      <img src="data/Pictures/matrix.png" alt="Matrix Logo" class="brand-logo">
+    </a>
+
+    <div class="nav__menu" id="nav-menu">
+      <ul class="nav__list">
+        <li class="nav__item">
+          <a href="index.html" class="nav__link">
+            <i class="ri-home-line"></i>
+            <span>Home</span>
+          </a>
+        </li>
+
+        <li class="nav__item">
+          <a href="mods.html" class="nav__link">
+            <i class="ri-code-box-line"></i>
+            <span>MODs</span>
+          </a>
+        </li>
+
+        <li class="nav__item">
+          <a href="emulators.html" class="nav__link">
+            <i class="ri-gamepad-line"></i>
+            <span>Emulators</span>
+          </a>
+        </li>
+
+        <li class="nav__item">
+          <a href="gallery.html" class="nav__link">
+            <i class="ri-image-line"></i>
+            <span>Gallery</span>
+          </a>
+        </li>
+
+        <li class="nav__item">
+          <a href="docs.html" class="nav__link">
+            <i class="ri-file-text-line"></i>
+            <span>Docs</span>
+          </a>
+        </li>
+
+        <li class="nav__item">
+          <a href="dashboard.html" class="nav__link auth-link">
+            <i class="ri-dashboard-line"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+      </ul>
     </div>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="navbar-collapse">
-      <ul class="nav navbar-nav">
-        <li class="nav-item">
-          <a href="index.html" class="nav-link">
-            <i class="fa fa-home" aria-hidden="true"></i> Home
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="dashboard.html" class="nav-link dashboard-link">
-            <i class="fa fa-tachometer-alt" aria-hidden="true"></i> Dashboard
-          </a>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-tools" aria-hidden="true"></i> Tools <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="emulators.html"><i class="fa fa-gamepad" aria-hidden="true"></i> Emulators</a></li>
-            <li><a href="mods.html"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> MODs</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="docs.html"><i class="fa fa-book" aria-hidden="true"></i> Documentation</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-folder-open" aria-hidden="true"></i> Library <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="gallery.html"><i class="fa fa-images" aria-hidden="true"></i> Gallery</a></li>
-            <li><a href="library.html"><i class="fa fa-archive" aria-hidden="true"></i> Archives</a></li>
-            <li><a href="archives.html"><i class="fa fa-history" aria-hidden="true"></i> Legacy</a></li>
-          </ul>
-        </li>
-      </ul>
-      
-      <ul class="nav navbar-nav navbar-right">
-        <li class="nav-item">
-          <a href="#" class="nav-link auth-link" id="auth-button">
-            <i class="fa fa-sign-in-alt" aria-hidden="true" id="auth-icon"></i> 
-            <span id="auth-text">Login</span>
-          </a>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
+    <div class="nav__toggle" id="nav-toggle">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </div>
+  </nav>
+</header>

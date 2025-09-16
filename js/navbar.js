@@ -1,140 +1,95 @@
-// Navbar functionality
-$(document).ready(function() {
-    // Set active page based on current URL
-    setActivePage();
-    
-    
-    // Smooth scrolling for anchor links
-    initSmoothScrolling();
-    
-    // Close mobile menu when clicking outside
-    initMobileMenuClose();
-});
+/*=============== SHOW MENU ===============*/
+const navMenu = document.getElementById('nav-menu'),
+      navToggle = document.getElementById('nav-toggle')
 
-function setActivePage() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    
-    // Remove active class from all nav items
-    $('.navbar-nav > li').removeClass('active');
-    
-    // Add active class to current page
-    $('.navbar-nav > li > a[href*="' + currentPage + '"]').parent().addClass('active');
-    
-    // Special handling for dropdown items
-    if (currentPage === 'emulators.html' || currentPage === 'mods.html' || currentPage === 'docs.html') {
-        $('.navbar-nav > li.dropdown:first').addClass('active');
-    } else if (currentPage === 'gallery.html' || currentPage === 'library.html' || currentPage === 'archives.html') {
-        $('.navbar-nav > li.dropdown:last').addClass('active');
-    }
+/* Menu toggle */
+if(navToggle){
+    navToggle.addEventListener('click', () =>{
+        navMenu.classList.toggle('show-menu')
+        navToggle.classList.toggle('active')
+    })
 }
 
+/*=============== REMOVE MENU MOBILE ===============*/
+const navLink = document.querySelectorAll('.nav__link')
 
-function initSmoothScrolling() {
-    $('a[href^="#"]').click(function(e) {
-        e.preventDefault();
-        const target = $(this.getAttribute('href'));
-        if (target.length) {
-            $('html, body').animate({
-                scrollTop: target.offset().top - 70
-            }, 500);
+const linkAction = () =>{
+    const navMenu = document.getElementById('nav-menu')
+    const navToggle = document.getElementById('nav-toggle')
+    // When we click on each nav__link, we remove the show-menu class
+    navMenu.classList.remove('show-menu')
+    navToggle.classList.remove('active')
+}
+navLink.forEach(n => n.addEventListener('click', linkAction))
+
+/*=============== ADD BLUR HEADER ===============*/
+const blurHeader = () =>{
+    const header = document.getElementById('header')
+    // Add a class if the bottom offset is greater than 50 of the viewport
+    this.scrollY >= 50 ? header.classList.add('scroll-header') 
+                       : header.classList.remove('scroll-header')
+}
+window.addEventListener('scroll', blurHeader)
+
+/*=============== HIGHLIGHT ACTIVE LINK ===============*/
+const sections = document.querySelectorAll('section[id]')
+
+const scrollActive = () =>{
+    const scrollDown = window.scrollY
+
+    sections.forEach(current =>{
+        const sectionHeight = current.offsetHeight,
+              sectionTop = current.offsetTop - 58,
+              sectionId = current.getAttribute('id'),
+              sectionsClass = document.querySelector('.nav__menu a[href*=' + sectionId + ']')
+
+        if(scrollDown > sectionTop && scrollDown <= sectionTop + sectionHeight){
+            sectionsClass?.classList.add('active-link')
+        }else{
+            sectionsClass?.classList.remove('active-link')
+        }                                                    
+    })
+}
+window.addEventListener('scroll', scrollActive)
+
+/*=============== PAGE-BASED ACTIVE LINK ===============*/
+const setActiveLink = () => {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html'
+    const navLinks = document.querySelectorAll('.nav__link')
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active-link')
+        const href = link.getAttribute('href')
+        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+            link.classList.add('active-link')
         }
-    });
+    })
 }
 
-function initMobileMenuClose() {
-    // Close mobile menu when clicking on a link
-    $('.navbar-nav > li > a:not(.dropdown-toggle)').click(function() {
-        if ($(window).width() < 768) {
-            $('.navbar-collapse').collapse('hide');
+// Set active link on page load
+document.addEventListener('DOMContentLoaded', setActiveLink)
+
+/*=============== SMOOTH SCROLLING FOR ANCHOR LINKS ===============*/
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault()
+        const target = document.querySelector(this.getAttribute('href'))
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            })
         }
-    });
+    })
+})
+
+/*=============== NAVBAR ANIMATION ON LOAD ===============*/
+window.addEventListener('load', () => {
+    const header = document.getElementById('header')
+    header.style.transform = 'translateY(-100%)'
+    header.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
     
-    // Close dropdown when clicking dropdown item
-    $('.dropdown-menu > li > a').click(function() {
-        $('.dropdown').removeClass('open');
-        if ($(window).width() < 768) {
-            $('.navbar-collapse').collapse('hide');
-        }
-    });
-    
-    // Close mobile menu when clicking outside
-    $(document).click(function(e) {
-        if (!$(e.target).closest('.navbar').length) {
-            $('.navbar-collapse').collapse('hide');
-        }
-    });
-}
-
-// Navbar scroll effect
-$(window).scroll(function() {
-    const navbar = $('.navbar');
-    if ($(window).scrollTop() > 50) {
-        navbar.addClass('navbar-scrolled');
-    } else {
-        navbar.removeClass('navbar-scrolled');
-    }
-});
-
-// Add loading state to login link
-$('.login-link').click(function() {
-    const $this = $(this);
-    const originalText = $this.html();
-    
-    $this.html('<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...');
-    
-    // Reset after 2 seconds if still on same page
-    setTimeout(function() {
-        if ($this.is(':visible')) {
-            $this.html(originalText);
-        }
-    }, 2000);
-});
-
-// Industry standard dropdown behavior
-function initDropdownHover() {
-    if ($(window).width() > 768) {
-        let hoverTimeout;
-        
-        $('.dropdown').off('mouseenter mouseleave').hover(
-            function() {
-                clearTimeout(hoverTimeout);
-                $('.dropdown').removeClass('open');
-                $(this).addClass('open');
-            },
-            function() {
-                const $dropdown = $(this);
-                hoverTimeout = setTimeout(function() {
-                    $dropdown.removeClass('open');
-                }, 300);
-            }
-        );
-        
-        $('.dropdown-menu').off('mouseenter mouseleave').hover(
-            function() {
-                clearTimeout(hoverTimeout);
-            },
-            function() {
-                const $dropdown = $(this).closest('.dropdown');
-                hoverTimeout = setTimeout(function() {
-                    $dropdown.removeClass('open');
-                }, 300);
-            }
-        );
-    } else {
-        $('.dropdown').off('mouseenter mouseleave');
-        $('.dropdown-menu').off('mouseenter mouseleave');
-    }
-}
-
-initDropdownHover();
-$(window).resize(initDropdownHover);
-
-// Add navbar padding to body to account for fixed navbar
-$(document).ready(function() {
-    $('body').css('padding-top', $('.navbar').outerHeight() + 'px');
-});
-
-// Update navbar padding on window resize
-$(window).resize(function() {
-    $('body').css('padding-top', $('.navbar').outerHeight() + 'px');
-});
+    setTimeout(() => {
+        header.style.transform = 'translateY(0)'
+    }, 100)
+})

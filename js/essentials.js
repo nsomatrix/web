@@ -39,30 +39,15 @@
     // Initialize all components
     async function init() {
         try {
-            // Load navbar and footer in parallel
-            const [navbarHtml, footerHtml] = await Promise.all([
-                loadComponent('assets/navbar.html'),
-                loadComponent('assets/footer.html')
-            ]);
+            // Load footer only
+            const footerHtml = await loadComponent('assets/footer.html');
             
             // Insert content
-            const navbar = document.getElementById('navbar-placeholder');
             const footer = document.getElementById('footer-placeholder');
-            
-            if (navbar && navbarHtml) {
-                navbar.innerHTML = navbarHtml;
-                navbar.style.opacity = '1';
-            }
             
             if (footer && footerHtml) {
                 footer.innerHTML = footerHtml;
             }
-            
-            // Load scripts in parallel after DOM is ready
-            await Promise.all([
-                loadScript('js/navbar.js'),
-                loadScript('js/navbar-auth.js')
-            ]);
             
         } catch (error) {
             console.error('Component initialization failed:', error);

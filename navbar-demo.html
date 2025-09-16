@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassomorphism Navbar Demo - Matrix-WEB</title>
+    
+    <!-- Navbar CSS -->
+    <link rel="stylesheet" href="css/navbar.css">
+    
+    <!-- Demo styles -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a0a0a 100%);
+            min-height: 100vh;
+            margin: 0;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+        
+        .demo-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-section {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1, h2 {
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-list li:before {
+            content: "✨";
+            margin-right: 0.5rem;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .demo-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <div class="demo-content">
+        <div class="demo-section">
+            <h1>🚀 Fresh Mobile-First Glassomorphism Navbar</h1>
+            <p>This is your new navbar with cutting-edge design and perfect mobile responsiveness!</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>✨ Key Features</h2>
+            <ul class="feature-list">
+                <li>Mobile-first responsive design</li>
+                <li>Glassomorphism effects with backdrop blur</li>
+                <li>Smooth animations and transitions</li>
+                <li>Active link highlighting</li>
+                <li>Scroll-based header styling</li>
+                <li>Touch-friendly mobile menu</li>
+                <li>Hover effects with icon animations</li>
+                <li>Perfect integration with your Matrix theme</li>
+            </ul>
+        </div>
+
+        <div class="demo-grid">
+            <div class="demo-card">
+                <h3>📱 Mobile Experience</h3>
+                <p>Tap the menu button to see the full-screen mobile navigation with smooth slide animations.</p>
+            </div>
+            
+            <div class="demo-card">
+                <h3>🎨 Glass Effects</h3>
+                <p>Beautiful backdrop blur and transparency effects that work across all modern browsers.</p>
+            </div>
+            
+            <div class="demo-card">
+                <h3>⚡ Performance</h3>
+                <p>Optimized CSS with hardware acceleration for smooth 60fps animations.</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 How to Integrate</h2>
+            <p>To add this navbar to any of your pages, simply include these three lines in your HTML:</p>
+            <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto;">
+&lt;link rel="stylesheet" href="css/navbar.css"&gt;
+&lt;div id="navbar-placeholder"&gt;&lt;/div&gt;
+&lt;script src="js/navbar.js"&gt;&lt;/script&gt;</pre>
+        </div>
+
+        <!-- Add some content to test scrolling -->
+        <div class="demo-section">
+            <h2>Scroll Test Section</h2>
+            <p>Scroll up and down to see the navbar blur effect in action!</p>
+        </div>
+        
+        <div style="height: 100vh; display: flex; align-items: center; justify-content: center;">
+            <h2>More content to enable scrolling...</h2>
+        </div>
+    </div>
+
+    <!-- Load navbar and scripts -->
+    <script>
+        // Load navbar HTML
+        fetch('assets/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-placeholder').innerHTML = data;
+                // Load navbar JS after HTML is inserted
+                const script = document.createElement('script');
+                script.src = 'js/navbar.js';
+                document.head.appendChild(script);
+            })
+            .catch(error => console.error('Error loading navbar:', error));
+    </script>
+</body>
+</html>
