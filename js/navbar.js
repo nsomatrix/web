@@ -11,38 +11,45 @@ if(navToggle){
 }
 
 /*=============== REMOVE MENU MOBILE ===============*/
-const navLinks = document.querySelectorAll('.nav__link:not(.dropdown-toggle), .dropdown-link')
-
-const closeMenu = () => {
-    const navMenu = document.getElementById('nav-menu')
-    const navToggle = document.getElementById('nav-toggle')
-    navMenu.classList.remove('show-menu')
-    navToggle.classList.remove('active')
-    dropdowns.forEach(dropdown => dropdown.classList.remove('active'))
+function initMenuClose() {
+    const navLinks = document.querySelectorAll('.nav__link:not(.dropdown-toggle), .dropdown-link')
+    const dropdowns = document.querySelectorAll('.dropdown')
+    
+    const closeMenu = () => {
+        const navMenu = document.getElementById('nav-menu')
+        const navToggle = document.getElementById('nav-toggle')
+        if (navMenu) navMenu.classList.remove('show-menu')
+        if (navToggle) navToggle.classList.remove('active')
+        dropdowns.forEach(dropdown => dropdown.classList.remove('active'))
+    }
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', closeMenu)
+    })
 }
 
-navLinks.forEach(link => {
-    link.addEventListener('click', closeMenu)
-})
-
 /*=============== DROPDOWN FUNCTIONALITY ===============*/
-const dropdowns = document.querySelectorAll('.dropdown')
-
-dropdowns.forEach(dropdown => {
-    const toggle = dropdown.querySelector('.dropdown-toggle')
+function initDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown')
     
-    toggle.addEventListener('click', (e) => {
-        e.preventDefault()
-        dropdown.classList.toggle('active')
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle')
         
-        // Close other dropdowns
-        dropdowns.forEach(other => {
-            if (other !== dropdown) {
-                other.classList.remove('active')
-            }
-        })
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault()
+                dropdown.classList.toggle('active')
+                
+                // Close other dropdowns
+                dropdowns.forEach(other => {
+                    if (other !== dropdown) {
+                        other.classList.remove('active')
+                    }
+                })
+            })
+        }
     })
-})
+}
 
 /*=============== ADD BLUR HEADER ===============*/
 const blurHeader = () =>{
@@ -96,8 +103,24 @@ const setActiveLink = () => {
     })
 }
 
-// Set active link on page load
-document.addEventListener('DOMContentLoaded', setActiveLink)
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    setActiveLink()
+    initDropdowns()
+    initMenuClose()
+})
+
+// Make functions globally accessible
+window.initDropdowns = initDropdowns;
+window.initMenuClose = initMenuClose;
+
+// Fallback initialization after a delay
+setTimeout(() => {
+    if (document.querySelector('.dropdown-toggle')) {
+        initDropdowns();
+        initMenuClose();
+    }
+}, 500);
 
 /*=============== SMOOTH SCROLLING FOR ANCHOR LINKS ===============*/
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {

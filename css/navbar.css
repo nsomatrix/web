@@ -27,7 +27,7 @@
 
   /*========== z index ==========*/
   --z-tooltip: 10;
-  --z-fixed: 100;
+  --z-fixed: 10000;
 }
 
 /*========== Responsive typography ==========*/
@@ -68,7 +68,7 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 8px 32px var(--glass-shadow);
-  z-index: var(--z-fixed);
+  z-index: 10000;
   transition: all 0.3s ease;
 }
 

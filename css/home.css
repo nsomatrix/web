@@ -8,12 +8,13 @@ html, body {
 
 /* General Body Styling (similar to dashboard for consistency) */
 body {
-    background-color: #1A1A1A; /* Dark background - will be covered by iframe */
-    color: #e2e8f0; /* Light grey text */
-    font-family: 'Inter', inherit; /* Fallback to a generic sans-serif */
-    display: flex; /* Use flexbox for overall layout */
-    flex-direction: column; /* Stack content vertically */
-    min-height: 100vh; /* Ensure body takes full viewport height */
+    background-color: #1A1A1A;
+    color: #e2e8f0;
+    font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 0;
 }
 
 /* Full-screen Pen Effect Iframe */
@@ -44,11 +45,11 @@ body {
 }
 
 /* Ensure navbar and footer placeholders have background */
-#navbar-placeholder, #footer-placeholder {
-    background-color: #0F0F0F; /* Or rgba(15, 15, 15, 0.9) if you want slight transparency */
+#navbar-container, #footer-placeholder {
+    background-color: transparent;
     width: 100%;
-    z-index: 15; /* Ensure they are above #main-content */
-    position: relative; /* Needed for z-index */
+    z-index: 5;
+    position: relative;
 }
 
 /* Main container for cards */
