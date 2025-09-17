@@ -1,7 +1,7 @@
 /* Retro Mobile-First Navbar */
 .retro-navbar {
   background-color: #000;
-  border-bottom: 2px solid #0aa;
+  border-bottom: 2px solid #e00;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -22,13 +22,13 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #0aa;
+  color: #e00;
   text-decoration: none;
 }
 
 .brand-logo {
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   object-fit: contain;
 }
 
@@ -44,20 +44,20 @@
   flex-direction: column;
   gap: 0.25rem;
   background: none;
-  border: 2px solid #0aa;
+  border: 2px solid #e00;
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .navbar-toggle:hover {
-  background-color: #0aa;
+  background-color: #e00;
 }
 
 .toggle-line {
   width: 1.5rem;
   height: 2px;
-  background-color: #0aa;
+  background-color: #e00;
   transition: all 0.2s ease;
 }
 
@@ -73,7 +73,7 @@
   left: 0;
   right: 0;
   background-color: #000;
-  border-bottom: 2px solid #0aa;
+  border-bottom: 2px solid #e00;
 }
 
 .navbar-menu.active {
@@ -102,7 +102,7 @@
 }
 
 .nav-link:hover {
-  background-color: #0aa;
+  background-color: #e00;
   color: #000;
 }
 
@@ -121,17 +121,17 @@
 
 .dropdown-link {
   display: block;
-  padding: 0.75rem 2rem;
+  padding: 1rem 2rem;
   color: #bbb !important;
   text-decoration: none;
   border-bottom: 1px solid #222;
   transition: all 0.2s ease;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 
 .dropdown-link:hover {
   background-color: #555;
-  color: #0aa !important;
+  color: #e00 !important;
 }
 
 /* Desktop Styles */
@@ -170,15 +170,16 @@
     top: 100%;
     left: 0;
     background-color: #000;
-    border: 2px solid #0aa;
-    box-shadow: 0 4px 8px rgba(0, 170, 170, 0.2);
+    border: 2px solid #e00;
+    box-shadow: 0 4px 8px rgba(224, 0, 0, 0.2);
     white-space: nowrap;
   }
   
   .dropdown-link {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid #333;
     color: #bbb !important;
+    font-size: 0.875rem;
   }
   
   .dropdown-link:last-child {
