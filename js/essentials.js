@@ -39,15 +39,7 @@
     // Initialize all components
     async function init() {
         try {
-            // Load footer only
-            const footerHtml = await loadComponent('assets/footer.html');
-            
-            // Insert content
-            const footer = document.getElementById('footer-placeholder');
-            
-            if (footer && footerHtml) {
-                footer.innerHTML = footerHtml;
-            }
+            // No components to load
             
         } catch (error) {
             console.error('Component initialization failed:', error);

@@ -17,11 +17,10 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/navbar.css">
+
 </head>
 <body>
-    <div id="navbar-container"></div>
+
 
 
     <div class="main-content-wrapper">
@@ -149,19 +148,9 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
             <li><strong>Cryptographic Libraries (CryptoJS):</strong> Powers the robust encryption and decryption of your sensitive data using AES encryption and PBKDF2 for key derivation.</li>
         </ul>
     </div>
-    <div id="footer-placeholder"></div>
+
 
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/footer.js"></script>
-    <script>
-        fetch('assets/navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('navbar-container').innerHTML = data;
-                const script = document.createElement('script');
-                script.src = 'js/navbar.js';
-                document.head.appendChild(script);
-            });
-    </script>
+
 </body>
 </html>

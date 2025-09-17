@@ -16,11 +16,10 @@
     <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
     <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/navbar.css">
+
 </head>
 <body>
-    <div id="navbar-container"></div>
+
 
 
   <div class="container">
@@ -177,48 +176,10 @@
     </div>
   </div>
 
-  <div id="footer-placeholder"></div>
+
 
   <script src="js/bootstrap.min.js"></script>
   <script src="js/download-handler.js"></script>
-    <script src="js/footer.js"></script>
-    <script>
-        fetch('assets/navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('navbar-container').innerHTML = data;
-                
-                // Direct dropdown handling
-                setTimeout(() => {
-                    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-                        toggle.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            const dropdown = toggle.closest('.dropdown');
-                            dropdown.classList.toggle('active');
-                            
-                            // Close other dropdowns
-                            document.querySelectorAll('.dropdown').forEach(other => {
-                                if (other !== dropdown) other.classList.remove('active');
-                            });
-                        });
-                    });
-                    
-                    // Close menu on link clicks
-                    document.querySelectorAll('.nav__link:not(.dropdown-toggle), .dropdown-link').forEach(link => {
-                        link.addEventListener('click', () => {
-                            const navMenu = document.getElementById('nav-menu');
-                            const navToggle = document.getElementById('nav-toggle');
-                            if (navMenu) navMenu.classList.remove('show-menu');
-                            if (navToggle) navToggle.classList.remove('active');
-                            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
-                        });
-                    });
-                }, 200);
-                
-                const script = document.createElement('script');
-                script.src = 'js/navbar.js';
-                document.head.appendChild(script);
-            });
-    </script>
+
 </body>
 </html>
