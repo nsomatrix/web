@@ -169,10 +169,10 @@
     position: absolute;
     top: 100%;
     left: 0;
-    min-width: 10rem;
     background-color: #000;
     border: 2px solid #0aa;
     box-shadow: 0 4px 8px rgba(0, 170, 170, 0.2);
+    white-space: nowrap;
   }
   
   .dropdown-link {
