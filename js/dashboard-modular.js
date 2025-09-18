@@ -622,6 +622,10 @@ async function loadFilesList() {
 // Authentication state listener
 auth.onAuthStateChanged(async (user) => {
     if (user) {
+        // Set currentUser immediately for managers to use
+        if (authManager) {
+            authManager.currentUser = user;
+        }
         setTimeout(() => {
             setupDashboard(user);
         }, 2000);
