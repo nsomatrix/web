@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/boot.css">
     <link rel="stylesheet" href="css/home.css">
     <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -77,7 +78,8 @@
   </div>
 </div>
 
-
+    <!-- Footer Component -->
+    <div id="footer-container"></div>
 
     <script src="js/bootstrap.min.js"></script>
     <script src="js/boot.js"></script>
@@ -89,10 +91,16 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar-container').innerHTML = html;
-                // Reinitialize navbar after loading
                 new RetroNavbar();
             });
-    </script></script>
+        
+        // Load footer component
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('footer-container').innerHTML = html;
+            });
+    </script>
 
 
 </body>

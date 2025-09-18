@@ -1,0 +1,25 @@
+/* Footer styles */
+.matrix-footer {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  border-top: 1px solid #ff0000;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.matrix-footer p {
+  color: #ff0000;
+  margin: 0;
+  font-size: 0.9rem;
+  text-shadow: 0 0 5px #ff0000;
+}
+
+/* Add bottom padding to body to prevent content overlap */
+body {
+  padding-bottom: 40px;
+}
