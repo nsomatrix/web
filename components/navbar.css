@@ -68,11 +68,21 @@
   }
 }
 
-.nav-auth {
-  display: none;
+@media (max-width: 768px) {
+  .nav-auth {
+    display: none;
+  }
+}
+
+.mobile-only {
+  display: block;
 }
 
 @media (min-width: 769px) {
+  .mobile-only {
+    display: none;
+  }
+  
   .nav-auth {
     display: block;
     flex: 0 0 auto;
