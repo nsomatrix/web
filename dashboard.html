@@ -189,8 +189,11 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar-container').innerHTML = html;
-                new RetroNavbar();
-                new NavbarAuth();
+                // Initialize navbar with delay to ensure DOM is ready
+                setTimeout(() => {
+                    new RetroNavbar();
+                    new NavbarAuth();
+                }, 100);
             });
         
         fetch('components/footer.html')
