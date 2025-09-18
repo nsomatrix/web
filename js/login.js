@@ -168,12 +168,8 @@ async function handleLogin() {
             console.warn("User data (salt/masterPasswordHash) missing for login. Encryption features might require manual unlock.");
         }
 
-        // Set navbar login state
-        if (typeof setNavbarLoginState === 'function') {
-            setNavbarLoginState(true);
-        } else {
-            localStorage.setItem('userLoggedIn', 'true');
-        }
+        // Set login state
+        localStorage.setItem('userLoggedIn', 'true');
 
         showMessageBox('Login successful! Redirecting', 'success');
         setTimeout(() => {
@@ -265,11 +261,7 @@ signupBtn.onclick = async () => {
 
         showMessageBox('Account created successfully! Redirecting', 'success');
         
-        if (typeof setNavbarLoginState === 'function') {
-            setNavbarLoginState(true);
-        } else {
-            localStorage.setItem('userLoggedIn', 'true');
-        }
+        localStorage.setItem('userLoggedIn', 'true');
         
         setTimeout(() => {
             window.location.href = "dashboard.html";
