@@ -1,0 +1,324 @@
+/* Glassomorphism Dashboard CSS - Mobile First */
+:root {
+  --glass-bg: rgba(255, 0, 0, 0.1);
+  --glass-border: rgba(255, 0, 0, 0.3);
+  --glass-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
+  --text-light: #ff0000;
+  --text-dim: rgba(255, 0, 0, 0.7);
+  --accent-red: #ff0000;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: var(--text-light);
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Pen effect background */
+#fullScreenPenEffect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  border: none;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Glass containers */
+#setup-section, #main-dashboard {
+  max-width: 90vw;
+  width: 100%;
+  margin: 80px auto 40px;
+  padding: 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Headers */
+h2, h3 {
+  color: var(--text-light);
+  text-align: center;
+  margin: 0 0 2rem 0;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+/* Form controls */
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-light);
+  padding: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-red);
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+}
+
+.form-control::placeholder {
+  color: var(--text-dim);
+}
+
+/* Avatar system */
+.avatar-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.avatar-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.avatar-display, .user-avatar-display {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar-display {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.nav-btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  color: var(--text-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow);
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Button system */
+.btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-light);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow);
+  min-width: 120px;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.btn-primary, .btn-success {
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.8), rgba(255, 71, 87, 0.6));
+  border-color: var(--accent-red);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.8), rgba(255, 59, 48, 0.6));
+}
+
+/* Dashboard layout */
+.dashboard-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.last-login-display {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Language selector */
+.language-selector {
+  position: static;
+  margin: 1rem 0;
+  text-align: center;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
+}
+
+.language-selector select {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  color: var(--text-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-family: inherit;
+}
+
+.language-selector label {
+  color: var(--text-light);
+  margin-right: 0.5rem;
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
+
+.modal-content {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 90vw;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--glass-shadow);
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  color: var(--text-light);
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  color: var(--accent-red);
+  transform: scale(1.1);
+}
+
+/* File displays */
+.saved-notes-display, .file-list-display {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Custom message box */
+.custom-message-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  z-index: 1100;
+  text-align: center;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Tablet styles */
+@media (min-width: 768px) {
+  #setup-section, #main-dashboard {
+    max-width: 600px;
+    padding: 3rem;
+  }
+  
+  .dashboard-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .avatar-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  #setup-section, #main-dashboard {
+    max-width: 700px;
+  }
+  
+  .dashboard-buttons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .modal-content {
+    max-width: 500px;
+  }
+}
