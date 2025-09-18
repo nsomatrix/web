@@ -44,8 +44,15 @@ export class AuthManager {
             return false;
         }
 
+        // Get current user from Firebase auth if not set
+        const user = this.currentUser || this.auth.currentUser;
+        if (!user) {
+            showMessageBox("message_box_please_login_first", "error", 3000, this.translations);
+            return false;
+        }
+
         try {
-            const playerDocRef = this.db.collection("players").doc(this.currentUser.uid);
+            const playerDocRef = this.db.collection("players").doc(user.uid);
             const playerDoc = await playerDocRef.get();
             const data = playerDoc.data();
 

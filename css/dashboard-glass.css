@@ -1,10 +1,10 @@
 /* Glassomorphism Dashboard CSS - Mobile First */
 :root {
-  --glass-bg: rgba(255, 0, 0, 0.1);
-  --glass-border: rgba(255, 0, 0, 0.3);
-  --glass-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
-  --text-light: #ff0000;
-  --text-dim: rgba(255, 0, 0, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 0, 0, 0.5);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --text-light: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.7);
   --accent-red: #ff0000;
 }
 
