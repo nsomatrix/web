@@ -18,12 +18,19 @@
   height: 60px;
 }
 
-.nav-brand a {
-  color: #ff0000;
-  text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 0 10px #ff0000;
+@media (min-width: 769px) {
+  .nav-container {
+    justify-content: flex-start;
+  }
+}
+
+.nav-logo {
+  height: 40px;
+  width: auto;
+}
+
+.nav-brand {
+  flex: 0 0 auto;
 }
 
 .nav-toggle {
@@ -52,6 +59,40 @@
   margin: 0;
   padding: 0;
   gap: 2rem;
+}
+
+@media (min-width: 769px) {
+  .nav-menu {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.nav-auth {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .nav-auth {
+    display: block;
+    flex: 0 0 auto;
+  }
+  
+  .nav-auth a {
+    color: #ff0000;
+    text-decoration: none;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+  }
+  
+  .nav-auth a:hover {
+    color: #ffffff;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    text-shadow: 0 0 5px #ff0000;
+  }
 }
 
 .nav-menu li a {
