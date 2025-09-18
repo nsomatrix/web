@@ -60,11 +60,13 @@
 
 
 
+    <link rel="stylesheet" href="components/navbar.css">
 </head>
 <body>
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
+
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
-
-
 
     <div id="main-content">
         <div class="login">
@@ -96,6 +98,16 @@
 
     <script src="js/bootstrap.min.js"></script>
     <script type="module" src="js/login.js"></script>
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+    </script></script>
 
 </body>
 </html>

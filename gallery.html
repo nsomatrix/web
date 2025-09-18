@@ -16,10 +16,11 @@
     <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
 
+    <link rel="stylesheet" href="components/navbar.css">
 </head>
 <body>
-
-
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
 
     <div class="container" style="margin-top: 20px;">
         <h2 class="text-center">Gallery</h2>
@@ -86,6 +87,16 @@
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
     <script src="js/supabase-gallery.js"></script>
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+    </script>
 
     <script src="js/bootstrap.min.js"></script>
 

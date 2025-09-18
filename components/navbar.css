@@ -97,11 +97,21 @@
     border: 1px solid transparent;
   }
   
+  .nav-auth a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
   .nav-auth a:hover {
     color: #ffffff;
     background: rgba(255, 0, 0, 0.1);
     border: 1px solid #ff0000;
     text-shadow: 0 0 5px #ff0000;
+  }
+  
+  .nav-auth a svg {
+    flex-shrink: 0;
   }
 }
 

@@ -14,9 +14,11 @@
     <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
 
+    <link rel="stylesheet" href="components/navbar.css">
 </head>
 <body>
-
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
 
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
 
@@ -180,6 +182,16 @@
     <script src="js/essentials.js"></script>
     <script type="module" src="js/dashboard-modular.js"></script>
     <script src="js/fileChooser.js"></script>
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+    </script></script>
 
 </body>
 </html>

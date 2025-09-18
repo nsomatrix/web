@@ -56,7 +56,96 @@ class RetroNavbar {
   }
 }
 
+// Firebase auth state management
+class NavbarAuth {
+  constructor() {
+    this.authLink = document.getElementById('authLink');
+    this.mobileAuthLink = document.getElementById('mobileAuthLink');
+    this.initFirebaseAuth();
+  }
+
+  initFirebaseAuth() {
+    // Check for both Firebase v9 (login.js) and v8 (dashboard.js) setups
+    if (window.firebaseAuth) {
+      this.setupAuthListener(window.firebaseAuth);
+    } else if (window.firebase && window.firebase.auth) {
+      this.setupAuthListener(window.firebase.auth());
+    } else {
+      // Check periodically for Firebase
+      const checkFirebase = setInterval(() => {
+        if (window.firebaseAuth) {
+          clearInterval(checkFirebase);
+          this.setupAuthListener(window.firebaseAuth);
+        } else if (window.firebase && window.firebase.auth) {
+          clearInterval(checkFirebase);
+          this.setupAuthListener(window.firebase.auth());
+        }
+      }, 100);
+    }
+  }
+
+  setupAuthListener(auth) {
+    auth.onAuthStateChanged((user) => {
+      this.updateAuthLinks(user);
+    });
+  }
+
+  updateAuthLinks(user) {
+    const loginSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 17v-3H3v-4h7V7l5 5-5 5M10 2h9a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-2h2v2h9V4h-9v2H8V4a2 2 0 0 1 2-2z"/></svg>';
+    const logoutSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.08 15.59L16.67 13H7v-2h9.67l-2.59-2.59L15.5 7l5 5-5 5-1.42-1.41M19 3a2 2 0 0 1 2 2v4.67l-2-2V5H5v14h14v-2.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z"/></svg>';
+    
+    if (user) {
+      // User is logged in - show LOGOUT
+      if (this.authLink) {
+        this.authLink.innerHTML = logoutSvg + ' LOGOUT';
+        this.authLink.href = '#';
+        this.authLink.onclick = (e) => {
+          e.preventDefault();
+          this.logout();
+        };
+      }
+      if (this.mobileAuthLink) {
+        this.mobileAuthLink.innerHTML = logoutSvg + ' LOGOUT';
+        this.mobileAuthLink.href = '#';
+        this.mobileAuthLink.onclick = (e) => {
+          e.preventDefault();
+          this.logout();
+        };
+      }
+    } else {
+      // User is not logged in - show LOGIN
+      if (this.authLink) {
+        this.authLink.innerHTML = loginSvg + ' LOGIN';
+        this.authLink.href = 'login.html';
+        this.authLink.onclick = null;
+      }
+      if (this.mobileAuthLink) {
+        this.mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
+        this.mobileAuthLink.href = 'login.html';
+        this.mobileAuthLink.onclick = null;
+      }
+    }
+  }
+
+  async logout() {
+    try {
+      // Use the appropriate Firebase auth instance
+      if (window.firebaseAuth) {
+        await window.firebaseAuth.signOut();
+      } else if (window.firebase && window.firebase.auth) {
+        await window.firebase.auth().signOut();
+      }
+      localStorage.removeItem('userLoggedIn');
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  }
+}
+
 // Initialize navbar when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new RetroNavbar();
+  new NavbarAuth();
 });

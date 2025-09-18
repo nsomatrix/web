@@ -18,10 +18,11 @@
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
 
+    <link rel="stylesheet" href="components/navbar.css">
 </head>
 <body>
-
-
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
 
     <div class="main-content-wrapper">
         <p>Welcome to the Matrix™ WEB, your personal, secure space built with privacy, convenience and longevity in mind. Encoded by the tactical world of Ninja School Online, our dashboard provides essential tools to manage your digital space with robust security measures.</p>
@@ -149,6 +150,17 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
         </ul>
     </div>
 
+
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+    </script>
 
     <script src="js/bootstrap.min.js"></script>
 
