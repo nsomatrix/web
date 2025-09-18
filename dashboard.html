@@ -4,7 +4,7 @@
     <title data-translate-key="dashboard_title">NinjaBase Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/dashboard.css" rel="stylesheet">
+    <link href="css/dashboard-clean.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -183,21 +183,24 @@
     <script src="js/essentials.js"></script>
     <script type="module" src="js/dashboard-modular.js"></script>
     <script src="js/fileChooser.js"></script>
-    <script src="components/navbar.js"></script>
     <script>
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar-container').innerHTML = html;
-                // Use the global initialization function
-                if (window.initializeNavbar) {
-                    window.initializeNavbar();
-                } else {
-                    setTimeout(() => {
+                return fetch('components/navbar.js');
+            })
+            .then(response => response.text())
+            .then(jsCode => {
+                eval(jsCode);
+                setTimeout(() => {
+                    const toggle = document.getElementById('navToggle');
+                    const menu = document.getElementById('navMenu');
+                    if (toggle && menu) {
                         new RetroNavbar();
                         new NavbarAuth();
-                    }, 500);
-                }
+                    }
+                }, 100);
             });
         
         fetch('components/footer.html')
@@ -206,6 +209,7 @@
                 document.body.insertAdjacentHTML('beforeend', html);
             });
     </script>
+    <script src="components/navbar.js"></script>
 
 </body>
 </html>

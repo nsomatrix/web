@@ -1,0 +1,232 @@
+/* Clean Dashboard CSS */
+body {
+  background-color: #1A1A1A;
+  color: #e2e8f0;
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+}
+
+/* Pen effect background */
+#fullScreenPenEffect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  border: none;
+  pointer-events: none;
+}
+
+/* Main sections */
+#setup-section, #main-dashboard {
+  max-width: 500px;
+  margin: 80px auto 20px;
+  padding: 2rem;
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid #ff0000;
+  border-radius: 8px;
+  text-align: center;
+  backdrop-filter: blur(5px);
+}
+
+/* Headers */
+h2, h3 {
+  color: #ff0000;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 5px #ff0000;
+}
+
+/* Form controls */
+.form-control {
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid #ff0000;
+  color: #ffffff;
+  padding: 0.75rem;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Avatar selector */
+.avatar-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.avatar-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #ff0000;
+}
+
+.avatar-display, .user-avatar-display {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.nav-btn {
+  background: rgba(20, 20, 20, 0.8);
+  color: #ff0000;
+  border: 1px solid #ff0000;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0.25rem;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-primary, .btn-success {
+  background: #ff0000;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: rgba(100, 100, 100, 0.8);
+  color: #ffffff;
+}
+
+.btn-danger {
+  background: #cc0000;
+  color: #ffffff;
+}
+
+.btn:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+/* Dashboard specific */
+.dashboard-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.last-login-display {
+  color: #cccccc;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+
+/* Language selector */
+.language-selector {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 100;
+}
+
+.language-selector select {
+  background: rgba(20, 20, 20, 0.8);
+  color: #ffffff;
+  border: 1px solid #ff0000;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
+
+.modal-content {
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid #ff0000;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: #ff0000;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* File displays */
+.saved-notes-display, .file-list-display {
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid #ff0000;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Custom message box */
+.custom-message-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid #ff0000;
+  padding: 1rem;
+  border-radius: 8px;
+  z-index: 1100;
+  text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  #setup-section, #main-dashboard {
+    margin: 70px 10px 20px;
+    padding: 1rem;
+  }
+  
+  .language-selector {
+    position: static;
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  .dashboard-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}
