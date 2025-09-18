@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="css/boot.css">
-    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/home-clean.css">
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
 
@@ -51,32 +51,30 @@
 
 
 
-    <center>
-        <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
-    </center>
-    <br>
-    <center>
-        <section class="card-section">
-            <div class="card inception-card">
-                <img src="data/Pictures/matrix.png" alt="Matrix Image" class="card-image">
+    <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
+    
+    <div class="home-container">
+        <div class="hero-section">
+            <img src="data/Pictures/matrix.png" alt="Matrix" class="hero-logo">
+            <h1>Welcome to Matrix</h1>
+            <p>Your secure digital space</p>
+        </div>
+        
+        <div class="stats-card">
+            <div id="ut" class="uptime-display">
+                <span>System Uptime: Loading...</span>
             </div>
-        </section>
-        <br>
-        <section class="card-section">
-            <div id="ut" class="card uptime-card">
-                <p>System Uptime: Loading...</p>
+        </div>
+        
+        <div id="rpg-dialogue-box" class="dialogue-card">
+            <div class="dialogue-avatar">
+                <img src="avatars/Therewasnosorrow.gif" alt="Character">
             </div>
-        </section>
-    </center>
-
-<div id="rpg-dialogue-box" class="dialogue-box">
-  <div class="avatar">
-    <img src="avatars/Therewasnosorrow.gif" alt="Character Avatar" />
-  </div>
-  <div class="dialogue-content">
-    <p id="dialogue-text"></p>
-  </div>
-</div>
+            <div class="dialogue-text">
+                <p id="dialogue-text"></p>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer Component -->
     <div id="footer-container"></div>

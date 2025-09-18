@@ -196,9 +196,7 @@ body {
 }
 
 .dialogue-box {
-  display: flex;
-  /* Vertically center avatar and content */
-  align-items: center; /* This centers items vertically */
+  position: relative;
   background-color: rgba(15, 15, 15, 0.85);
   border: 2px solid #333;
   border-radius: 10px;
@@ -209,18 +207,19 @@ body {
   color: #c0c0c0;
   margin: 20px auto;
   user-select: none;
+  margin-top: 60px;
 }
 
 .dialogue-box .avatar {
-  flex-shrink: 0;
-  width: 50px;   /* bigger container */
-  height: 80px;  /* bigger container */
-  margin-right: 20px;
-  border-radius: 10px;
+  position: absolute;
+  top: -40px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   overflow: hidden;
-  display: flex;           
-  align-items: center;      
-  justify-content: center;  
+  border: 2px solid #333;
+  background-color: rgba(15, 15, 15, 0.9);
 }
 
 .dialogue-box .avatar img {
@@ -231,12 +230,8 @@ body {
 }
 
 .dialogue-content {
-  /* Let the text take full height of avatar and center vertically */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex-grow: 1;
-  min-height: 96px; /* match avatar height */
+  width: 100%;
+  padding-left: 0;
 }
 
 #dialogue-text {
