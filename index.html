@@ -7,6 +7,7 @@
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="css/boot.css">
     <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="components/navbar.css">
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -25,6 +26,8 @@
 
 </head>
 <body>
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
 
 
 
@@ -79,6 +82,17 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/challenge-logic.js"></script>
+    <script src="components/navbar.js"></script>
+    <script>
+        // Load navbar component
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                // Reinitialize navbar after loading
+                new RetroNavbar();
+            });
+    </script></script>
 
 
 </body>

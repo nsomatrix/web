@@ -1,0 +1,122 @@
+.retro-navbar {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  border-bottom: 2px solid #00ff00;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+}
+
+.nav-brand a {
+  color: #00ff00;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px #00ff00;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  justify-content: space-around;
+}
+
+.nav-toggle span {
+  width: 100%;
+  height: 3px;
+  background: #00ff00;
+  transition: 0.3s;
+  box-shadow: 0 0 5px #00ff00;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+}
+
+.nav-menu li a {
+  color: #00ff00;
+  text-decoration: none;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+}
+
+.nav-menu li a:hover {
+  color: #ffffff;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: flex;
+  }
+  
+  .nav-menu {
+    position: fixed;
+    left: -100%;
+    top: 60px;
+    flex-direction: column;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    width: 100%;
+    text-align: center;
+    transition: 0.3s;
+    border-top: 1px solid #00ff00;
+    gap: 0;
+  }
+  
+  .nav-menu.active {
+    left: 0;
+  }
+  
+  .nav-menu li {
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  }
+  
+  .nav-menu li a {
+    padding: 1rem;
+    display: block;
+    width: 100%;
+  }
+  
+  .nav-toggle.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-9px, 6px);
+  }
+  
+  .nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .nav-toggle.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-8px, -8px);
+  }
+}
+
+/* Add padding to body to account for fixed navbar */
+body {
+  padding-top: 60px;
+}
