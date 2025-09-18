@@ -15,6 +15,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
 
     <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
 </head>
 <body>
     <!-- Navbar Component -->
@@ -190,6 +191,12 @@
                 document.getElementById('navbar-container').innerHTML = html;
                 new RetroNavbar();
                 new NavbarAuth();
+            });
+        
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.body.insertAdjacentHTML('beforeend', html);
             });
     </script></script>
 

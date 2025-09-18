@@ -19,6 +19,7 @@
     <script src="js/essentials.js"></script>
 
     <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
 </head>
 <body>
     <!-- Navbar Component -->
@@ -159,6 +160,12 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
                 document.getElementById('navbar-container').innerHTML = html;
                 new RetroNavbar();
                 new NavbarAuth();
+            });
+        
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.body.insertAdjacentHTML('beforeend', html);
             });
     </script>
 
