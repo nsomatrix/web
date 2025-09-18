@@ -65,7 +65,11 @@ class NavbarAuth {
   }
 
   initFirebaseAuth() {
-    // Check for both Firebase v9 (login.js) and v8 (dashboard.js) setups
+    // Check localStorage first for login state
+    const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+    this.updateAuthLinks(isLoggedIn ? { uid: 'user' } : null);
+    
+    // Then setup Firebase listener if available
     if (window.firebaseAuth) {
       this.setupAuthListener(window.firebaseAuth);
     } else if (window.firebase && window.firebase.auth) {
