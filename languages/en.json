@@ -124,5 +124,7 @@
     "unlocking_status": "Unlocking...",
     "message_box_incorrect_password_wait": "Incorrect password. Please wait 30 seconds.",
     "message_box_try_again": "You can try again now.",
-    "message_box_supabase_data_deleted_success": "Account deleted successfully!"
+    "message_box_supabase_data_deleted_success": "Account deleted successfully!",
+    "friends_button": "Friends",
+    "friends_modal_title": "Friends"
 }

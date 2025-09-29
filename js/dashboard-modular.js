@@ -942,6 +942,8 @@ window.sendMessage = function(friendId) {
 
 let currentChatFriend = null;
 
+let messageListener = null;
+
 async function loadMessages(friendId) {
     try {
         // Get friend's username for title
@@ -949,26 +951,27 @@ async function loadMessages(friendId) {
         const friendData = friendDoc.data();
         document.getElementById('messageModalTitle').textContent = `Chat with @${friendData.usernameTag}`;
         
-        // Load messages
-        const messagesSnapshot = await db.collection('messages')
+        // Remove previous listener
+        if (messageListener) {
+            messageListener();
+        }
+        
+        // Set up real-time listener
+        messageListener = db.collection('messages')
             .where('participants', 'array-contains', authManager.currentUser.uid)
-            .get();
+            .orderBy('createdAt', 'asc')
+            .onSnapshot(snapshot => {
+                let chatMessages = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.participants.includes(friendId)) {
+                        chatMessages.push({ id: doc.id, ...data });
+                    }
+                });
+                
+                displayMessages(chatMessages);
+            });
         
-        let chatMessages = [];
-        messagesSnapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.participants.includes(friendId)) {
-                chatMessages.push({ id: doc.id, ...data });
-            }
-        });
-        
-        // Sort by timestamp
-        chatMessages.sort((a, b) => {
-            if (!a.createdAt || !b.createdAt) return 0;
-            return a.createdAt.toMillis() - b.createdAt.toMillis();
-        });
-        
-        displayMessages(chatMessages);
     } catch (error) {
         console.error('Load messages error:', error);
     }
@@ -1018,7 +1021,6 @@ async function sendNewMessage() {
         });
         
         messageInput.value = '';
-        loadMessages(currentChatFriend);
     } catch (error) {
         console.error('Send message error:', error);
         showMessageBox('Failed to send message', 'error', 3000, translations);
