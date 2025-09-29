@@ -141,6 +141,41 @@
   text-shadow: 0 0 10px #ff0000;
 }
 
+.matri-text {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.x-text {
+  color: #ff0000;
+  animation: x-lightning 2s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+  display: inline-block;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.x-text:hover {
+  transform: scale(1.1) rotate(360deg);
+  text-shadow: 0 0 25px rgba(255, 0, 0, 1), 0 0 50px rgba(255, 0, 0, 0.8);
+}
+
+@keyframes x-lightning {
+  0%, 90%, 100% {
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+  }
+  92% {
+    text-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
+  }
+  94% {
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+  }
+  96% {
+    text-shadow: 0 0 35px rgba(255, 255, 255, 1), 0 0 45px rgba(255, 0, 0, 1), 0 0 70px rgba(255, 0, 0, 0.9);
+  }
+}
+
 .hero-section p {
   color: #ffffff;
   font-size: 1rem;
