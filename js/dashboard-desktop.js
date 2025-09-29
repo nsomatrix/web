@@ -38,43 +38,7 @@ class DesktopDashboard {
     }
 
     setupStats() {
-        // Update stats counters
-        this.updateStats();
-        
-        // Update stats periodically
-        setInterval(() => {
-            this.updateStats();
-        }, 30000); // Update every 30 seconds
-    }
-
-    async updateStats() {
-        try {
-            // Get auth manager from global scope
-            if (typeof authManager === 'undefined' || !authManager?.currentUser) {
-                return;
-            }
-            
-            // Notes count from Firestore
-            const notesSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
-                .collection('notes').get();
-            document.getElementById('notesCount').textContent = notesSnapshot.size;
-            
-            // Passwords count from Firestore
-            const passwordsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
-                .collection('passwords').get();
-            document.getElementById('passwordsCount').textContent = passwordsSnapshot.size;
-            
-            // Friends count from Firestore
-            const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
-                .collection('friends').where('status', '==', 'accepted').get();
-            document.getElementById('friendsCount').textContent = friendsSnapshot.size;
-            
-            // Files count from Supabase (placeholder for now)
-            document.getElementById('filesCount').textContent = '0';
-            
-        } catch (error) {
-            console.error('Error updating stats:', error);
-        }
+        // Stats removed
     }
 
     setupResponsive() {
