@@ -310,8 +310,8 @@ body {
 /* Language selector */
 .language-selector {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  bottom: 20px;
+  left: 20px;
   z-index: 1000;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
