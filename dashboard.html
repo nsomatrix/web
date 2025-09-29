@@ -67,6 +67,10 @@
                 <i class="fas fa-envelope" id="messageIcon" title="Messages"></i>
                 <i class="fas fa-bell" id="notificationIcon" title="Notifications"></i>
             </div>
+            <div class="search-container">
+                <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+                <i class="fas fa-search" id="searchIcon"></i>
+            </div>
         </div>
         <h2 class="welcome-message"><span data-translate-key="welcome_message">Welcome,</span> <span id="dashboard-username"></span>!</h2>
         <img id="user-avatar" src="" alt="Avatar" class="user-avatar-display" />
@@ -77,6 +81,7 @@
             <button id="notesBtn" class="btn btn-secondary" data-translate-key="notes_button">Notes</button>
             <button id="passwordManagerBtn" class="btn btn-secondary" data-translate-key="password_manager_button">Password Manager</button>
             <button id="ephemeralFilesBtn" class="btn btn-secondary" data-translate-key="ephemeral_files_button">Ephemeral Files</button>
+            <button id="friendsBtn" class="btn btn-secondary" data-translate-key="friends_button">Friends</button>
             <button id="deleteAccountBtn" class="btn btn-danger mt-3" data-translate-key="delete_account_button">Delete Account</button>
             <button id="logoutBtn" class="btn btn-danger mt-3" data-translate-key="logout_button">Logout</button>
         </div>
@@ -170,6 +175,22 @@
             <p data-translate-key="confirm_delete_account_message">Are you sure you want to delete your account? This action cannot be undone.</p>
             <button id="confirmDeleteAccountBtn" class="btn btn-danger" data-translate-key="yes_delete_account_button">Yes, Delete My Account</button>
             <button id="cancelDeleteAccountBtn" class="btn btn-secondary" data-translate-key="no_keep_account_button">No, Keep My Account</button>
+        </div>
+    </div>
+
+    <div id="friendsModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" data-modal="friendsModal">&times;</span>
+            <h3 data-translate-key="friends_modal_title">Friends</h3>
+            <div id="friendsList" class="friends-list"></div>
+        </div>
+    </div>
+
+    <div id="searchResultsModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" data-modal="searchResultsModal">&times;</span>
+            <h3>Search Results</h3>
+            <div id="searchResults" class="search-results"></div>
         </div>
     </div>
 

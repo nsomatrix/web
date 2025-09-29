@@ -158,6 +158,113 @@ h2, h3 {
   width: 100%;
 }
 
+/* Search container */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.search-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  color: var(--text-light);
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  width: 200px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-red);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+.search-input::placeholder {
+  color: var(--text-dim);
+}
+
+#searchIcon {
+  position: absolute;
+  right: 1rem;
+  color: var(--accent-red);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#searchIcon:hover {
+  color: var(--text-light);
+  transform: scale(1.1);
+}
+
+/* Friends and search results */
+.friends-list, .search-results {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.friend-item, .search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.friend-item:hover, .search-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.friend-info, .search-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+}
+
+.friend-avatar, .search-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.friend-actions, .search-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.friend-actions button, .search-actions button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-friend-btn {
+  background: var(--accent-red);
+  color: white;
+}
+
+.message-btn {
+  background: rgba(59, 130, 246, 0.8);
+  color: white;
+}
+
+.unfriend-btn {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+}
+
 .nav-btn {
   background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.1));
   backdrop-filter: blur(10px);

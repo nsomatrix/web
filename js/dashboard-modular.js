@@ -142,7 +142,7 @@ async function saveProfile(user) {
         await db.collection('players').doc(user.uid).set({
             username: username,
             avatar: selectedAvatar,
-            usernameTag: username,
+            usernameTag: username.toLowerCase(),
             level: data.level || 1
         }, { merge: true });
 
@@ -521,6 +521,23 @@ function setupEventListeners() {
         window.open("https://support.teamobi.com/login-game-3.html", "_blank");
     };
 
+    // Friends button
+    document.getElementById('friendsBtn').onclick = () => {
+        openModal(document.getElementById('friendsModal'));
+        loadFriendsList();
+    };
+
+    // Search functionality
+    document.getElementById('searchIcon').onclick = () => {
+        performUserSearch();
+    };
+
+    document.getElementById('userSearch').onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            performUserSearch();
+        }
+    };
+
     // Modal close buttons
     document.querySelectorAll('.close-button').forEach(button => {
         button.onclick = (e) => {
@@ -710,7 +727,7 @@ function setupUsernameTag(usernameTag, displayName) {
                 if (newUsername && authManager.currentUser) {
                     try {
                         await db.collection('players').doc(authManager.currentUser.uid).update({
-                            usernameTag: newUsername
+                            usernameTag: newUsername.toLowerCase()
                         });
                         usernameTagElement.textContent = `@${newUsername}`;
                         usernameTagElement.classList.remove('editable');
@@ -730,6 +747,124 @@ function setupUsernameTag(usernameTag, displayName) {
             };
         };
     }
+}
+
+// Friends and search functionality
+async function performUserSearch() {
+    const searchTerm = document.getElementById('userSearch').value.trim();
+    if (!searchTerm) return;
+
+    try {
+        const snapshot = await db.collection('players')
+            .where('usernameTag', '>=', searchTerm.toLowerCase())
+            .where('usernameTag', '<=', searchTerm.toLowerCase() + '\uf8ff')
+            .limit(10)
+            .get();
+
+        const results = [];
+        snapshot.forEach(doc => {
+            if (doc.id !== authManager.currentUser.uid) {
+                results.push({ id: doc.id, ...doc.data() });
+            }
+        });
+
+        displaySearchResults(results);
+    } catch (error) {
+        console.error('Search error:', error);
+        showMessageBox('Search failed. Please try again.', 'error', 3000, translations);
+    }
+}
+
+function displaySearchResults(results) {
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
+
+    if (results.length === 0) {
+        searchResults.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No users found</p>';
+    } else {
+        results.forEach(user => {
+            const item = document.createElement('div');
+            item.className = 'search-item';
+            item.innerHTML = `
+                <div class="search-info">
+                    <img src="avatars/${user.avatar}" alt="Avatar" class="search-avatar">
+                    <span>@${user.usernameTag}</span>
+                </div>
+                <div class="search-actions">
+                    <button class="add-friend-btn" onclick="addFriend('${user.id}', '${user.usernameTag}')">Add Friend</button>
+                </div>
+            `;
+            searchResults.appendChild(item);
+        });
+    }
+
+    openModal(document.getElementById('searchResultsModal'));
+}
+
+async function addFriend(friendId, friendUsername) {
+    try {
+        await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').doc(friendId).set({
+                friendId: friendId,
+                username: friendUsername,
+                addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        
+        showMessageBox('Friend added successfully!', 'success', 2000, translations);
+        closeModal(document.getElementById('searchResultsModal'));
+    } catch (error) {
+        console.error('Add friend error:', error);
+        showMessageBox('Failed to add friend', 'error', 3000, translations);
+    }
+}
+
+async function loadFriendsList() {
+    try {
+        const snapshot = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').get();
+
+        const friendsList = document.getElementById('friendsList');
+        friendsList.innerHTML = '';
+
+        if (snapshot.empty) {
+            friendsList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No friends yet</p>';
+        } else {
+            snapshot.forEach(doc => {
+                const friend = doc.data();
+                const item = document.createElement('div');
+                item.className = 'friend-item';
+                item.innerHTML = `
+                    <div class="friend-info">
+                        <span>@${friend.username}</span>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="message-btn" onclick="sendMessage('${friend.friendId}')">Message</button>
+                        <button class="unfriend-btn" onclick="removeFriend('${friend.friendId}')">Unfriend</button>
+                    </div>
+                `;
+                friendsList.appendChild(item);
+            });
+        }
+    } catch (error) {
+        console.error('Load friends error:', error);
+    }
+}
+
+async function removeFriend(friendId) {
+    try {
+        await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').doc(friendId).delete();
+        
+        showMessageBox('Friend removed', 'info', 2000, translations);
+        loadFriendsList();
+    } catch (error) {
+        console.error('Remove friend error:', error);
+    }
+}
+
+function sendMessage(friendId) {
+    // TODO: Implement messaging functionality
+    showMessageBox('Messaging feature coming soon!', 'info', 2000, translations);
 }
 
 // Initialize application
