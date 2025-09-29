@@ -51,8 +51,8 @@ body {
 .user-avatar-display {
   width: 60px;
   height: 60px;
-  border-radius: 50%;
-  border: 2px solid var(--accent-red);
+  border-radius: 0;
+  border: none;
 }
 
 .user-info {
@@ -307,9 +307,9 @@ body {
 .friend-avatar, .search-avatar {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 0;
   object-fit: cover;
-  border: 2px solid var(--glass-border);
+  border: none;
 }
 
 .friend-actions, .search-actions {

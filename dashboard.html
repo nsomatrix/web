@@ -281,7 +281,7 @@
 
     <div id="notificationsModal" class="modal" style="display:none;">
         <div class="modal-content">
-            <span class="close-button" data-modal="notificationsModal">&times;</span>
+            <span class="close-button" onclick="document.getElementById('notificationsModal').style.display='none'">&times;</span>
             <h3>Notifications</h3>
             <div id="notificationsList" class="notifications-list"></div>
         </div>
@@ -289,7 +289,7 @@
 
     <div id="messagesModal" class="modal" style="display:none;">
         <div class="modal-content">
-            <span class="close-button" data-modal="messagesModal">&times;</span>
+            <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'">&times;</span>
             <h3 id="messageModalTitle">Messages</h3>
             <div id="messagesList" class="messages-list"></div>
             <div class="message-input-container">
