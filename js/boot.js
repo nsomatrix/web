@@ -277,9 +277,9 @@ $(document).ready(function() {
     particleRadius: 2,
   });
 
-  // Fade out the boot screen after 4 seconds (adjust as needed)
+  // Fade out the boot screen after 1.5 seconds
   setTimeout(function() {
     $('#bootScreen').addClass('fade-out');
-    setTimeout(() => $('#bootScreen').remove(), 1000); // match CSS transition duration
-  }, 4000);
+    setTimeout(() => $('#bootScreen').remove(), 500);
+  }, 1500);
 });
