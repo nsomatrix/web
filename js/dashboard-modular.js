@@ -153,6 +153,9 @@ async function saveProfile(user) {
         userAvatar.src = `avatars/${selectedAvatar}`;
         setupUsernameTag(username, username);
         applyTranslations();
+        
+        // Setup notification and message icons for new users
+        setupNotificationHandlers();
 
     } catch (error) {
         console.error("Error saving profile:", error);
@@ -203,6 +206,9 @@ async function setupDashboard(user) {
         setupSection.style.display = 'none';
         mainDashboard.style.display = 'block';
         closeModal(masterPasswordPromptModal);
+        
+        // Setup notification and message icons after dashboard is shown
+        setupNotificationHandlers();
 
         // Update last login
         const lastLoginDisplay = document.getElementById('lastLoginDisplay');
@@ -538,6 +544,8 @@ function setupEventListeners() {
         }
     };
 
+    // Notification and message functionality will be set after dashboard loads
+
     // Modal close buttons
     document.querySelectorAll('.close-button').forEach(button => {
         button.onclick = (e) => {
@@ -801,27 +809,33 @@ function displaySearchResults(results) {
     openModal(document.getElementById('searchResultsModal'));
 }
 
-async function addFriend(friendId, friendUsername) {
+window.addFriend = async function(friendId, friendUsername) {
     try {
-        await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').doc(friendId).set({
-                friendId: friendId,
-                username: friendUsername,
-                addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        // Get current user data
+        const currentUserDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
+        const currentUserData = currentUserDoc.data();
+        
+        // Send friend request
+        await db.collection('players').doc(friendId)
+            .collection('friendRequests').doc(authManager.currentUser.uid).set({
+                fromUserId: authManager.currentUser.uid,
+                fromUsername: currentUserData.usernameTag,
+                status: 'pending',
+                sentAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         
-        showMessageBox('Friend added successfully!', 'success', 2000, translations);
+        showMessageBox('Friend request sent!', 'success', 2000, translations);
         closeModal(document.getElementById('searchResultsModal'));
     } catch (error) {
         console.error('Add friend error:', error);
-        showMessageBox('Failed to add friend', 'error', 3000, translations);
+        showMessageBox('Failed to send friend request', 'error', 3000, translations);
     }
 }
 
 async function loadFriendsList() {
     try {
         const snapshot = await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').get();
+            .collection('friends').where('status', '==', 'accepted').get();
 
         const friendsList = document.getElementById('friendsList');
         friendsList.innerHTML = '';
@@ -829,12 +843,17 @@ async function loadFriendsList() {
         if (snapshot.empty) {
             friendsList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No friends yet</p>';
         } else {
-            snapshot.forEach(doc => {
+            for (const doc of snapshot.docs) {
                 const friend = doc.data();
+                // Get friend's avatar
+                const friendProfile = await db.collection('players').doc(friend.friendId).get();
+                const friendData = friendProfile.data();
+                
                 const item = document.createElement('div');
                 item.className = 'friend-item';
                 item.innerHTML = `
                     <div class="friend-info">
+                        <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
                         <span>@${friend.username}</span>
                     </div>
                     <div class="friend-actions">
@@ -843,7 +862,7 @@ async function loadFriendsList() {
                     </div>
                 `;
                 friendsList.appendChild(item);
-            });
+            }
         }
     } catch (error) {
         console.error('Load friends error:', error);
@@ -865,6 +884,133 @@ async function removeFriend(friendId) {
 function sendMessage(friendId) {
     // TODO: Implement messaging functionality
     showMessageBox('Messaging feature coming soon!', 'info', 2000, translations);
+}
+
+// Setup notification handlers
+function setupNotificationHandlers() {
+    console.log('Setting up notification handlers...');
+    
+    // Wait a bit for elements to be ready
+    setTimeout(() => {
+        const notificationIcon = document.getElementById('notificationIcon');
+        const messageIcon = document.getElementById('messageIcon');
+        
+        console.log('Notification icon found:', !!notificationIcon);
+        console.log('Message icon found:', !!messageIcon);
+        
+        if (notificationIcon) {
+            notificationIcon.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Notification icon clicked');
+                alert('Notification clicked!');
+                openModal(document.getElementById('notificationsModal'));
+                loadNotifications();
+            });
+            console.log('Notification click handler set');
+        }
+        
+        if (messageIcon) {
+            messageIcon.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Message icon clicked');
+                alert('Message clicked!');
+                showMessageBox('Messaging feature coming soon!', 'info', 2000, translations);
+            });
+            console.log('Message click handler set');
+        }
+    }, 1000);
+}
+
+// Notifications functionality
+async function loadNotifications() {
+    try {
+        console.log('Loading notifications for user:', authManager.currentUser.uid);
+        const snapshot = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friendRequests').where('status', '==', 'pending').get();
+
+        console.log('Found notifications:', snapshot.docs.length);
+        const notificationsList = document.getElementById('notificationsList');
+        notificationsList.innerHTML = '';
+
+        if (snapshot.empty) {
+            notificationsList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No notifications</p>';
+        } else {
+            for (const doc of snapshot.docs) {
+                const request = doc.data();
+                // Get sender's profile
+                const senderProfile = await db.collection('players').doc(request.fromUserId).get();
+                const senderData = senderProfile.data();
+                
+                const item = document.createElement('div');
+                item.className = 'notification-item';
+                item.innerHTML = `
+                    <div class="notification-info">
+                        <img src="avatars/${senderData.avatar}" alt="Avatar" class="friend-avatar">
+                        <span>@${request.fromUsername} sent you a friend request</span>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="accept-btn" onclick="acceptFriendRequest('${request.fromUserId}', '${request.fromUsername}')">Accept</button>
+                        <button class="reject-btn" onclick="rejectFriendRequest('${request.fromUserId}')">Reject</button>
+                    </div>
+                `;
+                notificationsList.appendChild(item);
+            }
+        }
+    } catch (error) {
+        console.error('Load notifications error:', error);
+    }
+}
+
+async function acceptFriendRequest(fromUserId, fromUsername) {
+    try {
+        // Add to current user's friends
+        await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').doc(fromUserId).set({
+                friendId: fromUserId,
+                username: fromUsername,
+                status: 'accepted',
+                addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+        // Add current user to sender's friends
+        const currentUserData = await db.collection('players').doc(authManager.currentUser.uid).get();
+        await db.collection('players').doc(fromUserId)
+            .collection('friends').doc(authManager.currentUser.uid).set({
+                friendId: authManager.currentUser.uid,
+                username: currentUserData.data().usernameTag,
+                status: 'accepted',
+                addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+        // Update request status
+        await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friendRequests').doc(fromUserId).update({
+                status: 'accepted'
+            });
+
+        showMessageBox('Friend request accepted!', 'success', 2000, translations);
+        loadNotifications();
+    } catch (error) {
+        console.error('Accept friend request error:', error);
+        showMessageBox('Failed to accept friend request', 'error', 3000, translations);
+    }
+}
+
+window.rejectFriendRequest = async function(fromUserId) {
+    try {
+        await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friendRequests').doc(fromUserId).update({
+                status: 'rejected'
+            });
+
+        showMessageBox('Friend request rejected', 'info', 2000, translations);
+        loadNotifications();
+    } catch (error) {
+        console.error('Reject friend request error:', error);
+        showMessageBox('Failed to reject friend request', 'error', 3000, translations);
+    }
 }
 
 // Initialize application

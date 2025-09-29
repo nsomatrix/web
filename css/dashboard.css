@@ -265,6 +265,59 @@ h2, h3 {
   color: white;
 }
 
+/* Notifications */
+.notifications-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.notification-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+}
+
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.accept-btn {
+  background: var(--accent-red);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reject-btn {
+  background: rgba(107, 114, 128, 0.8);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .nav-btn {
   background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.1));
   backdrop-filter: blur(10px);
@@ -358,6 +411,9 @@ h2, h3 {
   padding: 0.5rem;
   border-radius: 50%;
   background: rgba(255, 0, 0, 0.1);
+  z-index: 1000;
+  position: relative;
+  pointer-events: auto;
 }
 
 .notification-icons i:hover {
