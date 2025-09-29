@@ -245,27 +245,34 @@ async function setupDashboard(user) {
 // Event Listeners
 function setupEventListeners() {
     // Avatar navigation
-    prevAvatarBtn.onclick = () => {
-        currentAvatarIndex = (currentAvatarIndex - 1 + allAvatars.length) % allAvatars.length;
-        updateAvatarDisplay();
-    };
+    if (prevAvatarBtn) {
+        prevAvatarBtn.onclick = () => {
+            currentAvatarIndex = (currentAvatarIndex - 1 + allAvatars.length) % allAvatars.length;
+            updateAvatarDisplay();
+        };
+    }
 
-    nextAvatarBtn.onclick = () => {
-        currentAvatarIndex = (currentAvatarIndex + 1) % allAvatars.length;
-        updateAvatarDisplay();
-    };
+    if (nextAvatarBtn) {
+        nextAvatarBtn.onclick = () => {
+            currentAvatarIndex = (currentAvatarIndex + 1) % allAvatars.length;
+            updateAvatarDisplay();
+        };
+    }
 
     // Profile save
-    saveProfileBtn.onclick = () => {
-        if (authManager.currentUser) {
-            saveProfile(authManager.currentUser);
-        } else {
-            showMessageBox("message_box_please_login_first", "error", 3000, translations);
-        }
-    };
+    if (saveProfileBtn) {
+        saveProfileBtn.onclick = () => {
+            if (authManager.currentUser) {
+                saveProfile(authManager.currentUser);
+            } else {
+                showMessageBox("message_box_please_login_first", "error", 3000, translations);
+            }
+        };
+    }
 
     // Master password unlock
-    unlockDashboardBtn.onclick = async () => {
+    if (unlockDashboardBtn) {
+        unlockDashboardBtn.onclick = async () => {
         const masterPassword = masterPasswordUnlockInput.value.trim();
         unlockDashboardBtn.disabled = true;
         unlockDashboardBtn.textContent = getTranslation("unlocking_status");
@@ -294,107 +301,136 @@ function setupEventListeners() {
 
         unlockDashboardBtn.disabled = false;
         unlockDashboardBtn.textContent = getTranslation("unlock_dashboard_button");
-    };
+        };
+    }
 
     // Enter key for master password
-    masterPasswordUnlockInput.addEventListener("keydown", (event) => {
+    if (masterPasswordUnlockInput) {
+        masterPasswordUnlockInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
             event.preventDefault();
             unlockDashboardBtn.click();
-        }
-    });
+            }
+        });
+    }
 
     // Feature buttons
-    document.getElementById('notesBtn').onclick = () => {
-        if (!authManager.currentEncryptionKey) {
-            openModal(masterPasswordPromptModal);
-            notesModal.dataset.pendingOpen = 'true';
-            masterPasswordUnlockInput.value = '';
-            return;
-        }
-        openModal(notesModal);
-        notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
-    };
+    const notesBtn = document.getElementById('notesBtn');
+    if (notesBtn) {
+        notesBtn.onclick = () => {
+            if (!authManager.currentEncryptionKey) {
+                openModal(masterPasswordPromptModal);
+                notesModal.dataset.pendingOpen = 'true';
+                masterPasswordUnlockInput.value = '';
+                return;
+            }
+            openModal(notesModal);
+            notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
+        };
+    }
 
-    document.getElementById('passwordManagerBtn').onclick = () => {
-        if (!authManager.currentEncryptionKey) {
-            openModal(masterPasswordPromptModal);
-            passwordManagerModal.dataset.pendingOpen = 'true';
-            masterPasswordUnlockInput.value = '';
-            return;
-        }
-        openModal(passwordManagerModal);
-        passwordManager.loadPasswords(document.getElementById('pmEntryList'));
-    };
+    const passwordManagerBtn = document.getElementById('passwordManagerBtn');
+    if (passwordManagerBtn) {
+        passwordManagerBtn.onclick = () => {
+            if (!authManager.currentEncryptionKey) {
+                openModal(masterPasswordPromptModal);
+                passwordManagerModal.dataset.pendingOpen = 'true';
+                masterPasswordUnlockInput.value = '';
+                return;
+            }
+            openModal(passwordManagerModal);
+            passwordManager.loadPasswords(document.getElementById('pmEntryList'));
+        };
+    }
 
-    document.getElementById('ephemeralFilesBtn').onclick = () => {
-        if (!authManager.currentEncryptionKey) {
-            openModal(masterPasswordPromptModal);
-            ephemeralFilesModal.dataset.pendingOpen = 'true';
-            masterPasswordUnlockInput.value = '';
-            return;
-        }
-        openModal(ephemeralFilesModal);
-        loadFilesList();
-    };
+    const ephemeralFilesBtn = document.getElementById('ephemeralFilesBtn');
+    if (ephemeralFilesBtn) {
+        ephemeralFilesBtn.onclick = () => {
+            if (!authManager.currentEncryptionKey) {
+                openModal(masterPasswordPromptModal);
+                ephemeralFilesModal.dataset.pendingOpen = 'true';
+                masterPasswordUnlockInput.value = '';
+                return;
+            }
+            openModal(ephemeralFilesModal);
+            loadFilesList();
+        };
+    }
 
     // Notes functionality
-    document.getElementById('saveNoteBtn').onclick = async () => {
-        const noteText = document.getElementById('noteInput').value.trim();
-        const success = await notesManager.saveNote(noteText);
-        if (success) {
-            document.getElementById('noteInput').value = '';
-        }
-    };
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    if (saveNoteBtn) {
+        saveNoteBtn.onclick = async () => {
+            const noteText = document.getElementById('noteInput').value.trim();
+            const success = await notesManager.saveNote(noteText);
+            if (success) {
+                document.getElementById('noteInput').value = '';
+            }
+        };
+    }
 
     // Password manager functionality
-    document.getElementById('savePmEntryBtn').onclick = async () => {
-        const serviceName = document.getElementById('pmServiceName').value.trim();
-        const pmUsername = document.getElementById('pmUsername').value.trim();
-        const pmPassword = document.getElementById('pmPassword').value.trim();
-        
-        const success = await passwordManager.savePassword(serviceName, pmUsername, pmPassword);
-        if (success) {
-            document.getElementById('pmServiceName').value = '';
-            document.getElementById('pmUsername').value = '';
-            document.getElementById('pmPassword').value = '';
-        }
-    };
+    const savePmEntryBtn = document.getElementById('savePmEntryBtn');
+    if (savePmEntryBtn) {
+        savePmEntryBtn.onclick = async () => {
+            const serviceName = document.getElementById('pmServiceName').value.trim();
+            const pmUsername = document.getElementById('pmUsername').value.trim();
+            const pmPassword = document.getElementById('pmPassword').value.trim();
+            
+            const success = await passwordManager.savePassword(serviceName, pmUsername, pmPassword);
+            if (success) {
+                document.getElementById('pmServiceName').value = '';
+                document.getElementById('pmUsername').value = '';
+                document.getElementById('pmPassword').value = '';
+            }
+        };
+    }
 
     // File upload
-    document.getElementById('uploadFileBtn').onclick = async () => {
-        const file = document.getElementById('fileUploadInput').files[0];
-        if (!file) {
-            showMessageBox("message_box_select_file_upload", "error", 3000, translations);
-            return;
-        }
-        
-        const success = await fileManager.uploadFile(file);
-        if (success) {
-            document.getElementById('fileUploadInput').value = '';
-            loadFilesList();
-        }
-    };
+    const uploadFileBtn = document.getElementById('uploadFileBtn');
+    if (uploadFileBtn) {
+        uploadFileBtn.onclick = async () => {
+            const file = document.getElementById('fileUploadInput').files[0];
+            if (!file) {
+                showMessageBox("message_box_select_file_upload", "error", 3000, translations);
+                return;
+            }
+            
+            const success = await fileManager.uploadFile(file);
+            if (success) {
+                document.getElementById('fileUploadInput').value = '';
+                loadFilesList();
+            }
+        };
+    }
 
     // Logout
-    document.getElementById('logoutBtn').onclick = async () => {
-        try {
-            await auth.signOut();
-            showMessageBox("message_box_logged_out_success", "success", 3000, translations);
-        } catch (error) {
-            console.error("Error logging out:", error);
-            showMessageBox("message_box_failed_to_log_out" + error.message, "error", 3000, translations);
-        } finally {
-            authManager.clearSession();
-        }
-    };
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = async () => {
+            try {
+                await auth.signOut();
+                showMessageBox("message_box_logged_out_success", "success", 3000, translations);
+            } catch (error) {
+                console.error("Error logging out:", error);
+                showMessageBox("message_box_failed_to_log_out" + error.message, "error", 3000, translations);
+            } finally {
+                authManager.clearSession();
+            }
+        };
+    }
 
     // Delete account
-    document.getElementById('deleteAccountBtn').onclick = () => {
-        openModal(document.getElementById('deleteAccountConfirmModal'));
-    };
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    if (deleteAccountBtn) {
+        deleteAccountBtn.onclick = () => {
+            openModal(document.getElementById('deleteAccountConfirmModal'));
+        };
+    }
 
-    document.getElementById('confirmDeleteAccountBtn').onclick = async () => {
+    const confirmDeleteAccountBtn = document.getElementById('confirmDeleteAccountBtn');
+    if (confirmDeleteAccountBtn) {
+        confirmDeleteAccountBtn.onclick = async () => {
         closeModal(document.getElementById('deleteAccountConfirmModal'));
         showMessageBox("message_box_initiating_account_deletion", 'info', 0, translations);
 
@@ -474,17 +510,24 @@ function setupEventListeners() {
                 }, 3000);
             }
         }
-    };
+        };
+    }
 
-    document.getElementById('cancelDeleteAccountBtn').onclick = () => {
+    const cancelDeleteAccountBtn = document.getElementById('cancelDeleteAccountBtn');
+    if (cancelDeleteAccountBtn) {
+        cancelDeleteAccountBtn.onclick = () => {
         closeModal(document.getElementById('deleteAccountConfirmModal'));
         showMessageBox("message_box_account_deletion_cancelled", "info", 2000, translations);
-    };
+        };
+    }
 
     // Forgot password button
-    document.getElementById('forgotPasswordBtn').onclick = () => {
-        showMessageBox("message_box_master_password_cannot_be_reset", "info", 5000, translations);
-    };
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    if (forgotPasswordBtn) {
+        forgotPasswordBtn.onclick = () => {
+            showMessageBox("message_box_master_password_cannot_be_reset", "info", 5000, translations);
+        };
+    }
 
     // File deletion confirmations
     document.getElementById('confirmDeleteFileBtn').onclick = async () => {
@@ -535,37 +578,56 @@ function setupEventListeners() {
     };
 
     // Server button
-    document.getElementById('serverBtn').onclick = () => {
-        window.open("https://support.teamobi.com/login-game-3.html", "_blank");
-    };
+    const serverBtn = document.getElementById('serverBtn');
+    if (serverBtn) {
+        serverBtn.onclick = () => {
+            window.open("https://support.teamobi.com/login-game-3.html", "_blank");
+        };
+    }
 
     // Friends button
-    document.getElementById('friendsBtn').onclick = () => {
-        openModal(document.getElementById('friendsModal'));
-        loadFriendsList();
-    };
+    const friendsBtn = document.getElementById('friendsBtn');
+    if (friendsBtn) {
+        friendsBtn.onclick = () => {
+            openModal(document.getElementById('friendsModal'));
+            loadFriendsList();
+        };
+    }
 
     // Search functionality
-    document.getElementById('searchIcon').onclick = () => {
-        performUserSearch();
-    };
-
-    document.getElementById('userSearch').onkeydown = (e) => {
-        if (e.key === 'Enter') {
+    const searchIcon = document.getElementById('searchIcon');
+    const userSearch = document.getElementById('userSearch');
+    
+    if (searchIcon) {
+        searchIcon.onclick = () => {
             performUserSearch();
-        }
-    };
+        };
+    }
+
+    if (userSearch) {
+        userSearch.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                performUserSearch();
+            }
+        };
+    }
 
     // Message functionality
-    document.getElementById('sendMessageBtn').onclick = () => {
-        sendNewMessage();
-    };
-
-    document.getElementById('messageInput').onkeydown = (e) => {
-        if (e.key === 'Enter') {
+    const sendMessageBtn = document.getElementById('sendMessageBtn');
+    if (sendMessageBtn) {
+        sendMessageBtn.onclick = () => {
             sendNewMessage();
-        }
-    };
+        };
+    }
+
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                sendNewMessage();
+            }
+        };
+    }
 
     // Notification and message functionality will be set after dashboard loads
 
@@ -786,20 +848,37 @@ async function performUserSearch() {
     if (!searchTerm) return;
 
     try {
-        const snapshot = await db.collection('players')
+        // Search by usernameTag first
+        const tagSnapshot = await db.collection('players')
             .where('usernameTag', '>=', searchTerm.toLowerCase())
             .where('usernameTag', '<=', searchTerm.toLowerCase() + '\uf8ff')
             .limit(10)
             .get();
 
-        const results = [];
-        snapshot.forEach(doc => {
+        // Search by username as fallback
+        const nameSnapshot = await db.collection('players')
+            .where('username', '>=', searchTerm)
+            .where('username', '<=', searchTerm + '\uf8ff')
+            .limit(10)
+            .get();
+
+        const results = new Map();
+        
+        // Add results from usernameTag search
+        tagSnapshot.forEach(doc => {
             if (doc.id !== authManager.currentUser.uid) {
-                results.push({ id: doc.id, ...doc.data() });
+                results.set(doc.id, { id: doc.id, ...doc.data() });
+            }
+        });
+        
+        // Add results from username search
+        nameSnapshot.forEach(doc => {
+            if (doc.id !== authManager.currentUser.uid) {
+                results.set(doc.id, { id: doc.id, ...doc.data() });
             }
         });
 
-        displaySearchResults(results);
+        displaySearchResults(Array.from(results.values()));
     } catch (error) {
         console.error('Search error:', error);
         showMessageBox('Search failed. Please try again.', 'error', 3000, translations);

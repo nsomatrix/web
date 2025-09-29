@@ -1,63 +1,54 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default deny rule
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Enhanced player document rules
     match /players/{userId} {
-      // Allow read only for authenticated user
-      allow read: if request.auth != null && request.auth.uid == userId;
-
-      // Allow create only for authenticated user with required fields
-      allow create: if request.auth != null && 
-                       request.auth.uid == userId &&
-                       request.resource.data.keys().hasAll(['username', 'avatar', 'level']) &&
-                       request.resource.data.username is string &&
-                       request.resource.data.username.size() > 0 &&
-                       request.resource.data.username.size() <= 50;
-
-      // Allow update with field protection and validation
-      allow update: if request.auth != null && 
-                       request.auth.uid == userId &&
-                       // Prevent modification of security fields
-                       (!('salt' in request.resource.data) || request.resource.data.salt == resource.data.salt) &&
-                       (!('masterPasswordHash' in request.resource.data) || request.resource.data.masterPasswordHash == resource.data.masterPasswordHash) &&
-                       // Validate username if being updated
-                       (!('username' in request.resource.data) || 
-                        (request.resource.data.username is string && 
-                         request.resource.data.username.size() > 0 && 
-                         request.resource.data.username.size() <= 50));
-
-      // Allow delete only for authenticated user (consider removing if not needed)
-      allow delete: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
     }
 
-    // Enhanced subcollection rules with size limits
+    // Allow querying players collection for search functionality
+    match /players/{document=**} {
+      allow read: if request.auth != null;
+    }
+
     match /players/{userId}/notes/{noteId} {
-      allow read, write: if request.auth != null && 
-                           request.auth.uid == userId &&
-                           // Limit note content size (1MB)
-                           (!('content' in request.resource.data) || 
-                            request.resource.data.content.size() <= 1048576);
+      allow read, write: if request.auth.uid == userId;
     }
 
     match /players/{userId}/passwords/{passwordId} {
-      allow read, write: if request.auth != null && 
-                           request.auth.uid == userId &&
-                           // Validate required fields and sizes
-                           (!('serviceName' in request.resource.data) || 
-                            (request.resource.data.serviceName is string && 
-                             request.resource.data.serviceName.size() <= 100)) &&
-                           (!('username' in request.resource.data) || 
-                            (request.resource.data.username is string && 
-                             request.resource.data.username.size() <= 100));
+      allow read, write: if request.auth.uid == userId;
     }
 
     match /players/{userId}/ephemeral_files/{fileId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    match /players/{userId}/friendRequests/{requestId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /players/{userId}/friends/{friendId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /players/{userId}/notifications/{notificationId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid in resource.data.participants;
+      allow create: if request.auth != null && 
+        request.auth.uid in request.resource.data.participants;
+    }
+
+    match /presence/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
     }
   }
 }
