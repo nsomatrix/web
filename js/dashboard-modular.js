@@ -783,27 +783,45 @@ async function performUserSearch() {
     }
 }
 
-function displaySearchResults(results) {
+async function displaySearchResults(results) {
     const searchResults = document.getElementById('searchResults');
     searchResults.innerHTML = '';
 
     if (results.length === 0) {
         searchResults.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No users found</p>';
     } else {
-        results.forEach(user => {
+        for (const user of results) {
+            // Check if there's a pending friend request from this user
+            const pendingRequest = await db.collection('players').doc(authManager.currentUser.uid)
+                .collection('friendRequests').doc(user.id).get();
+            
+            // Check if already friends
+            const existingFriend = await db.collection('players').doc(authManager.currentUser.uid)
+                .collection('friends').doc(user.id).get();
+            
             const item = document.createElement('div');
             item.className = 'search-item';
+            
+            let actionButton = '';
+            if (existingFriend.exists && existingFriend.data().status === 'accepted') {
+                actionButton = '<span style="color: var(--accent-red);">Already Friends</span>';
+            } else if (pendingRequest.exists && pendingRequest.data().status === 'pending') {
+                actionButton = `<button class="accept-btn" onclick="acceptFriendRequest('${user.id}', '${user.usernameTag}')">Accept Request</button>`;
+            } else {
+                actionButton = `<button class="add-friend-btn" onclick="addFriend('${user.id}', '${user.usernameTag}')">Add Friend</button>`;
+            }
+            
             item.innerHTML = `
                 <div class="search-info">
                     <img src="avatars/${user.avatar}" alt="Avatar" class="search-avatar">
                     <span>@${user.usernameTag}</span>
                 </div>
                 <div class="search-actions">
-                    <button class="add-friend-btn" onclick="addFriend('${user.id}', '${user.usernameTag}')">Add Friend</button>
+                    ${actionButton}
                 </div>
             `;
             searchResults.appendChild(item);
-        });
+        }
     }
 
     openModal(document.getElementById('searchResultsModal'));
@@ -888,37 +906,25 @@ function sendMessage(friendId) {
 
 // Setup notification handlers
 function setupNotificationHandlers() {
-    console.log('Setting up notification handlers...');
-    
-    // Wait a bit for elements to be ready
     setTimeout(() => {
         const notificationIcon = document.getElementById('notificationIcon');
         const messageIcon = document.getElementById('messageIcon');
-        
-        console.log('Notification icon found:', !!notificationIcon);
-        console.log('Message icon found:', !!messageIcon);
         
         if (notificationIcon) {
             notificationIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Notification icon clicked');
-                alert('Notification clicked!');
                 openModal(document.getElementById('notificationsModal'));
                 loadNotifications();
             });
-            console.log('Notification click handler set');
         }
         
         if (messageIcon) {
             messageIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Message icon clicked');
-                alert('Message clicked!');
                 showMessageBox('Messaging feature coming soon!', 'info', 2000, translations);
             });
-            console.log('Message click handler set');
         }
     }, 1000);
 }
@@ -926,11 +932,8 @@ function setupNotificationHandlers() {
 // Notifications functionality
 async function loadNotifications() {
     try {
-        console.log('Loading notifications for user:', authManager.currentUser.uid);
         const snapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friendRequests').where('status', '==', 'pending').get();
-
-        console.log('Found notifications:', snapshot.docs.length);
         const notificationsList = document.getElementById('notificationsList');
         notificationsList.innerHTML = '';
 
@@ -963,7 +966,7 @@ async function loadNotifications() {
     }
 }
 
-async function acceptFriendRequest(fromUserId, fromUsername) {
+window.acceptFriendRequest = async function(fromUserId, fromUsername) {
     try {
         // Add to current user's friends
         await db.collection('players').doc(authManager.currentUser.uid)
