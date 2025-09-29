@@ -940,32 +940,60 @@ async function loadNotifications() {
     try {
         const snapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friendRequests').where('status', '==', 'pending').get();
+        // Load general notifications
+        const notificationsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('notifications').where('read', '==', false).get();
+
         const notificationsList = document.getElementById('notificationsList');
         notificationsList.innerHTML = '';
 
-        if (snapshot.empty) {
+        let hasNotifications = false;
+
+        // Display friend requests
+        for (const doc of snapshot.docs) {
+            hasNotifications = true;
+            const request = doc.data();
+            const senderProfile = await db.collection('players').doc(request.fromUserId).get();
+            const senderData = senderProfile.data();
+            
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.innerHTML = `
+                <div class="notification-info">
+                    <img src="avatars/${senderData.avatar}" alt="Avatar" class="friend-avatar">
+                    <span>@${request.fromUsername} sent you a friend request</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="accept-btn" onclick="acceptFriendRequest('${request.fromUserId}', '${request.fromUsername}')">Accept</button>
+                    <button class="reject-btn" onclick="rejectFriendRequest('${request.fromUserId}')">Reject</button>
+                </div>
+            `;
+            notificationsList.appendChild(item);
+        }
+
+        // Display general notifications
+        for (const doc of notificationsSnapshot.docs) {
+            hasNotifications = true;
+            const notification = doc.data();
+            const senderProfile = await db.collection('players').doc(notification.fromUserId).get();
+            const senderData = senderProfile.data();
+            
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.innerHTML = `
+                <div class="notification-info">
+                    <img src="avatars/${senderData.avatar}" alt="Avatar" class="friend-avatar">
+                    <span>${notification.message}</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="reject-btn" onclick="markAsRead('${doc.id}')">Mark as Read</button>
+                </div>
+            `;
+            notificationsList.appendChild(item);
+        }
+
+        if (!hasNotifications) {
             notificationsList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No notifications</p>';
-        } else {
-            for (const doc of snapshot.docs) {
-                const request = doc.data();
-                // Get sender's profile
-                const senderProfile = await db.collection('players').doc(request.fromUserId).get();
-                const senderData = senderProfile.data();
-                
-                const item = document.createElement('div');
-                item.className = 'notification-item';
-                item.innerHTML = `
-                    <div class="notification-info">
-                        <img src="avatars/${senderData.avatar}" alt="Avatar" class="friend-avatar">
-                        <span>@${request.fromUsername} sent you a friend request</span>
-                    </div>
-                    <div class="notification-actions">
-                        <button class="accept-btn" onclick="acceptFriendRequest('${request.fromUserId}', '${request.fromUsername}')">Accept</button>
-                        <button class="reject-btn" onclick="rejectFriendRequest('${request.fromUserId}')">Reject</button>
-                    </div>
-                `;
-                notificationsList.appendChild(item);
-            }
         }
     } catch (error) {
         console.error('Load notifications error:', error);
@@ -1030,6 +1058,18 @@ window.rejectFriendRequest = async function(fromUserId) {
     } catch (error) {
         console.error('Reject friend request error:', error);
         showMessageBox('Failed to reject friend request', 'error', 3000, translations);
+    }
+}
+
+window.markAsRead = async function(notificationId) {
+    try {
+        await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('notifications').doc(notificationId).update({
+                read: true
+            });
+        loadNotifications();
+    } catch (error) {
+        console.error('Mark as read error:', error);
     }
 }
 
