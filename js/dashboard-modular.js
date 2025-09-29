@@ -177,16 +177,19 @@ async function setupDashboard(user) {
         authManager.restoreEncryptionKey();
 
         if (!hasUsername || !hasAvatar) {
-            setupSection.style.display = 'flex';
+            if (allAvatars.length === 0) await loadAvatars();
+            
+            setupSection.style.display = 'block';
             mainDashboard.style.display = 'none';
             closeModal(masterPasswordPromptModal);
 
             usernameInput.value = data.username || '';
-            if (allAvatars.length === 0) await loadAvatars();
             
-            const avatarFileName = data.avatar && allAvatars.includes(data.avatar) ? data.avatar : allAvatars[0] || 'default_avatar.png';
-            currentAvatarIndex = allAvatars.indexOf(avatarFileName);
-            if (currentAvatarIndex === -1 && allAvatars.length > 0) currentAvatarIndex = 0;
+            if (data.avatar && allAvatars.includes(data.avatar)) {
+                currentAvatarIndex = allAvatars.indexOf(data.avatar);
+            } else {
+                currentAvatarIndex = 0;
+            }
             updateAvatarDisplay();
             applyTranslations();
             return;

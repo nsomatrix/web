@@ -100,12 +100,15 @@ h2, h3 {
 .avatar-wrapper {
   width: 80px;
   height: 80px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  overflow: visible;
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.avatar-wrapper:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.6));
 }
 
 .avatar-display, .user-avatar-display {
@@ -124,22 +127,28 @@ h2, h3 {
 }
 
 .nav-btn {
-  background: var(--glass-bg);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.1));
   backdrop-filter: blur(10px);
   color: var(--text-light);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
+  border: 1px solid var(--accent-red);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
   cursor: pointer;
   font-family: inherit;
+  font-size: 18px;
+  font-weight: bold;
   transition: all 0.3s ease;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.4), rgba(255, 0, 0, 0.2));
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
 }
 
 /* Button system */
