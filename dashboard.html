@@ -64,8 +64,14 @@
     <div id="main-dashboard" style="display:none;">
         <div class="dashboard-header">
             <div class="notification-icons">
-                <i class="fas fa-envelope" id="messageIcon" title="Messages"></i>
-                <i class="fas fa-bell" id="notificationIcon" title="Notifications"></i>
+                <div class="icon-container">
+                    <i class="fas fa-envelope" id="messageIcon" title="Messages"></i>
+                    <span class="notification-badge" id="messageBadge" style="display:none;">0</span>
+                </div>
+                <div class="icon-container">
+                    <i class="fas fa-bell" id="notificationIcon" title="Notifications"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
+                </div>
             </div>
             <div class="search-container">
                 <input type="text" id="userSearch" placeholder="Search users..." class="search-input">

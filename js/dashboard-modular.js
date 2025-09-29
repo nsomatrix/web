@@ -159,6 +159,9 @@ async function saveProfile(user) {
         
         // Setup online presence for new users
         setupOnlinePresence();
+        
+        // Setup notification counters for new users
+        setupNotificationCounters();
 
     } catch (error) {
         console.error("Error saving profile:", error);
@@ -215,6 +218,9 @@ async function setupDashboard(user) {
         
         // Setup online presence
         setupOnlinePresence();
+        
+        // Setup notification counters
+        setupNotificationCounters();
 
         // Update last login
         const lastLoginDisplay = document.getElementById('lastLoginDisplay');
@@ -962,12 +968,27 @@ async function loadMessages(friendId) {
             .orderBy('createdAt', 'asc')
             .onSnapshot(snapshot => {
                 let chatMessages = [];
+                const batch = db.batch();
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.participants.includes(friendId)) {
                         chatMessages.push({ id: doc.id, ...data });
+                        
+                        // Mark message as read if not already read by current user
+                        if (!data.readBy || !data.readBy.includes(authManager.currentUser.uid)) {
+                            const messageRef = db.collection('messages').doc(doc.id);
+                            batch.update(messageRef, {
+                                readBy: firebase.firestore.FieldValue.arrayUnion(authManager.currentUser.uid)
+                            });
+                        }
                     }
                 });
+                
+                // Commit batch update for read status
+                if (chatMessages.length > 0) {
+                    batch.commit().catch(error => console.error('Error marking messages as read:', error));
+                }
                 
                 displayMessages(chatMessages);
             });
@@ -1017,7 +1038,8 @@ async function sendNewMessage() {
             text: messageText,
             senderId: authManager.currentUser.uid,
             participants: [authManager.currentUser.uid, currentChatFriend],
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            readBy: [authManager.currentUser.uid]
         });
         
         messageInput.value = '';
@@ -1039,6 +1061,8 @@ function setupNotificationHandlers() {
                 e.stopPropagation();
                 openModal(document.getElementById('notificationsModal'));
                 loadNotifications();
+                // Clear notification badge when opened
+                updateNotificationBadge(0);
             });
         }
         
@@ -1299,6 +1323,61 @@ async function getOnlineStatus(userId) {
     } catch (error) {
         console.error('Get online status error:', error);
         return { isOnline: false, lastSeen: 'Unknown' };
+    }
+}
+
+// Notification counters
+function setupNotificationCounters() {
+    // Listen for friend requests
+    db.collection('players').doc(authManager.currentUser.uid)
+        .collection('friendRequests').where('status', '==', 'pending')
+        .onSnapshot(snapshot => {
+            updateNotificationBadge(snapshot.size);
+        });
+    
+    // Listen for general notifications
+    db.collection('players').doc(authManager.currentUser.uid)
+        .collection('notifications').where('read', '==', false)
+        .onSnapshot(snapshot => {
+            const currentBadge = parseInt(document.getElementById('notificationBadge').textContent) || 0;
+            const friendRequests = parseInt(document.getElementById('notificationBadge').dataset.friendRequests) || 0;
+            updateNotificationBadge(friendRequests + snapshot.size);
+        });
+    
+    // Listen for new messages
+    db.collection('messages')
+        .where('participants', 'array-contains', authManager.currentUser.uid)
+        .onSnapshot(snapshot => {
+            let unreadCount = 0;
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Count messages not sent by current user and not read by current user
+                if (data.senderId !== authManager.currentUser.uid && 
+                    (!data.readBy || !data.readBy.includes(authManager.currentUser.uid))) {
+                    unreadCount++;
+                }
+            });
+            updateMessageBadge(unreadCount);
+        });
+}
+
+function updateNotificationBadge(count) {
+    const badge = document.getElementById('notificationBadge');
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function updateMessageBadge(count) {
+    const badge = document.getElementById('messageBadge');
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
     }
 }
 
