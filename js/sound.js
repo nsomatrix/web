@@ -1,4 +1,4 @@
-const clickSound = new Audio("assets/sound.mp3");
+const clickSound = new Audio("assets/click.wav");
 clickSound.preload = 'auto';
 
 document.addEventListener("click", () => {

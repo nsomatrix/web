@@ -295,6 +295,7 @@ h2, h3 {
   max-height: 150px;
   overflow-y: auto;
   font-size: 0.85rem;
+  color: var(--text-light);
 }
 
 /* File upload - compact */
