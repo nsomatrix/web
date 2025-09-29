@@ -156,6 +156,9 @@ async function saveProfile(user) {
         
         // Setup notification and message icons for new users
         setupNotificationHandlers();
+        
+        // Setup online presence for new users
+        setupOnlinePresence();
 
     } catch (error) {
         console.error("Error saving profile:", error);
@@ -209,6 +212,9 @@ async function setupDashboard(user) {
         
         // Setup notification and message icons after dashboard is shown
         setupNotificationHandlers();
+        
+        // Setup online presence
+        setupOnlinePresence();
 
         // Update last login
         const lastLoginDisplay = document.getElementById('lastLoginDisplay');
@@ -885,12 +891,17 @@ async function loadFriendsList() {
                 const friendProfile = await db.collection('players').doc(friend.friendId).get();
                 const friendData = friendProfile.data();
                 
+                // Get online status
+                const onlineStatus = await getOnlineStatus(friend.friendId);
+                
                 const item = document.createElement('div');
                 item.className = 'friend-item';
                 item.innerHTML = `
                     <div class="friend-info">
                         <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
                         <span>@${friend.username}</span>
+                        <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
+                        ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
                     </div>
                     <div class="friend-actions">
                         <button class="message-btn" onclick="sendMessage('${friend.friendId}')">Message</button>
@@ -1199,6 +1210,9 @@ async function loadRecentChats() {
             const friendProfile = await db.collection('players').doc(friend.friendId).get();
             const friendData = friendProfile.data();
             
+            // Get online status
+            const onlineStatus = await getOnlineStatus(friend.friendId);
+            
             const chatItem = document.createElement('div');
             chatItem.className = 'friend-item';
             chatItem.style.cursor = 'pointer';
@@ -1207,6 +1221,8 @@ async function loadRecentChats() {
                 <div class="friend-info">
                     <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
                     <span>@${friend.username}</span>
+                    <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
+                    ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
                 </div>
                 <div class="friend-actions">
                     <span style="color: var(--accent-red);">Chat</span>
@@ -1216,6 +1232,71 @@ async function loadRecentChats() {
         }
     } catch (error) {
         console.error('Load recent chats error:', error);
+    }
+}
+
+// Online presence system
+function setupOnlinePresence() {
+    const userStatusRef = db.collection('presence').doc(authManager.currentUser.uid);
+    
+    // Set user as online
+    userStatusRef.set({
+        isOnline: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Set user as offline when they disconnect
+    window.addEventListener('beforeunload', () => {
+        userStatusRef.set({
+            isOnline: false,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    });
+    
+    // Update presence every 30 seconds
+    setInterval(() => {
+        userStatusRef.update({
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }, 30000);
+}
+
+async function getOnlineStatus(userId) {
+    try {
+        const presenceDoc = await db.collection('presence').doc(userId).get();
+        if (!presenceDoc.exists) {
+            return { isOnline: false, lastSeen: 'Never' };
+        }
+        
+        const data = presenceDoc.data();
+        const now = Date.now();
+        const lastSeenTime = data.lastSeen ? data.lastSeen.toMillis() : 0;
+        const timeDiff = now - lastSeenTime;
+        
+        // Consider online if last seen within 2 minutes
+        const isOnline = data.isOnline && timeDiff < 120000;
+        
+        let lastSeenText = 'Never';
+        if (lastSeenTime > 0) {
+            const minutes = Math.floor(timeDiff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) {
+                lastSeenText = `${days}d ago`;
+            } else if (hours > 0) {
+                lastSeenText = `${hours}h ago`;
+            } else if (minutes > 0) {
+                lastSeenText = `${minutes}m ago`;
+            } else {
+                lastSeenText = 'Just now';
+            }
+        }
+        
+        return { isOnline, lastSeen: lastSeenText };
+    } catch (error) {
+        console.error('Get online status error:', error);
+        return { isOnline: false, lastSeen: 'Unknown' };
     }
 }
 
