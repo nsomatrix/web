@@ -887,15 +887,21 @@ async function loadFriendsList() {
     }
 }
 
-async function removeFriend(friendId) {
+window.removeFriend = async function(friendId) {
     try {
+        // Remove from current user's friends
         await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friends').doc(friendId).delete();
+        
+        // Remove from other user's friends
+        await db.collection('players').doc(friendId)
+            .collection('friends').doc(authManager.currentUser.uid).delete();
         
         showMessageBox('Friend removed', 'info', 2000, translations);
         loadFriendsList();
     } catch (error) {
         console.error('Remove friend error:', error);
+        showMessageBox('Failed to remove friend', 'error', 3000, translations);
     }
 }
 
@@ -991,6 +997,17 @@ window.acceptFriendRequest = async function(fromUserId, fromUsername) {
         await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friendRequests').doc(fromUserId).update({
                 status: 'accepted'
+            });
+
+        // Send acceptance notification to the sender
+        await db.collection('players').doc(fromUserId)
+            .collection('notifications').add({
+                type: 'friend_accepted',
+                fromUserId: authManager.currentUser.uid,
+                fromUsername: currentUserData.data().usernameTag,
+                message: `@${currentUserData.data().usernameTag} accepted your friend request`,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                read: false
             });
 
         showMessageBox('Friend request accepted!', 'success', 2000, translations);
