@@ -11,40 +11,7 @@ class DesktopDashboard {
     }
 
     setupNavigation() {
-        const navItems = document.querySelectorAll('.nav-item');
-        const cardActions = document.querySelectorAll('.card-action');
-        
-        // Handle navigation clicks
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Remove active class from all items
-                navItems.forEach(nav => nav.classList.remove('active'));
-                // Add active class to clicked item
-                item.classList.add('active');
-                
-                // Handle section switching
-                const section = item.dataset.section;
-                this.switchSection(section);
-            });
-        });
-        
-        // Handle card action clicks
-        cardActions.forEach(action => {
-            action.addEventListener('click', (e) => {
-                e.preventDefault();
-                const section = action.dataset.section;
-                this.switchSection(section);
-                
-                // Update nav active state
-                navItems.forEach(nav => nav.classList.remove('active'));
-                const navItem = document.querySelector(`[data-section="${section}"]`);
-                if (navItem) {
-                    navItem.classList.add('active');
-                }
-            });
-        });
+        // No navigation needed for card-only layout
     }
 
     switchSection(section) {
@@ -80,22 +47,34 @@ class DesktopDashboard {
         }, 30000); // Update every 30 seconds
     }
 
-    updateStats() {
-        // Notes count
-        const savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-        document.getElementById('notesCount').textContent = savedNotes.length;
-        
-        // Files count
-        const fileList = document.getElementById('fileListDisplay');
-        const filesCount = fileList ? fileList.children.length : 0;
-        document.getElementById('filesCount').textContent = filesCount;
-        
-        // Passwords count
-        const pmEntries = JSON.parse(localStorage.getItem('pmEntries') || '[]');
-        document.getElementById('passwordsCount').textContent = pmEntries.length;
-        
-        // Friends count (placeholder)
-        document.getElementById('friendsCount').textContent = '0';
+    async updateStats() {
+        try {
+            // Get auth manager from global scope
+            if (typeof authManager === 'undefined' || !authManager?.currentUser) {
+                return;
+            }
+            
+            // Notes count from Firestore
+            const notesSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
+                .collection('notes').get();
+            document.getElementById('notesCount').textContent = notesSnapshot.size;
+            
+            // Passwords count from Firestore
+            const passwordsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
+                .collection('passwords').get();
+            document.getElementById('passwordsCount').textContent = passwordsSnapshot.size;
+            
+            // Friends count from Firestore
+            const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
+                .collection('friends').where('status', '==', 'accepted').get();
+            document.getElementById('friendsCount').textContent = friendsSnapshot.size;
+            
+            // Files count from Supabase (placeholder for now)
+            document.getElementById('filesCount').textContent = '0';
+            
+        } catch (error) {
+            console.error('Error updating stats:', error);
+        }
     }
 
     setupResponsive() {

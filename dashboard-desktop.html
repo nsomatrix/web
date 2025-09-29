@@ -351,40 +351,18 @@
                 document.getElementById('loader-container').innerHTML = html;
             });
         
-        // Navigation handling for desktop layout
+        // Desktop dashboard card functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const navItems = document.querySelectorAll('.nav-item');
-            const cardActions = document.querySelectorAll('.card-action');
-            
-            // Handle navigation clicks
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    // Remove active class from all items
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    // Add active class to clicked item
-                    this.classList.add('active');
-                    
-                    // Handle section switching if needed
-                    const section = this.dataset.section;
-                    if (section && section !== 'overview') {
-                        // Trigger existing modal/functionality
-                        const buttonId = this.id;
-                        if (buttonId) {
-                            document.getElementById(buttonId).click();
-                        }
-                    }
-                });
-            });
-            
-            // Handle card action clicks
-            cardActions.forEach(action => {
-                action.addEventListener('click', function() {
-                    const section = this.dataset.section;
-                    if (section) {
-                        // Find corresponding nav item and trigger click
-                        const navItem = document.querySelector(`[data-section="${section}"]`);
-                        if (navItem) {
-                            navItem.click();
+            // Make cards clickable
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const buttonId = this.id;
+                    if (buttonId) {
+                        // Trigger the existing button functionality
+                        const existingButton = document.getElementById(buttonId);
+                        if (existingButton && existingButton.onclick) {
+                            existingButton.onclick();
                         }
                     }
                 });
