@@ -95,6 +95,9 @@ function applyTranslations() {
         $('#main-dashboard h2.welcome-message').html(getTranslation('welcome_message') + ` <span id="dashboard-username"></span>!`);
         $('#dashboard-username').text(authManager.currentUser.displayName);
     }
+    
+    // Handle responsive text after translation
+    setTimeout(() => handleResponsiveText(), 100);
 }
 
 // Avatar functions
@@ -640,6 +643,40 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
+// Handle responsive text adjustments
+function handleResponsiveText() {
+    const isMobile = window.innerWidth <= 768;
+    const isSmallMobile = window.innerWidth <= 480;
+    
+    // Adjust button text for mobile
+    $('.btn[data-translate-key]').each(function() {
+        const $btn = $(this);
+        const text = $btn.text().trim();
+        
+        if (isSmallMobile && text.length > 12) {
+            $btn.css({
+                'font-size': '11px',
+                'padding': '0.5rem 0.6rem',
+                'line-height': '1.1'
+            });
+        } else if (isMobile && text.length > 16) {
+            $btn.css({
+                'font-size': '12px',
+                'padding': '0.6rem 0.8rem',
+                'line-height': '1.2'
+            });
+        }
+    });
+    
+    // Adjust modal content for long text
+    $('.modal-content h3').each(function() {
+        const $header = $(this);
+        if ($header.text().length > 30 && isMobile) {
+            $header.css('font-size', 'clamp(0.9rem, 4vw, 1.1rem)');
+        }
+    });
+}
+
 // Initialize application
 $(document).ready(function() {
     const storedLang = localStorage.getItem('selectedLanguage') || 'en';
@@ -657,4 +694,12 @@ $(document).ready(function() {
             loadTranslations(selectedLang);
         });
     }
+    
+    // Handle window resize
+    $(window).on('resize orientationchange', function() {
+        setTimeout(() => handleResponsiveText(), 200);
+    });
+    
+    // Initial responsive text handling
+    setTimeout(() => handleResponsiveText(), 500);
 });

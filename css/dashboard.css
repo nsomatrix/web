@@ -1,622 +1,482 @@
-/* dashboard.css */
-
-/* ========================================= */
-/* Global CSS Variables (Custom Properties)  */
-/* Define your theme colors, spacing, etc. here for easy updates */
-/* ========================================= */
+/* Glassomorphism Dashboard CSS - Mobile First */
 :root {
-    /* Colors - Keeping existing for now as user's latest CSS doesn't use these widely for new elements */
-    --color-background-dark: #1A1A1A;
-    --color-text-light: #e2e8f0; /* Default text color */
-    --color-accent-blue: #60a5fa;
-    --color-card-background: rgba(15, 15, 15, 0.7);
-    --color-modal-background: rgba(15, 15, 15, 0.9); /* From user's latest CSS */
-    --color-border-dark: #333; /* Used in old ephemeral, re-evaluate */
-    --color-list-background: #2a2a2a; /* Specific background for file list */
-
-    /* Spacing */
-    --spacing-xs: 5px;
-    --spacing-sm: 8px;
-    --spacing-md: 10px;
-    --spacing-lg: 15px;
-    --spacing-xl: 30px;
-
-    /* Border Radius - Aligning to user's latest values */
-    --border-radius-sm: 0.375rem; /* Consistent with form-control, nav-btn */
-    --border-radius-md: 0.5rem; /* Consistent with general buttons */
-    --border-radius-lg: 0.75rem; /* Consistent with cards/modals */
-
-    /* Font */
-    --font-size-sm: 0.8em; /* For timestamps */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 0, 0, 0.5);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --text-light: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.7);
+  --accent-red: #ff0000;
 }
 
-/* General body and text styling for a modern dark theme */
+/* Text overflow handling for all languages */
+* {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 body {
-  background-color: #1A1A1A; /* User's specified dark background */
-  color: #e2e8f0; /* Light grey text */
-  font-family: 'Inter', inherit; /* Modern sans-serif font */
+  background: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
+  color: var(--text-light);
+  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
-/* Main sections (setup and dashboard) as smooth cards */
+/* Pen effect background */
+#fullScreenPenEffect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  border: none;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Glass containers */
 #setup-section, #main-dashboard {
-  max-width: 500px;
-  margin: 50px auto;
-  padding: 30px 24px; /* Increased top/bottom padding for more vertical space */
-  background-color: rgba(15, 15, 15, 0.7); /* Semi-transparent dark background */
-  border: none; /* Remove explicit border */
-  border-radius: var(--border-radius-lg); /* Large border-radius for smooth cards */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
-  display: flex; /* Ensure flex for column layout */
-  flex-direction: column; /* Stack children vertically */
-  align-items: center; /* Center items horizontally within the card */
-}
-
-/* Header styling */
-h2, h3 {
-  color: #60a5fa; /* Modern blue accent for headers */
-  text-align: center;
-  margin-bottom: 30px; /* Increased margin-bottom for headers for more separation */
-}
-
-/* Input field styling for modern look */
-.form-control {
-  background-color: #2b3a4a; /* Darker grey for input background, slightly lighter than card */
-  border: 1px solid #475569; /* Subtle border */
-  color: #e2e8f0; /* Light text for input */
-  text-align: center;
-  padding: 12px 16px; /* Slightly more vertical padding for better touch targets */
+  max-width: min(90vw, 500px);
   width: 100%;
-  border-radius: var(--border-radius-sm); /* Rounded corners for input */
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
-  margin-bottom: 20px; /* Ensure good spacing below the input field */
-}
-.form-control::placeholder {
-  color: #94a3b8; /* Lighter placeholder color for better contrast */
+  margin: 20px auto 0;
+  padding: 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  box-sizing: border-box;
 }
 
-/* Avatar Selector Styling */
+/* Headers */
+h2, h3 {
+  color: var(--text-light);
+  text-align: center;
+  margin: 0 0 1rem 0;
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 300;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.3;
+}
+
+/* Form controls */
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-light);
+  padding: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-red);
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+}
+
+.form-control::placeholder {
+  color: var(--text-dim);
+}
+
+/* Avatar system */
 .avatar-selector {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px; /* Slightly reduced gap for compactness, especially on mobile */
-  margin: 30px 0; /* Adjusted vertical margin for better spacing */
-  width: 100%; /* Ensure it takes full width of its parent */
+  gap: 1.5rem;
+  margin: 2rem 0;
 }
 
-/* Avatar Wrapper Styling */
 .avatar-wrapper {
-  width: 100px;
-  height: 100px;
-  border-radius: 0.5rem; /* Slightly rounded square */
-  border: none; /* No border */
-  background-color: transparent; /* Changed to transparent */
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  box-shadow: none;
-  flex-shrink: 0; /* Prevent it from shrinking too much on small screens */
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
-/* Selected state for the wrapper - blue background and border removed */
-.avatar-wrapper.selected {
-  box-shadow: none;
-}
-
-/* Avatar Image Styling (inside the wrapper) */
-.avatar-display {
+.avatar-display, .user-avatar-display {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures image fills the space, potentially cropping */
-  object-position: center; /* Centers the image content */
-  image-rendering: pixelated; /* Keep for pixel art avatars */
-}
-
-/* Navigation Buttons */
-.nav-btn {
-  background-color: #2b3a4a; /* Darker grey background, same as input/avatar wrapper */
-  color: #e2e8f0; /* Light text */
-  border: none; /* No border */
-  padding: 10px 15px; /* Adjusted padding for better touch targets */
-  cursor: pointer;
-  font-size: 1.5em; /* Slightly smaller arrows for better fit */
-  line-height: 1;
-  border-radius: var(--border-radius-sm); /* Rounded corners */
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Subtle shadow */
-  flex-shrink: 0; /* Prevent from shrinking */
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-out, box-shadow 0.2s ease-in-out;
-}
-.nav-btn:hover {
-  background-color: #60a5fa; /* Blue background on hover */
-  color: white;
-  box-shadow: 0 4px 6px -1px rgba(96, 165, 250, 0.2), 0 2px 4px -1px rgba(96, 165, 250, 0.1);
-}
-.nav-btn:active {
-  transform: translateY(1px);
-}
-
-/* Bootstrap button overrides for modern look */
-.btn {
-  border-radius: var(--border-radius-md); /* Rounded corners for all buttons */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Subtle shadow */
-  text-shadow: none;
-  padding: 10px 20px;
-  margin: 8px; /* Adjusted margin */
-  transition: all 0.2s ease-in-out;
-  color: white; /* Ensure all buttons have white text by default */
-}
-
-.btn-primary, .btn-success {
-  background-color: #2563eb; /* Blue */
-  border-color: transparent;
-  color: white;
-}
-.btn-primary:hover, .btn-success:hover {
-  background-color: #1d4ed8; /* Darker blue on hover */
-  box-shadow: 0 6px 10px -2px rgba(37, 99, 235, 0.3), 0 3px 5px -1px rgba(37, 99, 235, 0.2);
-}
-
-.btn-warning {
-  background-color: #f97316; /* Orange-red for warning, closer to progress bar */
-  border-color: transparent;
-  color: white;
-}
-.btn-warning:hover {
-  background-color: #ea580c; /* Darker orange-red on hover */
-  box-shadow: 0 6px 10px -2px rgba(249, 115, 22, 0.3), 0 3px 5px -1px rgba(249, 115, 22, 0.2);
-}
-
-.btn-danger {
-  background-color: #ef4444; /* Red */
-  border-color: transparent;
-  color: white;
-}
-.btn-danger:hover {
-  background-color: #dc2626; /* Darker red on hover */
-  box-shadow: 0 6px 10px -2px rgba(239, 68, 68, 0.3), 0 3px 5px -1px rgba(239, 68, 68, 0.2);
-}
-
-.btn-secondary { /* Style for Notes, Ephemeral, Password Manager buttons */
-    background-color: #475569; /* Slate grey */
-    border-color: transparent;
-    color: white;
-}
-.btn-secondary:hover {
-    background-color: #334155; /* Darker slate grey */
-    box-shadow: 0 6px 10px -2px rgba(71, 85, 105, 0.3), 0 3px 5px -1px rgba(71, 85, 105, 0.2);
-}
-
-/* Removed .btn-info styling as it was for the speedtest button */
-
-
-/* Main Dashboard elements */
-#main-dashboard h2, #main-dashboard p {
-  color: #60a5fa; /* Blue for main dashboard text */
-}
-
-.last-login-display {
-    text-align: center;
-    color: #94a3b8; /* Lighter grey color */
-    font-size: 0.9em;
-    margin-top: 5px;
-    margin-bottom: 15px;
+  object-fit: cover;
 }
 
 .user-avatar-display {
-  width: 100px;
-  height: 100px;
-  border-radius: 0.5rem; /* Rounded square for main avatar */
-  border: none; /* No border */
-  image-rendering: pixelated; /* Keep for pixel art avatars */
-  object-fit: cover; /* Ensures image fills the space, potentially cropping */
-  object-position: center; /* Centers the image content */
-  margin: 16px auto; /* Adjusted margin and centered */
-  display: block; /* Make it a block element to center with margin: auto */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Subtle shadow */
+  width: 60px;
+  height: 60px;
+  border: none;
+  background: transparent;
+  display: block;
+  margin: 0 auto;
 }
 
+.nav-btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  color: var(--text-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow);
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Button system */
+.btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-light);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow);
+  min-width: 100px;
+  word-wrap: break-word;
+  hyphens: auto;
+  text-align: center;
+  line-height: 1.2;
+  white-space: normal;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.btn-primary, .btn-success {
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.8), rgba(255, 71, 87, 0.6));
+  border-color: var(--accent-red);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.8), rgba(255, 59, 48, 0.6));
+}
+
+/* Dashboard layout */
 .dashboard-buttons {
-    display: flex;
-    flex-wrap: wrap; /* Allow buttons to wrap to next line on small screens */
-    justify-content: center; /* Center buttons horizontally */
-    margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
-/* Removed Speedtest Results Display Styling */
-
-/* Modal Styles */
-.modal {
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.last-login-display {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
 }
 
-.modal-content {
-    background-color: var(--color-modal-background); /* Using variable */
-    margin: auto;
-    padding: 20px;
-    border-radius: var(--border-radius-lg);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    width: 90%; /* Responsive width */
-    max-width: 400px; /* Max width for desktop */
-    position: relative;
-    z-index: 1000;
-    text-align: center;
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    color: #60a5fa;
-}
-
-.close-button {
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    cursor: pointer;
-    z-index: 1001;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* NEW RULE: Ensure button text is white within delete confirmation modals */
-#deleteFileConfirmModal .modal-content button,
-#deleteAccountConfirmModal .modal-content button,
-#deleteNoteConfirmModal .modal-content button, /* NEW */
-#deletePmEntryConfirmModal .modal-content button /* NEW */
-{
-    color: white;
-}
-
-/* NEW RULE: Ensure paragraph text is white within delete confirmation modals */
-#deleteFileConfirmModal .modal-content p,
-#deleteAccountConfirmModal .modal-content p,
-#deleteNoteConfirmModal .modal-content p, /* NEW */
-#deletePmEntryConfirmModal .modal-content p /* NEW */
-{
-    color: white;
-}
-
-
-/* --- Ephemeral Files Section Styling (Magic Design) --- */
-
-/* Custom File Upload Input Wrapper */
-/* This now contains the "Choose File" button, file name display, and "Upload File" button */
-.custom-file-upload {
-    display: flex;
-    flex-direction: column; /* CHANGE: Force column layout for stacking */
-    flex-wrap: wrap; /* Allow items to wrap if needed, although column should prevent this for now */
-    align-items: center; /* Center items horizontally within the column */
-    justify-content: center; /* Vertically center content if there's extra space */
-    gap: 10px; /* Reduced gap for stacked items */
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto 30px auto; /* Center container and add bottom margin */
-}
-
-/* Hide the default file input visually */
-.custom-file-upload input[type="file"] {
-    display: none;
-}
-
-/* Custom "Choose File" button styling - aligned with btn-secondary */
-.custom-file-upload-button {
-    display: inline-block; /* Treat as inline-block to respect flex rules */
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: var(--border-radius-md);
-    background-color: #475569;
-    color: white;
-    border: transparent;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    flex-shrink: 0; /* Prevent from shrinking */
-    width: 100%; /* Make it take full width of the flex container */
-    max-width: 250px; /* Optional: limit max width even if 100% */
-}
-
-.custom-file-upload-button:hover {
-    background-color: #334155;
-    box-shadow: 0 6px 10px -2px rgba(71, 85, 105, 0.3), 0 3px 5px -1px rgba(71, 85, 105, 0.2);
-}
-
-.custom-file-upload-button:active {
-    transform: translateY(1px);
-}
-
-/* Display for selected file name */
-.file-name-display {
-    color: #e2e8f0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 5px;
-    min-width: 50px;
-    width: 100%; /* Make it take full width of the flex container */
-    max-width: 250px; /* Optional: limit max width */
-    text-align: center; /* Center text within this element */
-    flex-shrink: 1; /* Allow it to shrink if necessary */
-}
-
-/* The Upload File Button - now a flex item within .custom-file-upload */
-#uploadFileBtn {
-    flex-shrink: 0; /* Prevent from shrinking */
-    width: 100%; /* Make it take full width of the flex container */
-    max-width: 250px; /* Optional: limit max width */
-}
-
-
-/* Styles for the Ephemeral Files List Container */
-#fileListDisplay {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #475569;
-    padding: 15px;
-    border-radius: 0.375rem;
-    background-color: #1f2937;
-    margin-top: 20px;
-    list-style: none;
-    padding-left: 0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Styling for individual file items (the div.file-item) */
-#fileListDisplay .file-item {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center; /* Vertically center items */
-    padding: 8px 0;
-    border-bottom: 1px solid #2b3a4a;
-    justify-content: flex-start; /* Align all items to the left */
-}
-
-/* Remove border from the last file item */
-#fileListDisplay .file-item:last-child {
-    border-bottom: none;
-}
-
-/* File name within the list item */
-#fileListDisplay .file-name {
-    color: #a78bfa;
-    flex-grow: 1; /* Allows it to take available space */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-    font-weight: bold;
-    text-align: left;
-}
-
-/* File timestamp within the list item */
-#fileListDisplay .file-timestamp {
-    font-size: var(--font-size-sm);
-    color: #94a3b8;
-    white-space: nowrap;
-    margin-left: 10px;
-}
-
-/* Container for download/delete buttons */
-#fileListDisplay .file-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-/* Specific styling for download button */
-.download-file-action-btn {
-    background-color: #2563eb;
-    border-color: transparent;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    font-size: 0.8em;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-.download-file-action-btn:hover {
-    background-color: #1d4ed8;
-    box-shadow: 0 2px 4px -1px rgba(37, 99, 235, 0.2);
-}
-
-/* Specific styling for delete button */
-.delete-file-btn {
-    background-color: #ef4444;
-    border-color: transparent;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    font-size: 0.8em;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-.delete-file-btn:hover {
-    background-color: #dc2626;
-    box-shadow: 0 2px 4px -1px rgba(239, 68, 68, 0.2);
-}
-
-/* Notes & Password Manager & Ephemeral File List Display */
-.saved-notes-display, .file-list-display {
-    background-color: #1f2937;
-    border-radius: 0.375rem;
-    padding: 15px;
-    margin-top: 20px;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #475569;
-}
-.saved-notes-display p, .file-list-display div {
-    padding: 8px 0;
-    border-bottom: 1px solid #2b3a4a;
-    color: #e2e8f0;
-    word-wrap: break-word;
-}
-.saved-notes-display p:last-child, .file-list-display div:last-child {
-    border-bottom: none;
-}
-.saved-notes-display p strong, .file-list-display div strong {
-    color: #a78bfa;
-}
-.file-list-display button {
-    margin-left: 10px;
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 0.25rem;
-    padding: 4px 8px;
-    font-size: 0.8em;
-    cursor: pointer;
-}
-.file-list-display button:hover {
-    background-color: #dc2626;
-}
-
-/* Custom Message Box */
-.custom-message-box {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #333;
-    color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-    z-index: 10000;
-    text-align: center;
-    font-family: inherit;
-    font-size: 1.1em;
-}
-
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  /* ... (other responsive styles) ... */
-
-  /* Responsive for ephemeral file list items */
-  #fileListDisplay .file-item {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 8px 0;
-      gap: 5px;
-      justify-items: start;
-  }
-  /* Ensure the filename takes full width and aligns left when stacked */
-  #fileListDisplay .file-name {
-      width: 100%;
-      text-align: left;
-  }
-  /* Align timestamp to the left when stacked */
-  #fileListDisplay .file-timestamp {
-      margin-left: 0;
-      align-self: flex-start;
-  }
-  /* Align action buttons to the left when stacked */
-  #fileListDisplay .file-actions {
-      width: 100%;
-      justify-content: flex-start;
-  }
-
-  /* Responsive for ephemeral file upload - force column layout on smaller screens */
-  .custom-file-upload {
-      flex-direction: column; /* Force column layout on small screens */
-      gap: 10px; /* Reduced gap for stacked items */
-  }
-  .custom-file-upload-button,
-  .file-name-display,
-  #uploadFileBtn { /* Apply width to all elements within the flex container */
-      width: 100%; /* Make them take full width when stacked */
-      text-align: center; /* Center text within these elements when stacked */
-      max-width: none; /* Remove max-width constraint for full width */
-  }
-  .file-name-display {
-    text-align: center; /* Ensure text is centered when stacked */
-  }
-}
-
-/* #fullScreenPenEffect styling (from previous CSS) */
-#fullScreenPenEffect {
-    position: fixed; /* Fixed to the viewport */
-    top: 0;
-    left: 0;
-    width: 100vw; /* 100% of viewport width */
-    height: 100vh; /* 100% of viewport height */
-    z-index: -1; /* Place it behind other content */
-    border: none; /* Remove default iframe border */
-    background-color: #000; /* Fallback background for iframe */
-    pointer-events: none; /* CRUCIAL: Allows clicks/interactions to pass through to elements below */
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Hide any overflow from within the iframe's bounds */
-}
-
-/* #deleteAccountConfirmModal .modal-content p styling (from previous CSS) */
-#deleteAccountConfirmModal .modal-content p {
-    color: #ffffff; /* Sets the text color to white */
-}
-
-/* Styles for the language selector to ensure visibility and position (from previous CSS) */
-.language-selector label {
-    color: white; /* Sets the text color to white */
+/* Language selector */
+.language-selector {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  padding: 0.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  box-shadow: var(--glass-shadow);
 }
 
 .language-selector select {
-    background-color: #2b3a4a; /* Darker grey from theme, consistent with form-control */
-    border: 1px solid #475569; /* Use a consistent border color */
-    color: #e2e8f0; /* Ensure text is light grey for contrast */
-    padding: 8px 12px; /* Add some padding */
-    border-radius: 0.375rem; /* Rounded corners */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  color: var(--text-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  padding: 0.25rem;
+  font-family: inherit;
+  font-size: 0.8rem;
 }
 
-/* Ensure options are readable when the dropdown is open (from previous CSS) */
-.language-selector select option {
-    background-color: #2b3a4a; /* Set option background to match select */
-    color: #e2e8f0; /* Set option text to light grey for readability */
+.language-selector label {
+  display: none;
 }
 
-/* Add to dashboard.css if not using Tailwind directly */
-#fileUploadProgressBarContainer {
-    width: 100%; /* Ensure it takes full width within its flex column */
-    max-width: 250px; /* Match other elements' max-width for consistency */
-    display: none; /* Hidden by default */
-}
-#fileUploadProgressBar {
-    height: 100%;
-    width: 0%;
-    background-color: #3b82f6; /* A blue color */
-    border-radius: 9999px; /* Fully rounded */
-    transition: width 0.1s linear; /* Smooth transition for progress */
-}
-#fileUploadProgressText {
-    display: none; /* Hidden by default */
-    text-align: center;
-    color: #94a3b8; /* Light gray text */
-    font-size: 0.875rem; /* Text-sm equivalent */
-    margin-top: 4px; /* mt-1 equivalent */
+/* Modals */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
-.confirm-file-deletion-message select option {
-    color : white;
+.modal-content {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  max-width: min(90vw, 400px);
+  max-height: calc(100vh - 2rem);
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--glass-shadow);
+  overflow-y: auto;
+  box-sizing: border-box;
+  word-wrap: break-word;
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  color: var(--text-light);
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  color: var(--accent-red);
+  transform: scale(1.1);
+}
+
+/* File displays */
+.saved-notes-display, .file-list-display {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+/* File upload - compact */
+.custom-file-upload {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.custom-file-upload-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.file-name-display {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  padding: 0.5rem;
+  flex: 1;
+  min-width: 100px;
+}
+
+/* File items - compact */
+.file-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  gap: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.file-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.file-name {
+  color: var(--text-light);
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.25rem;
+  align-self: flex-end;
+}
+
+.file-actions button {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  min-width: 50px;
+}
+
+.download-file-action-btn {
+  background: rgba(59, 130, 246, 0.8);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  transition: all 0.3s ease;
+}
+
+.download-file-action-btn:hover {
+  background: rgba(59, 130, 246, 1);
+  transform: translateY(-1px);
+}
+
+.delete-file-btn {
+  background: rgba(239, 68, 68, 0.8);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  transition: all 0.3s ease;
+}
+
+.delete-file-btn:hover {
+  background: rgba(239, 68, 68, 1);
+  transform: translateY(-1px);
+}
+
+/* Custom message box */
+.custom-message-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  z-index: 1100;
+  text-align: center;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Remove list-group styling */
+.list-group {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Tablet styles */
+@media (min-width: 768px) {
+  #setup-section, #main-dashboard {
+    max-width: 600px;
+    padding: 3rem;
+  }
+  
+  .dashboard-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .avatar-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 480px) {
+  .btn {
+    font-size: 12px;
+    padding: 0.6rem 0.8rem;
+    min-height: 40px;
+    margin: 0.2rem;
+  }
+  
+  h2, h3 {
+    font-size: clamp(0.9rem, 5vw, 1.1rem);
+  }
+  
+  .form-control {
+    font-size: 14px;
+    padding: 0.75rem;
+  }
+  
+  .modal-content {
+    padding: 0.8rem;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  #setup-section, #main-dashboard {
+    max-width: 700px;
+  }
+  
+  .dashboard-buttons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .modal-content {
+    max-width: 500px;
+  }
 }
