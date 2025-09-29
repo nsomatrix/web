@@ -57,6 +57,9 @@
         <button id="saveProfileBtn" class="btn btn-success" data-translate-key="save_profile_button">Save Profile</button>
     </div>
 
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
+
     <div id="main-dashboard" style="display:none;">
         <!-- Header -->
         <header class="dashboard-header">
@@ -119,7 +122,7 @@
                 </div>
 
                 <div class="dashboard-grid">
-                    <div class="dashboard-card">
+                    <div class="dashboard-card" id="serverBtn">
                         <div class="card-header">
                             <div class="card-icon">
                                 <i class="fas fa-server"></i>
@@ -127,10 +130,9 @@
                             <h3 class="card-title" data-translate-key="server_button">Server Management</h3>
                         </div>
                         <p class="card-description">Access and manage your server configurations and settings.</p>
-                        <button class="card-action" data-section="server">Open Server</button>
                     </div>
 
-                    <div class="dashboard-card">
+                    <div class="dashboard-card" id="notesBtn">
                         <div class="card-header">
                             <div class="card-icon">
                                 <i class="fas fa-sticky-note"></i>
@@ -138,10 +140,9 @@
                             <h3 class="card-title" data-translate-key="notes_button">Notes</h3>
                         </div>
                         <p class="card-description">Create, edit, and organize your personal notes securely.</p>
-                        <button class="card-action" data-section="notes">Manage Notes</button>
                     </div>
 
-                    <div class="dashboard-card">
+                    <div class="dashboard-card" id="passwordManagerBtn">
                         <div class="card-header">
                             <div class="card-icon">
                                 <i class="fas fa-key"></i>
@@ -149,10 +150,9 @@
                             <h3 class="card-title" data-translate-key="password_manager_button">Password Manager</h3>
                         </div>
                         <p class="card-description">Store and manage your passwords with military-grade encryption.</p>
-                        <button class="card-action" data-section="passwords">Open Vault</button>
                     </div>
 
-                    <div class="dashboard-card">
+                    <div class="dashboard-card" id="ephemeralFilesBtn">
                         <div class="card-header">
                             <div class="card-icon">
                                 <i class="fas fa-file-alt"></i>
@@ -160,10 +160,9 @@
                             <h3 class="card-title" data-translate-key="ephemeral_files_button">Ephemeral Files</h3>
                         </div>
                         <p class="card-description">Upload and share files with automatic expiration for security.</p>
-                        <button class="card-action" data-section="files">Manage Files</button>
                     </div>
 
-                    <div class="dashboard-card">
+                    <div class="dashboard-card" id="friendsBtn">
                         <div class="card-header">
                             <div class="card-icon">
                                 <i class="fas fa-users"></i>
@@ -171,7 +170,26 @@
                             <h3 class="card-title" data-translate-key="friends_button">Friends</h3>
                         </div>
                         <p class="card-description">Connect with friends and manage your social network.</p>
-                        <button class="card-action" data-section="friends">View Friends</button>
+                    </div>
+
+                    <div class="dashboard-card danger" id="deleteAccountBtn">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <h3 class="card-title" data-translate-key="delete_account_button">Delete Account</h3>
+                        </div>
+                        <p class="card-description">Permanently delete your account and all associated data.</p>
+                    </div>
+
+                    <div class="dashboard-card danger" id="logoutBtn">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <h3 class="card-title" data-translate-key="logout_button">Logout</h3>
+                        </div>
+                        <p class="card-description">Sign out of your account securely.</p>
                     </div>
                 </div>
             </div>
@@ -376,7 +394,7 @@
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
-                // Don't show navbar in desktop layout
+                document.getElementById('navbar-container').innerHTML = html;
                 return fetch('components/navbar.js');
             })
             .then(response => response.text())
