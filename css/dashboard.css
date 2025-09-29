@@ -318,6 +318,67 @@ h2, h3 {
   cursor: pointer;
 }
 
+/* Messages */
+.messages-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.message-item {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.message-sent {
+  background: var(--accent-red);
+  color: white;
+  margin-left: auto;
+  text-align: right;
+}
+
+.message-received {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+}
+
+.message-input-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.message-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  color: var(--text-light);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: var(--accent-red);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+.message-input::placeholder {
+  color: var(--text-dim);
+}
+
+.message-timestamp {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
 .nav-btn {
   background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.1));
   backdrop-filter: blur(10px);

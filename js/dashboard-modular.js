@@ -544,6 +544,17 @@ function setupEventListeners() {
         }
     };
 
+    // Message functionality
+    document.getElementById('sendMessageBtn').onclick = () => {
+        sendNewMessage();
+    };
+
+    document.getElementById('messageInput').onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            sendNewMessage();
+        }
+    };
+
     // Notification and message functionality will be set after dashboard loads
 
     // Modal close buttons
@@ -829,23 +840,30 @@ async function displaySearchResults(results) {
 
 window.addFriend = async function(friendId, friendUsername) {
     try {
+        console.log('Sending friend request from:', authManager.currentUser.uid, 'to:', friendId);
+        
         // Get current user data
         const currentUserDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
         const currentUserData = currentUserDoc.data();
+        console.log('Current user data:', currentUserData);
         
         // Send friend request
+        const requestData = {
+            fromUserId: authManager.currentUser.uid,
+            fromUsername: currentUserData.usernameTag || currentUserData.username,
+            status: 'pending',
+            sentAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        console.log('Request data:', requestData);
+        
         await db.collection('players').doc(friendId)
-            .collection('friendRequests').doc(authManager.currentUser.uid).set({
-                fromUserId: authManager.currentUser.uid,
-                fromUsername: currentUserData.usernameTag,
-                status: 'pending',
-                sentAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            .collection('friendRequests').doc(authManager.currentUser.uid).set(requestData);
         
         showMessageBox('Friend request sent!', 'success', 2000, translations);
         closeModal(document.getElementById('searchResultsModal'));
     } catch (error) {
         console.error('Add friend error:', error);
+        console.error('Error details:', error.code, error.message);
         showMessageBox('Failed to send friend request', 'error', 3000, translations);
     }
 }
@@ -905,9 +923,95 @@ window.removeFriend = async function(friendId) {
     }
 }
 
-function sendMessage(friendId) {
-    // TODO: Implement messaging functionality
-    showMessageBox('Messaging feature coming soon!', 'info', 2000, translations);
+window.sendMessage = function(friendId) {
+    currentChatFriend = friendId;
+    openModal(document.getElementById('messagesModal'));
+    loadMessages(friendId);
+}
+
+let currentChatFriend = null;
+
+async function loadMessages(friendId) {
+    try {
+        // Get friend's username for title
+        const friendDoc = await db.collection('players').doc(friendId).get();
+        const friendData = friendDoc.data();
+        document.getElementById('messageModalTitle').textContent = `Chat with @${friendData.usernameTag}`;
+        
+        // Load messages
+        const messagesSnapshot = await db.collection('messages')
+            .where('participants', 'array-contains', authManager.currentUser.uid)
+            .get();
+        
+        let chatMessages = [];
+        messagesSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.participants.includes(friendId)) {
+                chatMessages.push({ id: doc.id, ...data });
+            }
+        });
+        
+        // Sort by timestamp
+        chatMessages.sort((a, b) => {
+            if (!a.createdAt || !b.createdAt) return 0;
+            return a.createdAt.toMillis() - b.createdAt.toMillis();
+        });
+        
+        displayMessages(chatMessages);
+    } catch (error) {
+        console.error('Load messages error:', error);
+    }
+}
+
+function displayMessages(messages) {
+    const messagesList = document.getElementById('messagesList');
+    messagesList.innerHTML = '';
+    
+    if (messages.length === 0) {
+        messagesList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No messages yet</p>';
+        return;
+    }
+    
+    messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        const isSent = message.senderId === authManager.currentUser.uid;
+        messageDiv.className = `message-item ${isSent ? 'message-sent' : 'message-received'}`;
+        
+        let timestamp = '';
+        if (message.createdAt) {
+            timestamp = message.createdAt.toDate().toLocaleString();
+        }
+        
+        messageDiv.innerHTML = `
+            <div>${message.text}</div>
+            <div class="message-timestamp">${timestamp}</div>
+        `;
+        messagesList.appendChild(messageDiv);
+    });
+    
+    messagesList.scrollTop = messagesList.scrollHeight;
+}
+
+async function sendNewMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const messageText = messageInput.value.trim();
+    
+    if (!messageText || !currentChatFriend) return;
+    
+    try {
+        await db.collection('messages').add({
+            text: messageText,
+            senderId: authManager.currentUser.uid,
+            participants: [authManager.currentUser.uid, currentChatFriend],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        messageInput.value = '';
+        loadMessages(currentChatFriend);
+    } catch (error) {
+        console.error('Send message error:', error);
+        showMessageBox('Failed to send message', 'error', 3000, translations);
+    }
 }
 
 // Setup notification handlers
@@ -929,7 +1033,8 @@ function setupNotificationHandlers() {
             messageIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                showMessageBox('Messaging feature coming soon!', 'info', 2000, translations);
+                openModal(document.getElementById('messagesModal'));
+                loadRecentChats();
             });
         }
     }, 1000);
@@ -1070,6 +1175,47 @@ window.markAsRead = async function(notificationId) {
         loadNotifications();
     } catch (error) {
         console.error('Mark as read error:', error);
+    }
+}
+
+async function loadRecentChats() {
+    try {
+        document.getElementById('messageModalTitle').textContent = 'Recent Chats';
+        
+        // Get friends list to show as chat options
+        const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').where('status', '==', 'accepted').get();
+        
+        const messagesList = document.getElementById('messagesList');
+        messagesList.innerHTML = '';
+        
+        if (friendsSnapshot.empty) {
+            messagesList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No friends to chat with</p>';
+            return;
+        }
+        
+        for (const doc of friendsSnapshot.docs) {
+            const friend = doc.data();
+            const friendProfile = await db.collection('players').doc(friend.friendId).get();
+            const friendData = friendProfile.data();
+            
+            const chatItem = document.createElement('div');
+            chatItem.className = 'friend-item';
+            chatItem.style.cursor = 'pointer';
+            chatItem.onclick = () => sendMessage(friend.friendId);
+            chatItem.innerHTML = `
+                <div class="friend-info">
+                    <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
+                    <span>@${friend.username}</span>
+                </div>
+                <div class="friend-actions">
+                    <span style="color: var(--accent-red);">Chat</span>
+                </div>
+            `;
+            messagesList.appendChild(chatItem);
+        }
+    } catch (error) {
+        console.error('Load recent chats error:', error);
     }
 }
 
