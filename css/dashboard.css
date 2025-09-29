@@ -126,6 +126,38 @@ h2, h3 {
   margin: 0 auto;
 }
 
+.username-tag {
+  text-align: center;
+  color: var(--accent-red);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.username-tag:hover {
+  background: rgba(255, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.username-tag.editable {
+  border: 1px solid var(--accent-red);
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.username-input {
+  background: transparent;
+  border: none;
+  color: var(--accent-red);
+  text-align: center;
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+}
+
 .nav-btn {
   background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.1));
   backdrop-filter: blur(10px);

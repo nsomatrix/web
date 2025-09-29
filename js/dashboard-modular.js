@@ -142,6 +142,7 @@ async function saveProfile(user) {
         await db.collection('players').doc(user.uid).set({
             username: username,
             avatar: selectedAvatar,
+            usernameTag: username,
             level: data.level || 1
         }, { merge: true });
 
@@ -150,6 +151,7 @@ async function saveProfile(user) {
         mainDashboard.style.display = 'block';
         dashboardUsername.textContent = username;
         userAvatar.src = `avatars/${selectedAvatar}`;
+        setupUsernameTag(username, username);
         applyTranslations();
 
     } catch (error) {
@@ -197,6 +199,7 @@ async function setupDashboard(user) {
 
         dashboardUsername.textContent = data.username;
         userAvatar.src = `avatars/${data.avatar}`;
+        setupUsernameTag(data.usernameTag, data.username);
         setupSection.style.display = 'none';
         mainDashboard.style.display = 'block';
         closeModal(masterPasswordPromptModal);
@@ -678,6 +681,55 @@ function handleResponsiveText() {
             $header.css('font-size', 'clamp(0.9rem, 4vw, 1.1rem)');
         }
     });
+}
+
+// Username tag functionality
+function setupUsernameTag(usernameTag, displayName) {
+    const usernameTagElement = document.getElementById('username-tag');
+    
+    if (usernameTag) {
+        usernameTagElement.textContent = `@${usernameTag}`;
+        usernameTagElement.classList.remove('editable');
+    } else {
+        usernameTagElement.textContent = 'Set username';
+        usernameTagElement.classList.add('editable');
+        
+        usernameTagElement.onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'username-input';
+            input.placeholder = 'Enter username';
+            input.maxLength = 20;
+            
+            usernameTagElement.innerHTML = '';
+            usernameTagElement.appendChild(input);
+            input.focus();
+            
+            const saveUsername = async () => {
+                const newUsername = input.value.trim().replace(/[^a-zA-Z0-9_]/g, '');
+                if (newUsername && authManager.currentUser) {
+                    try {
+                        await db.collection('players').doc(authManager.currentUser.uid).update({
+                            usernameTag: newUsername
+                        });
+                        usernameTagElement.textContent = `@${newUsername}`;
+                        usernameTagElement.classList.remove('editable');
+                        usernameTagElement.onclick = null;
+                    } catch (error) {
+                        console.error('Error saving username:', error);
+                        usernameTagElement.textContent = 'Set username';
+                    }
+                } else {
+                    usernameTagElement.textContent = 'Set username';
+                }
+            };
+            
+            input.onblur = saveUsername;
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') saveUsername();
+            };
+        };
+    }
 }
 
 // Initialize application
