@@ -75,7 +75,7 @@
 
     <div id="main-content">
         <div class="login">
-            <h2>Login</h2>
+            <h2 id="formTitle">Login</h2>
             <div class="inputBx">
                 <input type="email" id="email" placeholder="Email">
             </div>
@@ -85,14 +85,20 @@
                     <i class="fa fa-eye"></i>
                 </span>
             </div>
-            <div class="inputBx">
-                <button id="loginBtn" type="submit">Sign in</button>
+            <div class="inputBx password-input-container" id="confirmPasswordContainer" style="display: none;">
+                <input type="password" id="confirmPassword" placeholder="Confirm Password">
+                <span class="toggle-password" id="toggleConfirmPassword">
+                    <i class="fa fa-eye"></i>
+                </span>
             </div>
             <div class="inputBx">
-                <button id="signupBtn" type="button">Sign Up</button>
+                <button id="primaryBtn" type="submit">Sign in</button>
+            </div>
+            <div class="inputBx">
+                <button id="switchBtn" type="button">Sign Up</button>
             </div>
             <center>
-            <div class="links">
+            <div class="links" id="forgotPasswordLink">
                 <a href="#">Forgot Password?</a>
             </div>
             </center>

@@ -18,29 +18,54 @@ if (!initializeFirebase()) {
     document.addEventListener('firebaseReady', initializeFirebase);
 }
 
-const loginBtn = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
+const primaryBtn = document.getElementById("primaryBtn");
+const switchBtn = document.getElementById("switchBtn");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
-const forgotPasswordLink = document.querySelector(".login .links a[href='#']");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+const confirmPasswordContainer = document.getElementById("confirmPasswordContainer");
+const formTitle = document.getElementById("formTitle");
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+const forgotPasswordLinkAnchor = document.querySelector(".login .links a[href='#']");
 
 const togglePassword = document.getElementById("togglePassword");
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
-if (togglePassword) {
-    togglePassword.addEventListener("click", () => {
-        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-        passwordInput.setAttribute("type", type);
+let isSignupMode = false;
 
-        const eyeIcon = togglePassword.querySelector('i');
-        if (type === "password") {
-            eyeIcon.classList.remove('fa-eye-slash');
-            eyeIcon.classList.add('fa-eye');
-        } else {
-            eyeIcon.classList.remove('fa-eye');
-            eyeIcon.classList.add('fa-eye-slash');
-        }
-    });
+function setupPasswordToggle(toggleElement, inputElement) {
+    if (toggleElement) {
+        toggleElement.addEventListener("click", () => {
+            const type = inputElement.getAttribute("type") === "password" ? "text" : "password";
+            inputElement.setAttribute("type", type);
+            const eyeIcon = toggleElement.querySelector('i');
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+    }
 }
+
+setupPasswordToggle(togglePassword, passwordInput);
+setupPasswordToggle(toggleConfirmPassword, confirmPasswordInput);
+
+function switchMode() {
+    isSignupMode = !isSignupMode;
+    if (isSignupMode) {
+        formTitle.textContent = "Sign Up";
+        primaryBtn.textContent = "Sign Up";
+        switchBtn.textContent = "Login";
+        confirmPasswordContainer.style.display = "block";
+        forgotPasswordLink.style.display = "none";
+    } else {
+        formTitle.textContent = "Login";
+        primaryBtn.textContent = "Sign in";
+        switchBtn.textContent = "Sign Up";
+        confirmPasswordContainer.style.display = "none";
+        forgotPasswordLink.style.display = "block";
+    }
+}
+
+switchBtn.addEventListener("click", switchMode);
 
 // --- Utility Functions (for messages and spinners) ---
 function showMessageBox(message, type = 'info', duration = 4000) {
@@ -129,12 +154,20 @@ async function deriveKey(masterPassword, salt) {
     });
 }
 
+// --- Primary Action Handler ---
+async function handlePrimaryAction() {
+    if (isSignupMode) {
+        await handleSignup();
+    } else {
+        await handleLogin();
+    }
+}
+
 // --- Login Functionality ---
 async function handleLogin() {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
-    // Basic validation
     if (!email || !password) {
         showMessageBox('Please fill in all fields', 'error');
         return;
@@ -145,87 +178,62 @@ async function handleLogin() {
         return;
     }
 
-    // Ensure Firebase is ready
     if (!auth || !db) {
         showMessageBox('Firebase not ready, please try again', 'error');
         return;
     }
 
-    setButtonLoading(loginBtn, true, 'Sign in');
+    setButtonLoading(primaryBtn, true, 'Sign in');
 
     try {
         const userCred = await signInWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
 
-        // Fetch user's salt to derive encryption key
         const playerDoc = await getDoc(doc(db, "players", user.uid));
         const playerData = playerDoc.data();
 
         if (playerData && playerData.salt && playerData.masterPasswordHash) {
             const derivedEncryptionKey = await deriveKey(password, playerData.salt);
             sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
-        } else {
-            console.warn("User data (salt/masterPasswordHash) missing for login. Encryption features might require manual unlock.");
         }
 
-        // Set login state
         localStorage.setItem('userLoggedIn', 'true');
-
         showMessageBox('Login successful! Redirecting', 'success');
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
     } catch (err) {
-        console.error('Login error:', err);
         let errorMessage = 'Login failed. Please try again.';
         if (err.code === 'auth/user-not-found') {
             errorMessage = 'No account found with this email.';
         } else if (err.code === 'auth/wrong-password') {
             errorMessage = 'Incorrect password.';
-        } else if (err.code === 'auth/invalid-email') {
-            errorMessage = 'Invalid email address.';
-        } else if (err.code === 'auth/operation-not-allowed') {
-            errorMessage = 'Email/password authentication is not enabled.';
         } else if (err.code === 'auth/invalid-credential') {
             errorMessage = 'Invalid credentials. Check your email and password.';
-        } else {
-            console.error('Login error details:', err);
-            errorMessage = 'Login failed. Please check your credentials and try again.';
         }
         showMessageBox(errorMessage, 'error');
     } finally {
-        setButtonLoading(loginBtn, false, 'Sign in');
+        setButtonLoading(primaryBtn, false, 'Sign in');
     }
 }
 
-loginBtn.onclick = handleLogin;
-
-emailInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        handleLogin();
-    }
-});
-
-passwordInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        handleLogin();
-    }
-});
-
 // --- Signup Functionality ---
-signupBtn.onclick = async () => {
+async function handleSignup() {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
 
-    // Validation
-    if (!email || !password) {
+    if (!email || !password || !confirmPassword) {
         showMessageBox('Please fill in all fields', 'error');
         return;
     }
 
-    if (!email.includes('@') || email.length > 254) {
+    if (password !== confirmPassword) {
+        showMessageBox('Passwords do not match', 'error');
+        return;
+    }
+
+    if (!email.includes('@')) {
         showMessageBox('Please enter a valid email address', 'error');
         return;
     }
@@ -235,20 +243,20 @@ signupBtn.onclick = async () => {
         return;
     }
 
-    // Ensure Firebase is ready
     if (!auth || !db) {
         showMessageBox('Service not ready, please try again', 'error');
         return;
     }
 
-    setButtonLoading(signupBtn, true, 'Sign Up');
+    setButtonLoading(primaryBtn, true, 'Sign Up');
 
     try {
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
 
         const userSalt = generateSalt();
-        const masterPasswordHash = (await deriveKey(password, userSalt)).toString(CryptoJS.enc.Hex);
+        const derivedKey = await deriveKey(password, userSalt);
+        const masterPasswordHash = derivedKey.toString(CryptoJS.enc.Hex);
 
         await setDoc(doc(db, "players", user.uid), {
             level: 1,
@@ -256,42 +264,41 @@ signupBtn.onclick = async () => {
             masterPasswordHash: masterPasswordHash
         });
 
-        const derivedEncryptionKey = await deriveKey(password, userSalt);
-        sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
-
-        showMessageBox('Account created successfully! Redirecting', 'success');
-        
+        sessionStorage.setItem('currentEncryptionKeyHex', masterPasswordHash);
         localStorage.setItem('userLoggedIn', 'true');
         
+        showMessageBox('Account created successfully! Redirecting', 'success');
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1500);
 
     } catch (err) {
-        console.error('Signup error:', err);
         let errorMessage = 'Account creation failed. Please try again.';
         if (err.code === 'auth/email-already-in-use') {
             errorMessage = 'An account with this email already exists.';
         } else if (err.code === 'auth/weak-password') {
             errorMessage = 'Password is too weak. Please choose a stronger password.';
-        } else if (err.code === 'auth/invalid-email') {
-            errorMessage = 'Invalid email address.';
-        } else if (err.code === 'auth/operation-not-allowed') {
-            errorMessage = 'Email/password authentication is not enabled.';
-        } else {
-            console.error('Signup error details:', err);
-            errorMessage = 'Account creation failed. Please try again.';
         }
         showMessageBox(errorMessage, 'error');
     } finally {
-        setButtonLoading(signupBtn, false, 'Sign Up');
+        setButtonLoading(primaryBtn, false, 'Sign Up');
     }
-};
+}
+
+primaryBtn.onclick = handlePrimaryAction;
+
+[emailInput, passwordInput, confirmPasswordInput].forEach(input => {
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            handlePrimaryAction();
+        }
+    });
+});
 
 // --- Forgot Password Functionality ---
-forgotPasswordLink.onclick = (e) => {
+forgotPasswordLinkAnchor.onclick = (e) => {
     e.preventDefault();
-
     const email = emailInput.value.trim();
 
     if (!email) {
@@ -299,21 +306,18 @@ forgotPasswordLink.onclick = (e) => {
         return;
     }
 
-    // Basic email validation
-    if (!email.includes('@') || email.length > 254) {
+    if (!email.includes('@')) {
         showMessageBox("Please enter a valid email address.", 'error');
         return;
     }
 
     showMessageBox("Sending password reset email...");
-
     sendPasswordResetEmail(auth, email)
         .then(() => {
             showMessageBox("Password reset email sent! Check your inbox.", 'success');
             emailInput.value = '';
         })
-        .catch((error) => {
-            console.error("Password reset error:", error);
+        .catch(() => {
             showMessageBox("Failed to send password reset email. Please try again.", 'error');
         });
 };
