@@ -13,7 +13,6 @@ const db = firebase.firestore();
 const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
 // Global variables
-let translations = {};
 let allAvatars = [];
 let currentAvatarIndex = 0;
 
@@ -33,7 +32,7 @@ const nextAvatarBtn = document.getElementById('nextAvatarBtn');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 const dashboardUsername = document.getElementById('dashboard-username');
 const userAvatar = document.getElementById('user-avatar');
-const languageSelect = document.getElementById('language-select');
+
 
 // Modal elements
 const masterPasswordPromptModal = document.getElementById('masterPasswordPromptModal');
@@ -45,60 +44,13 @@ const ephemeralFilesModal = document.getElementById('ephemeralFilesModal');
 
 // Initialize managers
 function initializeManagers() {
-    authManager = new AuthManager(auth, db, translations);
-    fileManager = new FileManager(authManager, translations);
-    notesManager = new NotesManager(authManager, db, translations);
-    passwordManager = new PasswordManager(authManager, db, translations);
+    authManager = new AuthManager(auth, db);
+    fileManager = new FileManager(authManager);
+    notesManager = new NotesManager(authManager, db);
+    passwordManager = new PasswordManager(authManager, db);
 }
 
-// Translation functions
-async function loadTranslations(lang) {
-    try {
-        const response = await fetch(`languages/${lang}.json`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        translations = await response.json();
-        applyTranslations();
-        localStorage.setItem('selectedLanguage', lang);
-        
-        // Reinitialize managers with new translations
-        if (authManager) initializeManagers();
-    } catch (error) {
-        console.error('Error loading translations:', error);
-        if (lang !== 'en') loadTranslations('en');
-    }
-}
 
-function getTranslation(key) {
-    return translations[key] || `[${key}]`;
-}
-
-function applyTranslations() {
-    document.title = getTranslation('dashboard_title');
-    $('[data-translate-key]').each(function() {
-        const key = $(this).data('translate-key');
-        let translatedText = getTranslation(key);
-        
-        if ($(this).is('input[placeholder], textarea[placeholder]')) {
-            $(this).attr('placeholder', translatedText);
-        } else {
-            if ($(this).children().length > 0) {
-                $(this).contents().filter(function() {
-                    return this.nodeType === 3;
-                }).replaceWith(translatedText);
-            } else {
-                $(this).text(translatedText);
-            }
-        }
-    });
-
-    if ($('#dashboard-username').length && authManager?.currentUser?.displayName) {
-        $('#main-dashboard h2.welcome-message').html(getTranslation('welcome_message') + ` <span id="dashboard-username"></span>!`);
-        $('#dashboard-username').text(authManager.currentUser.displayName);
-    }
-    
-    // Handle responsive text after translation
-    setTimeout(() => handleResponsiveText(), 100);
-}
 
 // Avatar functions
 async function loadAvatars() {
@@ -111,7 +63,7 @@ async function loadAvatars() {
         }
     } catch (error) {
         console.error("Error loading avatars:", error);
-        showMessageBox("could_not_load_avatars_error", "error", 3000, translations);
+        showMessageBox("Could not load avatars", "error", 3000);
     }
 }
 
@@ -127,12 +79,12 @@ async function saveProfile(user) {
     const selectedAvatar = allAvatars[currentAvatarIndex];
 
     if (!username || !selectedAvatar) {
-        showMessageBox("message_box_please_enter_username_avatar", "error", 3000, translations);
+        showMessageBox("Please enter username and select avatar", "error", 3000);
         return;
     }
 
     saveProfileBtn.disabled = true;
-    saveProfileBtn.textContent = getTranslation("saving_status");
+    saveProfileBtn.textContent = "Saving...";
 
     try {
         const playerDocRef = db.collection('players').doc(user.uid);
@@ -146,13 +98,12 @@ async function saveProfile(user) {
             level: data.level || 1
         }, { merge: true });
 
-        showMessageBox("message_box_profile_saved_success", "success", 3000, translations);
+        showMessageBox("Profile saved successfully", "success", 3000);
         setupSection.style.display = 'none';
         mainDashboard.style.display = 'block';
         dashboardUsername.textContent = username;
         userAvatar.src = `avatars/${selectedAvatar}`;
         setupUsernameTag(username, username);
-        applyTranslations();
         
         // Setup notification and message icons for new users
         setupNotificationHandlers();
@@ -165,10 +116,10 @@ async function saveProfile(user) {
 
     } catch (error) {
         console.error("Error saving profile:", error);
-        showMessageBox("message_box_failed_to_save_profile" + error.message, "error", 3000, translations);
+        showMessageBox("Failed to save profile: " + error.message, "error", 3000);
     } finally {
         saveProfileBtn.disabled = false;
-        saveProfileBtn.textContent = getTranslation("save_profile_button");
+        saveProfileBtn.textContent = "Save Profile";
     }
 }
 
@@ -202,7 +153,6 @@ async function setupDashboard(user) {
                 currentAvatarIndex = 0;
             }
             updateAvatarDisplay();
-            applyTranslations();
             return;
         }
 
@@ -227,18 +177,16 @@ async function setupDashboard(user) {
         if (lastLoginDisplay) {
             if (lastLoginTimestamp) {
                 const date = lastLoginTimestamp.toDate();
-                lastLoginDisplay.innerHTML = `${getTranslation("last_login_label")}: ${date.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`;
+                lastLoginDisplay.innerHTML = `Last Login: ${date.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`;
             } else {
-                lastLoginDisplay.innerHTML = `${getTranslation("last_login_label")}: ${getTranslation("never")}`;
+                lastLoginDisplay.innerHTML = `Last Login: Never`;
             }
             await playerDocRef.set({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
         }
 
-        applyTranslations();
-
     } catch (error) {
         console.error("Error setting up dashboard:", error);
-        showMessageBox("message_box_failed_to_load_dashboard" + error.message, "error", 3000, translations);
+        showMessageBox("Failed to load dashboard: " + error.message, "error", 3000);
     }
 }
 
@@ -265,7 +213,7 @@ function setupEventListeners() {
             if (authManager.currentUser) {
                 saveProfile(authManager.currentUser);
             } else {
-                showMessageBox("message_box_please_login_first", "error", 3000, translations);
+                showMessageBox("Please login first", "error", 3000);
             }
         };
     }
@@ -275,7 +223,7 @@ function setupEventListeners() {
         unlockDashboardBtn.onclick = async () => {
         const masterPassword = masterPasswordUnlockInput.value.trim();
         unlockDashboardBtn.disabled = true;
-        unlockDashboardBtn.textContent = getTranslation("unlocking_status");
+        unlockDashboardBtn.textContent = "Unlocking...";
 
         const success = await authManager.unlockDashboard(masterPassword);
         
@@ -300,7 +248,7 @@ function setupEventListeners() {
         }
 
         unlockDashboardBtn.disabled = false;
-        unlockDashboardBtn.textContent = getTranslation("unlock_dashboard_button");
+        unlockDashboardBtn.textContent = "Unlock Dashboard";
         };
     }
 
@@ -392,7 +340,7 @@ function setupEventListeners() {
         uploadFileBtn.onclick = async () => {
             const file = document.getElementById('fileUploadInput').files[0];
             if (!file) {
-                showMessageBox("message_box_select_file_upload", "error", 3000, translations);
+                showMessageBox("Please select a file to upload", "error", 3000);
                 return;
             }
             
@@ -410,10 +358,10 @@ function setupEventListeners() {
         logoutBtn.onclick = async () => {
             try {
                 await auth.signOut();
-                showMessageBox("message_box_logged_out_success", "success", 3000, translations);
+                showMessageBox("Logged out successfully", "success", 3000);
             } catch (error) {
                 console.error("Error logging out:", error);
-                showMessageBox("message_box_failed_to_log_out" + error.message, "error", 3000, translations);
+                showMessageBox("Failed to log out: " + error.message, "error", 3000);
             } finally {
                 authManager.clearSession();
             }
@@ -432,10 +380,10 @@ function setupEventListeners() {
     if (confirmDeleteAccountBtn) {
         confirmDeleteAccountBtn.onclick = async () => {
         closeModal(document.getElementById('deleteAccountConfirmModal'));
-        showMessageBox("message_box_initiating_account_deletion", 'info', 0, translations);
+        showMessageBox("Initiating account deletion...", 'info', 0);
 
         if (!authManager.currentUser) {
-            showMessageBox("message_box_please_login_first", "error", 3000, translations);
+            showMessageBox("Please login first", "error", 3000);
             return;
         }
 
@@ -458,7 +406,7 @@ function setupEventListeners() {
                 throw new Error(errorData.message || 'Failed to delete Supabase data');
             }
             console.log("Supabase data deletion successful.");
-            showMessageBox("message_box_supabase_data_deleted_success", "success", 2000, translations);
+            showMessageBox("Supabase data deleted successfully", "success", 2000);
 
             // Delete Firebase notes
             console.log("Deleting user notes from Firestore...");
@@ -488,21 +436,21 @@ function setupEventListeners() {
             console.log("Deleting Firebase authentication account...");
             await authManager.currentUser.delete();
 
-            showMessageBox("message_box_account_deleted_success", "success", 3000, translations);
+            showMessageBox("Account deleted successfully", "success", 3000);
             setTimeout(() => {
                 window.location.href = "login.html";
             }, 3000);
 
         } catch (error) {
             console.error("Error during full account deletion:", error);
-            let errorMessage = getTranslation("message_box_failed_to_delete_account");
+            let errorMessage = "Failed to delete account";
             if (error.message) {
                 errorMessage += `: ${error.message}`;
             }
-            showMessageBox(errorMessage, "error", 5000, translations);
+            showMessageBox(errorMessage, "error", 5000);
 
             if (error.code === 'auth/requires-recent-login') {
-                showMessageBox("message_box_account_requires_recent_login", "warning", 5000, translations);
+                showMessageBox("Account deletion requires recent login. Please log in again.", "warning", 5000);
                 setTimeout(() => {
                     auth.signOut().then(() => {
                         window.location.href = "login.html";
@@ -517,7 +465,7 @@ function setupEventListeners() {
     if (cancelDeleteAccountBtn) {
         cancelDeleteAccountBtn.onclick = () => {
         closeModal(document.getElementById('deleteAccountConfirmModal'));
-        showMessageBox("message_box_account_deletion_cancelled", "info", 2000, translations);
+        showMessageBox("Account deletion cancelled", "info", 2000);
         };
     }
 
@@ -525,7 +473,7 @@ function setupEventListeners() {
     const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
     if (forgotPasswordBtn) {
         forgotPasswordBtn.onclick = () => {
-            showMessageBox("message_box_master_password_cannot_be_reset", "info", 5000, translations);
+            showMessageBox("Master password cannot be reset. If forgotten, you'll need to delete your account.", "info", 5000);
         };
     }
 
@@ -543,7 +491,7 @@ function setupEventListeners() {
 
     document.getElementById('cancelDeleteFileBtn').onclick = () => {
         closeModal(document.getElementById('deleteFileConfirmModal'));
-        showMessageBox("cancelled!", "info", 2000, translations);
+        showMessageBox("Cancelled!", "info", 2000);
         fileManager.fileToDeleteName = null;
     };
 
@@ -558,7 +506,7 @@ function setupEventListeners() {
 
     document.getElementById('cancelDeleteNoteBtn').onclick = () => {
         closeModal(document.getElementById('deleteNoteConfirmModal'));
-        showMessageBox("cancelled!", "info", 2000, translations);
+        showMessageBox("Cancelled!", "info", 2000);
         notesManager.noteToDeleteId = null;
     };
 
@@ -573,7 +521,7 @@ function setupEventListeners() {
 
     document.getElementById('cancelDeletePmEntryBtn').onclick = () => {
         closeModal(document.getElementById('deletePmEntryConfirmModal'));
-        showMessageBox("cancelled!", "info", 2000, translations);
+        showMessageBox("Cancelled!", "info", 2000);
         passwordManager.pmEntryToDeleteId = null;
     };
 
@@ -648,7 +596,7 @@ async function loadFilesList() {
     
     fileListDisplay.innerHTML = '';
     if (files.length === 0) {
-        fileListDisplay.innerHTML = `<p style="text-align: center; color: #94a3b8;">${getTranslation("no_files_saved")}</p>`;
+        fileListDisplay.innerHTML = `<p style="text-align: center; color: #94a3b8;">No files saved</p>`;
         return;
     }
 
@@ -667,10 +615,10 @@ async function loadFilesList() {
             <span class="file-timestamp" style="font-size: 0.8em; color: #aaa; margin-left: 10px;">${formattedTimestamp}</span>
             <div class="file-actions">
                 <button class="download-file-action-btn btn btn-info btn-sm" data-signed-url="${file.signedUrl}" data-original-file-name="${file.name}">
-                    ${getTranslation("download_file_button")}
+                    Download
                 </button>
                 <button class="delete-file-btn btn btn-danger btn-sm" data-file-name="${file.name}">
-                    ${getTranslation("delete_file_button")}
+                    Delete
                 </button>
             </div>
         `;
@@ -706,12 +654,12 @@ async function loadFilesList() {
                         const pureBase64 = base64DataWithPrefix.split(',')[1];
                         const mimeType = blob.type || 'application/octet-stream';
                         Android.onBlobDataReceived(pureBase64, mimeType, originalFileName);
-                        showMessageBox("message_box_download_started", "success", 2000, translations);
+                        showMessageBox("Download started", "success", 2000);
                         console.log("File data sent to Android via JavaScript interface for download.");
                     };
                     reader.onerror = function(event) {
                         console.error("FileReader error during blob conversion:", event.target.error);
-                        showMessageBox("message_box_failed_to_download_file" + " (JS read error)", "error", 3000, translations);
+                        showMessageBox("Failed to download file (JS read error)", "error", 3000);
                         if (typeof Android !== 'undefined' && Android.onBlobError) {
                             Android.onBlobError("FileReader error during blob conversion: " + event.target.error?.message);
                         }
@@ -728,11 +676,11 @@ async function loadFilesList() {
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
-                    showMessageBox("message_box_download_started", "success", 2000, translations);
+                    showMessageBox("Download started", "success", 2000);
                 }
             } catch (error) {
                 console.error("Error during download:", error);
-                showMessageBox("message_box_failed_to_download_file" + error.message, "error", 3000, translations);
+                showMessageBox("Failed to download file: " + error.message, "error", 3000);
             }
         }
     };
@@ -759,39 +707,7 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
-// Handle responsive text adjustments
-function handleResponsiveText() {
-    const isMobile = window.innerWidth <= 768;
-    const isSmallMobile = window.innerWidth <= 480;
-    
-    // Adjust button text for mobile
-    $('.btn[data-translate-key]').each(function() {
-        const $btn = $(this);
-        const text = $btn.text().trim();
-        
-        if (isSmallMobile && text.length > 12) {
-            $btn.css({
-                'font-size': '11px',
-                'padding': '0.5rem 0.6rem',
-                'line-height': '1.1'
-            });
-        } else if (isMobile && text.length > 16) {
-            $btn.css({
-                'font-size': '12px',
-                'padding': '0.6rem 0.8rem',
-                'line-height': '1.2'
-            });
-        }
-    });
-    
-    // Adjust modal content for long text
-    $('.modal-content h3').each(function() {
-        const $header = $(this);
-        if ($header.text().length > 30 && isMobile) {
-            $header.css('font-size', 'clamp(0.9rem, 4vw, 1.1rem)');
-        }
-    });
-}
+
 
 // Username tag functionality
 function setupUsernameTag(usernameTag, displayName) {
@@ -881,7 +797,7 @@ async function performUserSearch() {
         displaySearchResults(Array.from(results.values()));
     } catch (error) {
         console.error('Search error:', error);
-        showMessageBox('Search failed. Please try again.', 'error', 3000, translations);
+        showMessageBox('Search failed. Please try again.', 'error', 3000);
     }
 }
 
@@ -950,12 +866,12 @@ window.addFriend = async function(friendId, friendUsername) {
         await db.collection('players').doc(friendId)
             .collection('friendRequests').doc(authManager.currentUser.uid).set(requestData);
         
-        showMessageBox('Friend request sent!', 'success', 2000, translations);
+        showMessageBox('Friend request sent!', 'success', 2000);
         closeModal(document.getElementById('searchResultsModal'));
     } catch (error) {
         console.error('Add friend error:', error);
         console.error('Error details:', error.code, error.message);
-        showMessageBox('Failed to send friend request', 'error', 3000, translations);
+        showMessageBox('Failed to send friend request', 'error', 3000);
     }
 }
 
@@ -1011,11 +927,11 @@ window.removeFriend = async function(friendId) {
         await db.collection('players').doc(friendId)
             .collection('friends').doc(authManager.currentUser.uid).delete();
         
-        showMessageBox('Friend removed', 'info', 2000, translations);
+        showMessageBox('Friend removed', 'info', 2000);
         loadFriendsList();
     } catch (error) {
         console.error('Remove friend error:', error);
-        showMessageBox('Failed to remove friend', 'error', 3000, translations);
+        showMessageBox('Failed to remove friend', 'error', 3000);
     }
 }
 
@@ -1124,7 +1040,7 @@ async function sendNewMessage() {
         messageInput.value = '';
     } catch (error) {
         console.error('Send message error:', error);
-        showMessageBox('Failed to send message', 'error', 3000, translations);
+        showMessageBox('Failed to send message', 'error', 3000);
     }
 }
 
@@ -1259,11 +1175,11 @@ window.acceptFriendRequest = async function(fromUserId, fromUsername) {
                 read: false
             });
 
-        showMessageBox('Friend request accepted!', 'success', 2000, translations);
+        showMessageBox('Friend request accepted!', 'success', 2000);
         loadNotifications();
     } catch (error) {
         console.error('Accept friend request error:', error);
-        showMessageBox('Failed to accept friend request', 'error', 3000, translations);
+        showMessageBox('Failed to accept friend request', 'error', 3000);
     }
 }
 
@@ -1274,11 +1190,11 @@ window.rejectFriendRequest = async function(fromUserId) {
                 status: 'rejected'
             });
 
-        showMessageBox('Friend request rejected', 'info', 2000, translations);
+        showMessageBox('Friend request rejected', 'info', 2000);
         loadNotifications();
     } catch (error) {
         console.error('Reject friend request error:', error);
-        showMessageBox('Failed to reject friend request', 'error', 3000, translations);
+        showMessageBox('Failed to reject friend request', 'error', 3000);
     }
 }
 
@@ -1462,27 +1378,7 @@ function updateMessageBadge(count) {
 
 // Initialize application
 $(document).ready(function() {
-    const storedLang = localStorage.getItem('selectedLanguage') || 'en';
-    if (languageSelect) languageSelect.value = storedLang;
-    
-    loadTranslations(storedLang).then(() => {
-        initializeManagers();
-        setupEventListeners();
-        loadAvatars();
-    });
-
-    if (languageSelect) {
-        $('#language-select').on('change', function() {
-            const selectedLang = $(this).val();
-            loadTranslations(selectedLang);
-        });
-    }
-    
-    // Handle window resize
-    $(window).on('resize orientationchange', function() {
-        setTimeout(() => handleResponsiveText(), 200);
-    });
-    
-    // Initial responsive text handling
-    setTimeout(() => handleResponsiveText(), 500);
+    initializeManagers();
+    setupEventListeners();
+    loadAvatars();
 });
