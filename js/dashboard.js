@@ -169,12 +169,7 @@ async function setupDashboard(user) {
         document.getElementById('main-dashboard').style.display = 'block';
         closeModal(document.getElementById('masterPasswordPromptModal'));
         
-        // Check if master password needs to be set
-        if (!hasMasterPassword) {
-            setTimeout(() => {
-                showMasterPasswordSetup();
-            }, 1000);
-        }
+
         
         setupNotificationHandlers();
         setupOnlinePresence();
