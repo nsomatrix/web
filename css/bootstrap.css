@@ -1218,12 +1218,7 @@ h2,
 h3 {
   line-height: 19px;
 }
-h3:before {
-  content: "[";
-}
-h3:after {
-  content: "]";
-}
+
 h1 {
   font-size: 18px;
   text-transform: uppercase;
