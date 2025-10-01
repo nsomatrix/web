@@ -172,24 +172,24 @@ body {
     outline: none;
 }
 
-.login .inputBx button#loginBtn {
+.login .inputBx button#primaryBtn {
     background: #3b82f6;
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
-.login .inputBx button#loginBtn:hover {
+.login .inputBx button#primaryBtn:hover {
     background: #2563eb;
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 }
 
-.login .inputBx button#loginBtn:active {
+.login .inputBx button#primaryBtn:active {
     transform: translateY(0);
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
-.login .inputBx button#signupBtn {
+.login .inputBx button#switchBtn {
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     border: 2px solid rgba(255, 255, 255, 0.2);
@@ -197,14 +197,14 @@ body {
     box-shadow: none;
 }
 
-.login .inputBx button#signupBtn:hover {
+.login .inputBx button#switchBtn:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.login .inputBx button#signupBtn:active {
+.login .inputBx button#switchBtn:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
