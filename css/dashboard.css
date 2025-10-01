@@ -1,11 +1,13 @@
-/* Glassomorphism Dashboard CSS - Mobile First */
+/* Unified Dashboard CSS - Responsive */
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 0, 0, 0.5);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 0, 0, 0.3);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   --text-light: #ffffff;
   --text-dim: rgba(255, 255, 255, 0.7);
   --accent-red: #ff0000;
+  --sidebar-width: 280px;
+  --header-height: 80px;
 }
 
 /* Text overflow handling for all languages */
@@ -810,7 +812,7 @@ h2, h3 {
 
 /* Desktop styles */
 @media (min-width: 1024px) {
-  #setup-section, #main-dashboard {
+  #setup-section {
     max-width: 700px;
   }
   
@@ -820,5 +822,210 @@ h2, h3 {
   
   .modal-content {
     max-width: 500px;
+  }
+  
+  /* Full screen layout for desktop */
+  #main-dashboard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  /* Desktop header */
+  .dashboard-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 0;
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .user-avatar-display {
+    width: 60px;
+    height: 60px;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin: 0;
+    color: var(--text-light);
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .search-container {
+    position: relative;
+  }
+  
+  .search-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    border-radius: 25px;
+    color: var(--text-light);
+    padding: 0.75rem 3rem 0.75rem 1.25rem;
+    width: 300px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent-red);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+    width: 350px;
+  }
+  
+  #searchIcon {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-red);
+    cursor: pointer;
+  }
+  
+  .notification-icons {
+    display: flex;
+    gap: 1rem;
+    position: static;
+  }
+  
+  .notification-icons i {
+    color: var(--accent-red);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0.75rem;
+    border-radius: 50%;
+    background: rgba(255, 0, 0, 0.1);
+  }
+  
+  .notification-icons i:hover {
+    color: var(--text-light);
+    background: var(--accent-red);
+    transform: scale(1.1);
+  }
+  
+  /* Desktop main content */
+  .dashboard-main {
+    padding: 1rem 2rem 2rem 2rem;
+    overflow-y: auto;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .welcome-section {
+    margin-bottom: 3rem;
+    margin-top: 0;
+  }
+  
+  .welcome-message {
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin: 0;
+    color: var(--text-light);
+  }
+  
+  /* Desktop dashboard grid */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .dashboard-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--glass-shadow);
+    cursor: pointer;
+    position: relative;
+    z-index: 3;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    border-color: var(--accent-red);
+  }
+  
+  .dashboard-card.danger {
+    border-color: rgba(255, 59, 48, 0.5);
+  }
+  
+  .dashboard-card.danger:hover {
+    border-color: rgba(255, 59, 48, 0.8);
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-red);
+    font-size: 1.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--text-light);
+  }
+  
+  .card-description {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
   }
 }
