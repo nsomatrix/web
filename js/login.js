@@ -138,21 +138,7 @@ function setButtonLoading(button, isLoading, originalText) {
     }
 }
 
-// --- Key Derivation Functions (for Master Password) ---
-const PBKDF2_ITERATIONS = 200000;
-const KEY_SIZE = 256 / 32;
 
-function generateSalt() {
-    return CryptoJS.lib.WordArray.random(128 / 8).toString(CryptoJS.enc.Hex);
-}
-
-async function deriveKey(masterPassword, salt) {
-    return CryptoJS.PBKDF2(masterPassword, CryptoJS.enc.Hex.parse(salt), {
-        keySize: KEY_SIZE,
-        iterations: PBKDF2_ITERATIONS,
-        hasher: CryptoJS.algo.SHA256
-    });
-}
 
 // --- Primary Action Handler ---
 async function handlePrimaryAction() {
@@ -257,20 +243,23 @@ async function handleSignup() {
         const userSalt = generateSalt();
         const derivedKey = await deriveKey(password, userSalt);
         const masterPasswordHash = derivedKey.toString(CryptoJS.enc.Hex);
+        
+        // Generate recovery key
+        const recoveryKey = generateRecoveryKey();
+        const encryptedMasterKey = encryptWithRecoveryKey(masterPasswordHash, recoveryKey);
 
         await setDoc(doc(db, "players", user.uid), {
             level: 1,
             salt: userSalt,
-            masterPasswordHash: masterPasswordHash
+            masterPasswordHash: masterPasswordHash,
+            encryptedMasterKey: encryptedMasterKey
         });
 
         sessionStorage.setItem('currentEncryptionKeyHex', masterPasswordHash);
         localStorage.setItem('userLoggedIn', 'true');
         
-        showMessageBox('Account created successfully! Redirecting', 'success');
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 1500);
+        showMessageBox('Account created successfully!', 'success');
+        showRecoveryKey(recoveryKey);
 
     } catch (err) {
         let errorMessage = 'Account creation failed. Please try again.';
@@ -295,6 +284,76 @@ primaryBtn.onclick = handlePrimaryAction;
         }
     });
 });
+
+// --- Key Derivation Functions ---
+function generateSalt() {
+    return CryptoJS.lib.WordArray.random(128 / 8).toString(CryptoJS.enc.Hex);
+}
+
+async function deriveKey(password, salt) {
+    return CryptoJS.PBKDF2(password, CryptoJS.enc.Hex.parse(salt), {
+        keySize: 256 / 32,
+        iterations: 200000,
+        hasher: CryptoJS.algo.SHA256
+    });
+}
+
+function generateRecoveryKey() {
+    return CryptoJS.lib.WordArray.random(256 / 8).toString(CryptoJS.enc.Base64).replace(/[+/=]/g, '').substring(0, 32);
+}
+
+function encryptWithRecoveryKey(data, recoveryKey) {
+    const key = CryptoJS.SHA256(recoveryKey);
+    const iv = CryptoJS.lib.WordArray.random(128 / 8);
+    const encrypted = CryptoJS.AES.encrypt(data, key, { iv: iv });
+    return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.toString();
+}
+
+function showRecoveryKey(recoveryKey) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+        <div style="background:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;">
+            <h3 style="color:#e74c3c;margin-bottom:20px;">⚠️ SAVE YOUR RECOVERY KEY</h3>
+            <p style="margin-bottom:20px;">This is your ONLY way to recover access if you reset your password:</p>
+            <div id="recoveryKeyDisplay" style="background:#f8f9fa;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
+            <div style="margin:15px 0;">
+                <button id="copyKeyBtn" style="background:#007bff;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;margin-right:10px;">Copy to Clipboard</button>
+                <button id="downloadKeyBtn" style="background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;">Download as TXT</button>
+            </div>
+            <p style="color:#e74c3c;font-weight:bold;margin-bottom:20px;">Write this down and store it safely offline!</p>
+            <button id="recoveryKeySaved" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">I've Saved It Safely</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    document.getElementById('copyKeyBtn').onclick = () => {
+        navigator.clipboard.writeText(recoveryKey).then(() => {
+            showMessageBox('Recovery key copied to clipboard!', 'success', 2000);
+        }).catch(() => {
+            showMessageBox('Failed to copy. Please copy manually.', 'error', 2000);
+        });
+    };
+    
+    document.getElementById('downloadKeyBtn').onclick = () => {
+        const blob = new Blob([`Matrix Recovery Key\n\nYour recovery key: ${recoveryKey}\n\nKeep this safe! This is the only way to recover your encrypted data if you reset your password.\n\nGenerated: ${new Date().toLocaleString()}`], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'matrix-recovery-key.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+        showMessageBox('Recovery key downloaded!', 'success', 2000);
+    };
+    
+    document.getElementById('recoveryKeySaved').onclick = () => {
+        document.body.removeChild(modal);
+        showMessageBox('Redirecting to dashboard...', 'success');
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1000);
+    };
+}
 
 // --- Forgot Password Functionality ---
 forgotPasswordLinkAnchor.onclick = (e) => {

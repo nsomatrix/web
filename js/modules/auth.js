@@ -43,7 +43,6 @@ export class AuthManager {
             return false;
         }
 
-        // Get current user from Firebase auth if not set
         const user = this.currentUser || this.auth.currentUser;
         if (!user) {
             showMessageBox("Please login first", "error", 3000);
@@ -67,14 +66,13 @@ export class AuthManager {
                 this.failedUnlockAttempts++;
                 if (this.failedUnlockAttempts >= CRYPTO_CONFIG.MAX_ATTEMPTS) {
                     this.unlockLocked = true;
-                    showMessageBox("Incorrect password. Please wait before trying again.", "error", 3000);
+                    showMessageBox("Password changed? Use recovery key instead.", "error", 3000);
                     setTimeout(() => {
                         this.unlockLocked = false;
                         this.failedUnlockAttempts = 0;
-                        showMessageBox("You can try again now", "info", 3000);
                     }, CRYPTO_CONFIG.LOCKOUT_TIME);
                 } else {
-                    showMessageBox("Incorrect master password", "error", 3000);
+                    showMessageBox("Password doesn't match. Try recovery key if you reset your password.", "error", 3000);
                 }
                 this.currentEncryptionKey = null;
                 return false;
@@ -94,11 +92,25 @@ export class AuthManager {
         }
     }
 
-    restoreEncryptionKey() {
+    async restoreEncryptionKey() {
         const storedKeyHex = sessionStorage.getItem('currentEncryptionKeyHex');
         if (storedKeyHex) {
             try {
                 this.currentEncryptionKey = CryptoJS.enc.Hex.parse(storedKeyHex);
+                
+                // Verify the key still works by checking against stored hash
+                const user = this.currentUser || this.auth.currentUser;
+                if (user) {
+                    const playerDoc = await this.db.collection('players').doc(user.uid).get();
+                    const data = playerDoc.data();
+                    if (data && data.masterPasswordHash && storedKeyHex !== data.masterPasswordHash) {
+                        // Key doesn't match - password was likely reset
+                        sessionStorage.removeItem('currentEncryptionKeyHex');
+                        this.currentEncryptionKey = null;
+                        return false;
+                    }
+                }
+                
                 console.log("Encryption key restored from sessionStorage.");
                 return true;
             } catch (e) {

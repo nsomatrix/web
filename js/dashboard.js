@@ -132,9 +132,17 @@ async function setupDashboard(user) {
 
         const hasUsername = !!data.username;
         const hasAvatar = !!data.avatar;
+        const hasMasterPassword = !!data.hasMasterPassword;
         const lastLoginTimestamp = data.lastLogin;
 
-        authManager.restoreEncryptionKey();
+        const keyRestored = await authManager.restoreEncryptionKey();
+        
+        // If key restoration failed, user likely reset password
+        if (!keyRestored && data.encryptedMasterKey) {
+            setTimeout(() => {
+                showMessageBox('Password was reset. Use recovery key to access encrypted data.', 'warning', 5000);
+            }, 2000);
+        }
 
         if (!hasUsername || !hasAvatar) {
             if (allAvatars.length === 0) await loadAvatars();
@@ -160,6 +168,13 @@ async function setupDashboard(user) {
         document.getElementById('setup-section').style.display = 'none';
         document.getElementById('main-dashboard').style.display = 'block';
         closeModal(document.getElementById('masterPasswordPromptModal'));
+        
+        // Check if master password needs to be set
+        if (!hasMasterPassword) {
+            setTimeout(() => {
+                showMasterPasswordSetup();
+            }, 1000);
+        }
         
         setupNotificationHandlers();
         setupOnlinePresence();
@@ -215,20 +230,29 @@ function setupEventListeners() {
         };
     }
 
-    // Master password unlock
+    // Master password unlock/setup
     const unlockDashboardBtn = document.getElementById('unlockDashboardBtn');
     if (unlockDashboardBtn) {
         unlockDashboardBtn.onclick = async () => {
             const masterPassword = document.getElementById('masterPasswordUnlockInput').value.trim();
+            const confirmPassword = document.getElementById('confirmMasterPasswordInput').value.trim();
+            const isSetupMode = document.getElementById('confirmMasterPasswordInput').style.display !== 'none';
+            
             unlockDashboardBtn.disabled = true;
-            unlockDashboardBtn.textContent = "Unlocking...";
+            unlockDashboardBtn.textContent = isSetupMode ? "Setting up..." : "Unlocking...";
 
-            const success = await authManager.unlockDashboard(masterPassword);
+            let success = false;
+            if (isSetupMode) {
+                success = await setupMasterPassword(masterPassword, confirmPassword);
+            } else {
+                success = await authManager.unlockDashboard(masterPassword);
+            }
             
             if (success) {
                 const masterPasswordPromptModal = document.getElementById('masterPasswordPromptModal');
                 closeModal(masterPasswordPromptModal);
                 document.getElementById('masterPasswordUnlockInput').value = '';
+                document.getElementById('confirmMasterPasswordInput').value = '';
                 
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
@@ -251,7 +275,77 @@ function setupEventListeners() {
             }
 
             unlockDashboardBtn.disabled = false;
-            unlockDashboardBtn.textContent = "Unlock Dashboard";
+            unlockDashboardBtn.textContent = isSetupMode ? "Set Master Password" : "Unlock Dashboard";
+        };
+    }
+
+    // Forgot master password handler
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    if (forgotPasswordBtn) {
+        forgotPasswordBtn.onclick = () => {
+            document.getElementById('recoverySection').style.display = 'block';
+        };
+    }
+
+    const recoverBtn = document.getElementById('recoverBtn');
+    if (recoverBtn) {
+        recoverBtn.onclick = async () => {
+            const recoveryKey = document.getElementById('recoveryKeyInput').value.trim();
+            recoverBtn.disabled = true;
+            recoverBtn.textContent = 'Recovering...';
+            
+            if (await recoverWithKey(recoveryKey)) {
+                document.getElementById('recoverySection').style.display = 'none';
+                document.getElementById('syncPasswordSection').style.display = 'block';
+                document.getElementById('masterPasswordModalTitle').textContent = 'Sync with Current Password';
+            }
+            
+            recoverBtn.disabled = false;
+            recoverBtn.textContent = 'Recover Access';
+        };
+    }
+    
+    const syncPasswordBtn = document.getElementById('syncPasswordBtn');
+    if (syncPasswordBtn) {
+        syncPasswordBtn.onclick = async () => {
+            const currentPassword = document.getElementById('syncPasswordInput').value.trim();
+            syncPasswordBtn.disabled = true;
+            syncPasswordBtn.textContent = 'Syncing...';
+            
+            if (await syncWithCurrentPassword(currentPassword)) {
+                document.getElementById('syncPasswordSection').style.display = 'none';
+                closeModal(document.getElementById('masterPasswordPromptModal'));
+                
+                // Handle pending modal opens
+                const notesModal = document.getElementById('notesModal');
+                const passwordManagerModal = document.getElementById('passwordManagerModal');
+                const ephemeralFilesModal = document.getElementById('ephemeralFilesModal');
+                
+                if (notesModal.dataset.pendingOpen === 'true') {
+                    openModal(notesModal);
+                    notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
+                    notesModal.dataset.pendingOpen = 'false';
+                } else if (passwordManagerModal.dataset.pendingOpen === 'true') {
+                    openModal(passwordManagerModal);
+                    passwordManager.loadPasswords(document.getElementById('pmEntryList'));
+                    passwordManagerModal.dataset.pendingOpen = 'false';
+                } else if (ephemeralFilesModal.dataset.pendingOpen === 'true') {
+                    openModal(ephemeralFilesModal);
+                    loadFilesList();
+                    ephemeralFilesModal.dataset.pendingOpen = 'false';
+                }
+            }
+            
+            syncPasswordBtn.disabled = false;
+            syncPasswordBtn.textContent = 'Sync Password';
+        };
+    }
+
+    const cancelRecoveryBtn = document.getElementById('cancelRecoveryBtn');
+    if (cancelRecoveryBtn) {
+        cancelRecoveryBtn.onclick = () => {
+            document.getElementById('recoverySection').style.display = 'none';
+            document.getElementById('recoveryKeyInput').value = '';
         };
     }
 
@@ -276,11 +370,17 @@ function setupEventListeners() {
 function setupFeatureButtons() {
     const notesBtn = document.getElementById('notesBtn');
     if (notesBtn) {
-        notesBtn.onclick = () => {
+        notesBtn.onclick = async () => {
             if (!authManager.currentEncryptionKey) {
                 openModal(document.getElementById('masterPasswordPromptModal'));
                 document.getElementById('notesModal').dataset.pendingOpen = 'true';
                 document.getElementById('masterPasswordUnlockInput').value = '';
+                // Show recovery section if password was likely reset
+                const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
+                const data = playerDoc.data();
+                if (data && data.encryptedMasterKey && !sessionStorage.getItem('currentEncryptionKeyHex')) {
+                    document.getElementById('recoverySection').style.display = 'block';
+                }
                 return;
             }
             openModal(document.getElementById('notesModal'));
@@ -290,11 +390,17 @@ function setupFeatureButtons() {
 
     const passwordManagerBtn = document.getElementById('passwordManagerBtn');
     if (passwordManagerBtn) {
-        passwordManagerBtn.onclick = () => {
+        passwordManagerBtn.onclick = async () => {
             if (!authManager.currentEncryptionKey) {
                 openModal(document.getElementById('masterPasswordPromptModal'));
                 document.getElementById('passwordManagerModal').dataset.pendingOpen = 'true';
                 document.getElementById('masterPasswordUnlockInput').value = '';
+                // Show recovery section if password was likely reset
+                const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
+                const data = playerDoc.data();
+                if (data && data.encryptedMasterKey && !sessionStorage.getItem('currentEncryptionKeyHex')) {
+                    document.getElementById('recoverySection').style.display = 'block';
+                }
                 return;
             }
             openModal(document.getElementById('passwordManagerModal'));
@@ -1301,6 +1407,175 @@ function updateMessageBadge(count) {
         badge.style.display = 'flex';
     } else {
         badge.style.display = 'none';
+    }
+}
+
+// Master password setup functions
+function showMasterPasswordSetup() {
+    document.getElementById('masterPasswordModalTitle').textContent = 'Set Master Password for Encryption';
+    document.getElementById('confirmMasterPasswordInput').style.display = 'block';
+    document.getElementById('unlockDashboardBtn').textContent = 'Set Master Password';
+    document.getElementById('forgotPasswordBtn').style.display = 'none';
+    openModal(document.getElementById('masterPasswordPromptModal'));
+}
+
+async function setupMasterPassword(masterPassword, confirmPassword) {
+    if (!masterPassword || !confirmPassword) {
+        showMessageBox('Please fill in both fields', 'error');
+        return false;
+    }
+    
+    if (masterPassword !== confirmPassword) {
+        showMessageBox('Passwords do not match', 'error');
+        return false;
+    }
+    
+    if (masterPassword.length < 8) {
+        showMessageBox('Master password must be at least 8 characters', 'error');
+        return false;
+    }
+    
+    try {
+        const userSalt = generateSalt();
+        const derivedKey = await deriveKey(masterPassword, userSalt);
+        const masterPasswordHash = derivedKey.toString(CryptoJS.enc.Hex);
+        
+        await db.collection('players').doc(authManager.currentUser.uid).update({
+            salt: userSalt,
+            masterPasswordHash: masterPasswordHash,
+            hasMasterPassword: true
+        });
+        
+        authManager.currentEncryptionKey = derivedKey;
+        sessionStorage.setItem('currentEncryptionKeyHex', derivedKey.toString(CryptoJS.enc.Hex));
+        
+        // Generate recovery key
+        const recoveryKey = generateRecoveryKey();
+        const encryptedMasterKey = encryptWithRecoveryKey(derivedKey.toString(CryptoJS.enc.Hex), recoveryKey);
+        
+        await db.collection('players').doc(authManager.currentUser.uid).update({
+            encryptedMasterKey: encryptedMasterKey
+        });
+        
+        showRecoveryKey(recoveryKey);
+        showMessageBox('Master password set successfully!', 'success');
+        return true;
+    } catch (error) {
+        console.error('Setup master password error:', error);
+        showMessageBox('Failed to set master password', 'error');
+        return false;
+    }
+}
+
+function generateSalt() {
+    return CryptoJS.lib.WordArray.random(128 / 8).toString(CryptoJS.enc.Hex);
+}
+
+async function deriveKey(masterPassword, salt) {
+    return CryptoJS.PBKDF2(masterPassword, CryptoJS.enc.Hex.parse(salt), {
+        keySize: 256 / 32,
+        iterations: 200000,
+        hasher: CryptoJS.algo.SHA256
+    });
+}
+
+function generateRecoveryKey() {
+    return CryptoJS.lib.WordArray.random(256 / 8).toString(CryptoJS.enc.Base64).replace(/[+/=]/g, '').substring(0, 32);
+}
+
+function encryptWithRecoveryKey(data, recoveryKey) {
+    const key = CryptoJS.SHA256(recoveryKey);
+    const iv = CryptoJS.lib.WordArray.random(128 / 8);
+    const encrypted = CryptoJS.AES.encrypt(data, key, { iv: iv });
+    return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.toString();
+}
+
+function decryptWithRecoveryKey(encryptedData, recoveryKey) {
+    const key = CryptoJS.SHA256(recoveryKey);
+    const parts = encryptedData.split(':');
+    const iv = CryptoJS.enc.Hex.parse(parts[0]);
+    const decrypted = CryptoJS.AES.decrypt(parts[1], key, { iv: iv });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+function showRecoveryKey(recoveryKey) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+        <div style="background:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;">
+            <h3 style="color:#e74c3c;margin-bottom:20px;">⚠️ SAVE YOUR RECOVERY KEY</h3>
+            <p style="margin-bottom:20px;">This is your ONLY way to recover your data if you forget your master password:</p>
+            <div style="background:#f8f9fa;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
+            <p style="color:#e74c3c;font-weight:bold;margin-bottom:20px;">Write this down and store it safely offline!</p>
+            <button id="recoveryKeySaved" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">I've Saved It Safely</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    document.getElementById('recoveryKeySaved').onclick = () => {
+        document.body.removeChild(modal);
+    };
+}
+
+async function recoverWithKey(recoveryKey) {
+    if (!recoveryKey || recoveryKey.length !== 32) {
+        showMessageBox('Please enter a valid 32-character recovery key', 'error');
+        return false;
+    }
+    
+    try {
+        const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
+        const data = playerDoc.data();
+        
+        if (!data.encryptedMasterKey) {
+            showMessageBox('No recovery key found for this account', 'error');
+            return false;
+        }
+        
+        const masterKeyHex = decryptWithRecoveryKey(data.encryptedMasterKey, recoveryKey);
+        if (!masterKeyHex) {
+            showMessageBox('Invalid recovery key', 'error');
+            return false;
+        }
+        
+        authManager.currentEncryptionKey = CryptoJS.enc.Hex.parse(masterKeyHex);
+        sessionStorage.setItem('currentEncryptionKeyHex', masterKeyHex);
+        
+        showMessageBox('Recovery key verified! Now sync with your current password.', 'success');
+        return true;
+    } catch (error) {
+        console.error('Recovery error:', error);
+        showMessageBox('Recovery failed. Check your key and try again.', 'error');
+        return false;
+    }
+}
+
+async function syncWithCurrentPassword(currentPassword) {
+    if (!currentPassword) {
+        showMessageBox('Please enter your current password', 'error');
+        return false;
+    }
+    
+    try {
+        const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
+        const data = playerDoc.data();
+        const newDerivedKey = await deriveKey(currentPassword, data.salt);
+        const newMasterPasswordHash = newDerivedKey.toString(CryptoJS.enc.Hex);
+        
+        await db.collection('players').doc(authManager.currentUser.uid).update({
+            masterPasswordHash: newMasterPasswordHash
+        });
+        
+        // Update session with new key
+        authManager.currentEncryptionKey = newDerivedKey;
+        sessionStorage.setItem('currentEncryptionKeyHex', newMasterPasswordHash);
+        
+        showMessageBox('Password synced successfully! You can now use your login password.', 'success');
+        return true;
+    } catch (error) {
+        console.error('Sync error:', error);
+        showMessageBox('Failed to sync password', 'error');
+        return false;
     }
 }
 
