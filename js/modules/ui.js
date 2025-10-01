@@ -24,9 +24,26 @@ export function showMessageBox(messageText, type = 'info', duration = 3000) {
 }
 
 export function openModal(modalElement) {
+    if (!modalElement) return;
+    
     modalElement.style.display = 'flex';
+    // Force reflow for smooth animation
+    modalElement.offsetHeight;
+    modalElement.classList.add('modal-open');
+    
+    // Prevent body scroll on mobile
+    document.body.style.overflow = 'hidden';
 }
 
 export function closeModal(modalElement) {
+    if (!modalElement) return;
+    
+    modalElement.classList.remove('modal-open');
     modalElement.style.display = 'none';
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+    
+    // Clear any pending modal opens
+    modalElement.dataset.pendingOpen = 'false';
 }

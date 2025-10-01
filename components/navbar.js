@@ -8,16 +8,23 @@ class RetroNavbar {
     const menu = document.getElementById('navMenu');
     
     if (toggle && menu) {
-      toggle.addEventListener('click', () => {
+      // Handle both click and touch events for mobile
+      const toggleMenu = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         toggle.classList.toggle('active');
         menu.classList.toggle('active');
-      });
+      };
+      
+      toggle.addEventListener('click', toggleMenu);
+      toggle.addEventListener('touchend', toggleMenu);
 
       // Handle dropdown toggles
       const dropdowns = document.querySelectorAll('.dropdown-toggle');
       dropdowns.forEach(dropdown => {
-        dropdown.addEventListener('click', (e) => {
+        const handleDropdown = (e) => {
           e.preventDefault();
+          e.stopPropagation();
           const parent = dropdown.parentElement;
           parent.classList.toggle('active');
           
@@ -27,11 +34,14 @@ class RetroNavbar {
               other.parentElement.classList.remove('active');
             }
           });
-        });
+        };
+        
+        dropdown.addEventListener('click', handleDropdown);
+        dropdown.addEventListener('touchend', handleDropdown);
       });
 
       // Close menu when clicking on a non-dropdown link
-      menu.addEventListener('click', (e) => {
+      const closeMenu = (e) => {
         if (e.target.tagName === 'A' && !e.target.classList.contains('dropdown-toggle')) {
           toggle.classList.remove('active');
           menu.classList.remove('active');
@@ -40,11 +50,28 @@ class RetroNavbar {
             dropdown.classList.remove('active');
           });
         }
-      });
+      };
+      
+      menu.addEventListener('click', closeMenu);
+      menu.addEventListener('touchend', closeMenu);
 
       // Close menu and dropdowns when clicking outside
-      document.addEventListener('click', (e) => {
+      const closeOnOutsideClick = (e) => {
         if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+          toggle.classList.remove('active');
+          menu.classList.remove('active');
+          document.querySelectorAll('.dropdown').forEach(dropdown => {
+            dropdown.classList.remove('active');
+          });
+        }
+      };
+      
+      document.addEventListener('click', closeOnOutsideClick);
+      document.addEventListener('touchend', closeOnOutsideClick);
+      
+      // Close menu on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menu.classList.contains('active')) {
           toggle.classList.remove('active');
           menu.classList.remove('active');
           document.querySelectorAll('.dropdown').forEach(dropdown => {

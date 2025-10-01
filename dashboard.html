@@ -336,14 +336,13 @@
             .then(response => response.text())
             .then(jsCode => {
                 eval(jsCode);
+                // Initialize navbar after DOM is ready
                 setTimeout(() => {
-                    const toggle = document.getElementById('navToggle');
-                    const menu = document.getElementById('navMenu');
-                    if (toggle && menu) {
+                    if (typeof RetroNavbar !== 'undefined' && typeof NavbarAuth !== 'undefined') {
                         new RetroNavbar();
                         new NavbarAuth();
                     }
-                }, 100);
+                }, 200);
             });
         
         fetch('components/footer.html')
@@ -352,6 +351,5 @@
                 document.body.insertAdjacentHTML('beforeend', html);
             });
     </script>
-    <script src="components/navbar.js"></script>
 </body>
 </html>

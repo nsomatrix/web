@@ -579,13 +579,40 @@ function setupEventListeners() {
 
     // Notification and message functionality will be set after dashboard loads
 
-    // Modal close buttons
+    // Modal close buttons - improved for mobile
     document.querySelectorAll('.close-button').forEach(button => {
-        button.onclick = (e) => {
+        // Handle both click and touch events
+        const handleClose = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const modalId = e.target.dataset.modal;
             const modalElement = document.getElementById(modalId);
-            if (modalElement) closeModal(modalElement);
+            if (modalElement) {
+                closeModal(modalElement);
+            } else {
+                // Fallback: find the closest modal
+                const modal = e.target.closest('.modal');
+                if (modal) closeModal(modal);
+            }
         };
+        
+        button.addEventListener('click', handleClose);
+        button.addEventListener('touchend', handleClose);
+    });
+    
+    // Close modals when clicking outside (improved for mobile)
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target);
+        }
+    });
+    
+    // Close modals on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const openModals = document.querySelectorAll('.modal[style*="display: flex"], .modal[style*="display: block"]');
+            openModals.forEach(modal => closeModal(modal));
+        }
     });
 }
 

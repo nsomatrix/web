@@ -793,6 +793,44 @@ input.form-control {
   background: linear-gradient(135deg, rgba(255, 59, 48, 0.8), rgba(255, 59, 48, 0.6));
 }
 
+/* Modal animations and mobile improvements */
+.modal {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.modal-open {
+  opacity: 1;
+}
+
+.modal-content {
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.modal.modal-open .modal-content {
+  transform: scale(1);
+}
+
+/* Close button improvements for mobile */
+.close-button {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.close-button:hover,
+.close-button:active {
+  background: rgba(255, 0, 0, 0.2);
+  transform: scale(1.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-header {
@@ -853,9 +891,25 @@ input.form-control {
     height: 50px;
   }
   
+  .modal {
+    padding: 0.5rem;
+  }
+  
   .modal-content {
     padding: 1.5rem;
-    margin: 1rem;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    border-radius: 12px;
+    max-height: 90vh;
+  }
+  
+  .close-button {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
   }
   
   .friend-item, .search-item, .notification-item {
@@ -867,5 +921,34 @@ input.form-control {
   .friend-actions, .search-actions, .notification-actions {
     width: 100%;
     justify-content: center;
+  }
+  
+  /* Improve touch targets on mobile */
+  .btn {
+    min-height: 44px;
+    padding: 0.75rem 1.5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .notification-icons i {
+    padding: 1rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Prevent zoom on input focus */
+  .form-control {
+    font-size: 16px;
+  }
+  
+  .search-input {
+    font-size: 16px;
+  }
+  
+  .message-input {
+    font-size: 16px;
   }
 }
