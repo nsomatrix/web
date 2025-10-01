@@ -2,20 +2,19 @@ import { SUPABASE_CONFIG, FILE_CONFIG } from './config.js';
 import { showMessageBox, openModal, closeModal } from './ui.js';
 
 export class FileManager {
-    constructor(authManager, translations) {
+    constructor(authManager) {
         this.authManager = authManager;
-        this.translations = translations;
         this.fileToDeleteName = null;
     }
 
     async uploadFile(file) {
         if (!this.authManager.currentUser) {
-            showMessageBox("message_box_please_login_upload_files", "error", 3000, this.translations);
+            showMessageBox("Please login to upload files", "error", 3000);
             return false;
         }
 
         if (file.size > FILE_CONFIG.MAX_FILE_SIZE_BYTES) {
-            showMessageBox(`Limit Exceeded! (${FILE_CONFIG.MAX_FILE_SIZE_MB}MB)`, "error", 5000, this.translations);
+            showMessageBox(`Limit Exceeded! (${FILE_CONFIG.MAX_FILE_SIZE_MB}MB)`, "error", 5000);
             return false;
         }
 
@@ -37,12 +36,12 @@ export class FileManager {
             const idToken = await this.authManager.currentUser.getIdToken();
 
             const result = await this.uploadWithProgress(formData, idToken, progressBar, progressText);
-            showMessageBox("message_box_file_uploaded_success", "success", 3000, this.translations);
+            showMessageBox("File uploaded successfully", "success", 3000);
             return true;
 
         } catch (error) {
             console.error("Error uploading file:", error);
-            showMessageBox("message_box_failed_to_upload_file" + error.message, "error", 5000, this.translations);
+            showMessageBox("Failed to upload file: " + error.message, "error", 5000);
             return false;
         } finally {
             setTimeout(() => {
@@ -115,14 +114,14 @@ export class FileManager {
             return await response.json();
         } catch (error) {
             console.error("Error listing files:", error);
-            showMessageBox("failed_to_load_files_error" + error.message, "error", 3000, this.translations);
+            showMessageBox("Failed to load files: " + error.message, "error", 3000);
             return [];
         }
     }
 
     async deleteFile(fileName) {
         if (!this.authManager.currentUser) {
-            showMessageBox("message_box_please_login_delete_files", "error", 3000, this.translations);
+            showMessageBox("Please login to delete files", "error", 3000);
             return false;
         }
 
@@ -142,11 +141,11 @@ export class FileManager {
                 throw new Error(errorData.message || 'Failed to delete file');
             }
 
-            showMessageBox("message_box_file_deleted_success", "success", 3000, this.translations);
+            showMessageBox("File deleted successfully", "success", 3000);
             return true;
         } catch (error) {
             console.error("Error deleting file:", error);
-            showMessageBox("message_box_failed_to_delete_file" + error.message, "error", 3000, this.translations);
+            showMessageBox("Failed to delete file: " + error.message, "error", 3000);
             return false;
         }
     }

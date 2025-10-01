@@ -2,22 +2,21 @@ import { encryptData, decryptData } from './crypto.js';
 import { showMessageBox } from './ui.js';
 
 export class PasswordManager {
-    constructor(authManager, db, translations) {
+    constructor(authManager, db) {
         this.authManager = authManager;
         this.db = db;
-        this.translations = translations;
         this.pmEntryToDeleteId = null;
         this.unsubscribePasswords = null;
     }
 
     async savePassword(serviceName, username, password) {
         if (!this.authManager.currentUser || !this.authManager.currentEncryptionKey) {
-            showMessageBox("message_box_please_unlock_dashboard", "error", 3000, this.translations);
+            showMessageBox("Please unlock dashboard first", "error", 3000);
             return false;
         }
 
         if (!serviceName || !username || !password) {
-            showMessageBox("message_box_pm_all_fields_required", "error", 3000, this.translations);
+            showMessageBox("All fields are required", "error", 3000);
             return false;
         }
 
@@ -34,18 +33,18 @@ export class PasswordManager {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            showMessageBox("message_box_password_added_success", "success", 3000, this.translations);
+            showMessageBox("Password added successfully", "success", 3000);
             return true;
         } catch (error) {
             console.error("Error adding password:", error);
-            showMessageBox("message_box_failed_to_add_password" + error.message, "error", 3000, this.translations);
+            showMessageBox("Failed to add password: " + error.message, "error", 3000);
             return false;
         }
     }
 
     loadPasswords(displayElement) {
         if (!this.authManager.currentUser || !this.authManager.currentEncryptionKey) {
-            displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">${this.translations["unlock_dashboard_to_view_passwords"] || "Unlock dashboard to view passwords"}</p>`;
+            displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">Unlock dashboard to view passwords</p>`;
             return;
         }
 
@@ -59,7 +58,7 @@ export class PasswordManager {
             .onSnapshot((snapshot) => {
                 displayElement.innerHTML = '';
                 if (snapshot.empty) {
-                    displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">${this.translations["no_passwords_saved"] || "No passwords saved"}</p>`;
+                    displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">No passwords saved</p>`;
                     return;
                 }
                 
@@ -70,25 +69,25 @@ export class PasswordManager {
                     const entryDiv = document.createElement('div');
                     
                     const serviceP = document.createElement('p');
-                    serviceP.innerHTML = `<strong>${this.translations["service_label"] || "Service"}:</strong> `;
+                    serviceP.innerHTML = `<strong>Service:</strong> `;
                     const serviceNameSpan = document.createElement('span');
                     serviceNameSpan.textContent = entry.serviceName;
                     serviceP.appendChild(serviceNameSpan);
 
                     const usernameP = document.createElement('p');
-                    usernameP.innerHTML = `<strong>${this.translations["username_label"] || "Username"}:</strong> `;
+                    usernameP.innerHTML = `<strong>Username:</strong> `;
                     const usernameSpan = document.createElement('span');
                     usernameSpan.textContent = entry.username;
                     usernameP.appendChild(usernameSpan);
 
                     const passwordP = document.createElement('p');
-                    passwordP.innerHTML = `<strong>${this.translations["password_label"] || "Password"}:</strong> `;
+                    passwordP.innerHTML = `<strong>Password:</strong> `;
                     const decryptedPasswordSpan = document.createElement('span');
                     decryptedPasswordSpan.className = 'decrypted-password';
 
                     if (decryptedContent === null) {
                         decryptedPasswordSpan.style.color = 'red';
-                        decryptedPasswordSpan.textContent = this.translations["decryption_failed_invalid_data"] || "Decryption failed";
+                        decryptedPasswordSpan.textContent = "Decryption failed";
                     } else {
                         decryptedPasswordSpan.textContent = decryptedContent;
                     }
@@ -97,7 +96,7 @@ export class PasswordManager {
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'delete-pm-btn btn btn-danger';
                     deleteButton.dataset.entryId = doc.id;
-                    deleteButton.textContent = this.translations["Delete"] || "Delete";
+                    deleteButton.textContent = "Delete";
 
                     entryDiv.appendChild(serviceP);
                     entryDiv.appendChild(usernameP);
@@ -116,23 +115,23 @@ export class PasswordManager {
                 });
             }, (error) => {
                 console.error("Error loading passwords:", error);
-                showMessageBox("failed_to_load_passwords_error" + error.message, "error", 3000, this.translations);
+                showMessageBox("Failed to load passwords: " + error.message, "error", 3000);
             });
     }
 
     async deletePassword(entryId) {
         if (!this.authManager.currentUser) {
-            showMessageBox("message_box_please_login_delete_pm_entries", "error", 3000, this.translations);
+            showMessageBox("Please login to delete password entries", "error", 3000);
             return false;
         }
 
         try {
             await this.db.collection('players').doc(this.authManager.currentUser.uid).collection('passwords').doc(entryId).delete();
-            showMessageBox("message_box_pm_entry_deleted_success", "success", 3000, this.translations);
+            showMessageBox("Password entry deleted successfully", "success", 3000);
             return true;
         } catch (error) {
             console.error("Error deleting password entry:", error);
-            showMessageBox("message_box_failed_to_delete_pm_entry" + error.message, "error", 3000, this.translations);
+            showMessageBox("Failed to delete password entry: " + error.message, "error", 3000);
             return false;
         }
     }

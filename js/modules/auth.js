@@ -3,10 +3,9 @@ import { deriveKey } from './crypto.js';
 import { showMessageBox, openModal, closeModal } from './ui.js';
 
 export class AuthManager {
-    constructor(auth, db, translations) {
+    constructor(auth, db) {
         this.auth = auth;
         this.db = db;
-        this.translations = translations;
         this.currentUser = null;
         this.currentEncryptionKey = null;
         this.failedUnlockAttempts = 0;
@@ -23,7 +22,7 @@ export class AuthManager {
                 console.warn("Session expired due to inactivity. Clearing encryption key.");
                 this.currentEncryptionKey = null;
                 sessionStorage.removeItem('currentEncryptionKeyHex');
-                showMessageBox("message_box_session_expired_re_enter_master_password", 'warning', 3000, this.translations);
+                showMessageBox("Session expired due to inactivity. Please re-enter master password.", 'warning', 3000);
             }, CRYPTO_CONFIG.SESSION_TIMEOUT);
         };
 
@@ -35,19 +34,19 @@ export class AuthManager {
 
     async unlockDashboard(masterPassword) {
         if (this.unlockLocked) {
-            showMessageBox("message_box_too_many_failed_attempts", "error", 3000, this.translations);
+            showMessageBox("Too many failed attempts. Please wait.", "error", 3000);
             return false;
         }
 
         if (!masterPassword) {
-            showMessageBox("message_box_please_enter_master_password", "error", 3000, this.translations);
+            showMessageBox("Please enter master password", "error", 3000);
             return false;
         }
 
         // Get current user from Firebase auth if not set
         const user = this.currentUser || this.auth.currentUser;
         if (!user) {
-            showMessageBox("message_box_please_login_first", "error", 3000, this.translations);
+            showMessageBox("Please login first", "error", 3000);
             return false;
         }
 
@@ -57,7 +56,7 @@ export class AuthManager {
             const data = playerDoc.data();
 
             if (!data || !data.salt || !data.masterPasswordHash) {
-                showMessageBox("message_box_no_master_password_set_yet", "info", 3000, this.translations);
+                showMessageBox("No master password set yet", "info", 3000);
                 return false;
             }
 
@@ -68,14 +67,14 @@ export class AuthManager {
                 this.failedUnlockAttempts++;
                 if (this.failedUnlockAttempts >= CRYPTO_CONFIG.MAX_ATTEMPTS) {
                     this.unlockLocked = true;
-                    showMessageBox("message_box_incorrect_password_wait", "error", 3000, this.translations);
+                    showMessageBox("Incorrect password. Please wait before trying again.", "error", 3000);
                     setTimeout(() => {
                         this.unlockLocked = false;
                         this.failedUnlockAttempts = 0;
-                        showMessageBox("message_box_try_again", "info", 3000, this.translations);
+                        showMessageBox("You can try again now", "info", 3000);
                     }, CRYPTO_CONFIG.LOCKOUT_TIME);
                 } else {
-                    showMessageBox("message_box_incorrect_master_password", "error", 3000, this.translations);
+                    showMessageBox("Incorrect master password", "error", 3000);
                 }
                 this.currentEncryptionKey = null;
                 return false;
@@ -84,12 +83,12 @@ export class AuthManager {
             this.currentEncryptionKey = derivedKeyForVerification;
             sessionStorage.setItem('currentEncryptionKeyHex', this.currentEncryptionKey.toString(CryptoJS.enc.Hex));
             this.failedUnlockAttempts = 0;
-            showMessageBox("message_box_dashboard_unlocked", "success", 4000, this.translations);
+            showMessageBox("Dashboard unlocked successfully", "success", 4000);
             return true;
 
         } catch (error) {
             console.error("Error unlocking dashboard:", error);
-            showMessageBox("error_unlocking_dashboard_error" + error.message, "error", 3000, this.translations);
+            showMessageBox("Error unlocking dashboard: " + error.message, "error", 3000);
             this.currentEncryptionKey = null;
             return false;
         }

@@ -2,22 +2,21 @@ import { encryptData, decryptData } from './crypto.js';
 import { showMessageBox } from './ui.js';
 
 export class NotesManager {
-    constructor(authManager, db, translations) {
+    constructor(authManager, db) {
         this.authManager = authManager;
         this.db = db;
-        this.translations = translations;
         this.noteToDeleteId = null;
         this.unsubscribeNotes = null;
     }
 
     async saveNote(noteText) {
         if (!this.authManager.currentUser || !this.authManager.currentEncryptionKey) {
-            showMessageBox("message_box_please_unlock_dashboard", "error", 3000, this.translations);
+            showMessageBox("Please unlock dashboard first", "error", 3000);
             return false;
         }
 
         if (!noteText.trim()) {
-            showMessageBox("message_box_note_empty", "error", 3000, this.translations);
+            showMessageBox("Note cannot be empty", "error", 3000);
             return false;
         }
 
@@ -32,18 +31,18 @@ export class NotesManager {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            showMessageBox("message_box_note_added_success", "success", 3000, this.translations);
+            showMessageBox("Note added successfully", "success", 3000);
             return true;
         } catch (error) {
             console.error("Error adding note:", error);
-            showMessageBox("message_box_failed_to_add_note" + error.message, "error", 3000, this.translations);
+            showMessageBox("Failed to add note: " + error.message, "error", 3000);
             return false;
         }
     }
 
     loadNotes(displayElement) {
         if (!this.authManager.currentUser || !this.authManager.currentEncryptionKey) {
-            displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">${this.translations["unlock_dashboard_to_view_notes"] || "Unlock dashboard to view notes"}</p>`;
+            displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">Unlock dashboard to view notes</p>`;
             return;
         }
 
@@ -57,7 +56,7 @@ export class NotesManager {
             .onSnapshot((snapshot) => {
                 displayElement.innerHTML = '';
                 if (snapshot.empty) {
-                    displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">${this.translations["no_notes_saved"] || "No notes saved"}</p>`;
+                    displayElement.innerHTML = `<p style="text-align: center; color: #94a3b8;">No notes saved</p>`;
                     return;
                 }
                 
@@ -67,12 +66,12 @@ export class NotesManager {
 
                     const noteDiv = document.createElement('div');
                     const timestampP = document.createElement('p');
-                    timestampP.innerHTML = `<strong>${note.timestamp ? new Date(note.timestamp.toDate()).toLocaleString() : this.translations["saving_status"] || "Saving..."}</strong>`;
+                    timestampP.innerHTML = `<strong>${note.timestamp ? new Date(note.timestamp.toDate()).toLocaleString() : "Saving..."}</strong>`;
 
                     const contentP = document.createElement('p');
                     if (decryptedContent === null) {
                         contentP.style.color = 'red';
-                        contentP.textContent = this.translations["decryption_failed_invalid_data"] || "Decryption failed";
+                        contentP.textContent = "Decryption failed";
                     } else {
                         contentP.textContent = decryptedContent;
                     }
@@ -80,7 +79,7 @@ export class NotesManager {
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'delete-note-btn btn btn-danger';
                     deleteButton.dataset.noteId = doc.id;
-                    deleteButton.textContent = this.translations["Delete"] || "Delete";
+                    deleteButton.textContent = "Delete";
 
                     noteDiv.appendChild(timestampP);
                     noteDiv.appendChild(contentP);
@@ -98,23 +97,23 @@ export class NotesManager {
                 });
             }, (error) => {
                 console.error("Error loading notes:", error);
-                showMessageBox("failed_to_load_notes_error" + error.message, "error", 3000, this.translations);
+                showMessageBox("Failed to load notes: " + error.message, "error", 3000);
             });
     }
 
     async deleteNote(noteId) {
         if (!this.authManager.currentUser) {
-            showMessageBox("message_box_please_login_delete_notes", "error", 3000, this.translations);
+            showMessageBox("Please login to delete notes", "error", 3000);
             return false;
         }
 
         try {
             await this.db.collection('players').doc(this.authManager.currentUser.uid).collection('notes').doc(noteId).delete();
-            showMessageBox("message_box_note_deleted_success", "success", 3000, this.translations);
+            showMessageBox("Note deleted successfully", "success", 3000);
             return true;
         } catch (error) {
             console.error("Error deleting note:", error);
-            showMessageBox("message_box_failed_to_delete_note" + error.message, "error", 3000, this.translations);
+            showMessageBox("Failed to delete note: " + error.message, "error", 3000);
             return false;
         }
     }
