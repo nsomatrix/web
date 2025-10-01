@@ -170,7 +170,12 @@
             </div>
             <div id="syncPasswordSection" style="display:none; margin-top:10px; padding:10px; background:#e8f5e8; border-radius:5px;">
                 <p><strong>Enter your current login password to sync:</strong></p>
-                <input type="password" id="syncPasswordInput" class="form-control mb-2" placeholder="Current Login Password" style="color:#000;" />
+                <div class="inputBx password-input-container">
+                    <input type="password" id="syncPasswordInput" placeholder="Current Login Password" style="color:#000;" />
+                    <span class="toggle-password" id="toggleSyncPassword">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
                 <button id="syncPasswordBtn" class="btn btn-primary btn-sm">Sync Password</button>
             </div>
         </div>

@@ -340,6 +340,18 @@ function setupEventListeners() {
             syncPasswordBtn.textContent = 'Sync Password';
         };
     }
+    
+    const toggleSyncPassword = document.getElementById('toggleSyncPassword');
+    if (toggleSyncPassword) {
+        toggleSyncPassword.addEventListener('click', () => {
+            const syncPasswordInput = document.getElementById('syncPasswordInput');
+            const type = syncPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            syncPasswordInput.setAttribute('type', type);
+            const eyeIcon = toggleSyncPassword.querySelector('i');
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+    }
 
     const cancelRecoveryBtn = document.getElementById('cancelRecoveryBtn');
     if (cancelRecoveryBtn) {
@@ -378,7 +390,7 @@ function setupFeatureButtons() {
                 // Show recovery section if password was likely reset
                 const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
                 const data = playerDoc.data();
-                if (data && data.encryptedMasterKey && !sessionStorage.getItem('currentEncryptionKeyHex')) {
+                if (data && data.encryptedMasterKey && !authManager.currentEncryptionKey) {
                     document.getElementById('recoverySection').style.display = 'block';
                 }
                 return;
@@ -398,7 +410,7 @@ function setupFeatureButtons() {
                 // Show recovery section if password was likely reset
                 const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
                 const data = playerDoc.data();
-                if (data && data.encryptedMasterKey && !sessionStorage.getItem('currentEncryptionKeyHex')) {
+                if (data && data.encryptedMasterKey && !authManager.currentEncryptionKey) {
                     document.getElementById('recoverySection').style.display = 'block';
                 }
                 return;
@@ -1538,9 +1550,8 @@ async function recoverWithKey(recoveryKey) {
             return false;
         }
         
-        authManager.currentEncryptionKey = CryptoJS.enc.Hex.parse(masterKeyHex);
-        sessionStorage.setItem('currentEncryptionKeyHex', masterKeyHex);
-        
+        // Don't set the key yet - wait for password sync
+        window.tempRecoveredKey = masterKeyHex;
         showMessageBox('Recovery key verified! Now sync with your current password.', 'success');
         return true;
     } catch (error) {
@@ -1556,19 +1567,32 @@ async function syncWithCurrentPassword(currentPassword) {
         return false;
     }
     
+    if (!window.tempRecoveredKey) {
+        showMessageBox('No recovery key found. Please try again.', 'error');
+        return false;
+    }
+    
     try {
         const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
         const data = playerDoc.data();
         const newDerivedKey = await deriveKey(currentPassword, data.salt);
         const newMasterPasswordHash = newDerivedKey.toString(CryptoJS.enc.Hex);
         
+        // Generate new recovery key for the new password
+        const newRecoveryKey = generateRecoveryKey();
+        const newEncryptedMasterKey = encryptWithRecoveryKey(newMasterPasswordHash, newRecoveryKey);
+        
         await db.collection('players').doc(authManager.currentUser.uid).update({
-            masterPasswordHash: newMasterPasswordHash
+            masterPasswordHash: newMasterPasswordHash,
+            encryptedMasterKey: newEncryptedMasterKey
         });
         
-        // Update session with new key
-        authManager.currentEncryptionKey = newDerivedKey;
-        sessionStorage.setItem('currentEncryptionKeyHex', newMasterPasswordHash);
+        // Set the correct encryption key
+        authManager.currentEncryptionKey = CryptoJS.enc.Hex.parse(window.tempRecoveredKey);
+        sessionStorage.setItem('currentEncryptionKeyHex', window.tempRecoveredKey);
+        
+        // Clean up
+        delete window.tempRecoveredKey;
         
         showMessageBox('Password synced successfully! You can now use your login password.', 'success');
         return true;
