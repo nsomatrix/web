@@ -1,12 +1,8 @@
-export function showMessageBox(messageKeyOrText, type = 'info', duration = 3000, translations = {}) {
+export function showMessageBox(messageText, type = 'info', duration = 3000) {
     const customMessageBox = document.getElementById('customMessageBox');
     const messageBoxText = document.getElementById('messageBoxText');
     
-    let messageToDisplay = messageKeyOrText;
-    if (translations[messageKeyOrText]) {
-        messageToDisplay = translations[messageKeyOrText];
-    }
-    messageBoxText.innerText = messageToDisplay;
+    messageBoxText.innerText = messageText;
     customMessageBox.style.display = 'block';
 
     customMessageBox.style.backgroundColor = '#333';
