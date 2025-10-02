@@ -927,7 +927,7 @@ async function displaySearchResults(results) {
             } else if (pendingRequest.exists && pendingRequest.data().status === 'pending') {
                 actionButton = `<button class="accept-btn" onclick="acceptFriendRequest('${user.id}', '${user.usernameTag}')">Accept Request</button>`;
             } else {
-                actionButton = `<button class="add-friend-btn" onclick="addFriend('${user.id}', '${user.usernameTag}')">Add Friend</button>`;
+                actionButton = `<button class="add-friend-btn btn btn-danger" onclick="addFriend('${user.id}', '${user.usernameTag}')">Add Friend</button>`;
             }
             
             item.innerHTML = `
@@ -1267,8 +1267,8 @@ async function loadNotifications() {
                     <span>@${request.fromUsername} sent you a friend request</span>
                 </div>
                 <div class="notification-actions">
-                    <button class="accept-btn" onclick="acceptFriendRequest('${request.fromUserId}', '${request.fromUsername}')">Accept</button>
-                    <button class="reject-btn" onclick="rejectFriendRequest('${request.fromUserId}')">Reject</button>
+                    <button class="accept-btn btn btn-success" onclick="acceptFriendRequest('${request.fromUserId}', '${request.fromUsername}')">Accept</button>
+                    <button class="reject-btn btn btn-danger" onclick="rejectFriendRequest('${request.fromUserId}')">Reject</button>
                 </div>
             `;
             notificationsList.appendChild(item);
@@ -1288,7 +1288,7 @@ async function loadNotifications() {
                     <span>${notification.message}</span>
                 </div>
                 <div class="notification-actions">
-                    <button class="reject-btn" onclick="markAsRead('${doc.id}')">Mark as Read</button>
+                    <button class="reject-btn btn btn-danger" onclick="markAsRead('${doc.id}')">Mark as Read</button>
                 </div>
             `;
             notificationsList.appendChild(item);
