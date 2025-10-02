@@ -26,19 +26,50 @@
 
 
 
-    <div id="setup-section" style="display:none;">
-        <h3>Set Username & Choose Avatar</h3>
-        <input id="usernameInput" type="text" class="form-control mb-3" placeholder="Enter username" />
-
-        <div class="avatar-selector">
-            <button id="prevAvatarBtn" class="nav-btn">&lt;</button>
-            <div id="currentAvatarWrapper" class="avatar-wrapper">
-                <img id="currentAvatarDisplay" src="" alt="Selected Avatar" class="avatar-display" />
+    <div id="setup-section" class="gaming-setup" style="display:none;">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h1 class="setup-title">Welcome, Ninja!</h1>
+                <p class="setup-subtitle">Let's setup your gaming profile</p>
             </div>
-            <button id="nextAvatarBtn" class="nav-btn">&gt;</button>
-        </div>
 
-        <button id="saveProfileBtn" class="btn btn-success">Save Profile</button>
+            <div class="setup-progress">
+                <div class="progress-step active" id="step1">1</div>
+                <div class="progress-step" id="step2">2</div>
+            </div>
+
+            <div class="username-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user"></i>
+                    Choose Your Username
+                </h2>
+                <div class="username-input-container">
+                    <input id="usernameInput" type="text" class="username-input" placeholder="Enter Username" maxlength="20" />
+                    <div id="usernameFeedback" class="username-feedback"></div>
+                </div>
+            </div>
+
+            <div class="avatar-section">
+                <h2 class="section-title">
+                    <i class="fas fa-image"></i>
+                    Select Your Avatar
+                </h2>
+                <div class="avatar-navigator">
+                    <button id="prevAvatarBtn" class="nav-arrow">&lt;</button>
+                    <div class="avatar-preview-container">
+                        <img id="currentAvatarDisplay" src="" alt="Selected Avatar" class="avatar-preview-img" />
+                    </div>
+                    <button id="nextAvatarBtn" class="nav-arrow">&gt;</button>
+                </div>
+            </div>
+
+            <div class="setup-actions">
+                <button id="saveProfileBtn" class="btn-setup btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Start Gaming
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Navbar Component -->
@@ -313,6 +344,7 @@
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
     <script src="js/fileChooser.js"></script>
+    <script src="js/setup.js"></script>
     <script type="module" src="js/dashboard.js"></script>
     <script src="components/loader.js"></script>
     
