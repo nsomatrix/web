@@ -123,10 +123,16 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar-container').innerHTML = html;
-                setTimeout(() => {
-                    new RetroNavbar();
-                    new NavbarAuth();
-                }, 100);
+                // Wait for Firebase to be ready before initializing navbar auth
+                const initNavbar = () => {
+                    if (window.firebaseReady) {
+                        new RetroNavbar();
+                        new NavbarAuth();
+                    } else {
+                        setTimeout(initNavbar, 100);
+                    }
+                };
+                initNavbar();
             });
         
         fetch('components/footer.html')
@@ -134,7 +140,7 @@
             .then(html => {
                 document.body.insertAdjacentHTML('beforeend', html);
             });
-    </script></script>
+    </script>
 
 </body>
 </html>

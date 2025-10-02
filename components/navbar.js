@@ -96,29 +96,47 @@ class NavbarAuth {
     const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
     this.updateAuthLinks(isLoggedIn ? { uid: 'user' } : null);
     
-    // Then setup Firebase listener if available
-    if (window.firebaseAuth) {
-      this.setupAuthListener(window.firebaseAuth);
-    } else if (window.firebase && window.firebase.auth) {
-      this.setupAuthListener(window.firebase.auth());
-    } else {
-      // Check periodically for Firebase
-      const checkFirebase = setInterval(() => {
-        if (window.firebaseAuth) {
-          clearInterval(checkFirebase);
-          this.setupAuthListener(window.firebaseAuth);
-        } else if (window.firebase && window.firebase.auth) {
-          clearInterval(checkFirebase);
-          this.setupAuthListener(window.firebase.auth());
-        }
-      }, 100);
-    }
+    // Setup Firebase listener with multiple attempts
+    this.setupFirebaseListener();
   }
 
-  setupAuthListener(auth) {
-    auth.onAuthStateChanged((user) => {
-      this.updateAuthLinks(user);
-    });
+  setupFirebaseListener() {
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    const trySetupListener = () => {
+      attempts++;
+      
+      // Try different Firebase auth instances
+      let auth = null;
+      if (window.firebase && window.firebase.auth) {
+        auth = window.firebase.auth();
+      } else if (window.firebaseAuth) {
+        auth = window.firebaseAuth;
+      }
+      
+      if (auth) {
+        console.log('Firebase auth found, setting up listener');
+        auth.onAuthStateChanged((user) => {
+          console.log('Auth state changed:', user ? 'logged in' : 'logged out');
+          this.updateAuthLinks(user);
+          if (user) {
+            localStorage.setItem('userLoggedIn', 'true');
+          } else {
+            localStorage.removeItem('userLoggedIn');
+          }
+        });
+        return;
+      }
+      
+      if (attempts < maxAttempts) {
+        setTimeout(trySetupListener, 200);
+      } else {
+        console.warn('Firebase auth not found after maximum attempts');
+      }
+    };
+    
+    trySetupListener();
   }
 
   updateAuthLinks(user) {
@@ -160,23 +178,45 @@ class NavbarAuth {
 
   async logout() {
     try {
-      // Use the appropriate Firebase auth instance
-      if (window.firebaseAuth) {
-        await window.firebaseAuth.signOut();
-      } else if (window.firebase && window.firebase.auth) {
-        await window.firebase.auth().signOut();
+      console.log('Logout initiated');
+      
+      // Find and use the appropriate Firebase auth instance
+      let auth = null;
+      if (window.firebase && window.firebase.auth) {
+        auth = window.firebase.auth();
+      } else if (window.firebaseAuth) {
+        auth = window.firebaseAuth;
       }
+      
+      if (auth) {
+        await auth.signOut();
+        console.log('Firebase signOut completed');
+      }
+      
+      // Clear all session data
       localStorage.removeItem('userLoggedIn');
       sessionStorage.clear();
+      
+      // Redirect to home page
       window.location.href = 'index.html';
     } catch (error) {
       console.error('Logout error:', error);
+      // Even if Firebase logout fails, clear local data and redirect
+      localStorage.removeItem('userLoggedIn');
+      sessionStorage.clear();
+      window.location.href = 'index.html';
     }
   }
 }
 
 // Initialize navbar when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    new RetroNavbar();
+    new NavbarAuth();
+  });
+} else {
+  // DOM is already loaded
   new RetroNavbar();
   new NavbarAuth();
-});
+}
