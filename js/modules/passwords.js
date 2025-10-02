@@ -88,7 +88,6 @@ export class PasswordManager {
                     
                     const decryptedPasswordSpan = document.createElement('span');
                     decryptedPasswordSpan.className = 'decrypted-password';
-                    decryptedPasswordSpan.style.fontFamily = 'monospace';
 
                     if (decryptedContent === null) {
                         decryptedPasswordSpan.style.color = 'red';
