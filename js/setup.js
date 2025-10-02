@@ -125,11 +125,15 @@ class GameSetup {
                 .where('username', '==', username)
                 .get();
             
-            const existingUser = [...tagQuery.docs, ...nameQuery.docs]
-                .find(doc => window.authManager && window.authManager.currentUser ? 
-                    doc.id !== window.authManager.currentUser.uid : true);
+            const currentUser = firebase.auth().currentUser;
+            let userExists = false;
+            [...tagQuery.docs, ...nameQuery.docs].forEach(doc => {
+                if (!currentUser || doc.id !== currentUser.uid) {
+                    userExists = true;
+                }
+            });
             
-            if (existingUser) {
+            if (userExists) {
                 this.showUsernameFeedback('Username is already taken', 'error');
                 input.classList.add('invalid');
                 this.validateForm();
@@ -219,7 +223,8 @@ class GameSetup {
             return;
         }
 
-        if (!window.authManager || !window.authManager.currentUser) {
+        const currentUser = firebase.auth().currentUser;
+        if (!currentUser) {
             this.showFeedback("Please login first", "error");
             return;
         }
@@ -233,7 +238,7 @@ class GameSetup {
 
         try {
             const db = firebase.firestore();
-            const user = window.authManager.currentUser;
+            const user = currentUser;
             
             // Check for existing username before saving
             const tagQuery = await db.collection('players')
