@@ -682,6 +682,15 @@ body {
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
   position: relative;
+  color: white;
+}
+
+.modal-content h3 {
+  color: white;
+}
+
+.modal-content p {
+  color: white;
 }
 
 .close-button {
