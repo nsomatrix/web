@@ -597,6 +597,11 @@ body {
   margin-bottom: 1rem;
   font-size: 0.875rem;
   transition: all 0.2s;
+  color: white;
+}
+
+.form-control::placeholder {
+  color: #888;
 }
 
 .form-control:focus {
