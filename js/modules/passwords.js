@@ -82,16 +82,45 @@ export class PasswordManager {
 
                     const passwordP = document.createElement('p');
                     passwordP.innerHTML = `<strong>Password:</strong> `;
+                    const passwordContainer = document.createElement('span');
+                    passwordContainer.style.position = 'relative';
+                    passwordContainer.style.display = 'inline-block';
+                    
                     const decryptedPasswordSpan = document.createElement('span');
                     decryptedPasswordSpan.className = 'decrypted-password';
+                    decryptedPasswordSpan.style.fontFamily = 'monospace';
 
                     if (decryptedContent === null) {
                         decryptedPasswordSpan.style.color = 'red';
                         decryptedPasswordSpan.textContent = "Decryption failed";
                     } else {
-                        decryptedPasswordSpan.textContent = decryptedContent;
+                        decryptedPasswordSpan.textContent = '••••••••';
+                        decryptedPasswordSpan.dataset.password = decryptedContent;
+                        decryptedPasswordSpan.dataset.hidden = 'true';
                     }
-                    passwordP.appendChild(decryptedPasswordSpan);
+                    
+                    const toggleBtn = document.createElement('span');
+                    toggleBtn.innerHTML = '<i class="fa fa-eye"></i>';
+                    toggleBtn.style.marginLeft = '8px';
+                    toggleBtn.style.cursor = 'pointer';
+                    toggleBtn.style.color = '#888';
+                    toggleBtn.onclick = () => {
+                        if (decryptedPasswordSpan.dataset.hidden === 'true') {
+                            decryptedPasswordSpan.textContent = decryptedPasswordSpan.dataset.password;
+                            toggleBtn.innerHTML = '<i class="fa fa-eye-slash"></i>';
+                            decryptedPasswordSpan.dataset.hidden = 'false';
+                        } else {
+                            decryptedPasswordSpan.textContent = '••••••••';
+                            toggleBtn.innerHTML = '<i class="fa fa-eye"></i>';
+                            decryptedPasswordSpan.dataset.hidden = 'true';
+                        }
+                    };
+                    
+                    passwordContainer.appendChild(decryptedPasswordSpan);
+                    if (decryptedContent !== null) {
+                        passwordContainer.appendChild(toggleBtn);
+                    }
+                    passwordP.appendChild(passwordContainer);
 
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'delete-pm-btn btn btn-danger';

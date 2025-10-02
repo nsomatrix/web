@@ -320,6 +320,21 @@ function setupEventListeners() {
             showMessageBox('Lost your recovery key? Your only option is to delete your account and start over due to our zero-knowledge encryption model. We cannot recover your data without the key. Go to Dashboard → Delete Account to proceed.', 'error', 8000);
         };
     }
+
+    // Password manager toggle
+    setTimeout(() => {
+        const togglePmPassword = document.getElementById('togglePmPassword');
+        if (togglePmPassword) {
+            togglePmPassword.addEventListener('click', () => {
+                const pmPasswordInput = document.getElementById('pmPassword');
+                const type = pmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                pmPasswordInput.setAttribute('type', type);
+                const eyeIcon = togglePmPassword.querySelector('i');
+                eyeIcon.classList.toggle('fa-eye');
+                eyeIcon.classList.toggle('fa-eye-slash');
+            });
+        }
+    }, 1000);
     
     const syncPasswordBtn = document.getElementById('syncPasswordBtn');
     if (syncPasswordBtn) {
