@@ -114,7 +114,7 @@ export class AuthManager {
                 console.log("Encryption key restored from sessionStorage.");
                 return true;
             } catch (e) {
-                console.error("Failed to restore encryption key from sessionStorage:", e);
+                console.error("Failed to restore encryption key from localStorage:", e);
                 sessionStorage.removeItem('currentEncryptionKeyHex');
                 this.currentEncryptionKey = null;
                 return false;

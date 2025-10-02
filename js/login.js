@@ -179,8 +179,14 @@ async function handleLogin() {
         const playerData = playerDoc.data();
 
         if (playerData && playerData.salt && playerData.masterPasswordHash) {
-            const derivedEncryptionKey = await deriveKey(password, playerData.salt);
-            sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
+            if (playerData.recoveredFromKey) {
+                // Account was recovered with recovery key, use stored master password hash directly
+                sessionStorage.setItem('currentEncryptionKeyHex', playerData.masterPasswordHash);
+            } else {
+                // Normal login, derive key from password
+                const derivedEncryptionKey = await deriveKey(password, playerData.salt);
+                sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
+            }
         }
 
         localStorage.setItem('userLoggedIn', 'true');
@@ -313,10 +319,10 @@ function showRecoveryKey(recoveryKey) {
     const modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;';
     modal.innerHTML = `
-        <div style="background:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;">
+        <div style="background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;border:1px solid #333;">
             <h3 style="color:#e74c3c;margin-bottom:20px;">⚠️ SAVE YOUR RECOVERY KEY</h3>
-            <p style="margin-bottom:20px;">This is your ONLY way to recover access if you reset your password:</p>
-            <div id="recoveryKeyDisplay" style="background:#f8f9fa;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
+            <p style="margin-bottom:20px;color:white;">This is your ONLY way to recover access if you reset your password:</p>
+            <div id="recoveryKeyDisplay" style="background:#2d2d2d;color:#00ff00;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
             <div style="margin:15px 0;">
                 <button id="copyKeyBtn" style="background:#007bff;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;margin-right:10px;">Copy to Clipboard</button>
                 <button id="downloadKeyBtn" style="background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;">Download as TXT</button>

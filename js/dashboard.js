@@ -287,13 +287,37 @@ function setupEventListeners() {
             recoverBtn.textContent = 'Recovering...';
             
             if (await recoverWithKey(recoveryKey)) {
-                document.getElementById('recoverySection').style.display = 'none';
-                document.getElementById('syncPasswordSection').style.display = 'block';
-                document.getElementById('masterPasswordModalTitle').textContent = 'Sync with Current Password';
+                closeModal(document.getElementById('recoveryKeyModal'));
+                
+                // Handle pending modal opens
+                const notesModal = document.getElementById('notesModal');
+                const passwordManagerModal = document.getElementById('passwordManagerModal');
+                const ephemeralFilesModal = document.getElementById('ephemeralFilesModal');
+                
+                if (notesModal.dataset.pendingOpen === 'true') {
+                    openModal(notesModal);
+                    notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
+                    notesModal.dataset.pendingOpen = 'false';
+                } else if (passwordManagerModal.dataset.pendingOpen === 'true') {
+                    openModal(passwordManagerModal);
+                    passwordManager.loadPasswords(document.getElementById('pmEntryList'));
+                    passwordManagerModal.dataset.pendingOpen = 'false';
+                } else if (ephemeralFilesModal.dataset.pendingOpen === 'true') {
+                    openModal(ephemeralFilesModal);
+                    loadFilesList();
+                    ephemeralFilesModal.dataset.pendingOpen = 'false';
+                }
             }
             
             recoverBtn.disabled = false;
             recoverBtn.textContent = 'Recover Access';
+        };
+    }
+
+    const lostKeyBtn = document.getElementById('lostKeyBtn');
+    if (lostKeyBtn) {
+        lostKeyBtn.onclick = () => {
+            showMessageBox('Lost your recovery key? Your only option is to delete your account and start over due to our zero-knowledge encryption model. We cannot recover your data without the key. Go to Dashboard → Delete Account to proceed.', 'error', 8000);
         };
     }
     
@@ -376,15 +400,9 @@ function setupFeatureButtons() {
     if (notesBtn) {
         notesBtn.onclick = async () => {
             if (!authManager.currentEncryptionKey) {
-                openModal(document.getElementById('masterPasswordPromptModal'));
+                openModal(document.getElementById('recoveryKeyModal'));
                 document.getElementById('notesModal').dataset.pendingOpen = 'true';
-                document.getElementById('masterPasswordUnlockInput').value = '';
-                // Show recovery section if password was likely reset
-                const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
-                const data = playerDoc.data();
-                if (data && data.encryptedMasterKey && !authManager.currentEncryptionKey) {
-                    document.getElementById('recoverySection').style.display = 'block';
-                }
+                document.getElementById('recoveryKeyInput').value = '';
                 return;
             }
             openModal(document.getElementById('notesModal'));
@@ -396,15 +414,9 @@ function setupFeatureButtons() {
     if (passwordManagerBtn) {
         passwordManagerBtn.onclick = async () => {
             if (!authManager.currentEncryptionKey) {
-                openModal(document.getElementById('masterPasswordPromptModal'));
+                openModal(document.getElementById('recoveryKeyModal'));
                 document.getElementById('passwordManagerModal').dataset.pendingOpen = 'true';
-                document.getElementById('masterPasswordUnlockInput').value = '';
-                // Show recovery section if password was likely reset
-                const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
-                const data = playerDoc.data();
-                if (data && data.encryptedMasterKey && !authManager.currentEncryptionKey) {
-                    document.getElementById('recoverySection').style.display = 'block';
-                }
+                document.getElementById('recoveryKeyInput').value = '';
                 return;
             }
             openModal(document.getElementById('passwordManagerModal'));
@@ -416,9 +428,9 @@ function setupFeatureButtons() {
     if (ephemeralFilesBtn) {
         ephemeralFilesBtn.onclick = () => {
             if (!authManager.currentEncryptionKey) {
-                openModal(document.getElementById('masterPasswordPromptModal'));
+                openModal(document.getElementById('recoveryKeyModal'));
                 document.getElementById('ephemeralFilesModal').dataset.pendingOpen = 'true';
-                document.getElementById('masterPasswordUnlockInput').value = '';
+                document.getElementById('recoveryKeyInput').value = '';
                 return;
             }
             openModal(document.getElementById('ephemeralFilesModal'));
@@ -1506,10 +1518,10 @@ function showRecoveryKey(recoveryKey) {
     const modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;';
     modal.innerHTML = `
-        <div style="background:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;">
+        <div style="background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;border:1px solid #333;">
             <h3 style="color:#e74c3c;margin-bottom:20px;">⚠️ SAVE YOUR RECOVERY KEY</h3>
-            <p style="margin-bottom:20px;">This is your ONLY way to recover your data if you forget your master password:</p>
-            <div style="background:#f8f9fa;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
+            <p style="margin-bottom:20px;color:white;">This is your ONLY way to recover your data if you forget your master password:</p>
+            <div style="background:#2d2d2d;color:#00ff00;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
             <p style="color:#e74c3c;font-weight:bold;margin-bottom:20px;">Write this down and store it safely offline!</p>
             <button id="recoveryKeySaved" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">I've Saved It Safely</button>
         </div>
@@ -1542,13 +1554,39 @@ async function recoverWithKey(recoveryKey) {
             return false;
         }
         
-        // Don't set the key yet - wait for password sync
-        window.tempRecoveredKey = masterKeyHex;
-        showMessageBox('Recovery key verified! Now sync with your current password.', 'success');
+        // Set the encryption key and sync with current password
+        authManager.currentEncryptionKey = CryptoJS.enc.Hex.parse(masterKeyHex);
+        sessionStorage.setItem('currentEncryptionKeyHex', masterKeyHex);
+        
+        // Sync with current login password
+        await syncRecoveryKeyWithPassword(masterKeyHex);
+        
+        showMessageBox('Access recovered successfully!', 'success');
         return true;
     } catch (error) {
         console.error('Recovery error:', error);
         showMessageBox('Recovery failed. Check your key and try again.', 'error');
+        return false;
+    }
+}
+
+async function syncRecoveryKeyWithPassword(recoveredKeyHex) {
+    try {
+        const user = authManager.currentUser;
+        if (!user) return false;
+        
+        // Store the recovered key as the master password hash
+        // This allows future logins to work with the login password
+        await db.collection('players').doc(user.uid).update({
+            masterPasswordHash: recoveredKeyHex,
+            // Keep the same salt - login will derive key from password+salt
+            // but we override the comparison to use the recovered key
+            recoveredFromKey: true
+        });
+        
+        return true;
+    } catch (error) {
+        console.error('Sync error:', error);
         return false;
     }
 }

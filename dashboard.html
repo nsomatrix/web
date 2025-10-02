@@ -186,28 +186,15 @@
     </div>
 
     <!-- All existing modals remain the same -->
-    <div id="masterPasswordPromptModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close-button" data-modal="masterPasswordPromptModal">&times;</span>
-            <h3>Enter Master Password to Unlock</h3>
-            <input type="password" id="masterPasswordUnlockInput" class="form-control mb-3" placeholder="Master Password" />
-            <button id="unlockDashboardBtn" class="btn btn-primary">Unlock Dashboard</button>
-            <button id="forgotPasswordBtn" class="btn btn-link mt-2" style="color: #66ccff;">Forgot Master Password?</button>
-            <div id="recoverySection" style="display:none; margin-top:10px; padding:10px; background:#f8f9fa; border-radius:5px;">
-                <p><strong>Enter your 32-character recovery key:</strong></p>
-                <input type="text" id="recoveryKeyInput" class="form-control mb-2" placeholder="Recovery Key" maxlength="32" style="color:#000;" />
-                <button id="recoverBtn" class="btn btn-success btn-sm">Recover Access</button>
-                <button id="cancelRecoveryBtn" class="btn btn-secondary btn-sm">Cancel</button>
-            </div>
-            <div id="syncPasswordSection" style="display:none; margin-top:10px; padding:10px; background:#e8f5e8; border-radius:5px;">
-                <p><strong>Enter your current login password to sync:</strong></p>
-                <div class="inputBx password-input-container">
-                    <input type="password" id="syncPasswordInput" placeholder="Current Login Password" style="color:#000;" />
-                    <span class="toggle-password" id="toggleSyncPassword">
-                        <i class="fa fa-eye"></i>
-                    </span>
-                </div>
-                <button id="syncPasswordBtn" class="btn btn-primary btn-sm">Sync Password</button>
+    <div id="recoveryKeyModal" class="modal" style="display:none;">
+        <div class="modal-content" style="background:#1a1a1a;color:white;border:1px solid #333;">
+            <span class="close-button" data-modal="recoveryKeyModal" style="color:white;">&times;</span>
+            <h3 style="color:white;">Enter Recovery Key to Access Data</h3>
+            <p style="color:white;"><strong>Enter your 32-character recovery key:</strong></p>
+            <input type="text" id="recoveryKeyInput" class="form-control mb-2" placeholder="Recovery Key" maxlength="32" style="background:#2d2d2d;color:white;border:1px solid #555;" />
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button id="recoverBtn" class="btn btn-success">Recover Access</button>
+                <button id="lostKeyBtn" class="btn btn-danger">Lost Key?</button>
             </div>
         </div>
     </div>
