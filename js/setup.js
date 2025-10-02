@@ -112,40 +112,39 @@ class GameSetup {
             return;
         }
 
-        if (window.authManager && window.authManager.currentUser) {
-            try {
-                feedback.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking availability...';
-                
-                const db = window.firebaseDb;
-                const snapshot = await db.collection('players')
-                    .where('usernameTag', '==', username.toLowerCase())
-                    .get();
-
-                if (!snapshot.empty) {
-                    const existingUser = snapshot.docs[0];
-                    if (existingUser.id !== window.authManager.currentUser.uid) {
-                        this.showUsernameFeedback('Username is already taken', 'error');
-                        input.classList.add('invalid');
-                        this.validateForm();
-                        return;
-                    }
-                }
-
-                this.showUsernameFeedback('Username is available!', 'success');
-                input.classList.add('valid');
-                this.usernameValid = true;
-                this.validateForm();
-                
-            } catch (error) {
-                console.error('Username validation error:', error);
-                this.showUsernameFeedback('Could not verify username availability', 'error');
+        // Check Firebase for existing usernames
+        try {
+            feedback.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking availability...';
+            
+            const db = firebase.firestore();
+            
+            const tagQuery = await db.collection('players')
+                .where('usernameTag', '==', username.toLowerCase())
+                .get();
+            const nameQuery = await db.collection('players')
+                .where('username', '==', username)
+                .get();
+            
+            const existingUser = [...tagQuery.docs, ...nameQuery.docs]
+                .find(doc => window.authManager && window.authManager.currentUser ? 
+                    doc.id !== window.authManager.currentUser.uid : true);
+            
+            if (existingUser) {
+                this.showUsernameFeedback('Username is already taken', 'error');
                 input.classList.add('invalid');
                 this.validateForm();
+                return;
             }
-        } else {
-            this.showUsernameFeedback('Username looks good!', 'success');
+
+            this.showUsernameFeedback('Username is available!', 'success');
             input.classList.add('valid');
             this.usernameValid = true;
+            this.validateForm();
+            
+        } catch (error) {
+            console.error('Username validation error:', error);
+            this.showUsernameFeedback('Could not verify username availability', 'error');
+            input.classList.add('invalid');
             this.validateForm();
         }
     }
@@ -233,8 +232,26 @@ class GameSetup {
         saveBtn.disabled = true;
 
         try {
-            const db = window.firebaseDb;
+            const db = firebase.firestore();
             const user = window.authManager.currentUser;
+            
+            // Check for existing username before saving
+            const tagQuery = await db.collection('players')
+                .where('usernameTag', '==', username.toLowerCase())
+                .get();
+            const nameQuery = await db.collection('players')
+                .where('username', '==', username)
+                .get();
+            
+            const existingUser = [...tagQuery.docs, ...nameQuery.docs]
+                .find(doc => doc.id !== user.uid);
+            
+            if (existingUser) {
+                this.showFeedback("Username is already taken", "error");
+                saveBtn.classList.remove('loading');
+                saveBtn.disabled = false;
+                return;
+            }
             
             const playerDocRef = db.collection('players').doc(user.uid);
             const playerDoc = await playerDocRef.get();
@@ -341,3 +358,12 @@ class GameSetup {
 
 // Initialize when needed
 window.GameSetup = GameSetup;
+
+// Simple initialization
+if (typeof window !== 'undefined') {
+    window.initGameSetup = function() {
+        if (!window.gameSetupInstance) {
+            window.gameSetupInstance = new GameSetup();
+        }
+    };
+}

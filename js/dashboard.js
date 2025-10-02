@@ -151,14 +151,11 @@ async function setupDashboard(user) {
             document.getElementById('main-dashboard').style.display = 'none';
             closeModal(document.getElementById('masterPasswordPromptModal'));
 
-            document.getElementById('usernameInput').value = data.username || '';
-            
-            if (data.avatar && allAvatars.includes(data.avatar)) {
-                currentAvatarIndex = allAvatars.indexOf(data.avatar);
-            } else {
-                currentAvatarIndex = 0;
+            // Initialize the new setup system
+            if (window.initGameSetup) {
+                window.initGameSetup();
             }
-            updateAvatarDisplay();
+            
             return;
         }
 
