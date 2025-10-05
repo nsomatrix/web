@@ -980,8 +980,8 @@ async function loadMessages(friendId) {
                     const data = doc.data();
                     const participants = data.participants || [];
                     
-                    // Filter for this specific conversation
-                    if (participants.includes(friendId) && participants.includes(authManager.currentUser.uid)) {
+                    // Filter for this specific conversation and exclude deleted messages
+                    if (participants.includes(friendId) && participants.includes(authManager.currentUser.uid) && !data.deleted) {
                         messages.push({ id: doc.id, ...data });
                     }
                 });
@@ -1082,6 +1082,20 @@ function renderMessages(messages) {
                 position: relative;
                 border: 1px solid ${isSent ? '#c0392b' : '#555'};
             ">
+                ${message.replyTo ? 
+                    `<div style="
+                        background: rgba(255,255,255,0.1);
+                        border-left: 3px solid #e74c3c;
+                        padding: 6px 10px;
+                        margin-bottom: 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        opacity: 0.8;
+                    ">
+                        <div style="font-style: italic;">↩️ ${escapeHtml(message.replyText || 'Message')}</div>
+                    </div>` : 
+                    ''
+                }
                 <div style="font-size: 14px; line-height: 1.4;">${escapeHtml(message.text)}</div>
                 <div style="
                     font-size: 11px;
@@ -1089,7 +1103,59 @@ function renderMessages(messages) {
                     margin-top: 4px;
                     text-align: right;
                     color: #ccc;
-                ">${timestamp}</div>
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <span>${timestamp}</span>
+                    <div style="position: relative;">
+                        <span class="message-menu-btn" ontouchstart="toggleMessageMenu('${message.id}')" onclick="toggleMessageMenu('${message.id}')" style="
+                            cursor: pointer;
+                            padding: 4px 8px;
+                            border-radius: 10px;
+                            font-size: 16px;
+                            opacity: 0.6;
+                            transition: opacity 0.2s;
+                            -webkit-tap-highlight-color: transparent;
+                            user-select: none;
+                        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">⋯</span>
+                        <div id="menu-${message.id}" class="message-menu" style="
+                            display: none;
+                            position: absolute;
+                            right: 0;
+                            bottom: 30px;
+                            background: #2d2d2d;
+                            border: 1px solid #555;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                            z-index: 1000;
+                            min-width: 120px;
+                        ">
+                            <div ontouchstart="replyToMessage('${message.id}', '${message.text}')" onclick="replyToMessage('${message.id}', '${message.text}')" style="
+                                padding: 12px 16px;
+                                cursor: pointer;
+                                color: white;
+                                ${isSent ? 'border-bottom: 1px solid #555;' : ''}
+                                font-size: 14px;
+                                -webkit-tap-highlight-color: transparent;
+                            " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
+                                ↩️ Reply
+                            </div>
+                            ${isSent ? 
+                                `<div ontouchstart="unsendMessage('${message.id}')" onclick="unsendMessage('${message.id}')" style="
+                                    padding: 12px 16px;
+                                    cursor: pointer;
+                                    color: #e74c3c;
+                                    font-size: 14px;
+                                    -webkit-tap-highlight-color: transparent;
+                                " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
+                                    🗑️ Delete
+                                </div>` : 
+                                ''
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
         
@@ -1108,6 +1174,111 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Message menu functions
+window.toggleMessageMenu = function(messageId) {
+    // Close all other menus first
+    document.querySelectorAll('.message-menu').forEach(menu => {
+        if (menu.id !== `menu-${messageId}`) {
+            menu.style.display = 'none';
+        }
+    });
+    
+    const menu = document.getElementById(`menu-${messageId}`);
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Close menus when clicking/touching outside
+function closeAllMenus() {
+    document.querySelectorAll('.message-menu').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.message-menu-btn') && !e.target.closest('.message-menu')) {
+        closeAllMenus();
+    }
+});
+
+document.addEventListener('touchstart', function(e) {
+    if (!e.target.closest('.message-menu-btn') && !e.target.closest('.message-menu')) {
+        closeAllMenus();
+    }
+});
+
+// Reply to message function
+window.replyToMessage = function(messageId, messageText) {
+    const messageInput = document.getElementById('messageInput');
+    const replyPreview = document.createElement('div');
+    
+    // Close menu
+    document.getElementById(`menu-${messageId}`).style.display = 'none';
+    
+    // Create reply preview
+    replyPreview.id = 'reply-preview';
+    replyPreview.style.cssText = `
+        background: #3d3d3d;
+        border-left: 3px solid #e74c3c;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #ccc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    `;
+    
+    replyPreview.innerHTML = `
+        <div>
+            <div style="color: #e74c3c; font-weight: bold;">Replying to:</div>
+            <div style="opacity: 0.8;">${messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText}</div>
+        </div>
+        <span onclick="cancelReply()" style="cursor: pointer; color: #999; font-size: 16px;">&times;</span>
+    `;
+    
+    // Add reply preview above input
+    const inputContainer = messageInput.parentElement;
+    const existingPreview = document.getElementById('reply-preview');
+    if (existingPreview) existingPreview.remove();
+    
+    inputContainer.insertBefore(replyPreview, inputContainer.firstChild);
+    messageInput.focus();
+    
+    // Store reply data
+    messageInput.dataset.replyTo = messageId;
+    messageInput.dataset.replyText = messageText;
+}
+
+// Cancel reply function
+window.cancelReply = function() {
+    const replyPreview = document.getElementById('reply-preview');
+    const messageInput = document.getElementById('messageInput');
+    
+    if (replyPreview) replyPreview.remove();
+    delete messageInput.dataset.replyTo;
+    delete messageInput.dataset.replyText;
+}
+
+// Unsend message function
+window.unsendMessage = async function(messageId) {
+    try {
+        // Close menu
+        document.getElementById(`menu-${messageId}`).style.display = 'none';
+        
+        console.log('Deleting message:', messageId);
+        
+        await db.collection('messages').doc(messageId).delete();
+        
+        console.log('Message deleted successfully');
+    } catch (error) {
+        console.error('Error deleting message:', error);
+        showMessageBox('Failed to delete message', 'error', 2000);
+    }
+}
+
 async function sendNewMessage() {
     const messageInput = document.getElementById('messageInput');
     const messageText = messageInput.value.trim();
@@ -1116,9 +1287,17 @@ async function sendNewMessage() {
     
     console.log('Sending message:', messageText, 'to:', currentChatFriend);
     
-    // Clear input immediately
+    // Check if this is a reply
+    const isReply = messageInput.dataset.replyTo;
+    const replyData = isReply ? {
+        replyTo: messageInput.dataset.replyTo,
+        replyText: messageInput.dataset.replyText
+    } : {};
+    
+    // Clear input and reply preview
     messageInput.value = '';
     messageInput.disabled = true;
+    if (isReply) cancelReply();
     
     try {
         const messageData = {
@@ -1126,7 +1305,8 @@ async function sendNewMessage() {
             senderId: authManager.currentUser.uid,
             participants: [authManager.currentUser.uid, currentChatFriend],
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            readBy: [authManager.currentUser.uid]
+            readBy: [authManager.currentUser.uid],
+            ...replyData
         };
         
         console.log('Message data:', messageData);
