@@ -961,6 +961,10 @@ async function loadMessages(friendId) {
         const friendData = friendDoc.data();
         document.getElementById('messageModalTitle').textContent = `Chat with @${sanitizeInput(friendData.usernameTag)}`;
         
+        // Show message input when opening a chat
+        const messageInputContainer = document.querySelector('.message-input-container');
+        if (messageInputContainer) messageInputContainer.style.display = 'block';
+        
         // Clean up previous listener
         if (messageListener) {
             messageListener();
