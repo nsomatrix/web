@@ -1059,7 +1059,15 @@ function renderMessages(messages) {
         let timestamp = 'Sending...';
         if (message.createdAt) {
             const date = message.createdAt.toDate();
-            timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
+            
+            if (isToday) {
+                timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                timestamp = date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
+                           date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
         }
         
         messageDiv.innerHTML = `
