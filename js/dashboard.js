@@ -1109,16 +1109,17 @@ function renderMessages(messages) {
                 ">
                     <span>${timestamp}</span>
                     <div style="position: relative;">
-                        <span class="message-menu-btn" ontouchstart="toggleMessageMenu('${message.id}')" onclick="toggleMessageMenu('${message.id}')" style="
+                        <span class="message-menu-btn" onclick="toggleMessageMenu('${message.id}')" style="
                             cursor: pointer;
                             padding: 4px 8px;
-                            border-radius: 10px;
+                            border-radius: 8px;
                             font-size: 16px;
-                            opacity: 0.6;
+                            opacity: 0.7;
                             transition: opacity 0.2s;
                             -webkit-tap-highlight-color: transparent;
                             user-select: none;
-                        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">⋯</span>
+                            touch-action: manipulation;
+                        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">⋯</span>
                         <div id="menu-${message.id}" class="message-menu" style="
                             display: none;
                             position: absolute;
@@ -1131,25 +1132,27 @@ function renderMessages(messages) {
                             z-index: 1000;
                             min-width: 120px;
                         ">
-                            <div ontouchstart="replyToMessage('${message.id}', '${message.text}')" onclick="replyToMessage('${message.id}', '${message.text}')" style="
+                            <div onclick="replyToMessage('${message.id}', '${message.text}')" style="
                                 padding: 12px 16px;
                                 cursor: pointer;
                                 color: white;
                                 ${isSent ? 'border-bottom: 1px solid #555;' : ''}
                                 font-size: 14px;
                                 -webkit-tap-highlight-color: transparent;
+                                touch-action: manipulation;
                             " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
                                 ↩️ Reply
                             </div>
                             ${isSent ? 
-                                `<div ontouchstart="unsendMessage('${message.id}')" onclick="unsendMessage('${message.id}')" style="
+                                `<div onclick="unsendMessage('${message.id}')" style="
                                     padding: 12px 16px;
                                     cursor: pointer;
                                     color: #e74c3c;
                                     font-size: 14px;
                                     -webkit-tap-highlight-color: transparent;
+                                    touch-action: manipulation;
                                 " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
-                                    🗑️ Delete
+                                    🗑️ Unsend
                                 </div>` : 
                                 ''
                             }
@@ -1185,7 +1188,20 @@ window.toggleMessageMenu = function(messageId) {
     
     const menu = document.getElementById(`menu-${messageId}`);
     if (menu) {
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        const isVisible = menu.style.display === 'block';
+        menu.style.display = isVisible ? 'none' : 'block';
+        
+        // On mobile, add a backdrop to prevent accidental closes
+        if ('ontouchstart' in window && !isVisible) {
+            const backdrop = document.createElement('div');
+            backdrop.id = 'menu-backdrop';
+            backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;';
+            backdrop.onclick = () => {
+                closeAllMenus();
+                backdrop.remove();
+            };
+            document.body.appendChild(backdrop);
+        }
     }
 }
 
@@ -1196,25 +1212,24 @@ function closeAllMenus() {
     });
 }
 
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.message-menu-btn') && !e.target.closest('.message-menu')) {
-        closeAllMenus();
-    }
-});
-
-document.addEventListener('touchstart', function(e) {
-    if (!e.target.closest('.message-menu-btn') && !e.target.closest('.message-menu')) {
-        closeAllMenus();
-    }
-});
+// Only use click events for desktop
+if (!('ontouchstart' in window)) {
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.message-menu-btn') && !e.target.closest('.message-menu')) {
+            closeAllMenus();
+        }
+    });
+}
 
 // Reply to message function
 window.replyToMessage = function(messageId, messageText) {
     const messageInput = document.getElementById('messageInput');
     const replyPreview = document.createElement('div');
     
-    // Close menu
+    // Close menu and backdrop
     document.getElementById(`menu-${messageId}`).style.display = 'none';
+    const backdrop = document.getElementById('menu-backdrop');
+    if (backdrop) backdrop.remove();
     
     // Create reply preview
     replyPreview.id = 'reply-preview';
@@ -1265,8 +1280,10 @@ window.cancelReply = function() {
 // Unsend message function
 window.unsendMessage = async function(messageId) {
     try {
-        // Close menu
+        // Close menu and backdrop
         document.getElementById(`menu-${messageId}`).style.display = 'none';
+        const backdrop = document.getElementById('menu-backdrop');
+        if (backdrop) backdrop.remove();
         
         console.log('Deleting message:', messageId);
         
