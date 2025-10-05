@@ -966,27 +966,40 @@ async function loadMessages(friendId) {
             messageListener();
         }
         
-        // Create conversation ID for consistent querying
-        const conversationId = [authManager.currentUser.uid, friendId].sort().join('_');
+        console.log('Setting up message listener for:', friendId);
         
-        // Real-time listener with proper filtering
+        // Real-time listener using participants array (no orderBy to avoid index issues)
         messageListener = db.collection('messages')
-            .where('conversationId', '==', conversationId)
-            .orderBy('createdAt', 'asc')
+            .where('participants', 'array-contains', authManager.currentUser.uid)
             .onSnapshot(snapshot => {
+                console.log('🔥 Message snapshot received, total docs:', snapshot.docs.length);
+                
                 const messages = [];
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    messages.push({ id: doc.id, ...data });
+                    const participants = data.participants || [];
+                    
+                    // Filter for this specific conversation
+                    if (participants.includes(friendId) && participants.includes(authManager.currentUser.uid)) {
+                        messages.push({ id: doc.id, ...data });
+                    }
                 });
                 
+                // Sort messages by timestamp (client-side)
+                messages.sort((a, b) => {
+                    if (!a.createdAt) return 1;
+                    if (!b.createdAt) return -1;
+                    return a.createdAt.toMillis() - b.createdAt.toMillis();
+                });
+                
+                console.log('📱 Filtered messages for conversation:', messages.length);
                 renderMessages(messages);
                 
                 // Mark messages as read
                 markMessagesAsRead(snapshot, friendId);
             }, error => {
-                console.error('Message listener error:', error);
+                console.error('❌ Message listener error:', error);
             });
         
     } catch (error) {
@@ -1015,6 +1028,8 @@ function markMessagesAsRead(snapshot, friendId) {
 }
 
 function renderMessages(messages) {
+    console.log('🎨 Rendering', messages.length, 'messages');
+    
     const messagesList = document.getElementById('messagesList');
     const wasAtBottom = messagesList.scrollTop + messagesList.clientHeight >= messagesList.scrollHeight - 10;
     
@@ -1032,8 +1047,6 @@ function renderMessages(messages) {
     
     messages.forEach((message, index) => {
         const isSent = message.senderId === authManager.currentUser.uid;
-        const prevMessage = messages[index - 1];
-        const showAvatar = !prevMessage || prevMessage.senderId !== message.senderId;
         
         const messageDiv = document.createElement('div');
         messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
@@ -1075,12 +1088,10 @@ function renderMessages(messages) {
         messagesList.appendChild(messageDiv);
     });
     
-    // Smart auto-scroll
-    if (wasAtBottom) {
-        requestAnimationFrame(() => {
-            messagesList.scrollTop = messagesList.scrollHeight;
-        });
-    }
+    // Always scroll to bottom for real-time messages
+    requestAnimationFrame(() => {
+        messagesList.scrollTop = messagesList.scrollHeight;
+    });
 }
 
 function escapeHtml(text) {
@@ -1095,39 +1106,25 @@ async function sendNewMessage() {
     
     if (!messageText || !currentChatFriend) return;
     
-    // Optimistic UI update
-    const tempId = 'temp_' + Date.now();
-    const optimisticMessage = {
-        id: tempId,
-        text: messageText,
-        senderId: authManager.currentUser.uid,
-        createdAt: null, // Will show "Sending..."
-        readBy: [authManager.currentUser.uid]
-    };
+    console.log('Sending message:', messageText, 'to:', currentChatFriend);
     
-    // Clear input and show optimistic message
+    // Clear input immediately
     messageInput.value = '';
     messageInput.disabled = true;
     
-    // Add to current messages for immediate display
-    const messagesList = document.getElementById('messagesList');
-    const currentMessages = Array.from(messagesList.children).map(el => ({
-        text: el.querySelector('div').textContent,
-        senderId: el.classList.contains('sent') ? authManager.currentUser.uid : currentChatFriend
-    }));
-    currentMessages.push(optimisticMessage);
-    
     try {
-        const conversationId = [authManager.currentUser.uid, currentChatFriend].sort().join('_');
-        
-        await db.collection('messages').add({
+        const messageData = {
             text: messageText,
             senderId: authManager.currentUser.uid,
             participants: [authManager.currentUser.uid, currentChatFriend],
-            conversationId: conversationId,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             readBy: [authManager.currentUser.uid]
-        });
+        };
+        
+        console.log('Message data:', messageData);
+        
+        const docRef = await db.collection('messages').add(messageData);
+        console.log('Message sent with ID:', docRef.id);
         
     } catch (error) {
         console.error('Send message error:', error);
