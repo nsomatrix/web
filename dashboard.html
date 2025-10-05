@@ -277,13 +277,42 @@
     </div>
 
     <div id="messagesModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'">&times;</span>
-            <h3 id="messageModalTitle">Messages</h3>
-            <div id="messagesList" class="messages-list"></div>
-            <div class="message-input-container">
-                <input type="text" id="messageInput" placeholder="Type a message..." class="message-input">
-                <button id="sendMessageBtn" class="btn btn-primary">Send</button>
+        <div class="modal-content" style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
+            <div style="padding: 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; background: #2d2d2d;">
+                <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
+                <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc;">&times;</span>
+            </div>
+            <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
+            <div style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d;">
+                <div style="display: flex; gap: 8px; align-items: flex-end;">
+                    <textarea id="messageInput" placeholder="Type a message..." style="
+                        flex: 1;
+                        border: 1px solid #555;
+                        border-radius: 20px;
+                        padding: 12px 16px;
+                        resize: none;
+                        min-height: 20px;
+                        max-height: 120px;
+                        font-family: inherit;
+                        font-size: 14px;
+                        outline: none;
+                        background: #3d3d3d;
+                        color: white;
+                    " rows="1"></textarea>
+                    <button id="sendMessageBtn" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        border-radius: 50%;
+                        width: 44px;
+                        height: 44px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        font-size: 16px;
+                    ">➤</button>
+                </div>
             </div>
         </div>
     </div>

@@ -18,6 +18,8 @@ let currentAvatarIndex = 0;
 let authManager, fileManager, notesManager, passwordManager;
 let currentChatFriend = null;
 let messageListener = null;
+let messageCache = new Map();
+let isTyping = false;
 
 // Desktop Dashboard Enhancement
 class DesktopDashboard {
@@ -625,20 +627,37 @@ function setupSearchAndMessaging() {
         };
     }
 
-    // Message functionality
+    // Enhanced message functionality
     const sendMessageBtn = document.getElementById('sendMessageBtn');
     if (sendMessageBtn) {
-        sendMessageBtn.onclick = () => {
+        sendMessageBtn.onclick = (e) => {
+            e.preventDefault();
             sendNewMessage();
         };
     }
 
     const messageInput = document.getElementById('messageInput');
     if (messageInput) {
+        // Enhanced input handling
         messageInput.onkeydown = (e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendNewMessage();
             }
+        };
+        
+        // Auto-resize textarea
+        messageInput.oninput = () => {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+        };
+        
+        // Focus management
+        messageInput.onfocus = () => {
+            setTimeout(() => {
+                const messagesList = document.getElementById('messagesList');
+                messagesList.scrollTop = messagesList.scrollHeight;
+            }, 300);
         };
     }
 }
@@ -933,43 +952,41 @@ window.sendMessage = function(friendId) {
     loadMessages(friendId);
 }
 
-// Messaging functionality
+// Modern messaging system
 async function loadMessages(friendId) {
     try {
+        currentChatFriend = friendId;
+        
         const friendDoc = await db.collection('players').doc(friendId).get();
         const friendData = friendDoc.data();
         document.getElementById('messageModalTitle').textContent = `Chat with @${friendData.usernameTag}`;
         
+        // Clean up previous listener
         if (messageListener) {
             messageListener();
         }
         
+        // Create conversation ID for consistent querying
+        const conversationId = [authManager.currentUser.uid, friendId].sort().join('_');
+        
+        // Real-time listener with proper filtering
         messageListener = db.collection('messages')
-            .where('participants', 'array-contains', authManager.currentUser.uid)
+            .where('conversationId', '==', conversationId)
             .orderBy('createdAt', 'asc')
             .onSnapshot(snapshot => {
-                let chatMessages = [];
-                const batch = db.batch();
+                const messages = [];
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.participants.includes(friendId)) {
-                        chatMessages.push({ id: doc.id, ...data });
-                        
-                        if (!data.readBy || !data.readBy.includes(authManager.currentUser.uid)) {
-                            const messageRef = db.collection('messages').doc(doc.id);
-                            batch.update(messageRef, {
-                                readBy: firebase.firestore.FieldValue.arrayUnion(authManager.currentUser.uid)
-                            });
-                        }
-                    }
+                    messages.push({ id: doc.id, ...data });
                 });
                 
-                if (chatMessages.length > 0) {
-                    batch.commit().catch(error => console.error('Error marking messages as read:', error));
-                }
+                renderMessages(messages);
                 
-                displayMessages(chatMessages);
+                // Mark messages as read
+                markMessagesAsRead(snapshot, friendId);
+            }, error => {
+                console.error('Message listener error:', error);
             });
         
     } catch (error) {
@@ -977,33 +994,99 @@ async function loadMessages(friendId) {
     }
 }
 
-function displayMessages(messages) {
+function markMessagesAsRead(snapshot, friendId) {
+    const batch = db.batch();
+    let hasUnread = false;
+    
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.senderId !== authManager.currentUser.uid && 
+            (!data.readBy || !data.readBy.includes(authManager.currentUser.uid))) {
+            batch.update(doc.ref, {
+                readBy: firebase.firestore.FieldValue.arrayUnion(authManager.currentUser.uid)
+            });
+            hasUnread = true;
+        }
+    });
+    
+    if (hasUnread) {
+        batch.commit().catch(console.error);
+    }
+}
+
+function renderMessages(messages) {
     const messagesList = document.getElementById('messagesList');
+    const wasAtBottom = messagesList.scrollTop + messagesList.clientHeight >= messagesList.scrollHeight - 10;
+    
     messagesList.innerHTML = '';
     
     if (messages.length === 0) {
-        messagesList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No messages yet</p>';
+        messagesList.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #888;">
+                <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5; color: #666;"></i>
+                <p style="color: #ccc;">Start your conversation!</p>
+            </div>
+        `;
         return;
     }
     
-    messages.forEach(message => {
-        const messageDiv = document.createElement('div');
+    messages.forEach((message, index) => {
         const isSent = message.senderId === authManager.currentUser.uid;
-        messageDiv.className = `message-item ${isSent ? 'message-sent' : 'message-received'}`;
+        const prevMessage = messages[index - 1];
+        const showAvatar = !prevMessage || prevMessage.senderId !== message.senderId;
         
-        let timestamp = '';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+        messageDiv.style.cssText = `
+            display: flex;
+            margin: 8px 16px;
+            ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
+        `;
+        
+        let timestamp = 'Sending...';
         if (message.createdAt) {
-            timestamp = message.createdAt.toDate().toLocaleString();
+            const date = message.createdAt.toDate();
+            timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
         
         messageDiv.innerHTML = `
-            <div>${message.text}</div>
-            <div class="message-timestamp">${timestamp}</div>
+            <div style="
+                max-width: 70%;
+                background: ${isSent ? '#e74c3c' : '#3d3d3d'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 18px;
+                ${isSent ? 'border-bottom-right-radius: 4px;' : 'border-bottom-left-radius: 4px;'}
+                word-wrap: break-word;
+                position: relative;
+                border: 1px solid ${isSent ? '#c0392b' : '#555'};
+            ">
+                <div style="font-size: 14px; line-height: 1.4;">${escapeHtml(message.text)}</div>
+                <div style="
+                    font-size: 11px;
+                    opacity: 0.7;
+                    margin-top: 4px;
+                    text-align: right;
+                    color: #ccc;
+                ">${timestamp}</div>
+            </div>
         `;
+        
         messagesList.appendChild(messageDiv);
     });
     
-    messagesList.scrollTop = messagesList.scrollHeight;
+    // Smart auto-scroll
+    if (wasAtBottom) {
+        requestAnimationFrame(() => {
+            messagesList.scrollTop = messagesList.scrollHeight;
+        });
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 async function sendNewMessage() {
@@ -1012,19 +1095,47 @@ async function sendNewMessage() {
     
     if (!messageText || !currentChatFriend) return;
     
+    // Optimistic UI update
+    const tempId = 'temp_' + Date.now();
+    const optimisticMessage = {
+        id: tempId,
+        text: messageText,
+        senderId: authManager.currentUser.uid,
+        createdAt: null, // Will show "Sending..."
+        readBy: [authManager.currentUser.uid]
+    };
+    
+    // Clear input and show optimistic message
+    messageInput.value = '';
+    messageInput.disabled = true;
+    
+    // Add to current messages for immediate display
+    const messagesList = document.getElementById('messagesList');
+    const currentMessages = Array.from(messagesList.children).map(el => ({
+        text: el.querySelector('div').textContent,
+        senderId: el.classList.contains('sent') ? authManager.currentUser.uid : currentChatFriend
+    }));
+    currentMessages.push(optimisticMessage);
+    
     try {
+        const conversationId = [authManager.currentUser.uid, currentChatFriend].sort().join('_');
+        
         await db.collection('messages').add({
             text: messageText,
             senderId: authManager.currentUser.uid,
             participants: [authManager.currentUser.uid, currentChatFriend],
+            conversationId: conversationId,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             readBy: [authManager.currentUser.uid]
         });
         
-        messageInput.value = '';
     } catch (error) {
         console.error('Send message error:', error);
-        showMessageBox('Failed to send message', 'error', 3000);
+        showMessageBox('Failed to send message', 'error', 2000);
+        messageInput.value = messageText;
+    } finally {
+        messageInput.disabled = false;
+        messageInput.focus();
     }
 }
 
