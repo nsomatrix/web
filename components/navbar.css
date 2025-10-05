@@ -229,16 +229,19 @@
   color: #ffffff;
 }
 
-.dropdown.active .dropdown-menu,
-.dropdown:hover .dropdown-menu {
+/* Desktop hover behavior */
+@media (min-width: 769px) {
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+}
+
+/* Always show when active (both desktop and mobile) */
+.dropdown.active .dropdown-menu {
   display: block;
 }
 
 @media (max-width: 768px) {
-  .dropdown:hover .dropdown-menu {
-    display: none;
-  }
-  
   .dropdown.active .dropdown-menu {
     max-height: 200px;
   }

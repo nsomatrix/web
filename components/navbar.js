@@ -22,6 +22,8 @@ class RetroNavbar {
       // Handle dropdown toggles
       const dropdowns = document.querySelectorAll('.dropdown-toggle');
       dropdowns.forEach(dropdown => {
+        let touchStarted = false;
+        
         const handleDropdown = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -36,8 +38,23 @@ class RetroNavbar {
           });
         };
         
-        dropdown.addEventListener('click', handleDropdown);
-        dropdown.addEventListener('touchend', handleDropdown);
+        // Handle touch events properly
+        dropdown.addEventListener('touchstart', (e) => {
+          touchStarted = true;
+        });
+        
+        dropdown.addEventListener('touchend', (e) => {
+          if (touchStarted) {
+            handleDropdown(e);
+            touchStarted = false;
+          }
+        });
+        
+        dropdown.addEventListener('click', (e) => {
+          if (!touchStarted) {
+            handleDropdown(e);
+          }
+        });
       });
 
       // Close menu when clicking on a non-dropdown link
@@ -53,7 +70,10 @@ class RetroNavbar {
       };
       
       menu.addEventListener('click', closeMenu);
-      menu.addEventListener('touchend', closeMenu);
+      menu.addEventListener('touchend', (e) => {
+        // Small delay to ensure touch events are processed correctly
+        setTimeout(() => closeMenu(e), 10);
+      });
 
       // Close menu and dropdowns when clicking outside
       const closeOnOutsideClick = (e) => {
