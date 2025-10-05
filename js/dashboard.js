@@ -793,15 +793,15 @@ async function displaySearchResults(results) {
             if (existingFriend.exists && existingFriend.data().status === 'accepted') {
                 actionButton = '<span style="color: var(--accent-red);">Already Friends</span>';
             } else if (pendingRequest.exists && pendingRequest.data().status === 'pending') {
-                actionButton = `<button class="accept-btn" onclick="acceptFriendRequest('${user.id}', '${user.usernameTag}')">Accept Request</button>`;
+                actionButton = `<button class="accept-btn" onclick="acceptFriendRequest('${sanitizeInput(user.id)}', '${sanitizeInput(user.usernameTag)}')">Accept Request</button>`;
             } else {
-                actionButton = `<button class="add-friend-btn btn btn-danger" onclick="addFriend('${user.id}', '${user.usernameTag}')">Add Friend</button>`;
+                actionButton = `<button class="add-friend-btn btn btn-danger" onclick="addFriend('${sanitizeInput(user.id)}', '${sanitizeInput(user.usernameTag)}')">Add Friend</button>`;
             }
             
             item.innerHTML = `
                 <div class="search-info">
-                    <img src="avatars/${user.avatar}" alt="Avatar" class="search-avatar">
-                    <span>@${user.usernameTag}</span>
+                    <img src="avatars/${sanitizeInput(user.avatar)}" alt="Avatar" class="search-avatar">
+                    <span>@${sanitizeInput(user.usernameTag)}</span>
                 </div>
                 <div class="search-actions">
                     ${actionButton}
@@ -959,11 +959,12 @@ async function loadMessages(friendId) {
         
         const friendDoc = await db.collection('players').doc(friendId).get();
         const friendData = friendDoc.data();
-        document.getElementById('messageModalTitle').textContent = `Chat with @${friendData.usernameTag}`;
+        document.getElementById('messageModalTitle').textContent = `Chat with @${sanitizeInput(friendData.usernameTag)}`;
         
         // Clean up previous listener
         if (messageListener) {
             messageListener();
+            messageListener = null;
         }
         
         console.log('Setting up message listener for:', friendId);
@@ -1092,11 +1093,11 @@ function renderMessages(messages) {
                         font-size: 12px;
                         opacity: 0.8;
                     ">
-                        <div style="font-style: italic;">↩️ ${escapeHtml(message.replyText || 'Message')}</div>
+                        <div style="font-style: italic;">↩️ ${sanitizeInput(message.replyText || 'Message')}</div>
                     </div>` : 
                     ''
                 }
-                <div style="font-size: 14px; line-height: 1.4;">${escapeHtml(message.text)}</div>
+                <div style="font-size: 14px; line-height: 1.4;">${sanitizeInput(message.text)}</div>
                 <div style="
                     font-size: 11px;
                     opacity: 0.7;
@@ -1172,9 +1173,23 @@ function renderMessages(messages) {
 }
 
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function sanitizeInput(input) {
+    if (!input) return '';
+    return input.replace(/[<>"'&]/g, function(match) {
+        return {
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+            '&': '&amp;'
+        }[match];
+    });
 }
 
 // Message menu functions
@@ -1302,6 +1317,12 @@ async function sendNewMessage() {
     
     if (!messageText || !currentChatFriend) return;
     
+    // Validate message length and content
+    if (messageText.length > 1000) {
+        showMessageBox('Message too long (max 1000 characters)', 'error', 3000);
+        return;
+    }
+    
     console.log('Sending message:', messageText, 'to:', currentChatFriend);
     
     // Check if this is a reply
@@ -1375,14 +1396,14 @@ async function loadFriendsList() {
             item.className = 'friend-item';
             item.innerHTML = `
                 <div class="friend-info">
-                    <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
-                    <span>@${friend.username}</span>
+                    <img src="avatars/${sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
+                    <span>@${sanitizeInput(friend.username)}</span>
                     <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
-                    ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
+                    ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : ''}
                 </div>
                 <div class="friend-actions">
-                    <button class="message-btn" style="background:#007bff;color:white;border:1px solid #007bff;padding:5px 10px;border-radius:3px;" onclick="sendMessage('${friend.friendId}')">Message</button>
-                    <button class="unfriend-btn" style="background:#dc3545;color:white;border:1px solid #dc3545;padding:5px 10px;border-radius:3px;" onclick="removeFriend('${friend.friendId}')">Unfriend</button>
+                    <button class="message-btn" style="background:#007bff;color:white;border:1px solid #007bff;padding:5px 10px;border-radius:3px;" onclick="sendMessage('${sanitizeInput(friend.friendId)}')">Message</button>
+                    <button class="unfriend-btn" style="background:#dc3545;color:white;border:1px solid #dc3545;padding:5px 10px;border-radius:3px;" onclick="removeFriend('${sanitizeInput(friend.friendId)}')">Unfriend</button>
                 </div>
             `;
             friendsList.appendChild(item);
@@ -1422,10 +1443,10 @@ async function loadRecentChats() {
             chatItem.onclick = () => sendMessage(friend.friendId);
             chatItem.innerHTML = `
                 <div class="friend-info">
-                    <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
-                    <span>@${friend.username}</span>
+                    <img src="avatars/${sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
+                    <span>@${sanitizeInput(friend.username)}</span>
                     <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
-                    ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
+                    ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : ''}
                 </div>
                 <div class="friend-actions">
                     <span style="color: var(--accent-red);">Chat</span>
@@ -1461,12 +1482,12 @@ async function loadNotifications() {
             item.className = 'notification-item';
             item.innerHTML = `
                 <div class="notification-info">
-                    <img src="avatars/${senderData.avatar}" alt="Avatar" class="friend-avatar">
-                    <span>@${request.fromUsername} sent you a friend request</span>
+                    <img src="avatars/${sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
+                    <span>@${sanitizeInput(request.fromUsername)} sent you a friend request</span>
                 </div>
                 <div class="notification-actions">
-                    <button class="accept-btn btn btn-success" onclick="acceptFriendRequest('${request.fromUserId}', '${request.fromUsername}')">Accept</button>
-                    <button class="reject-btn btn btn-danger" onclick="rejectFriendRequest('${request.fromUserId}')">Reject</button>
+                    <button class="accept-btn btn btn-success" onclick="acceptFriendRequest('${sanitizeInput(request.fromUserId)}', '${sanitizeInput(request.fromUsername)}')">Accept</button>
+                    <button class="reject-btn btn btn-danger" onclick="rejectFriendRequest('${sanitizeInput(request.fromUserId)}')">Reject</button>
                 </div>
             `;
             notificationsList.appendChild(item);
@@ -1482,11 +1503,11 @@ async function loadNotifications() {
             item.className = 'notification-item';
             item.innerHTML = `
                 <div class="notification-info">
-                    <img src="avatars/${senderData.avatar}" alt="Avatar" class="friend-avatar">
-                    <span>${notification.message}</span>
+                    <img src="avatars/${sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
+                    <span>${sanitizeInput(notification.message)}</span>
                 </div>
                 <div class="notification-actions">
-                    <button class="reject-btn btn btn-danger" onclick="markAsRead('${doc.id}')">Mark as Read</button>
+                    <button class="reject-btn btn btn-danger" onclick="markAsRead('${sanitizeInput(doc.id)}')">Mark as Read</button>
                 </div>
             `;
             notificationsList.appendChild(item);
@@ -1536,12 +1557,19 @@ function setupOnlinePresence() {
         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
     });
     
-    window.addEventListener('beforeunload', () => {
+    const handleBeforeUnload = () => {
         userStatusRef.set({
             isOnline: false,
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         });
-    });
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    // Cleanup function
+    window.cleanupPresence = () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
     
     setInterval(() => {
         userStatusRef.update({
