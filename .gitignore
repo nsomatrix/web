@@ -4,6 +4,9 @@
 .env.production
 .env.staging
 
+# Firebase files
+firestore.rules
+
 # Node modules
 node_modules/
 npm-debug.log*

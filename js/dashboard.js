@@ -821,38 +821,55 @@ window.addFriend = async function(friendId, friendUsername) {
 
 window.acceptFriendRequest = async function(fromUserId, fromUsername) {
     try {
-        await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').doc(fromUserId).set({
-                friendId: fromUserId,
-                username: fromUsername,
-                status: 'accepted',
-                addedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
+        const batch = db.batch();
         const currentUserData = await db.collection('players').doc(authManager.currentUser.uid).get();
-        await db.collection('players').doc(fromUserId)
-            .collection('friends').doc(authManager.currentUser.uid).set({
-                friendId: authManager.currentUser.uid,
-                username: currentUserData.data().usernameTag,
-                status: 'accepted',
-                addedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+        
+        // Clean up any existing friend documents first
+        const existingFriends = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').where('friendId', '==', fromUserId).get();
+        existingFriends.forEach(doc => batch.delete(doc.ref));
+        
+        const existingReverseFriends = await db.collection('players').doc(fromUserId)
+            .collection('friends').where('friendId', '==', authManager.currentUser.uid).get();
+        existingReverseFriends.forEach(doc => batch.delete(doc.ref));
+        
+        // Create new friend relationships using friendId as document ID
+        const friendRef1 = db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').doc(fromUserId);
+        batch.set(friendRef1, {
+            friendId: fromUserId,
+            username: fromUsername,
+            status: 'accepted',
+            addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-        await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friendRequests').doc(fromUserId).update({
-                status: 'accepted'
-            });
+        const friendRef2 = db.collection('players').doc(fromUserId)
+            .collection('friends').doc(authManager.currentUser.uid);
+        batch.set(friendRef2, {
+            friendId: authManager.currentUser.uid,
+            username: currentUserData.data().usernameTag,
+            status: 'accepted',
+            addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-        await db.collection('players').doc(fromUserId)
-            .collection('notifications').add({
-                type: 'friend_accepted',
-                fromUserId: authManager.currentUser.uid,
-                fromUsername: currentUserData.data().usernameTag,
-                message: `@${currentUserData.data().usernameTag} accepted your friend request`,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                read: false
-            });
+        // Mark friend request as accepted
+        const requestRef = db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friendRequests').doc(fromUserId);
+        batch.update(requestRef, { status: 'accepted' });
 
+        // Send notification
+        const notificationRef = db.collection('players').doc(fromUserId)
+            .collection('notifications').doc();
+        batch.set(notificationRef, {
+            type: 'friend_accepted',
+            fromUserId: authManager.currentUser.uid,
+            fromUsername: currentUserData.data().usernameTag,
+            message: `@${currentUserData.data().usernameTag} accepted your friend request`,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            read: false
+        });
+
+        await batch.commit();
         showMessageBox('Friend request accepted!', 'success', 2000);
         loadNotifications();
     } catch (error) {
@@ -890,12 +907,18 @@ window.markAsRead = async function(notificationId) {
 
 window.removeFriend = async function(friendId) {
     try {
-        await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').doc(friendId).delete();
+        const batch = db.batch();
         
-        await db.collection('players').doc(friendId)
-            .collection('friends').doc(authManager.currentUser.uid).delete();
+        // Delete using document ID (friendId)
+        const friendRef1 = db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').doc(friendId);
+        batch.delete(friendRef1);
         
+        const friendRef2 = db.collection('players').doc(friendId)
+            .collection('friends').doc(authManager.currentUser.uid);
+        batch.delete(friendRef2);
+        
+        await batch.commit();
         showMessageBox('Friend removed', 'info', 2000);
         loadFriendsList();
     } catch (error) {
@@ -1015,30 +1038,36 @@ async function loadFriendsList() {
 
         if (snapshot.empty) {
             friendsList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No friends yet</p>';
-        } else {
-            for (const doc of snapshot.docs) {
-                const friend = doc.data();
-                const friendProfile = await db.collection('players').doc(friend.friendId).get();
-                const friendData = friendProfile.data();
-                
-                const onlineStatus = await getOnlineStatus(friend.friendId);
-                
-                const item = document.createElement('div');
-                item.className = 'friend-item';
-                item.innerHTML = `
-                    <div class="friend-info">
-                        <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
-                        <span>@${friend.username}</span>
-                        <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
-                        ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
-                    </div>
-                    <div class="friend-actions">
-                        <button class="message-btn" onclick="sendMessage('${friend.friendId}')">Message</button>
-                        <button class="unfriend-btn" onclick="removeFriend('${friend.friendId}')">Unfriend</button>
-                    </div>
-                `;
-                friendsList.appendChild(item);
+            return;
+        }
+
+        for (const doc of snapshot.docs) {
+            const friend = doc.data();
+            const friendProfile = await db.collection('players').doc(friend.friendId).get();
+            
+            if (!friendProfile.exists) {
+                doc.ref.delete().catch(console.error);
+                continue;
             }
+            
+            const friendData = friendProfile.data();
+            const onlineStatus = await getOnlineStatus(friend.friendId);
+            
+            const item = document.createElement('div');
+            item.className = 'friend-item';
+            item.innerHTML = `
+                <div class="friend-info">
+                    <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
+                    <span>@${friend.username}</span>
+                    <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
+                    ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
+                </div>
+                <div class="friend-actions">
+                    <button class="message-btn" onclick="sendMessage('${friend.friendId}')">Message</button>
+                    <button class="unfriend-btn" onclick="removeFriend('${friend.friendId}')">Unfriend</button>
+                </div>
+            `;
+            friendsList.appendChild(item);
         }
     } catch (error) {
         console.error('Load friends error:', error);
