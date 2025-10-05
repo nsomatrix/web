@@ -1028,7 +1028,12 @@ async function sendNewMessage() {
     }
 }
 
+let loadFriendsListRunning = false;
+
 async function loadFriendsList() {
+    if (loadFriendsListRunning) return;
+    loadFriendsListRunning = true;
+    
     try {
         const snapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friends').where('status', '==', 'accepted').get();
@@ -1063,14 +1068,16 @@ async function loadFriendsList() {
                     ${!onlineStatus.isOnline ? `<span class="last-seen">${onlineStatus.lastSeen}</span>` : ''}
                 </div>
                 <div class="friend-actions">
-                    <button class="message-btn" onclick="sendMessage('${friend.friendId}')">Message</button>
-                    <button class="unfriend-btn" onclick="removeFriend('${friend.friendId}')">Unfriend</button>
+                    <button class="message-btn" style="background:#007bff;color:white;border:1px solid #007bff;padding:5px 10px;border-radius:3px;" onclick="sendMessage('${friend.friendId}')">Message</button>
+                    <button class="unfriend-btn" style="background:#dc3545;color:white;border:1px solid #dc3545;padding:5px 10px;border-radius:3px;" onclick="removeFriend('${friend.friendId}')">Unfriend</button>
                 </div>
             `;
             friendsList.appendChild(item);
         }
     } catch (error) {
         console.error('Load friends error:', error);
+    } finally {
+        loadFriendsListRunning = false;
     }
 }
 
