@@ -77,7 +77,7 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
         <ul>
             <li><strong>Secure Notes:</strong> Store important thoughts, reminders, or game strategies.</li>
             <li><strong>Password Manager:</strong> Safely keep track of your login credentials for various services.</li>
-            <li><strong>Storage Disk:</strong> Upload and manage small files securely.</li>
+
             <li><strong>Profile Management:</strong> Customize your in-app character.</li>
         </ul>
 
@@ -120,29 +120,15 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
             <li><strong>Deleting an Entry:</strong> Use the "Delete" button next to an entry to remove it. A confirmation prompt will appear before permanent deletion.</li>
         </ul>
 
-        <h4>4. Storage Disk</h4>
-        <p>Upload and manage files that you need to store securely.</p>
-        <ul>
-            <li><strong>Accessing Files:</strong> Click the "Storage" button. You will be prompted for your Master Password if your encryption key is not available.</li>
-            <li><strong>Uploading Files:</strong>
-                <ul>
-                    <li>Click "Choose File" and select the file from your device.</li>
-                    <li><strong>File Size Limit:</strong> Please note there is a file size limit of <strong>5 MB</strong> per file. If your file exceeds this, the upload will be prevented.</li>
-                    <li>Click "Upload File" to initiate the upload.</li>
-                    <li>A progress bar will show the upload status.</li>
-                </ul>
-            </li>
-            <li><strong>Viewing and Downloading Files:</strong> Your uploaded files are listed, showing the file name and upload timestamp. Click the "Download" button to retrieve a file to your device.</li>
-            <li><strong>Deleting Files:</strong> Click the "Delete" button next to a file. A confirmation dialog will appear before the file is permanently removed.</li>
-        </ul>
 
-        <h4>5. Language Selection</h4>
+
+        <h4>4. Language Selection</h4>
         <p>The Matrix™ Dashboard supports multiple languages for a personalized user experience.</p>
         <ul>
             <li><strong>Change Language:</strong> Use the dropdown selector to choose your preferred language. The dashboard elements will instantly update to the selected language. Your language preference is saved in your browser's local storage for future visits.</li>
         </ul>
 
-        <h4>6. Account Management</h4>
+        <h4>5. Account Management</h4>
         <ul>
             <li><strong>Logout:</strong> Click the "Logout" button to securely sign out of your Matrix™ account. This will clear your encryption key from the session and redirect you to the login page.</li>
             <li><strong>Delete Account:</strong>
@@ -155,7 +141,7 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
                             <li>All your notes and password manager entries from our database.</li>
                             <li>Your user profile document.</li>
                             <li>Your Firebase authentication account.</li>
-                            <li>Your Supabase storage account.</li>
+
                         </ul>
                     </li>
                     <li><strong>Recent Login Requirement:</strong> For security, Firebase may require you to have recently logged in to delete your account. If this is the case, you'll be informed and may be logged out to re-authenticate before attempting deletion again.</li>
@@ -167,7 +153,7 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
         <p>The Matrix™ application leverages powerful and secure cloud technologies to provide its services:</p>
         <ul>
             <li><strong>Google Firebase:</strong> Used for user authentication (managing your login and user sessions) and for storing your encrypted notes and password manager entries in its Firestore database. Your user profile data (username, avatar, encryption salt, and master password hash) is also stored here.</li>
-            <li><strong>Supabase:</strong> Utilized for secure and file storage. File uploads, listings, and deletions are handled via Supabase Edge Functions for efficient and secure operations.</li>
+
             <li><strong>Cryptographic Libraries (CryptoJS):</strong> Powers the robust encryption and decryption of your sensitive data using AES encryption and PBKDF2 for key derivation.</li>
         </ul>
     </div>

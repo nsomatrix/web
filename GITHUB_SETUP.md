@@ -14,8 +14,7 @@ FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
 FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 FIREBASE_APP_ID=your_app_id
 FIREBASE_MEASUREMENT_ID=your_measurement_id
-SUPABASE_URL=https://your_project.supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key
+
 ```
 
 ## 2. Enable GitHub Pages

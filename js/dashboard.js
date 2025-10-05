@@ -1,5 +1,5 @@
 // Unified Dashboard JavaScript
-import { FIREBASE_CONFIG, SUPABASE_CONFIG } from './modules/config.js';
+import { FIREBASE_CONFIG } from './modules/config.js';
 import { AuthManager } from './modules/auth.js';
 import { FileManager } from './modules/files.js';
 import { NotesManager } from './modules/notes.js';
@@ -10,7 +10,7 @@ import { showMessageBox, openModal, closeModal } from './modules/ui.js';
 firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
 
 // Global variables
 let allAvatars = [];
@@ -249,7 +249,6 @@ function setupEventListeners() {
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
                 const passwordManagerModal = document.getElementById('passwordManagerModal');
-                const ephemeralFilesModal = document.getElementById('ephemeralFilesModal');
                 
                 if (notesModal.dataset.pendingOpen === 'true') {
                     openModal(notesModal);
@@ -259,10 +258,6 @@ function setupEventListeners() {
                     openModal(passwordManagerModal);
                     passwordManager.loadPasswords(document.getElementById('pmEntryList'));
                     passwordManagerModal.dataset.pendingOpen = 'false';
-                } else if (ephemeralFilesModal.dataset.pendingOpen === 'true') {
-                    openModal(ephemeralFilesModal);
-                    loadFilesList();
-                    ephemeralFilesModal.dataset.pendingOpen = 'false';
                 }
             }
 
@@ -292,7 +287,6 @@ function setupEventListeners() {
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
                 const passwordManagerModal = document.getElementById('passwordManagerModal');
-                const ephemeralFilesModal = document.getElementById('ephemeralFilesModal');
                 
                 if (notesModal.dataset.pendingOpen === 'true') {
                     openModal(notesModal);
@@ -302,10 +296,6 @@ function setupEventListeners() {
                     openModal(passwordManagerModal);
                     passwordManager.loadPasswords(document.getElementById('pmEntryList'));
                     passwordManagerModal.dataset.pendingOpen = 'false';
-                } else if (ephemeralFilesModal.dataset.pendingOpen === 'true') {
-                    openModal(ephemeralFilesModal);
-                    loadFilesList();
-                    ephemeralFilesModal.dataset.pendingOpen = 'false';
                 }
             }
             
@@ -350,7 +340,6 @@ function setupEventListeners() {
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
                 const passwordManagerModal = document.getElementById('passwordManagerModal');
-                const ephemeralFilesModal = document.getElementById('ephemeralFilesModal');
                 
                 if (notesModal.dataset.pendingOpen === 'true') {
                     openModal(notesModal);
@@ -360,10 +349,6 @@ function setupEventListeners() {
                     openModal(passwordManagerModal);
                     passwordManager.loadPasswords(document.getElementById('pmEntryList'));
                     passwordManagerModal.dataset.pendingOpen = 'false';
-                } else if (ephemeralFilesModal.dataset.pendingOpen === 'true') {
-                    openModal(ephemeralFilesModal);
-                    loadFilesList();
-                    ephemeralFilesModal.dataset.pendingOpen = 'false';
                 }
             }
             
@@ -439,19 +424,7 @@ function setupFeatureButtons() {
         };
     }
 
-    const ephemeralFilesBtn = document.getElementById('ephemeralFilesBtn');
-    if (ephemeralFilesBtn) {
-        ephemeralFilesBtn.onclick = () => {
-            if (!authManager.currentEncryptionKey) {
-                openModal(document.getElementById('recoveryKeyModal'));
-                document.getElementById('ephemeralFilesModal').dataset.pendingOpen = 'true';
-                document.getElementById('recoveryKeyInput').value = '';
-                return;
-            }
-            openModal(document.getElementById('ephemeralFilesModal'));
-            loadFilesList();
-        };
-    }
+
 
     const serverBtn = document.getElementById('serverBtn');
     if (serverBtn) {
@@ -499,23 +472,7 @@ function setupModalHandlers() {
         };
     }
 
-    // File upload
-    const uploadFileBtn = document.getElementById('uploadFileBtn');
-    if (uploadFileBtn) {
-        uploadFileBtn.onclick = async () => {
-            const file = document.getElementById('fileUploadInput').files[0];
-            if (!file) {
-                showMessageBox("Please select a file to upload", "error", 3000);
-                return;
-            }
-            
-            const success = await fileManager.uploadFile(file);
-            if (success) {
-                document.getElementById('fileUploadInput').value = '';
-                loadFilesList();
-            }
-        };
-    }
+
 
     // Modal close buttons
     document.querySelectorAll('.close-button').forEach(button => {
@@ -575,21 +532,7 @@ function setupDeleteHandlers() {
             try {
                 const idToken = await authManager.currentUser.getIdToken();
 
-                // Delete Supabase data
-                const supabaseDeleteResponse = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/delete-user-data`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${idToken}`
-                    },
-                    body: JSON.stringify({ id: authManager.currentUser.uid })
-                });
 
-                if (!supabaseDeleteResponse.ok) {
-                    const errorData = await supabaseDeleteResponse.json();
-                    throw new Error(errorData.message || 'Failed to delete Supabase data');
-                }
-                showMessageBox("Supabase data deleted successfully", "success", 2000);
 
                 // Delete Firebase data
                 const notesRef = db.collection('players').doc(authManager.currentUser.uid).collection('notes');
@@ -632,17 +575,7 @@ function setupDeleteHandlers() {
         };
     }
 
-    // File, note, and password deletion confirmations
-    document.getElementById('confirmDeleteFileBtn').onclick = async () => {
-        closeModal(document.getElementById('deleteFileConfirmModal'));
-        if (fileManager.fileToDeleteName) {
-            const success = await fileManager.deleteFile(fileManager.fileToDeleteName);
-            if (success) {
-                loadFilesList();
-                fileManager.fileToDeleteName = null;
-            }
-        }
-    };
+    // Note and password deletion confirmations
 
     document.getElementById('confirmDeleteNoteBtn').onclick = async () => {
         closeModal(document.getElementById('deleteNoteConfirmModal'));
@@ -661,11 +594,11 @@ function setupDeleteHandlers() {
     };
 
     // Cancel buttons
-    ['cancelDeleteFileBtn', 'cancelDeleteNoteBtn', 'cancelDeletePmEntryBtn', 'cancelDeleteAccountBtn'].forEach(btnId => {
+    ['cancelDeleteNoteBtn', 'cancelDeletePmEntryBtn', 'cancelDeleteAccountBtn'].forEach(btnId => {
         const btn = document.getElementById(btnId);
         if (btn) {
             btn.onclick = () => {
-                const modalId = btnId.replace('cancel', '').replace('Btn', 'ConfirmModal');
+                const modalId = btnId.replace('cancelDelete', 'delete').replace('Btn', 'ConfirmModal');
                 closeModal(document.getElementById(modalId));
                 showMessageBox("Cancelled!", "info", 2000);
             };
@@ -710,91 +643,7 @@ function setupSearchAndMessaging() {
     }
 }
 
-// File list functionality
-async function loadFilesList() {
-    const fileListDisplay = document.getElementById('fileListDisplay');
-    const files = await fileManager.listFiles();
-    
-    fileListDisplay.innerHTML = '';
-    if (files.length === 0) {
-        fileListDisplay.innerHTML = `<p style="text-align: center; color: #94a3b8;">No files saved</p>`;
-        return;
-    }
 
-    files.forEach(file => {
-        const fileElement = document.createElement('div');
-        fileElement.classList.add('file-item');
-        
-        let formattedTimestamp = '';
-        if (file.createdAt) {
-            const date = new Date(file.createdAt);
-            formattedTimestamp = `Uploaded: ${date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        }
-
-        fileElement.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <span class="file-timestamp" style="font-size: 0.8em; color: #aaa; margin-left: 10px;">${formattedTimestamp}</span>
-            <div class="file-actions">
-                <button class="download-file-action-btn btn btn-info btn-sm" data-signed-url="${file.signedUrl}" data-original-file-name="${file.name}">
-                    Download
-                </button>
-                <button class="delete-file-btn btn btn-danger btn-sm" data-file-name="${file.name}">
-                    Delete
-                </button>
-            </div>
-        `;
-        fileListDisplay.appendChild(fileElement);
-    });
-
-    // Event delegation for file actions
-    fileListDisplay.onclick = async (event) => {
-        const target = event.target;
-        
-        if (target.classList.contains('delete-file-btn')) {
-            const fileName = target.dataset.fileName;
-            fileManager.fileToDeleteName = fileName;
-            openModal(document.getElementById('deleteFileConfirmModal'));
-        }
-        
-        if (target.classList.contains('download-file-action-btn')) {
-            const signedUrl = target.dataset.signedUrl;
-            const originalFileName = target.dataset.originalFileName;
-            
-            try {
-                const response = await fetch(signedUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const blob = await response.blob();
-
-                if (typeof Android !== 'undefined' && Android.onBlobDataReceived) {
-                    const reader = new FileReader();
-                    reader.onloadend = function() {
-                        const base64DataWithPrefix = reader.result;
-                        const pureBase64 = base64DataWithPrefix.split(',')[1];
-                        const mimeType = blob.type || 'application/octet-stream';
-                        Android.onBlobDataReceived(pureBase64, mimeType, originalFileName);
-                        showMessageBox("Download started", "success", 2000);
-                    };
-                    reader.readAsDataURL(blob);
-                } else {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = originalFileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    showMessageBox("Download started", "success", 2000);
-                }
-            } catch (error) {
-                console.error("Error during download:", error);
-                showMessageBox("Failed to download file: " + error.message, "error", 3000);
-            }
-        }
-    };
-}
 
 // Authentication state listener
 auth.onAuthStateChanged(async (user) => {
