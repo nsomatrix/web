@@ -110,7 +110,6 @@
     <script src="js/bootstrap.min.js"></script>
     <script type="module" src="js/login.js"></script>
     <script src="components/loader.js"></script>
-    <script src="components/navbar.js"></script>
     <script>
         // Load loader first
         fetch('components/loader.html')
@@ -119,21 +118,25 @@
                 document.getElementById('loader-container').innerHTML = html;
             });
         
-        fetch('components/navbar.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('navbar-container').innerHTML = html;
-                // Wait for Firebase to be ready before initializing navbar auth
-                const initNavbar = () => {
-                    if (window.firebaseReady) {
-                        new RetroNavbar();
-                        new NavbarAuth();
-                    } else {
-                        setTimeout(initNavbar, 100);
-                    }
-                };
-                initNavbar();
-            });
+        const script = document.createElement('script');
+        script.src = 'components/navbar.js';
+        script.onload = () => {
+            fetch('components/navbar.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('navbar-container').innerHTML = html;
+                    const initNavbar = () => {
+                        if (window.firebaseReady) {
+                            new RetroNavbar();
+                            new NavbarAuth();
+                        } else {
+                            setTimeout(initNavbar, 100);
+                        }
+                    };
+                    initNavbar();
+                });
+        };
+        document.head.appendChild(script);
         
         fetch('components/footer.html')
             .then(response => response.text())
