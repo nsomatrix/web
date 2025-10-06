@@ -102,6 +102,22 @@
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-spinner {
+    display: none;
+}
+
+.calculate-btn.loading .btn-text {
+    display: none;
+}
+
+.calculate-btn.loading .btn-spinner {
+    display: block;
 }
 
 .calculate-btn:hover {

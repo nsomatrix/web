@@ -74,6 +74,7 @@ class KinsEstimator {
     }
 
     calculateKins() {
+        const button = document.getElementById('calculateKins');
         const kinsPerHourInput = document.getElementById('kinsPerHour').value.trim();
         const daysInput = document.getElementById('days').value.trim();
 
@@ -91,24 +92,35 @@ class KinsEstimator {
             return;
         }
 
-        // Calculate totals
-        const hoursPerDay = 24;
-        const kinsPerDay = kinsPerHour * hoursPerDay;
-        const totalKins = kinsPerDay * days;
+        // Show loading state
+        button.classList.add('loading');
+        button.disabled = true;
 
-        // Calculate breakdown
-        const kinsPerWeek = kinsPerDay * 7;
-        const kinsPerMonth = kinsPerDay * 30; // Approximate month
-        const kinsPerYear = kinsPerDay * 365;
+        // Simulate calculation delay
+        setTimeout(() => {
+            // Calculate totals
+            const hoursPerDay = 24;
+            const kinsPerDay = kinsPerHour * hoursPerDay;
+            const totalKins = kinsPerDay * days;
 
-        // Display results
-        this.displayResults({
-            total: totalKins,
-            perDay: kinsPerDay,
-            perWeek: kinsPerWeek,
-            perMonth: kinsPerMonth,
-            perYear: kinsPerYear
-        });
+            // Calculate breakdown
+            const kinsPerWeek = kinsPerDay * 7;
+            const kinsPerMonth = kinsPerDay * 30;
+            const kinsPerYear = kinsPerDay * 365;
+
+            // Display results
+            this.displayResults({
+                total: totalKins,
+                perDay: kinsPerDay,
+                perWeek: kinsPerWeek,
+                perMonth: kinsPerMonth,
+                perYear: kinsPerYear
+            });
+
+            // Remove loading state
+            button.classList.remove('loading');
+            button.disabled = false;
+        }, 800);
     }
 
     displayResults(results) {

@@ -63,7 +63,15 @@
                     <label for="days">Number of Days:</label>
                     <input type="number" id="days" placeholder="e.g., 30" min="1">
                 </div>
-                <button id="calculateKins" class="calculate-btn">Calculate Kins</button>
+                <button id="calculateKins" class="calculate-btn">
+                    <span class="btn-text">Calculate Kins</span>
+                    <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </button>
                 
                 <div id="kinsResults" class="results-section" style="display: none;">
                     <h3>Results</h3>
