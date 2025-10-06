@@ -1,0 +1,84 @@
+:root {
+  --primary-bg: #000000;
+  --secondary-bg: #1a0a0a;
+  --tertiary-bg: #0f0505;
+  --accent-color: #b33c3c;
+  --accent-hover: #ff6666;
+  --accent-active: #ff3333;
+  --border-color: #660000;
+  --border-hover: #aa2222;
+  --text-primary: #ffffff;
+  --text-secondary: #a83333;
+  --shadow-color: rgba(168, 51, 51, 0.3);
+  --shadow-hover: rgba(136, 0, 0, 0.4);
+  --font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--primary-bg);
+  color: var(--accent-color);
+  font-family: var(--font-family);
+}
+
+.container {
+  flex: 1;
+  padding: 80px 20px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 3rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.page-title:before,
+.page-title:after {
+  content: none;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: var(--accent-color);
+  margin: 0;
+}
+
+.archive-link {
+  color: var(--accent-hover);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.archive-link:hover {
+  color: var(--accent-active);
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 70px 15px 60px;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+  }
+}

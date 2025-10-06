@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Render MODs grid
   function renderMods(mods) {
-    fileList.classList.remove('loading');
+    fileList.classList.remove('card-grid--loading');
     fileList.innerHTML = '';
 
     if (mods.length === 0) {
@@ -62,13 +62,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     mods.forEach(mod => {
       const modItem = document.createElement('div');
-      modItem.className = 'mod-item';
+      modItem.className = 'card';
       
       modItem.innerHTML = `
-        <div class="mod-name">${mod.name}</div>
-        <button class="download-button" data-url="${mod.download_url}" data-name="${mod.name}">
-          <span class="btn-text">Download</span>
-          <svg class="loader" viewBox="0 0 24 24">
+        <div class="card__name">${mod.name}</div>
+        <button class="btn btn--download" data-url="${mod.download_url}" data-name="${mod.name}">
+          <span class="btn__text">Download</span>
+          <svg class="btn__loader" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
               <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
               <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </button>
       `;
 
-      const downloadBtn = modItem.querySelector('.download-button');
+      const downloadBtn = modItem.querySelector('.btn--download');
       downloadBtn.addEventListener('click', handleDownload);
 
       fileList.appendChild(modItem);
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!url || !filename) return;
 
     button.disabled = true;
-    button.classList.add('loading');
+    button.classList.add('btn--loading');
 
     setTimeout(() => {
       // Create and trigger download
@@ -107,13 +107,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Reset button state
       button.disabled = false;
-      button.classList.remove('loading');
+      button.classList.remove('btn--loading');
     }, SPINNER_DURATION);
   }
 
   // Show error message
   function showError(message) {
-    fileList.classList.remove('loading');
+    fileList.classList.remove('card-grid--loading');
     fileList.innerHTML = `<div class="loading-message">${message}</div>`;
   }
 
@@ -127,14 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const debouncedSearch = debounceSearch(function(searchTerm) {
-    const items = document.querySelectorAll('.mod-item');
+    const items = document.querySelectorAll('.card');
     
     items.forEach(item => {
-      const modName = item.querySelector('.mod-name');
+      const modName = item.querySelector('.card__name');
       if (modName) {
         const name = modName.textContent.toLowerCase();
         const isVisible = name.includes(searchTerm.toLowerCase());
-        item.classList.toggle('hidden', !isVisible);
+        item.classList.toggle('card--hidden', !isVisible);
       }
     });
   }, 300);

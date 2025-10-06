@@ -1,0 +1,61 @@
+.btn {
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.btn--download {
+  background: linear-gradient(135deg, var(--border-color), #440000);
+  color: var(--text-primary);
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(102, 0, 0, 0.3);
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.btn--download:hover:not(:disabled) {
+  background: linear-gradient(135deg, #880000, #550000);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--shadow-hover);
+}
+
+.btn--download:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn__loader {
+  width: 18px;
+  height: 18px;
+  color: var(--text-primary);
+  display: none;
+}
+
+.btn--loading .btn__loader {
+  display: block;
+}
+
+.btn--loading .btn__text {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .btn--download {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}

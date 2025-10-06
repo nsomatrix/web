@@ -1,0 +1,12 @@
+/* Archives page specific styles */
+@import url('../base.css');
+@import url('../components/search.css');
+@import url('../components/card.css');
+@import url('../components/button.css');
+@import url('../components/loader.css');
+
+/* Footer spacing */
+#footer-placeholder {
+  height: 40px;
+  background-color: var(--primary-bg);
+}
