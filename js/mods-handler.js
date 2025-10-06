@@ -1,8 +1,7 @@
 const SPINNER_DURATION = 1000;
 const API_CONFIG = {
-  owner: 'cloudkore',
-  repo: 'matrix',
-  path: 'data/MODs'
+  itemId: 'nsomtx-active-mods',
+  baseUrl: 'https://archive.org/download/'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -16,10 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let modsData = [];
 
-  // Fetch MODs from GitHub API
+  // Fetch MODs from Internet Archive API
   async function fetchMods() {
     try {
-      const apiUrl = `https://api.github.com/repos/${API_CONFIG.owner}/${API_CONFIG.repo}/contents/${API_CONFIG.path}`;
+      const apiUrl = `https://archive.org/metadata/${API_CONFIG.itemId}`;
       const response = await fetch(apiUrl);
       
       if (!response.ok) {
@@ -28,14 +27,20 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const data = await response.json();
       
-      // Validate data is array
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid data format received');
+      // Extract files from Internet Archive metadata
+      if (!data.files) {
+        throw new Error('No files found in archive');
       }
       
-      // Limit iterations for security
-      const maxItems = Math.min(data.length, 100);
-      modsData = data.slice(0, maxItems);
+      // Filter for .jar files only
+      const jarFiles = data.files.filter(file => file.name.endsWith('.jar'));
+      const maxItems = Math.min(jarFiles.length, 100);
+      
+      // Transform to match expected format
+      modsData = jarFiles.slice(0, maxItems).map(file => ({
+        name: file.name,
+        download_url: `${API_CONFIG.baseUrl}${API_CONFIG.itemId}/${file.name}`
+      }));
       
       renderMods(modsData);
       
