@@ -1,6 +1,7 @@
 class KinsEstimator {
     constructor() {
         this.countdownInterval = null;
+        this.calculationData = null;
         this.initializeEventListeners();
     }
 
@@ -14,20 +15,18 @@ class KinsEstimator {
         document.getElementById('calculateKins').addEventListener('click', () => this.calculateKins());
         document.getElementById('calculateLevel').addEventListener('click', () => this.calculateLevel());
 
-        // Auto-format kins input as user types
+        // Auto-format kins input
         document.getElementById('kinsPerHour').addEventListener('input', (e) => {
             this.formatInputAsType(e.target);
         });
 
-        // Enter key support for inputs
-        document.getElementById('kinsPerHour').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.calculateKins();
-        });
-        document.getElementById('days').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.calculateKins();
+        // Enter key support
+        ['kinsPerHour', 'days'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.calculateKins();
+            });
         });
         
-        // Level estimator enter key support
         ['currentLevel', 'currentExp', 'expPerHour'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') this.calculateLevel();
@@ -36,39 +35,23 @@ class KinsEstimator {
     }
 
     switchTab(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
-        // Update tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
     }
 
     formatInputAsType(input) {
-        const cursorPos = input.selectionStart;
         const value = input.value.replace(/\D/g, '');
-        const formatted = this.formatKins(value);
-        input.value = formatted;
-        
-        // Restore cursor position
-        const newPos = Math.min(cursorPos + (formatted.length - input.value.length), formatted.length);
-        input.setSelectionRange(newPos, newPos);
+        input.value = this.formatKins(value);
     }
 
     parseKinsInput(input) {
-        // Remove any spaces and replace periods with empty string for parsing
-        // Then convert back to number
-        const cleanInput = input.replace(/\s/g, '').replace(/\./g, '');
-        return parseFloat(cleanInput) || 0;
+        return parseFloat(input.replace(/\./g, '')) || 0;
     }
 
     formatKins(number) {
-        // Convert number to string and add periods every 3 digits from right
         const numStr = number.toString();
         let formatted = '';
         
@@ -84,70 +67,30 @@ class KinsEstimator {
 
     calculateKins() {
         const button = document.getElementById('calculateKins');
-        const kinsPerHourInput = document.getElementById('kinsPerHour').value.trim();
-        const daysInput = document.getElementById('days').value.trim();
+        const kinsPerHour = this.parseKinsInput(document.getElementById('kinsPerHour').value.trim());
+        const days = parseInt(document.getElementById('days').value.trim());
 
-        // Validation
-        if (!kinsPerHourInput || !daysInput) {
-            alert('Please fill in both fields');
-            return;
-        }
-
-        const kinsPerHour = this.parseKinsInput(kinsPerHourInput);
-        const days = parseInt(daysInput);
-
-        if (kinsPerHour <= 0 || days <= 0) {
+        if (!kinsPerHour || !days || kinsPerHour <= 0 || days <= 0) {
             alert('Please enter valid positive numbers');
             return;
         }
 
-        // Show loading state
-        button.classList.add('loading');
-        button.disabled = true;
+        this.setLoadingState(button, true);
 
-        // Simulate calculation delay
         setTimeout(() => {
-            // Calculate totals
-            const hoursPerDay = 24;
-            const kinsPerDay = kinsPerHour * hoursPerDay;
+            const kinsPerDay = kinsPerHour * 24;
             const totalKins = kinsPerDay * days;
 
-            // Calculate breakdown
-            const kinsPerWeek = kinsPerDay * 7;
-            const kinsPerMonth = kinsPerDay * 30;
-            const kinsPerYear = kinsPerDay * 365;
-
-            // Display results
             this.displayResults({
                 total: totalKins,
                 perDay: kinsPerDay,
-                perWeek: kinsPerWeek,
-                perMonth: kinsPerMonth,
-                perYear: kinsPerYear
+                perWeek: kinsPerDay * 7,
+                perMonth: kinsPerDay * 30,
+                perYear: kinsPerDay * 365
             });
 
-            // Remove loading state
-            button.classList.remove('loading');
-            button.disabled = false;
+            this.setLoadingState(button, false);
         }, 800);
-    }
-
-    displayResults(results) {
-        // Show results section
-        document.getElementById('kinsResults').style.display = 'block';
-
-        // Update values
-        document.getElementById('totalKins').textContent = this.formatKins(results.total) + ' kins';
-        document.getElementById('kinsPerDay').textContent = this.formatKins(results.perDay) + ' kins';
-        document.getElementById('kinsPerWeek').textContent = this.formatKins(results.perWeek) + ' kins';
-        document.getElementById('kinsPerMonth').textContent = this.formatKins(results.perMonth) + ' kins';
-        document.getElementById('kinsPerYear').textContent = this.formatKins(results.perYear) + ' kins';
-
-        // Smooth scroll to results
-        document.getElementById('kinsResults').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'nearest' 
-        });
     }
 
     calculateLevel() {
@@ -156,38 +99,22 @@ class KinsEstimator {
         const currentExp = parseFloat(document.getElementById('currentExp').value);
         const expPerHour = parseFloat(document.getElementById('expPerHour').value);
 
-        // Validation
-        if (!currentLevel || currentExp === '' || !expPerHour) {
-            alert('Please fill in all fields');
+        if (!currentLevel || currentExp === '' || !expPerHour ||
+            currentLevel < 1 || currentLevel > 130 ||
+            currentExp < -50 || currentExp > 99.99 ||
+            expPerHour <= 0) {
+            alert('Please enter valid values within the specified ranges');
             return;
         }
 
-        if (currentLevel < 1 || currentLevel > 130) {
-            alert('Level must be between 1 and 130');
-            return;
-        }
-
-        if (currentExp < -50 || currentExp > 99.99) {
-            alert('Experience must be between -50.00% and 99.99%');
-            return;
-        }
-
-        if (expPerHour <= 0) {
-            alert('Experience per hour must be positive');
-            return;
-        }
-
-        // Show loading state
-        button.classList.add('loading');
-        button.disabled = true;
+        this.setLoadingState(button, true);
 
         setTimeout(() => {
-            // Calculate experience needed to reach next level
             const expNeeded = 100 - currentExp;
-            const hoursNeeded = expNeeded / expPerHour;
-            const secondsNeeded = Math.ceil(hoursNeeded * 3600);
+            const secondsNeeded = Math.ceil((expNeeded / expPerHour) * 3600);
 
-            // Display results
+            this.calculationData = { expNeeded, expPerHour };
+
             this.displayLevelResults({
                 fromLevel: currentLevel,
                 toLevel: currentLevel + 1,
@@ -195,51 +122,58 @@ class KinsEstimator {
                 secondsRemaining: secondsNeeded
             });
 
-            // Remove loading state
-            button.classList.remove('loading');
-            button.disabled = false;
+            this.setLoadingState(button, false);
         }, 500);
     }
 
-    displayLevelResults(results) {
-        // Show results section
-        document.getElementById('levelResults').style.display = 'block';
+    setLoadingState(button, loading) {
+        button.classList.toggle('loading', loading);
+        button.disabled = loading;
+    }
 
-        // Update values
+    displayResults(results) {
+        document.getElementById('kinsResults').style.display = 'block';
+        
+        Object.entries(results).forEach(([key, value]) => {
+            const element = document.getElementById(key === 'total' ? 'totalKins' : `kins${key.charAt(0).toUpperCase() + key.slice(1)}`);
+            if (element) element.textContent = this.formatKins(value) + ' kins';
+        });
+
+        document.getElementById('kinsResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    displayLevelResults(results) {
+        document.getElementById('levelResults').style.display = 'block';
         document.getElementById('fromLevel').textContent = `Level ${results.fromLevel}`;
         document.getElementById('toLevel').textContent = `Level ${results.toLevel}`;
         document.getElementById('expNeeded').textContent = `${results.expNeeded}%`;
 
-        // Start countdown
         this.startCountdown(results.secondsRemaining);
-
-        // Smooth scroll to results
-        document.getElementById('levelResults').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'nearest' 
-        });
+        document.getElementById('levelResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     startCountdown(seconds) {
-        // Clear existing countdown
-        if (this.countdownInterval) {
-            clearInterval(this.countdownInterval);
-        }
+        if (this.countdownInterval) clearInterval(this.countdownInterval);
 
-        let remainingSeconds = seconds;
         const countdownElement = document.getElementById('countdown');
+        const expNeededElement = document.getElementById('expNeeded');
+        const expPerMs = this.calculationData.expPerHour / 3600000;
+        let currentExpNeeded = this.calculationData.expNeeded;
+        let remainingMs = seconds * 1000;
 
         const updateCountdown = () => {
-            if (remainingSeconds <= 0) {
+            if (remainingMs <= 0) {
                 countdownElement.textContent = 'Level Up!';
+                expNeededElement.textContent = '0.00%';
                 clearInterval(this.countdownInterval);
                 return;
             }
 
-            const days = Math.floor(remainingSeconds / 86400);
-            const hours = Math.floor((remainingSeconds % 86400) / 3600);
-            const minutes = Math.floor((remainingSeconds % 3600) / 60);
-            const secs = remainingSeconds % 60;
+            const totalSeconds = Math.floor(remainingMs / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const secs = totalSeconds % 60;
 
             let timeString = '';
             if (days > 0) timeString += `${days} day${days > 1 ? 's' : ''} `;
@@ -248,15 +182,16 @@ class KinsEstimator {
             timeString += `${secs} second${secs > 1 ? 's' : ''}`;
 
             countdownElement.textContent = timeString;
-            remainingSeconds--;
+            
+            currentExpNeeded -= expPerMs * 100;
+            expNeededElement.textContent = `${Math.max(0, currentExpNeeded).toFixed(2)}%`;
+            
+            remainingMs -= 100;
         };
 
         updateCountdown();
-        this.countdownInterval = setInterval(updateCountdown, 1000);
+        this.countdownInterval = setInterval(updateCountdown, 100);
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new KinsEstimator();
-});
+document.addEventListener('DOMContentLoaded', () => new KinsEstimator());
