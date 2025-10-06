@@ -12,6 +12,11 @@ class KinsEstimator {
         // Calculate button
         document.getElementById('calculateKins').addEventListener('click', () => this.calculateKins());
 
+        // Auto-format kins input as user types
+        document.getElementById('kinsPerHour').addEventListener('input', (e) => {
+            this.formatInputAsType(e.target);
+        });
+
         // Enter key support for inputs
         document.getElementById('kinsPerHour').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.calculateKins();
@@ -35,6 +40,17 @@ class KinsEstimator {
         document.getElementById(`${tabName}-tab`).classList.add('active');
     }
 
+    formatInputAsType(input) {
+        const cursorPos = input.selectionStart;
+        const value = input.value.replace(/\D/g, '');
+        const formatted = this.formatKins(value);
+        input.value = formatted;
+        
+        // Restore cursor position
+        const newPos = Math.min(cursorPos + (formatted.length - input.value.length), formatted.length);
+        input.setSelectionRange(newPos, newPos);
+    }
+
     parseKinsInput(input) {
         // Remove any spaces and replace periods with empty string for parsing
         // Then convert back to number
@@ -44,7 +60,7 @@ class KinsEstimator {
 
     formatKins(number) {
         // Convert number to string and add periods every 3 digits from right
-        const numStr = Math.floor(number).toString();
+        const numStr = number.toString();
         let formatted = '';
         
         for (let i = 0; i < numStr.length; i++) {
