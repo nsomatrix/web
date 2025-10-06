@@ -91,6 +91,17 @@
     font-size: 1em;
     margin-bottom: 8px;
     color: #ff0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.country-flag {
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    object-fit: cover;
 }
 
 .country-result .time {
