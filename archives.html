@@ -1,35 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>NinjaBase</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+  <title>NinjaBase - Archives</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/mods.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Include essentials.js file -->
-    <script src="js/sound.js"></script>
-    <script src="js/essentials.js"></script>
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+      // Initialize Firebase for navbar auth
+      const firebaseConfig = {
+          apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
+          authDomain: 'nsomatrix-web.firebaseapp.com',
+          projectId: 'nsomatrix-web',
+          storageBucket: 'nsomatrix-web.firebasestorage.app',
+          messagingSenderId: '320519296982',
+          appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
+          measurementId: 'G-GK3J5PZW85'
+      };
+      
+      if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+      }
+      window.firebaseAuth = firebase.auth();
+      window.firebaseDb = firebase.firestore();
+  </script>
+  <script src="js/sound.js"></script>
+  <script src="js/essentials.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
 
-<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-<link rel="manifest" href="favicon/site.webmanifest">
-<link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
-
+  <link rel="stylesheet" href="components/navbar.css">
+  <link rel="stylesheet" href="components/footer.css">
 </head>
 <body>
+  <!-- Navbar Component -->
+  <div id="navbar-container"></div>
+
+  <div class="container">
+    <div class="text-center header-section">
+      <h1 class="page-title">MODs Archives</h1>
+      <p class="page-subtitle">Obsolete and legacy MODs are archived here. For active MODs, visit <a href="mods.html" class="archive-link">MODs Repository</a></p>
+    </div>
+
+    <div class="search-section">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search archived MODs...">
+    </div>
+
+    <div id="fileList" class="mods-grid loading">
+      <div class="loading-message">Loading archived MODs... 
+        <svg class="loader" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
+  </div>
 
 
-    <!-- Your page content goes here -->
-    <h1>Coming Soon!</h1>
 
-
-
-    <!-- Include Bootstrap JS if needed -->
-    <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/archives-handler.js"></script>
+  <script src="components/navbar.js"></script>
+  <script>
+    fetch('components/navbar.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+        new RetroNavbar();
+        new NavbarAuth();
+      });
+    
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(html => {
+        document.body.insertAdjacentHTML('beforeend', html);
+      });
+  </script>
 
 </body>
 </html>
