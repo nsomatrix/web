@@ -7,6 +7,7 @@
     <link href="css/base.css" rel="stylesheet">
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
+    <link rel="stylesheet" href="css/components/search.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
@@ -48,6 +49,19 @@
         h3 {
             color: red;
         }
+        .search__input {
+            background: #333;
+            border: 1px solid #555;
+            color: #EEE;
+            font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+        }
+        .search__input:focus {
+            outline: 1px solid red;
+            border-color: #777;
+        }
+        .search__input::placeholder {
+            color: #999;
+        }
     </style>
 </head>
 <body>
@@ -56,6 +70,11 @@
     <div class="main-content-wrapper">
         <h3>Game Items Database</h3>
         <p>Complete list of all items available in Ninja School Online with their corresponding IDs.</p>
+        
+        <div class="search">
+            <input type="text" class="search__input" id="searchInput" placeholder="Search items by name or ID...">
+        </div>
+        
         <div class="items-grid" id="itemsGrid"></div>
     </div>
 
@@ -76,15 +95,36 @@
                 document.body.insertAdjacentHTML('beforeend', html);
             });
         
+        let allItems = [];
+        
+        function renderItems(items) {
+            const grid = document.getElementById('itemsGrid');
+            grid.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `<span class="item-id">ID ${item.id}:</span><span class="item-name">${item.name}</span>`;
+                grid.appendChild(card);
+            });
+        }
+        
+        function filterItems(searchTerm) {
+            const filtered = allItems.filter(item => 
+                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.id.toString().includes(searchTerm)
+            );
+            renderItems(filtered);
+        }
+        
         fetch('data/items.json')
             .then(response => response.json())
             .then(items => {
-                const grid = document.getElementById('itemsGrid');
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'item-card';
-                    card.innerHTML = `<span class="item-id">ID ${item.id}:</span><span class="item-name">${item.name}</span>`;
-                    grid.appendChild(card);
+                allItems = items;
+                renderItems(items);
+                
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', (e) => {
+                    filterItems(e.target.value);
                 });
             });
     </script>
