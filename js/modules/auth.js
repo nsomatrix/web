@@ -18,11 +18,18 @@ export class AuthManager {
     initSessionTimer() {
         const startTimer = () => {
             clearTimeout(this.sessionExpiryTimer);
-            this.sessionExpiryTimer = setTimeout(() => {
+            this.sessionExpiryTimer = setTimeout(async () => {
                 console.warn("Session expired due to inactivity. Clearing encryption key.");
                 this.currentEncryptionKey = null;
                 sessionStorage.removeItem('currentEncryptionKeyHex');
-                showMessageBox("Session expired due to inactivity. Please re-enter master password.", 'warning', 3000);
+                
+                // Check if account needs recovery key
+                const needsRecovery = await this.checkPasswordResetStatus();
+                if (needsRecovery) {
+                    showMessageBox("Session expired. Please use your recovery key to access encrypted data.", 'warning', 4000);
+                } else {
+                    showMessageBox("Session expired due to inactivity. Please re-enter master password.", 'warning', 3000);
+                }
             }, CRYPTO_CONFIG.SESSION_TIMEOUT);
         };
 
@@ -56,6 +63,13 @@ export class AuthManager {
 
             if (!data || !data.salt || !data.masterPasswordHash) {
                 showMessageBox("No master password set yet", "info", 3000);
+                return false;
+            }
+
+            // Check if account was recovered from key (password was reset)
+            if (data.recoveredFromKey) {
+                showMessageBox("Password was reset. Please use your recovery key to access encrypted data.", "warning", 5000);
+                this.currentEncryptionKey = null;
                 return false;
             }
 
@@ -127,5 +141,20 @@ export class AuthManager {
         this.currentEncryptionKey = null;
         sessionStorage.removeItem('currentEncryptionKeyHex');
         clearTimeout(this.sessionExpiryTimer);
+    }
+
+    // Check if account needs recovery key due to password reset
+    async checkPasswordResetStatus() {
+        const user = this.currentUser || this.auth.currentUser;
+        if (!user) return false;
+        
+        try {
+            const playerDoc = await this.db.collection('players').doc(user.uid).get();
+            const data = playerDoc.data();
+            return data && data.recoveredFromKey;
+        } catch (error) {
+            console.error('Error checking password reset status:', error);
+            return false;
+        }
     }
 }

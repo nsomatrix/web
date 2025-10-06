@@ -179,18 +179,41 @@ async function handleLogin() {
         const playerData = playerDoc.data();
 
         if (playerData && playerData.salt && playerData.masterPasswordHash) {
+            // Store temporary password for recovery sync
+            sessionStorage.setItem('tempLoginPassword', password);
+            
             if (playerData.recoveredFromKey) {
-                // Account was recovered with recovery key, use stored master password hash directly
-                sessionStorage.setItem('currentEncryptionKeyHex', playerData.masterPasswordHash);
+                // Account needs recovery - don't set encryption key yet
+                // Will be set after recovery key is used
             } else {
                 // Normal login, derive key from password
                 const derivedEncryptionKey = await deriveKey(password, playerData.salt);
-                sessionStorage.setItem('currentEncryptionKeyHex', derivedEncryptionKey.toString(CryptoJS.enc.Hex));
+                const derivedKeyHex = derivedEncryptionKey.toString(CryptoJS.enc.Hex);
+                
+                // Check if derived key matches stored hash
+                if (derivedKeyHex !== playerData.masterPasswordHash) {
+                    // Password was likely reset, mark account for recovery
+                    await setDoc(doc(db, "players", user.uid), {
+                        ...playerData,
+                        recoveredFromKey: true
+                    });
+                } else {
+                    // Use the derived key as encryption key (this is the actual encryption key)
+                    sessionStorage.setItem('currentEncryptionKeyHex', derivedKeyHex);
+                }
             }
         }
 
         localStorage.setItem('userLoggedIn', 'true');
         showMessageBox('Login successful! Redirecting', 'success');
+        
+        // Clean up temp password after a delay (dashboard will use it if needed)
+        setTimeout(() => {
+            if (!sessionStorage.getItem('recoveryInProgress')) {
+                sessionStorage.removeItem('tempLoginPassword');
+            }
+        }, 10000);
+        
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
