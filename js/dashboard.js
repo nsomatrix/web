@@ -289,7 +289,7 @@ function setupEventListeners() {
     if (forgotPasswordBtn) {
         forgotPasswordBtn.onclick = () => {
             closeModal(document.getElementById('masterPasswordPromptModal'));
-            openModal(document.getElementById('recoveryKeyModal'));
+            showMessageBox('To reset your password, please log out and use the "Forgot Password" link on the sign-in page.', 'info', 5000);
         };
     }
 
