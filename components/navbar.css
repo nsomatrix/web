@@ -156,8 +156,10 @@
     transition: left 0.3s ease;
     border-top: 1px solid #ff0000;
     gap: 0;
-    z-index: 1000;
+    z-index: 1040;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
   }
   
   .nav-menu.active {
@@ -265,7 +267,7 @@
   }
   
   .dropdown-menu li a {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid rgba(255, 0, 0, 0.1);
     background: rgba(0, 0, 0, 0.3);
     width: 100%;

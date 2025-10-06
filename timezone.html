@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Game Time Tracker - Matrix-WEB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
+            authDomain: 'nsomatrix-web.firebaseapp.com',
+            projectId: 'nsomatrix-web',
+            storageBucket: 'nsomatrix-web.firebasestorage.app',
+            messagingSenderId: '320519296982',
+            appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
+            measurementId: 'G-GK3J5PZW85'
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.firebaseAuth = firebase.auth();
+        window.firebaseDb = firebase.firestore();
+    </script>
+    <script src="js/essentials.js"></script>
+    
+    <style>
+        .timezone-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 20px;
+            font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+        }
+        .timezone-title {
+            color: #ff0000;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 5px #ff0000;
+        }
+        .time-display {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 1px solid #ff0000;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .time {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+            text-shadow: 0 0 5px #4CAF50;
+        }
+        .label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #ff0000;
+        }
+        .date {
+            color: #ccc;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Component -->
+    <div id="navbar-container"></div>
+
+    <div class="timezone-container">
+        <h1 class="timezone-title">Game Time Tracker</h1>
+        
+        <div class="time-display">
+            <div class="label">Game Time (UTC)</div>
+            <div class="time" id="utc-time"></div>
+            <div class="date" id="utc-date"></div>
+        </div>
+        
+        <div class="time-display">
+            <div class="label">Your Local Time</div>
+            <div class="time" id="local-time"></div>
+            <div class="date" id="local-date"></div>
+        </div>
+    </div>
+
+    <!-- Footer Component -->
+    <div id="footer-container"></div>
+
+    <script src="components/navbar.js"></script>
+    <script>
+        // Load navbar component
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+        
+        // Load footer component
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('footer-container').innerHTML = html;
+            });
+
+        function updateTimes() {
+            const now = new Date();
+            
+            // UTC Time
+            document.getElementById('utc-time').textContent = now.toUTCString().slice(17, 25);
+            document.getElementById('utc-date').textContent = now.toUTCString().slice(0, 16);
+            
+            // Local Time
+            document.getElementById('local-time').textContent = now.toLocaleTimeString();
+            document.getElementById('local-date').textContent = now.toLocaleDateString();
+        }
+        
+        updateTimes();
+        setInterval(updateTimes, 1000);
+    </script>
+</body>
+</html>
