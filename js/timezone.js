@@ -189,6 +189,73 @@ const countries = [
 ];
 
 let searchResults = [];
+let comparisonCountries = { country1: null, country2: null };
+
+function populateCountrySelects() {
+    const select1 = document.getElementById('country1-select');
+    const select2 = document.getElementById('country2-select');
+    
+    countries.forEach(country => {
+        const option1 = document.createElement('option');
+        option1.value = JSON.stringify(country);
+        option1.textContent = country.name;
+        select1.appendChild(option1);
+        
+        const option2 = document.createElement('option');
+        option2.value = JSON.stringify(country);
+        option2.textContent = country.name;
+        select2.appendChild(option2);
+    });
+}
+
+function updateComparison() {
+    if (!comparisonCountries.country1 || !comparisonCountries.country2) {
+        document.getElementById('comparison-results').innerHTML = '';
+        return;
+    }
+    
+    const now = new Date();
+    const container = document.getElementById('comparison-results');
+    
+    container.innerHTML = `
+        <div class="comparison-card">
+            <div class="label">
+                <img src="https://flagcdn.com/24x18/${comparisonCountries.country1.flag}.png" alt="${comparisonCountries.country1.name}" class="country-flag">
+                ${comparisonCountries.country1.name}
+            </div>
+            <div class="time" id="comp-time-1"></div>
+            <div class="date" id="comp-date-1"></div>
+        </div>
+        <div class="comparison-card">
+            <div class="label">
+                <img src="https://flagcdn.com/24x18/${comparisonCountries.country2.flag}.png" alt="${comparisonCountries.country2.name}" class="country-flag">
+                ${comparisonCountries.country2.name}
+            </div>
+            <div class="time" id="comp-time-2"></div>
+            <div class="date" id="comp-date-2"></div>
+        </div>
+    `;
+    
+    updateComparisonTimes();
+}
+
+function updateComparisonTimes() {
+    if (!comparisonCountries.country1 || !comparisonCountries.country2) return;
+    
+    const now = new Date();
+    
+    try {
+        const time1 = new Date(now.toLocaleString("en-US", {timeZone: comparisonCountries.country1.timezone}));
+        const time2 = new Date(now.toLocaleString("en-US", {timeZone: comparisonCountries.country2.timezone}));
+        
+        document.getElementById('comp-time-1').textContent = time1.toLocaleTimeString();
+        document.getElementById('comp-date-1').textContent = time1.toLocaleDateString();
+        document.getElementById('comp-time-2').textContent = time2.toLocaleTimeString();
+        document.getElementById('comp-date-2').textContent = time2.toLocaleDateString();
+    } catch (error) {
+        console.error('Error updating comparison times:', error);
+    }
+}
 
 function updateUTCTime() {
     const now = new Date();
@@ -262,14 +329,29 @@ function updateSearchResults() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('country-search');
+    const select1 = document.getElementById('country1-select');
+    const select2 = document.getElementById('country2-select');
+    
+    populateCountrySelects();
     
     searchInput.addEventListener('input', function() {
         searchCountries(this.value);
+    });
+    
+    select1.addEventListener('change', function() {
+        comparisonCountries.country1 = this.value ? JSON.parse(this.value) : null;
+        updateComparison();
+    });
+    
+    select2.addEventListener('change', function() {
+        comparisonCountries.country2 = this.value ? JSON.parse(this.value) : null;
+        updateComparison();
     });
     
     updateUTCTime();
     setInterval(() => {
         updateUTCTime();
         updateSearchResults();
+        updateComparisonTimes();
     }, 1000);
 });

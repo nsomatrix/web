@@ -1,17 +1,3 @@
-.timezone-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 20px;
-    font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
-}
-
-.timezone-title {
-    color: #ff0000;
-    text-align: center;
-    margin-bottom: 2rem;
-    text-shadow: 0 0 5px #ff0000;
-}
-
 .utc-display {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
     border: 2px solid #ff0000;
@@ -115,4 +101,96 @@
     color: #ccc;
     margin-top: 5px;
     font-size: 0.9em;
+}
+
+.comparison-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #ff0000;
+}
+
+.comparison-title {
+    color: #ff0000;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 5px #ff0000;
+}
+
+.comparison-selectors {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.country-select {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border: 1px solid #ff0000;
+    border-radius: 8px;
+    color: #fff;
+    font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+    min-width: 200px;
+}
+
+.country-select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.vs-text {
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-shadow: 0 0 5px #ff0000;
+}
+
+.comparison-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.comparison-card {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border: 2px solid #ff0000;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.comparison-card .label {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #ff0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.comparison-card .time {
+    font-size: 2em;
+    font-weight: bold;
+    color: #4CAF50;
+    text-shadow: 0 0 10px #4CAF50;
+}
+
+.comparison-card .date {
+    color: #ccc;
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+@media (max-width: 768px) {
+    .comparison-results {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-selectors {
+        flex-direction: column;
+    }
 }

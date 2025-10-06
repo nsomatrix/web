@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/timezone.css">
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
-    <link rel="stylesheet" href="css/timezone.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
@@ -40,11 +41,14 @@
     <!-- Navbar Component -->
     <div id="navbar-container"></div>
 
-    <div class="timezone-container">
-        <h1 class="timezone-title">Global Time Tracker</h1>
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">Global Time Tracker</h1>
+            <p class="page-subtitle">Track time zones across all countries worldwide</p>
+        </div>
         
         <div class="utc-display">
-            <div class="label">UTC Time</div>
+            <div class="label">NSO Server Time</div>
             <div class="time" id="utc-time"></div>
             <div class="date" id="utc-date"></div>
         </div>
@@ -52,6 +56,20 @@
         <div class="search-container">
             <input type="text" id="country-search" placeholder="Search for a country..." class="search-input">
             <div id="search-results" class="search-results"></div>
+        </div>
+
+        <div class="comparison-section">
+            <h2 class="comparison-title">Compare Times</h2>
+            <div class="comparison-selectors">
+                <select id="country1-select" class="country-select">
+                    <option value="">Select first country</option>
+                </select>
+                <span class="vs-text">VS</span>
+                <select id="country2-select" class="country-select">
+                    <option value="">Select second country</option>
+                </select>
+            </div>
+            <div id="comparison-results" class="comparison-results"></div>
         </div>
     </div>
 
