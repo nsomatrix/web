@@ -16,6 +16,6 @@ export const CRYPTO_CONFIG = {
     KEY_SIZE: 256 / 32,
     MAX_ATTEMPTS: 3,
     LOCKOUT_TIME: 30 * 1000,
-    SESSION_TIMEOUT: 1 * 60 * 1000
+    SESSION_TIMEOUT: 5 * 60 * 1000
 };
 
