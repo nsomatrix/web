@@ -402,9 +402,7 @@ function setupFeatureButtons() {
     if (notesBtn) {
         notesBtn.onclick = async () => {
             if (!authManager.currentEncryptionKey) {
-                openModal(document.getElementById('recoveryKeyModal'));
-                document.getElementById('notesModal').dataset.pendingOpen = 'true';
-                document.getElementById('recoveryKeyInput').value = '';
+                showMasterPasswordPrompt('notesModal');
                 return;
             }
             openModal(document.getElementById('notesModal'));
@@ -416,9 +414,7 @@ function setupFeatureButtons() {
     if (passwordManagerBtn) {
         passwordManagerBtn.onclick = async () => {
             if (!authManager.currentEncryptionKey) {
-                openModal(document.getElementById('recoveryKeyModal'));
-                document.getElementById('passwordManagerModal').dataset.pendingOpen = 'true';
-                document.getElementById('recoveryKeyInput').value = '';
+                showMasterPasswordPrompt('passwordManagerModal');
                 return;
             }
             openModal(document.getElementById('passwordManagerModal'));
@@ -1876,6 +1872,16 @@ async function syncWithCurrentPassword(currentPassword) {
         showMessageBox('Failed to sync password', 'error');
         return false;
     }
+}
+
+// Master password prompt helper
+function showMasterPasswordPrompt(targetModal) {
+    document.getElementById('masterPasswordModalTitle').textContent = 'Enter Master Password';
+    document.getElementById('confirmMasterPasswordInput').style.display = 'none';
+    document.getElementById('unlockDashboardBtn').textContent = 'Unlock';
+    document.getElementById('forgotPasswordBtn').style.display = 'block';
+    document.getElementById(targetModal).dataset.pendingOpen = 'true';
+    openModal(document.getElementById('masterPasswordPromptModal'));
 }
 
 // Initialize application
