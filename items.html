@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Items - NinjaBase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    <style>
+        .main-content-wrapper {
+            padding: 20px;
+            width: calc(100% - 40px);
+            max-width: 1000px;
+            margin: 0 auto;
+            color: #EEE;
+            background-color: #222;
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 80px;
+            box-sizing: border-box;
+        }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .item-card {
+            background: #333;
+            border: 1px solid #555;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
+        }
+        .item-id {
+            color: red;
+            font-weight: bold;
+        }
+        .item-name {
+            color: #EEE;
+            margin-left: 8px;
+        }
+        h3 {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <div class="main-content-wrapper">
+        <h3>Game Items Database</h3>
+        <p>Complete list of all items available in Ninja School Online with their corresponding IDs.</p>
+        <div class="items-grid" id="itemsGrid"></div>
+    </div>
+
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                setTimeout(() => {
+                    new RetroNavbar();
+                }, 100);
+            });
+        
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.body.insertAdjacentHTML('beforeend', html);
+            });
+        
+        fetch('data/items.json')
+            .then(response => response.json())
+            .then(items => {
+                const grid = document.getElementById('itemsGrid');
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `<span class="item-id">ID ${item.id}:</span><span class="item-name">${item.name}</span>`;
+                    grid.appendChild(card);
+                });
+            });
+    </script>
+</body>
+</html>
