@@ -1541,6 +1541,9 @@ function setupNotificationHandlers() {
             messageIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                // Hide message input when opening recent chats
+                const messageInputContainer = document.querySelector('.message-input-container');
+                if (messageInputContainer) messageInputContainer.style.display = 'none';
                 openModal(document.getElementById('messagesModal'));
                 loadRecentChats();
             });
