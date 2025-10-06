@@ -106,7 +106,46 @@
         <div id="levels-tab" class="tab-content">
             <div class="estimator-card">
                 <h2>Level Calculator</h2>
-                <p class="coming-soon">Level estimator logic will be implemented soon...</p>
+                <div class="input-group">
+                    <label for="currentLevel">Current Level (1-130):</label>
+                    <input type="number" id="currentLevel" placeholder="e.g., 89" min="1" max="130">
+                </div>
+                <div class="input-group">
+                    <label for="currentExp">Current Experience (%):</label>
+                    <input type="number" id="currentExp" placeholder="e.g., 12.98" min="-50" max="99.99" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label for="expPerHour">Experience per Hour (%):</label>
+                    <input type="number" id="expPerHour" placeholder="e.g., 0.52" min="0.01" step="0.01">
+                </div>
+                <button id="calculateLevel" class="calculate-btn">
+                    <span class="btn-text">Calculate Level</span>
+                    <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </button>
+                
+                <div id="levelResults" class="results-section" style="display: none;">
+                    <h3>Time to Next Level</h3>
+                    <div class="countdown-display">
+                        <div id="countdown" class="countdown-timer"></div>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">From Level:</span>
+                        <span id="fromLevel" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">To Level:</span>
+                        <span id="toLevel" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Experience Needed:</span>
+                        <span id="expNeeded" class="result-value"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

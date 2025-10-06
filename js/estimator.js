@@ -1,5 +1,6 @@
 class KinsEstimator {
     constructor() {
+        this.countdownInterval = null;
         this.initializeEventListeners();
     }
 
@@ -9,8 +10,9 @@ class KinsEstimator {
             btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
         });
 
-        // Calculate button
+        // Calculate buttons
         document.getElementById('calculateKins').addEventListener('click', () => this.calculateKins());
+        document.getElementById('calculateLevel').addEventListener('click', () => this.calculateLevel());
 
         // Auto-format kins input as user types
         document.getElementById('kinsPerHour').addEventListener('input', (e) => {
@@ -23,6 +25,13 @@ class KinsEstimator {
         });
         document.getElementById('days').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.calculateKins();
+        });
+        
+        // Level estimator enter key support
+        ['currentLevel', 'currentExp', 'expPerHour'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.calculateLevel();
+            });
         });
     }
 
@@ -139,6 +148,111 @@ class KinsEstimator {
             behavior: 'smooth', 
             block: 'nearest' 
         });
+    }
+
+    calculateLevel() {
+        const button = document.getElementById('calculateLevel');
+        const currentLevel = parseInt(document.getElementById('currentLevel').value);
+        const currentExp = parseFloat(document.getElementById('currentExp').value);
+        const expPerHour = parseFloat(document.getElementById('expPerHour').value);
+
+        // Validation
+        if (!currentLevel || currentExp === '' || !expPerHour) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        if (currentLevel < 1 || currentLevel > 130) {
+            alert('Level must be between 1 and 130');
+            return;
+        }
+
+        if (currentExp < -50 || currentExp > 99.99) {
+            alert('Experience must be between -50.00% and 99.99%');
+            return;
+        }
+
+        if (expPerHour <= 0) {
+            alert('Experience per hour must be positive');
+            return;
+        }
+
+        // Show loading state
+        button.classList.add('loading');
+        button.disabled = true;
+
+        setTimeout(() => {
+            // Calculate experience needed to reach next level
+            const expNeeded = 100 - currentExp;
+            const hoursNeeded = expNeeded / expPerHour;
+            const secondsNeeded = Math.ceil(hoursNeeded * 3600);
+
+            // Display results
+            this.displayLevelResults({
+                fromLevel: currentLevel,
+                toLevel: currentLevel + 1,
+                expNeeded: expNeeded.toFixed(2),
+                secondsRemaining: secondsNeeded
+            });
+
+            // Remove loading state
+            button.classList.remove('loading');
+            button.disabled = false;
+        }, 500);
+    }
+
+    displayLevelResults(results) {
+        // Show results section
+        document.getElementById('levelResults').style.display = 'block';
+
+        // Update values
+        document.getElementById('fromLevel').textContent = `Level ${results.fromLevel}`;
+        document.getElementById('toLevel').textContent = `Level ${results.toLevel}`;
+        document.getElementById('expNeeded').textContent = `${results.expNeeded}%`;
+
+        // Start countdown
+        this.startCountdown(results.secondsRemaining);
+
+        // Smooth scroll to results
+        document.getElementById('levelResults').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+        });
+    }
+
+    startCountdown(seconds) {
+        // Clear existing countdown
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+        }
+
+        let remainingSeconds = seconds;
+        const countdownElement = document.getElementById('countdown');
+
+        const updateCountdown = () => {
+            if (remainingSeconds <= 0) {
+                countdownElement.textContent = 'Level Up!';
+                clearInterval(this.countdownInterval);
+                return;
+            }
+
+            const days = Math.floor(remainingSeconds / 86400);
+            const hours = Math.floor((remainingSeconds % 86400) / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const secs = remainingSeconds % 60;
+
+            let timeString = '';
+            if (days > 0) timeString += `${days} day${days > 1 ? 's' : ''} `;
+            if (hours > 0) timeString += `${hours} hour${hours > 1 ? 's' : ''} `;
+            if (minutes > 0) timeString += `${minutes} minute${minutes > 1 ? 's' : ''} `;
+            timeString += `${secs} second${secs > 1 ? 's' : ''}`;
+
+            countdownElement.textContent = timeString;
+            remainingSeconds--;
+        };
+
+        updateCountdown();
+        this.countdownInterval = setInterval(updateCountdown, 1000);
     }
 }
 
