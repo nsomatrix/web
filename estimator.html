@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Game Estimator - Matrix-WEB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/estimator.css">
+    <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
+            authDomain: 'nsomatrix-web.firebaseapp.com',
+            projectId: 'nsomatrix-web',
+            storageBucket: 'nsomatrix-web.firebasestorage.app',
+            messagingSenderId: '320519296982',
+            appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
+            measurementId: 'G-GK3J5PZW85'
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.firebaseAuth = firebase.auth();
+        window.firebaseDb = firebase.firestore();
+    </script>
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">Game Estimator</h1>
+            <p class="page-subtitle">Calculate your Kins and Level progression</p>
+        </div>
+
+        <div class="estimator-tabs">
+            <button class="tab-btn active" data-tab="kins">Kins Estimator</button>
+            <button class="tab-btn" data-tab="levels">Level Estimator</button>
+        </div>
+
+        <div id="kins-tab" class="tab-content active">
+            <div class="estimator-card">
+                <h2>Kins Calculator</h2>
+                <div class="input-group">
+                    <label for="kinsPerHour">Kins per Hour:</label>
+                    <input type="text" id="kinsPerHour" placeholder="e.g., 632.123">
+                </div>
+                <div class="input-group">
+                    <label for="days">Number of Days:</label>
+                    <input type="number" id="days" placeholder="e.g., 30" min="1">
+                </div>
+                <button id="calculateKins" class="calculate-btn">Calculate Kins</button>
+                
+                <div id="kinsResults" class="results-section" style="display: none;">
+                    <h3>Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Total Kins:</span>
+                        <span id="totalKins" class="result-value"></span>
+                    </div>
+                    
+                    <div class="breakdown-section">
+                        <h4>Accumulation Breakdown</h4>
+                        <div class="result-item">
+                            <span class="result-label">Per Day:</span>
+                            <span id="kinsPerDay" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Per Week:</span>
+                            <span id="kinsPerWeek" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Per Month:</span>
+                            <span id="kinsPerMonth" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Per Year:</span>
+                            <span id="kinsPerYear" class="result-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="levels-tab" class="tab-content">
+            <div class="estimator-card">
+                <h2>Level Calculator</h2>
+                <p class="coming-soon">Level estimator logic will be implemented soon...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/estimator.js"></script>
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+        
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('footer-container').innerHTML = html;
+            });
+    </script>
+</body>
+</html>
