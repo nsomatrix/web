@@ -54,20 +54,22 @@
         </div>
 
         <div class="search-container">
-            <input type="text" id="country-search" placeholder="Search for a country..." class="search-input">
+            <input type="text" id="country-search" placeholder="Search for a country" class="search-input">
             <div id="search-results" class="search-results"></div>
         </div>
 
         <div class="comparison-section">
             <h2 class="comparison-title">Compare Times</h2>
             <div class="comparison-selectors">
-                <select id="country1-select" class="country-select">
-                    <option value="">Select first country</option>
-                </select>
+                <div class="custom-select" id="country1-dropdown">
+                    <div class="select-display">Select first country</div>
+                    <div class="select-options" id="country1-options"></div>
+                </div>
                 <span class="vs-text">VS</span>
-                <select id="country2-select" class="country-select">
-                    <option value="">Select second country</option>
-                </select>
+                <div class="custom-select" id="country2-dropdown">
+                    <div class="select-display">Select second country</div>
+                    <div class="select-options" id="country2-options"></div>
+                </div>
             </div>
             <div id="comparison-results" class="comparison-results"></div>
         </div>

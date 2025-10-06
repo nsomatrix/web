@@ -192,20 +192,48 @@ let searchResults = [];
 let comparisonCountries = { country1: null, country2: null };
 
 function populateCountrySelects() {
-    const select1 = document.getElementById('country1-select');
-    const select2 = document.getElementById('country2-select');
+    const options1 = document.getElementById('country1-options');
+    const options2 = document.getElementById('country2-options');
     
     countries.forEach(country => {
-        const option1 = document.createElement('option');
-        option1.value = JSON.stringify(country);
-        option1.textContent = country.name;
-        select1.appendChild(option1);
+        const option1 = document.createElement('div');
+        option1.className = 'select-option';
+        option1.innerHTML = `
+            <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+            ${country.name}
+        `;
+        option1.addEventListener('click', () => selectCountry(1, country));
+        options1.appendChild(option1);
         
-        const option2 = document.createElement('option');
-        option2.value = JSON.stringify(country);
-        option2.textContent = country.name;
-        select2.appendChild(option2);
+        const option2 = document.createElement('div');
+        option2.className = 'select-option';
+        option2.innerHTML = `
+            <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+            ${country.name}
+        `;
+        option2.addEventListener('click', () => selectCountry(2, country));
+        options2.appendChild(option2);
     });
+}
+
+function selectCountry(dropdownNum, country) {
+    const display = document.querySelector(`#country${dropdownNum}-dropdown .select-display`);
+    const options = document.getElementById(`country${dropdownNum}-options`);
+    
+    display.innerHTML = `
+        <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+        ${country.name}
+    `;
+    
+    options.classList.remove('active');
+    
+    if (dropdownNum === 1) {
+        comparisonCountries.country1 = country;
+    } else {
+        comparisonCountries.country2 = country;
+    }
+    
+    updateComparison();
 }
 
 function updateComparison() {
@@ -329,8 +357,8 @@ function updateSearchResults() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('country-search');
-    const select1 = document.getElementById('country1-select');
-    const select2 = document.getElementById('country2-select');
+    const dropdown1 = document.getElementById('country1-dropdown');
+    const dropdown2 = document.getElementById('country2-dropdown');
     
     populateCountrySelects();
     
@@ -338,14 +366,27 @@ document.addEventListener('DOMContentLoaded', function() {
         searchCountries(this.value);
     });
     
-    select1.addEventListener('change', function() {
-        comparisonCountries.country1 = this.value ? JSON.parse(this.value) : null;
-        updateComparison();
+    // Custom dropdown handlers
+    dropdown1.querySelector('.select-display').addEventListener('click', function() {
+        const options = document.getElementById('country1-options');
+        options.classList.toggle('active');
+        document.getElementById('country2-options').classList.remove('active');
     });
     
-    select2.addEventListener('change', function() {
-        comparisonCountries.country2 = this.value ? JSON.parse(this.value) : null;
-        updateComparison();
+    dropdown2.querySelector('.select-display').addEventListener('click', function() {
+        const options = document.getElementById('country2-options');
+        options.classList.toggle('active');
+        document.getElementById('country1-options').classList.remove('active');
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!dropdown1.contains(e.target)) {
+            document.getElementById('country1-options').classList.remove('active');
+        }
+        if (!dropdown2.contains(e.target)) {
+            document.getElementById('country2-options').classList.remove('active');
+        }
     });
     
     updateUTCTime();
