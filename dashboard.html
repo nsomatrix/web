@@ -178,6 +178,19 @@
     </div>
 
     <!-- All existing modals remain the same -->
+    <div id="masterPasswordPromptModal" class="modal" style="display:none;">
+        <div class="modal-content" style="background:#1a1a1a;color:white;border:1px solid #333;">
+            <span class="close-button" data-modal="masterPasswordPromptModal" style="color:white;">&times;</span>
+            <h3 id="masterPasswordModalTitle" style="color:white;">Enter Master Password</h3>
+            <input type="password" id="masterPasswordUnlockInput" class="form-control mb-2" placeholder="Master Password" style="background:#2d2d2d;color:white;border:1px solid #555;" />
+            <input type="password" id="confirmMasterPasswordInput" class="form-control mb-2" placeholder="Confirm Master Password" style="background:#2d2d2d;color:white;border:1px solid #555;display:none;" />
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button id="unlockDashboardBtn" class="btn btn-success">Unlock</button>
+                <button id="forgotPasswordBtn" class="btn btn-danger">Forgot Password?</button>
+            </div>
+        </div>
+    </div>
+
     <div id="recoveryKeyModal" class="modal" style="display:none;">
         <div class="modal-content" style="background:#1a1a1a;color:white;border:1px solid #333;">
             <span class="close-button" data-modal="recoveryKeyModal" style="color:white;">&times;</span>

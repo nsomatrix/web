@@ -6,6 +6,10 @@ import { NotesManager } from './modules/notes.js';
 import { PasswordManager } from './modules/passwords.js';
 import { showMessageBox, openModal, closeModal } from './modules/ui.js';
 
+// Import closeModal for global use
+window.closeModal = closeModal;
+window.openModal = openModal;
+
 // Initialize Firebase
 firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
@@ -272,7 +276,8 @@ function setupEventListeners() {
     const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
     if (forgotPasswordBtn) {
         forgotPasswordBtn.onclick = () => {
-            document.getElementById('recoverySection').style.display = 'block';
+            closeModal(document.getElementById('masterPasswordPromptModal'));
+            openModal(document.getElementById('recoveryKeyModal'));
         };
     }
 
