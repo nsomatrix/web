@@ -179,7 +179,7 @@ class Ninjadex {
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">HP:</span>
-                    <span class="stat-value">${this.formatNumber(monster.hp)}</span>
+                    <span class="stat-value" style="color: #ffa500;">${this.formatNumber(monster.hp)}</span>
                 </div>
             </div>
             
@@ -321,7 +321,7 @@ class Ninjadex {
                     ${mapGroup.monsters.map(monster => `
                         <div class="blueprint-monster">
                             <span class="blueprint-monster-name">${monster.name}</span>
-                            <span class="blueprint-monster-stats">Lv.${monster.level} | ${this.formatNumber(monster.hp)} HP</span>
+                            <span class="blueprint-monster-stats">Lv.${monster.level} | <span style="color: #ffa500;">${this.formatNumber(monster.hp)} HP</span></span>
                         </div>
                     `).join('')}
                 </div>
@@ -412,7 +412,7 @@ class Ninjadex {
                     ${map.monsters.map(monster => `
                         <div class="monster-item">
                             <span class="monster-item-name">${monster.name}</span>
-                            <span class="monster-item-stats">Lv.${monster.level} | ${this.formatNumber(monster.hp)} HP</span>
+                            <span class="monster-item-stats">Lv.${monster.level} | <span style="color: #ffa500;">${this.formatNumber(monster.hp)} HP</span></span>
                         </div>
                     `).join('')}
                 </div>
