@@ -53,7 +53,7 @@
 
 .custom-select {
     position: relative;
-    min-width: 150px;
+    width: 100%;
     cursor: pointer;
 }
 
@@ -267,12 +267,16 @@
 .planner-card {
     background: var(--secondary-bg);
     border: 1px solid var(--border-color);
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 8px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .input-group {
     margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .input-group label {
@@ -284,13 +288,16 @@
 
 .input-group input {
     width: 100%;
+    max-width: none;
     background: var(--tertiary-bg);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     font-family: var(--font-family);
-    padding: 0.75rem;
+    padding: 1rem 1.5rem;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    box-sizing: border-box;
+    min-height: 50px;
 }
 
 .input-group input:focus {
