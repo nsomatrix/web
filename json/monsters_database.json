@@ -1,0 +1,1455 @@
+{
+  "version": "1.0",
+  "last_updated": "2024-01-01",
+  "total_monsters": 98,
+  "statistics": {
+    "regular_monsters": 77,
+    "cursed_monsters": 21,
+    "level_range": {
+      "min": 3,
+      "max": 159
+    },
+    "hp_range": {
+      "min": 300,
+      "max": 12000000
+    }
+  },
+  "monsters": {
+    "regular": [
+      {
+        "id": "snail",
+        "name": "Snail",
+        "level": 3,
+        "hp": 300,
+        "type": "regular",
+        "locations": [
+          "Ichidai Cliff",
+          "Ainodake Wall",
+          "Fumimen Hill"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "low"
+        }
+      },
+      {
+        "id": "green_frog",
+        "name": "Green Frog",
+        "level": 5,
+        "hp": 450,
+        "type": "regular",
+        "locations": [
+          "Ichidai Cliff",
+          "Kokoro Hill",
+          "Ainodake Wall",
+          "Death Valley",
+          "Old Forest",
+          "Fumimen Hill",
+          "Kitajima Waterfall I",
+          "Training Area"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "low"
+        }
+      },
+      {
+        "id": "grey_rabbit",
+        "name": "Grey Rabbit",
+        "level": 8,
+        "hp": 750,
+        "type": "regular",
+        "locations": [
+          "Ichidai Cliff",
+          "Kokoro Hill",
+          "Fuki Field",
+          "Death Valley",
+          "Old Forest",
+          "Kitajima Waterfall I",
+          "Training Area"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "low"
+        }
+      },
+      {
+        "id": "stone_porcupine",
+        "name": "Stone Porcupine",
+        "level": 6,
+        "hp": 650,
+        "type": "regular",
+        "locations": [
+          "Kokoro Hill",
+          "Fuki Field",
+          "Ainodake Wall",
+          "Death Valley",
+          "Old Forest",
+          "Fumimen Hill",
+          "Kitajima Waterfall I",
+          "Training Area",
+          "Kitajima Waterfall II"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "low"
+        }
+      },
+      {
+        "id": "herb",
+        "name": "Herb",
+        "level": 8,
+        "hp": 1000,
+        "type": "regular",
+        "locations": [
+          "Kitajima Waterfall I",
+          "Kitajima Waterfall II"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "yellow_turtle",
+        "name": "Yellow Turtle",
+        "level": 10,
+        "hp": 1100,
+        "type": "regular",
+        "locations": [
+          "Haruna Dormitory",
+          "Hachi Field"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "golden_bee",
+        "name": "Golden Bee",
+        "level": 10,
+        "hp": 1100,
+        "type": "regular",
+        "locations": [
+          "Aka Cave Gate",
+          "Hachi Field"
+        ],
+        "metadata": {
+          "difficulty_tier": "beginner",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "lady_bug",
+        "name": "Lady Bug",
+        "level": 11,
+        "hp": 1350,
+        "type": "regular",
+        "locations": [
+          "Aka Cave Gate"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "spotted_spider",
+        "name": "Spotted Spider",
+        "level": 11,
+        "hp": 1350,
+        "type": "regular",
+        "locations": [
+          "Aka Cave Gate",
+          "Sakura Peach Forest",
+          "Yamato Iced River"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "one_foot_demon",
+        "name": "One Foot Demon",
+        "level": 14,
+        "hp": 2750,
+        "type": "regular",
+        "locations": [
+          "Aka Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "mosquito",
+        "name": "Mosquito",
+        "level": 13,
+        "hp": 2200,
+        "type": "regular",
+        "locations": [
+          "Aka Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "helmet_bug",
+        "name": "Helmet Bug",
+        "level": 18,
+        "hp": 4300,
+        "type": "regular",
+        "locations": [
+          "Akagi Spring",
+          "Oura Beach"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "piranha",
+        "name": "Piranha",
+        "level": 16,
+        "hp": 3500,
+        "type": "regular",
+        "locations": [
+          "Akagi Spring",
+          "Mishima Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "green_worm",
+        "name": "Green Worm",
+        "level": 20,
+        "hp": 5600,
+        "type": "regular",
+        "locations": [
+          "Oura Beach",
+          "Watamaro River",
+          "Izuko Graveyard"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "dragonfly",
+        "name": "Dragonfly",
+        "level": 19,
+        "hp": 4850,
+        "type": "regular",
+        "locations": [
+          "Oura Beach",
+          "Mishima Forest",
+          "Izuko Graveyard",
+          "Nuranura Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "green_toad",
+        "name": "Green Toad",
+        "level": 12,
+        "hp": 1700,
+        "type": "regular",
+        "locations": [
+          "Sakura Peach Forest",
+          "Yamato Iced River",
+          "Stuki Lake"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "bat",
+        "name": "Bat",
+        "level": 13,
+        "hp": 2200,
+        "type": "regular",
+        "locations": [
+          "Utra Bamboo Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "fire_butterfly",
+        "name": "Fire Butterfly",
+        "level": 14,
+        "hp": 2750,
+        "type": "regular",
+        "locations": [
+          "Utra Bamboo Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "devil_sword",
+        "name": "Devil Sword",
+        "level": 17,
+        "hp": 3800,
+        "type": "regular",
+        "locations": [
+          "Mishima Forest",
+          "Hiya Field",
+          "Nuranura Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "red_piranha",
+        "name": "Red Piranha",
+        "level": 21,
+        "hp": 5950,
+        "type": "regular",
+        "locations": [
+          "Watamaro River",
+          "Izuko Graveyard"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "field_mouse",
+        "name": "Field Mouse",
+        "level": 22,
+        "hp": 6300,
+        "type": "regular",
+        "locations": [
+          "Izuko Graveyard"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "cyclope",
+        "name": "Cyclope",
+        "level": 12,
+        "hp": 1700,
+        "type": "regular",
+        "locations": [
+          "Yamato Iced River",
+          "Stuki Lake"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "green_snake",
+        "name": "Green Snake",
+        "level": 24,
+        "hp": 7000,
+        "type": "regular",
+        "locations": [
+          "Takana Canyon"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "giant_snail",
+        "name": "Giant Snail",
+        "level": 25,
+        "hp": 7400,
+        "type": "regular",
+        "locations": [
+          "Takana Canyon",
+          "Kawaguchi Water Front",
+          "Moshio Forgest",
+          "Kamo Temple"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "stone_scorpion",
+        "name": "Stone Scorpion",
+        "level": 23,
+        "hp": 6650,
+        "type": "regular",
+        "locations": [
+          "Ha Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "mosquito",
+        "name": "Mosquito",
+        "level": 28,
+        "hp": 8750,
+        "type": "regular",
+        "locations": [
+          "Ha Cave",
+          "Oboko Temple",
+          "Amaterasu Temple"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "stone_snail",
+        "name": "Stone Snail",
+        "level": 15,
+        "hp": 3250,
+        "type": "regular",
+        "locations": [
+          "Hiya Field"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "monkey",
+        "name": "Monkey",
+        "level": 26,
+        "hp": 7750,
+        "type": "regular",
+        "locations": [
+          "Kawaguchi Water Front",
+          "Moshio Forgest",
+          "Kanashii Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "grasshoppers",
+        "name": "Grasshoppers",
+        "level": 27,
+        "hp": 8200,
+        "type": "regular",
+        "locations": [
+          "Moshio Forgest",
+          "Kamo Temple",
+          "Kanashii Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "flower_devil",
+        "name": "Flower Devil",
+        "level": 31,
+        "hp": 10700,
+        "type": "regular",
+        "locations": [
+          "Hebi Island",
+          "Oboko Temple Backyard"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "scarab",
+        "name": "Scarab",
+        "level": 32,
+        "hp": 11400,
+        "type": "regular",
+        "locations": [
+          "Hebi Island",
+          "Meiro Cave",
+          "Oboko Temple Backyard",
+          "Toge Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "skeleton",
+        "name": "Skeleton",
+        "level": 33,
+        "hp": 12200,
+        "type": "regular",
+        "locations": [
+          "Meiro Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "cyclop_ghost",
+        "name": "Cyclop Ghost",
+        "level": 36,
+        "hp": 16600,
+        "type": "regular",
+        "locations": [
+          "Chorochoro Creek"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "green_ear_turtle",
+        "name": "Green Ear Turtle",
+        "level": 34,
+        "hp": 13800,
+        "type": "regular",
+        "locations": [
+          "Chorochoro Creek",
+          "Kouji Pine Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "muddy_flower",
+        "name": "Muddy Flower",
+        "level": 46,
+        "hp": 38525,
+        "type": "regular",
+        "locations": [
+          "Ontake Mountain"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "octopus",
+        "name": "Octopus",
+        "level": 45,
+        "hp": 36750,
+        "type": "regular",
+        "locations": [
+          "Ontake Mountain"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "ice_devil",
+        "name": "Ice Devil",
+        "level": 30,
+        "hp": 9900,
+        "type": "regular",
+        "locations": [
+          "Oboko Temple",
+          "Toge Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "ghost_centipede",
+        "name": "Ghost Centipede",
+        "level": 37,
+        "hp": 18750,
+        "type": "regular",
+        "locations": [
+          "Kouji Pine Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "fire_bat",
+        "name": "Fire Bat",
+        "level": 41,
+        "hp": 26850,
+        "type": "regular",
+        "locations": [
+          "Aokigahara Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "ghost_snail",
+        "name": "Ghost Snail",
+        "level": 42,
+        "hp": 29100,
+        "type": "regular",
+        "locations": [
+          "Aokigahara Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "mole",
+        "name": "Mole",
+        "level": 43,
+        "hp": 31750,
+        "type": "regular",
+        "locations": [
+          "Ito Cliff"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "ghost_umbrella",
+        "name": "Ghost Umbrella",
+        "level": 44,
+        "hp": 34650,
+        "type": "regular",
+        "locations": [
+          "Ito Cliff"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "stone_crab",
+        "name": "Stone Crab",
+        "level": 50,
+        "hp": 49695,
+        "type": "regular",
+        "locations": [
+          "Taira Valley"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "tiger_fish",
+        "name": "Tiger Fish",
+        "level": 47,
+        "hp": 41015,
+        "type": "regular",
+        "locations": [
+          "Taira Valley"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "junior_kappa",
+        "name": "Junior Kappa",
+        "level": 52,
+        "hp": 54875,
+        "type": "regular",
+        "locations": [
+          "Akai Red Stone Area-I"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "kappa",
+        "name": "Kappa",
+        "level": 51,
+        "hp": 52755,
+        "type": "regular",
+        "locations": [
+          "Akai Red Stone Area-I"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "poison_musroom",
+        "name": "Poison Musroom",
+        "level": 53,
+        "hp": 57335,
+        "type": "regular",
+        "locations": [
+          "Akai Red Stone Area-II"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "kappa",
+        "name": "Kappa",
+        "level": 55,
+        "hp": 60350,
+        "type": "regular",
+        "locations": [
+          "Akai Red Stone Area-II"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "omalai",
+        "name": "Omalai",
+        "level": 56,
+        "hp": 62990,
+        "type": "regular",
+        "locations": [
+          "Chi Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "human_spirit",
+        "name": "Human Spirit",
+        "level": 57,
+        "hp": 65780,
+        "type": "regular",
+        "locations": [
+          "Chi Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "doeto",
+        "name": "Doeto",
+        "level": 29,
+        "hp": 9350,
+        "type": "regular",
+        "locations": [
+          "Amaterasu Temple"
+        ],
+        "metadata": {
+          "difficulty_tier": "intermediate",
+          "hp_category": "medium"
+        }
+      },
+      {
+        "id": "sea_crab",
+        "name": "Sea Crab",
+        "level": 35,
+        "hp": 15200,
+        "type": "regular",
+        "locations": [
+          "Kappa Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "yellow_bat",
+        "name": "Yellow Bat",
+        "level": 38,
+        "hp": 20350,
+        "type": "regular",
+        "locations": [
+          "Kappa Forest"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "skull_devil",
+        "name": "Skull Devil",
+        "level": 40,
+        "hp": 24400,
+        "type": "regular",
+        "locations": [
+          "Kugyou Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "tapir",
+        "name": "Tapir",
+        "level": 39,
+        "hp": 22140,
+        "type": "regular",
+        "locations": [
+          "Kugyou Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "spirit",
+        "name": "Spirit",
+        "level": 58,
+        "hp": 68680,
+        "type": "regular",
+        "locations": [
+          "Okama Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "snail",
+        "name": "Snail",
+        "level": 59,
+        "hp": 70700,
+        "type": "regular",
+        "locations": [
+          "Okama Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "red_eye_bone",
+        "name": "Red Eye Bone",
+        "level": 67,
+        "hp": 94310,
+        "type": "regular",
+        "locations": [
+          "Kurai Mountain Cave",
+          "Tamatamo Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "venus_fly_trap",
+        "name": "Venus Fly Trap",
+        "level": 66,
+        "hp": 91200,
+        "type": "regular",
+        "locations": [
+          "Kurai Mountain Cave",
+          "Tamatamo Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "fire_bee",
+        "name": "Fire Bee",
+        "level": 68,
+        "hp": 97420,
+        "type": "regular",
+        "locations": [
+          "Tamatamo Cave"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "blue_mouse",
+        "name": "Blue Mouse",
+        "level": 80,
+        "hp": 178200,
+        "type": "regular",
+        "locations": [
+          "Harumoto Temple"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "evil_bone",
+        "name": "Evil Bone",
+        "level": 92,
+        "hp": 278400,
+        "type": "regular",
+        "locations": [
+          "Ounio Pagoda"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "purple_snake",
+        "name": "Purple Snake",
+        "level": 48,
+        "hp": 44275,
+        "type": "regular",
+        "locations": [
+          "Anzen Mountain"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "tibelele_devil",
+        "name": "Tibelele Devil",
+        "level": 49,
+        "hp": 47030,
+        "type": "regular",
+        "locations": [
+          "Anzen Mountain"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "blind_zombie",
+        "name": "Blind Zombie",
+        "level": 63,
+        "hp": 82650,
+        "type": "regular",
+        "locations": [
+          "Hone Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "spiky_snail",
+        "name": "Spiky Snail",
+        "level": 64,
+        "hp": 85740,
+        "type": "regular",
+        "locations": [
+          "Hone Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "fire_scorpion",
+        "name": "Fire Scorpion",
+        "level": 65,
+        "hp": 88830,
+        "type": "regular",
+        "locations": [
+          "Ichidai Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "light_fish",
+        "name": "Light Fish",
+        "level": 62,
+        "hp": 79550,
+        "type": "regular",
+        "locations": [
+          "Ichidai Peak"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "big_frog",
+        "name": "Big Frog",
+        "level": 77,
+        "hp": 155680,
+        "type": "regular",
+        "locations": [
+          "Kisei Field"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "old_tree",
+        "name": "Old Tree",
+        "level": 74,
+        "hp": 137400,
+        "type": "regular",
+        "locations": [
+          "Kisei Field"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "wind_bee",
+        "name": "Wind Bee",
+        "level": 84,
+        "hp": 201005,
+        "type": "regular",
+        "locations": [
+          "Hashigoto Mountain"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "devil_eyes",
+        "name": "Devil Eyes",
+        "level": 88,
+        "hp": 230050,
+        "type": "regular",
+        "locations": [
+          "Hashigoto Mountain"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "night_ghost",
+        "name": "Night Ghost",
+        "level": 60,
+        "hp": 73330,
+        "type": "regular",
+        "locations": [
+          "Orochi Temple Grounds"
+        ],
+        "metadata": {
+          "difficulty_tier": "advanced",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "powder_butterfly",
+        "name": "Powder Butterfly",
+        "level": 61,
+        "hp": 76440,
+        "type": "regular",
+        "locations": [
+          "Orochi Temple Grounds"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "high"
+        }
+      },
+      {
+        "id": "one_legged_monster",
+        "name": "One Legged Monster",
+        "level": 71,
+        "hp": 119320,
+        "type": "regular",
+        "locations": [
+          "Orochi Temple"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "crocodile",
+        "name": "Crocodile",
+        "level": 96,
+        "hp": 310980,
+        "type": "regular",
+        "locations": [
+          "Orochi Temple Backyard"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "lizard",
+        "name": "Lizard",
+        "level": 100,
+        "hp": 382000,
+        "type": "regular",
+        "locations": [
+          "Orochi Temple Backyard"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      }
+    ],
+    "cursed": [
+      {
+        "id": "gray_vulture",
+        "name": "Gray Vulture",
+        "level": 68,
+        "hp": 194840,
+        "type": "cursed",
+        "locations": [
+          "Mountain of Secrets"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "evil_mud",
+        "name": "Evil Mud",
+        "level": 64,
+        "hp": 177660,
+        "type": "cursed",
+        "locations": [
+          "Mountain of Secrets"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "evil_fish",
+        "name": "Evil Fish",
+        "level": 85,
+        "hp": 462010,
+        "type": "cursed",
+        "locations": [
+          "Mountain of Secrets",
+          "Mountain of Horrors",
+          "Island of Skeletons"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "evil_flytrap",
+        "name": "Evil Flytrap",
+        "level": 74,
+        "hp": 272780,
+        "type": "cursed",
+        "locations": [
+          "Suicide Cliff"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "blue_wolf",
+        "name": "Blue Wolf",
+        "level": 77,
+        "hp": 311360,
+        "type": "cursed",
+        "locations": [
+          "Suicide Cliff"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "cyclops_snake",
+        "name": "Cyclops Snake",
+        "level": 83,
+        "hp": 435910,
+        "type": "cursed",
+        "locations": [
+          "Mountain of Horrors"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "grim_reaper",
+        "name": "Grim Reaper",
+        "level": 88,
+        "hp": 492340,
+        "type": "cursed",
+        "locations": [
+          "Mountain of Horrors"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "tiny_skeleton",
+        "name": "Tiny Skeleton",
+        "level": 92,
+        "hp": 689280,
+        "type": "cursed",
+        "locations": [
+          "Island of Skeletons"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "undead_soldier",
+        "name": "Undead Soldier",
+        "level": 96,
+        "hp": 777450,
+        "type": "cursed",
+        "locations": [
+          "Island of Skeletons"
+        ],
+        "metadata": {
+          "difficulty_tier": "expert",
+          "hp_category": "very_high"
+        }
+      },
+      {
+        "id": "naughty_ghost",
+        "name": "Naughty Ghost",
+        "level": 103,
+        "hp": 1088430,
+        "type": "cursed",
+        "locations": [
+          "Death Bridge"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "ninja_hunter",
+        "name": "Ninja Hunter",
+        "level": 108,
+        "hp": 1188430,
+        "type": "cursed",
+        "locations": [
+          "Death Bridge"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "crabby",
+        "name": "Crabby",
+        "level": 114,
+        "hp": 1663810,
+        "type": "cursed",
+        "locations": [
+          "Heartbreak Road"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "tornado_maker",
+        "name": "Tornado Maker",
+        "level": 117,
+        "hp": 1863800,
+        "type": "cursed",
+        "locations": [
+          "Heartbreak Road"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "flying_scorpion",
+        "name": "Flying Scorpion",
+        "level": 123,
+        "hp": 2609330,
+        "type": "cursed",
+        "locations": [
+          "Cannibal Land"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "cruel_mouse",
+        "name": "Cruel Mouse",
+        "level": 126,
+        "hp": 2869330,
+        "type": "cursed",
+        "locations": [
+          "Cannibal Land"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "zombie",
+        "name": "Zombie",
+        "level": 131,
+        "hp": 4017070,
+        "type": "cursed",
+        "locations": [
+          "Nightmare Road"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "wicked_ape",
+        "name": "Wicked Ape",
+        "level": 137,
+        "hp": 4617070,
+        "type": "cursed",
+        "locations": [
+          "Nightmare Road"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "violet_beetle",
+        "name": "Violet Beetle",
+        "level": 142,
+        "hp": 6563800,
+        "type": "cursed",
+        "locations": [
+          "Beetle Land"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "poison_drop",
+        "name": "Poison Drop",
+        "level": 148,
+        "hp": 7232000,
+        "type": "cursed",
+        "locations": [
+          "Beetle Land"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "green_blob",
+        "name": "Green Blob",
+        "level": 159,
+        "hp": 12000000,
+        "type": "cursed",
+        "locations": [
+          "Bridge of Dread"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      },
+      {
+        "id": "strong_ant",
+        "name": "Strong Ant",
+        "level": 153,
+        "hp": 10000000,
+        "type": "cursed",
+        "locations": [
+          "Bridge of Dread"
+        ],
+        "metadata": {
+          "difficulty_tier": "master",
+          "hp_category": "extreme"
+        }
+      }
+    ]
+  }
+}

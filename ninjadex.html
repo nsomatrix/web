@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Ninjadex - Matrix-WEB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/ninjadex.css">
+    <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
+    <link rel="stylesheet" href="css/components/search.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
+            authDomain: 'nsomatrix-web.firebaseapp.com',
+            projectId: 'nsomatrix-web',
+            storageBucket: 'nsomatrix-web.firebasestorage.app',
+            messagingSenderId: '320519296982',
+            appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
+            measurementId: 'G-GK3J5PZW85'
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.firebaseAuth = firebase.auth();
+        window.firebaseDb = firebase.firestore();
+    </script>
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">Ninjadex</h1>
+            <p class="page-subtitle">Monster database and ninja planning guide</p>
+        </div>
+
+        <div class="ninjadex-tabs">
+            <button class="tab-btn active" data-tab="monsters">Monster Database</button>
+            <button class="tab-btn" data-tab="planner">Ninja Planner</button>
+        </div>
+
+        <div id="monsters-tab" class="tab-content active">
+            <div class="filters-section">
+                <div class="search">
+                    <input type="text" class="search__input" id="searchInput" placeholder="Search monsters by name or location...">
+                </div>
+                <div class="filter-controls">
+                    <select id="typeFilter" class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="regular">Regular</option>
+                        <option value="cursed">Cursed Land</option>
+                    </select>
+                    <select id="tierFilter" class="filter-select">
+                        <option value="all">All Tiers</option>
+                        <option value="beginner">Beginner (1-10)</option>
+                        <option value="intermediate">Intermediate (11-30)</option>
+                        <option value="advanced">Advanced (31-60)</option>
+                        <option value="expert">Expert (61-100)</option>
+                        <option value="master">Master (100+)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalMonsters">0</span>
+                    <span class="stat-label">Total Monsters</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="regularCount">0</span>
+                    <span class="stat-label">Regular</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="cursedCount">0</span>
+                    <span class="stat-label">Cursed</span>
+                </div>
+            </div>
+
+            <div class="monsters-grid" id="monstersGrid"></div>
+        </div>
+
+        <div id="planner-tab" class="tab-content">
+            <div class="planner-card">
+                <h2>Ninja Level Planner</h2>
+                <div class="input-group">
+                    <label for="ninjaLevel">Your Ninja Level:</label>
+                    <input type="number" id="ninjaLevel" placeholder="e.g., 45" min="1" max="130">
+                </div>
+                <div class="input-group">
+                    <label for="targetLevel">Target Level:</label>
+                    <input type="number" id="targetLevel" placeholder="e.g., 50" min="1" max="130">
+                </div>
+                <button id="generatePlan" class="calculate-btn">
+                    <span class="btn-text">Generate Training Plan</span>
+                </button>
+                
+                <div id="planResults" class="results-section" style="display: none;">
+                    <h3>Recommended Training Path</h3>
+                    <div id="recommendedMonsters" class="recommended-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/ninjadex.js"></script>
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+                new RetroNavbar();
+                new NavbarAuth();
+            });
+        
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('footer-container').innerHTML = html;
+            });
+    </script>
+</body>
+</html>
