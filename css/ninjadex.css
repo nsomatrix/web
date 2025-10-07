@@ -333,6 +333,19 @@
     box-shadow: 0 4px 8px var(--shadow-hover);
 }
 
+.btn-spinner {
+    display: none;
+    margin-left: 0.5rem;
+}
+
+.calculate-btn.loading .btn-spinner {
+    display: inline-block;
+}
+
+.calculate-btn.loading .btn-text {
+    opacity: 0.7;
+}
+
 .results-section {
     margin-top: 2rem;
     padding-top: 2rem;

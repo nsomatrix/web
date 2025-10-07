@@ -71,7 +71,7 @@ class KinsEstimator {
         const days = parseInt(document.getElementById('days').value.trim());
 
         if (!kinsPerHour || !days || kinsPerHour <= 0 || days <= 0) {
-            alert('Please enter valid positive numbers');
+            alert('Please enter valid numbers');
             return;
         }
 

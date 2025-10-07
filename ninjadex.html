@@ -57,7 +57,7 @@
         <div id="monsters-tab" class="tab-content active">
             <div class="filters-section">
                 <div class="search">
-                    <input type="text" class="search__input" id="searchInput" placeholder="Search monsters by name or location...">
+                    <input type="text" class="search__input" id="searchInput" placeholder="Search monsters by name or location">
                 </div>
                 <div class="filter-controls">
                     <div class="custom-select" id="typeFilter">
@@ -103,7 +103,7 @@
         <div id="maps-tab" class="tab-content">
             <div class="filters-section">
                 <div class="search">
-                    <input type="text" class="search__input" id="mapSearchInput" placeholder="Search maps by name...">
+                    <input type="text" class="search__input" id="mapSearchInput" placeholder="Search maps by name">
                 </div>
                 <div class="filter-controls">
                     <div class="custom-select" id="mapTypeFilter">
@@ -139,6 +139,12 @@
                 </div>
                 <button id="generatePlan" class="calculate-btn">
                     <span class="btn-text">Generate BluePrint</span>
+                    <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
                 </button>
                 
                 <div id="planResults" class="results-section" style="display: none;">

@@ -203,14 +203,22 @@ class Ninjadex {
     generateTrainingPlan() {
         const ninjaLevel = parseInt(document.getElementById('ninjaLevel').value);
         const objective = document.getElementById('objective').dataset.value || 'kins';
+        const button = document.getElementById('generatePlan');
 
         if (!ninjaLevel || ninjaLevel < 1 || ninjaLevel > 130) {
             alert('Please enter a valid ninja level (1-130)');
             return;
         }
 
-        const blueprint = this.generateBluePrint(ninjaLevel, objective);
-        this.renderBluePrint(blueprint);
+        // Show loading state
+        button.classList.add('loading');
+        
+        // Simulate processing time
+        setTimeout(() => {
+            const blueprint = this.generateBluePrint(ninjaLevel, objective);
+            this.renderBluePrint(blueprint);
+            button.classList.remove('loading');
+        }, 800);
     }
 
     generateBluePrint(ninjaLevel, objective) {
