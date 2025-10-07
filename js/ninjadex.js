@@ -2,11 +2,14 @@ class Ninjadex {
     constructor() {
         this.monsters = [];
         this.filteredMonsters = [];
+        this.maps = [];
+        this.filteredMaps = [];
         this.init();
     }
 
     async init() {
         await this.loadMonsters();
+        this.processMaps();
         this.setupEventListeners();
         this.updateStats();
         this.renderMonsters();
@@ -42,6 +45,15 @@ class Ninjadex {
             this.filterMonsters();
         });
 
+        // Maps search and filters
+        document.getElementById('mapSearchInput').addEventListener('input', () => {
+            this.filterMaps();
+        });
+
+        document.getElementById('mapTypeFilter').addEventListener('change', () => {
+            this.filterMaps();
+        });
+
         // Planner
         document.getElementById('generatePlan').addEventListener('click', () => {
             this.generateTrainingPlan();
@@ -60,6 +72,11 @@ class Ninjadex {
             content.classList.remove('active');
         });
         document.getElementById(`${tabName}-tab`).classList.add('active');
+        
+        // Load maps data when maps tab is opened
+        if (tabName === 'maps' && this.maps.length > 0) {
+            this.renderMaps();
+        }
     }
 
     filterMonsters() {
@@ -239,6 +256,103 @@ class Ninjadex {
         });
 
         document.getElementById('planResults').style.display = 'block';
+    }
+
+    processMaps() {
+        const mapData = new Map();
+        
+        this.monsters.forEach(monster => {
+            monster.locations.forEach(location => {
+                if (!mapData.has(location)) {
+                    mapData.set(location, {
+                        name: location,
+                        type: this.getMapType(location),
+                        monsters: []
+                    });
+                }
+                mapData.get(location).monsters.push(monster);
+            });
+        });
+        
+        this.maps = Array.from(mapData.values()).sort((a, b) => a.name.localeCompare(b.name));
+        this.filteredMaps = [...this.maps];
+    }
+
+    getMapType(mapName) {
+        const cursedKeywords = ['death', 'nightmare', 'horror', 'skeleton', 'cannibal', 'dread', 'heartbreak', 'suicide', 'secrets'];
+        const lowerName = mapName.toLowerCase();
+        return cursedKeywords.some(keyword => lowerName.includes(keyword)) ? 'cursed' : 'regular';
+    }
+
+    filterMaps() {
+        const searchTerm = document.getElementById('mapSearchInput').value.toLowerCase();
+        const typeFilter = document.getElementById('mapTypeFilter').value;
+
+        this.filteredMaps = this.maps.filter(map => {
+            const matchesSearch = map.name.toLowerCase().includes(searchTerm);
+            const matchesType = typeFilter === 'all' || map.type === typeFilter;
+            return matchesSearch && matchesType;
+        });
+
+        this.renderMaps();
+    }
+
+    renderMaps() {
+        const grid = document.getElementById('mapsGrid');
+        grid.innerHTML = '';
+
+        this.filteredMaps.forEach(map => {
+            const card = this.createMapCard(map);
+            grid.appendChild(card);
+        });
+    }
+
+    createMapCard(map) {
+        const card = document.createElement('div');
+        card.className = 'map-card';
+
+        const levelRange = this.getMapLevelRange(map.monsters);
+        const monsterCount = map.monsters.length;
+
+        card.innerHTML = `
+            <div class="map-header">
+                <div class="map-name">${map.name}</div>
+                <div class="map-type ${map.type}">${map.type.toUpperCase()}</div>
+            </div>
+            
+            <div class="map-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Monsters:</span>
+                    <span class="stat-value">${monsterCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Level Range:</span>
+                    <span class="stat-value">${levelRange.min}-${levelRange.max}</span>
+                </div>
+            </div>
+            
+            <div class="map-monsters">
+                <div class="monsters-label">Monsters Found Here:</div>
+                <div class="monsters-list">
+                    ${map.monsters.map(monster => `
+                        <div class="monster-item">
+                            <span class="monster-item-name">${monster.name}</span>
+                            <span class="monster-item-stats">Lv.${monster.level} | ${this.formatNumber(monster.hp)} HP</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        return card;
+    }
+
+    getMapLevelRange(monsters) {
+        const levels = monsters.map(m => m.level);
+        return {
+            min: Math.min(...levels),
+            max: Math.max(...levels)
+        };
     }
 
     formatNumber(num) {

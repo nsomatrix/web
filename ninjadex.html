@@ -50,6 +50,7 @@
 
         <div class="ninjadex-tabs">
             <button class="tab-btn active" data-tab="monsters">Monster Database</button>
+            <button class="tab-btn" data-tab="maps">Maps</button>
             <button class="tab-btn" data-tab="planner">Ninja Planner</button>
         </div>
 
@@ -91,6 +92,23 @@
             </div>
 
             <div class="monsters-grid" id="monstersGrid"></div>
+        </div>
+
+        <div id="maps-tab" class="tab-content">
+            <div class="filters-section">
+                <div class="search">
+                    <input type="text" class="search__input" id="mapSearchInput" placeholder="Search maps by name...">
+                </div>
+                <div class="filter-controls">
+                    <select id="mapTypeFilter" class="filter-select">
+                        <option value="all">All Areas</option>
+                        <option value="regular">Regular Areas</option>
+                        <option value="cursed">Cursed Land</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="maps-grid" id="mapsGrid"></div>
         </div>
 
         <div id="planner-tab" class="tab-content">

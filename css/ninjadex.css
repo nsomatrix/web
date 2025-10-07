@@ -311,6 +311,99 @@
     font-size: 0.9rem;
 }
 
+/* Maps Grid */
+.maps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+}
+
+.map-card {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.map-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.map-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.map-type {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.map-type.regular {
+    background: #2d5a2d;
+    color: #90ee90;
+}
+
+.map-type.cursed {
+    background: #5a2d2d;
+    color: #ff6b6b;
+}
+
+.map-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.map-monsters {
+    margin-top: 1rem;
+}
+
+.monsters-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.monsters-list {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.monster-item {
+    background: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.monster-item-name {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+.monster-item-stats {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .filter-controls {
@@ -322,6 +415,10 @@
     }
     
     .monsters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .maps-grid {
         grid-template-columns: 1fr;
     }
     
