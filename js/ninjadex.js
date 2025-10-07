@@ -13,6 +13,12 @@ class Ninjadex {
         this.setupEventListeners();
         this.updateStats();
         this.renderMonsters();
+        this.setRandomLevel();
+    }
+
+    setRandomLevel() {
+        const randomLevel = Math.floor(Math.random() * 130) + 1;
+        document.getElementById('ninjaLevel').placeholder = randomLevel.toString();
     }
 
     async loadMonsters() {
@@ -217,8 +223,14 @@ class Ninjadex {
 
         // Apply objective-specific filtering
         if (objective === 'kins') {
-            // For kins: prefer regular monsters, slightly lower levels for efficiency
-            suitableMonsters = suitableMonsters.filter(m => m.type === 'regular');
+            // For kins: prefer regular monsters, but include cursed for level 107+
+            if (ninjaLevel >= 107) {
+                // High level players can farm kins from cursed land too
+                // No type filtering needed, both regular and cursed are good
+            } else {
+                // Lower level players stick to regular monsters
+                suitableMonsters = suitableMonsters.filter(m => m.type === 'regular');
+            }
             if (ninjaLevel >= 40) {
                 suitableMonsters = suitableMonsters.filter(m => m.level <= ninjaLevel - 2);
             }
@@ -253,8 +265,15 @@ class Ninjadex {
         let score = 100 - (levelDiff * 5); // Base score decreases with level difference
         
         if (objective === 'kins') {
-            // For kins: prefer regular monsters, slightly lower levels
-            if (monster.type === 'regular') score += 20;
+            // For kins: prefer regular monsters, but cursed is good for 107+ players
+            if (ninjaLevel >= 107) {
+                // Both regular and cursed are good for high-level kins farming
+                if (monster.type === 'regular') score += 15;
+                if (monster.type === 'cursed') score += 18;
+            } else {
+                // Lower levels prefer regular monsters only
+                if (monster.type === 'regular') score += 20;
+            }
             if (monster.level <= ninjaLevel) score += 10;
         } else if (objective === 'level') {
             // For leveling: prefer cursed monsters, similar or higher levels
