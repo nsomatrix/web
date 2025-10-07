@@ -51,7 +51,7 @@
         <div class="ninjadex-tabs">
             <button class="tab-btn active" data-tab="monsters">Monster Database</button>
             <button class="tab-btn" data-tab="maps">Maps</button>
-            <button class="tab-btn" data-tab="planner">Ninja Planner</button>
+            <button class="tab-btn" data-tab="planner">BluePrint</button>
         </div>
 
         <div id="monsters-tab" class="tab-content active">
@@ -122,21 +122,27 @@
 
         <div id="planner-tab" class="tab-content">
             <div class="planner-card">
-                <h2>Ninja Level Planner</h2>
+                <h2>BluePrint Generator</h2>
                 <div class="input-group">
-                    <label for="ninjaLevel">Your Ninja Level:</label>
+                    <label for="ninjaLevel">Current Ninja Level:</label>
                     <input type="number" id="ninjaLevel" placeholder="e.g., 45" min="1" max="130">
                 </div>
                 <div class="input-group">
-                    <label for="targetLevel">Target Level:</label>
-                    <input type="number" id="targetLevel" placeholder="e.g., 50" min="1" max="130">
+                    <label for="objective">Objective:</label>
+                    <div class="custom-select" id="objective">
+                        <div class="select-trigger">Farm Kins</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="kins">Farm Kins</div>
+                            <div class="select-option" data-value="level">Boost Level</div>
+                        </div>
+                    </div>
                 </div>
                 <button id="generatePlan" class="calculate-btn">
-                    <span class="btn-text">Generate Training Plan</span>
+                    <span class="btn-text">Generate BluePrint</span>
                 </button>
                 
                 <div id="planResults" class="results-section" style="display: none;">
-                    <h3>Recommended Training Path</h3>
+                    <h3>Your BluePrint</h3>
                     <div id="recommendedMonsters" class="recommended-list"></div>
                 </div>
             </div>

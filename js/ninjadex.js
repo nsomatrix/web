@@ -40,6 +40,7 @@ class Ninjadex {
         this.setupCustomSelect('typeFilter', () => this.filterMonsters());
         this.setupCustomSelect('tierFilter', () => this.filterMonsters());
         this.setupCustomSelect('mapTypeFilter', () => this.filterMaps());
+        this.setupCustomSelect('objective', null);
 
         // Maps search
         document.getElementById('mapSearchInput').addEventListener('input', () => {
@@ -195,99 +196,138 @@ class Ninjadex {
 
     generateTrainingPlan() {
         const ninjaLevel = parseInt(document.getElementById('ninjaLevel').value);
-        const targetLevel = parseInt(document.getElementById('targetLevel').value);
+        const objective = document.getElementById('objective').dataset.value || 'kins';
 
-        if (!ninjaLevel || !targetLevel || ninjaLevel >= targetLevel) {
-            alert('Please enter valid ninja and target levels');
+        if (!ninjaLevel || ninjaLevel < 1 || ninjaLevel > 130) {
+            alert('Please enter a valid ninja level (1-130)');
             return;
         }
 
-        const recommendations = this.getTrainingRecommendations(ninjaLevel, targetLevel);
-        this.renderTrainingPlan(recommendations);
+        const blueprint = this.generateBluePrint(ninjaLevel, objective);
+        this.renderBluePrint(blueprint);
     }
 
-    getTrainingRecommendations(ninjaLevel, targetLevel) {
-        const recommendations = [];
+    generateBluePrint(ninjaLevel, objective) {
+        const levelRange = { min: ninjaLevel - 7, max: ninjaLevel + 7 };
         
-        // Find monsters suitable for the level range
-        const suitableMonsters = this.monsters.filter(monster => {
-            const levelDiff = Math.abs(monster.level - ninjaLevel);
-            return levelDiff <= 10 && monster.level <= targetLevel + 5;
-        });
+        // Get monsters within ±7 levels
+        let suitableMonsters = this.monsters.filter(monster => 
+            monster.level >= levelRange.min && monster.level <= levelRange.max
+        );
 
-        // Sort by level and efficiency
-        suitableMonsters.sort((a, b) => {
-            const aDiff = Math.abs(a.level - ninjaLevel);
-            const bDiff = Math.abs(b.level - ninjaLevel);
-            return aDiff - bDiff;
-        });
-
-        // Group by level ranges
-        const levelRanges = [
-            { min: ninjaLevel, max: ninjaLevel + 5, label: 'Early Training' },
-            { min: ninjaLevel + 5, max: ninjaLevel + 10, label: 'Mid Training' },
-            { min: ninjaLevel + 10, max: targetLevel, label: 'Advanced Training' }
-        ];
-
-        levelRanges.forEach(range => {
-            if (range.max > ninjaLevel) {
-                const monstersInRange = suitableMonsters.filter(m => 
-                    m.level >= range.min && m.level <= range.max
-                ).slice(0, 3);
-
-                monstersInRange.forEach(monster => {
-                    recommendations.push({
-                        monster,
-                        phase: range.label,
-                        reason: this.getTrainingReason(monster, ninjaLevel)
-                    });
-                });
+        // Apply objective-specific filtering
+        if (objective === 'kins') {
+            // For kins: prefer regular monsters, slightly lower levels for efficiency
+            suitableMonsters = suitableMonsters.filter(m => m.type === 'regular');
+            if (ninjaLevel >= 40) {
+                suitableMonsters = suitableMonsters.filter(m => m.level <= ninjaLevel - 2);
             }
+        } else if (objective === 'level') {
+            // For leveling: prefer cursed monsters for better exp
+            const cursedMonsters = suitableMonsters.filter(m => m.type === 'cursed');
+            if (cursedMonsters.length > 0) {
+                suitableMonsters = cursedMonsters;
+            }
+        }
+
+        // Sort by efficiency
+        suitableMonsters.sort((a, b) => {
+            const aScore = this.calculateEfficiencyScore(a, ninjaLevel, objective);
+            const bScore = this.calculateEfficiencyScore(b, ninjaLevel, objective);
+            return bScore - aScore;
         });
 
-        return recommendations;
-    }
-
-    getTrainingReason(monster, ninjaLevel) {
-        const levelDiff = monster.level - ninjaLevel;
+        // Group by maps for better organization
+        const mapGroups = this.groupMonstersByMaps(suitableMonsters.slice(0, 10));
         
-        if (levelDiff <= 0) {
-            return 'Good for safe training and resource farming';
-        } else if (levelDiff <= 3) {
-            return 'Optimal experience gain with manageable difficulty';
-        } else if (levelDiff <= 7) {
-            return 'Challenging but rewarding for faster progression';
-        } else {
-            return 'High-risk, high-reward training for experienced ninjas';
-        }
+        return {
+            objective,
+            ninjaLevel,
+            mapGroups,
+            totalMonsters: suitableMonsters.length
+        };
     }
 
-    renderTrainingPlan(recommendations) {
+    calculateEfficiencyScore(monster, ninjaLevel, objective) {
+        const levelDiff = Math.abs(monster.level - ninjaLevel);
+        let score = 100 - (levelDiff * 5); // Base score decreases with level difference
+        
+        if (objective === 'kins') {
+            // For kins: prefer regular monsters, slightly lower levels
+            if (monster.type === 'regular') score += 20;
+            if (monster.level <= ninjaLevel) score += 10;
+        } else if (objective === 'level') {
+            // For leveling: prefer cursed monsters, similar or higher levels
+            if (monster.type === 'cursed') score += 30;
+            if (monster.level >= ninjaLevel) score += 15;
+        }
+        
+        return Math.max(0, score);
+    }
+
+    groupMonstersByMaps(monsters) {
+        const mapGroups = new Map();
+        
+        monsters.forEach(monster => {
+            monster.locations.forEach(location => {
+                if (!mapGroups.has(location)) {
+                    mapGroups.set(location, {
+                        mapName: location,
+                        monsters: [],
+                        mapType: this.getMapType(location)
+                    });
+                }
+                mapGroups.get(location).monsters.push(monster);
+            });
+        });
+        
+        return Array.from(mapGroups.values())
+            .sort((a, b) => b.monsters.length - a.monsters.length)
+            .slice(0, 5);
+    }
+
+    renderBluePrint(blueprint) {
         const container = document.getElementById('recommendedMonsters');
         container.innerHTML = '';
 
-        if (recommendations.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-secondary);">No suitable monsters found for your level range.</p>';
+        if (blueprint.mapGroups.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">No suitable monsters found for your level and objective.</p>';
             document.getElementById('planResults').style.display = 'block';
             return;
         }
 
-        recommendations.forEach(rec => {
-            const item = document.createElement('div');
-            item.className = 'recommended-monster';
+        // Add objective summary
+        const summary = document.createElement('div');
+        summary.className = 'blueprint-summary';
+        summary.innerHTML = `
+            <div class="summary-text">
+                <strong>Objective:</strong> ${blueprint.objective === 'kins' ? 'Farm Kins (Regular Maps Recommended)' : 'Boost Level (Cursed Land Recommended)'}<br>
+                <strong>Level Range:</strong> ${blueprint.ninjaLevel - 7} - ${blueprint.ninjaLevel + 7} (±7 from your level)
+            </div>
+        `;
+        container.appendChild(summary);
 
-            item.innerHTML = `
-                <div class="recommended-info">
-                    <div class="recommended-name">${rec.monster.name}</div>
-                    <div class="recommended-reason">${rec.phase}: ${rec.reason}</div>
+        // Render map groups
+        blueprint.mapGroups.forEach(mapGroup => {
+            const mapCard = document.createElement('div');
+            mapCard.className = 'blueprint-map';
+            
+            mapCard.innerHTML = `
+                <div class="blueprint-map-header">
+                    <span class="blueprint-map-name">${mapGroup.mapName}</span>
+                    <span class="blueprint-map-type ${mapGroup.mapType}">${mapGroup.mapType.toUpperCase()}</span>
                 </div>
-                <div class="recommended-stats">
-                    Level ${rec.monster.level}<br>
-                    HP: ${this.formatNumber(rec.monster.hp)}
+                <div class="blueprint-monsters">
+                    ${mapGroup.monsters.map(monster => `
+                        <div class="blueprint-monster">
+                            <span class="blueprint-monster-name">${monster.name}</span>
+                            <span class="blueprint-monster-stats">Lv.${monster.level} | ${this.formatNumber(monster.hp)} HP</span>
+                        </div>
+                    `).join('')}
                 </div>
             `;
-
-            container.appendChild(item);
+            
+            container.appendChild(mapCard);
         });
 
         document.getElementById('planResults').style.display = 'block';
