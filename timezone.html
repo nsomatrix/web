@@ -63,12 +63,18 @@
             <div class="comparison-selectors">
                 <div class="custom-select" id="country1-dropdown">
                     <div class="select-display">Select first country</div>
-                    <div class="select-options" id="country1-options"></div>
+                    <div class="select-options" id="country1-options">
+                        <input type="text" class="dropdown-search" id="country1-search" placeholder="Search countries...">
+                        <div class="options-list" id="country1-list"></div>
+                    </div>
                 </div>
                 <span class="vs-text">VS</span>
                 <div class="custom-select" id="country2-dropdown">
                     <div class="select-display">Select second country</div>
-                    <div class="select-options" id="country2-options"></div>
+                    <div class="select-options" id="country2-options">
+                        <input type="text" class="dropdown-search" id="country2-search" placeholder="Search countries...">
+                        <div class="options-list" id="country2-list"></div>
+                    </div>
                 </div>
             </div>
             <div id="comparison-results" class="comparison-results"></div>

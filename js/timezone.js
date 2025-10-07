@@ -192,33 +192,36 @@ let searchResults = [];
 let comparisonCountries = { country1: null, country2: null };
 
 function populateCountrySelects() {
-    const options1 = document.getElementById('country1-options');
-    const options2 = document.getElementById('country2-options');
+    const list1 = document.getElementById('country1-list');
+    const list2 = document.getElementById('country2-list');
     
     countries.forEach(country => {
         const option1 = document.createElement('div');
         option1.className = 'select-option';
+        option1.dataset.name = country.name.toLowerCase();
         option1.innerHTML = `
             <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
             ${country.name}
         `;
         option1.addEventListener('click', () => selectCountry(1, country));
-        options1.appendChild(option1);
+        list1.appendChild(option1);
         
         const option2 = document.createElement('div');
         option2.className = 'select-option';
+        option2.dataset.name = country.name.toLowerCase();
         option2.innerHTML = `
             <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
             ${country.name}
         `;
         option2.addEventListener('click', () => selectCountry(2, country));
-        options2.appendChild(option2);
+        list2.appendChild(option2);
     });
 }
 
 function selectCountry(dropdownNum, country) {
     const display = document.querySelector(`#country${dropdownNum}-dropdown .select-display`);
     const options = document.getElementById(`country${dropdownNum}-options`);
+    const search = document.getElementById(`country${dropdownNum}-search`);
     
     display.innerHTML = `
         <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
@@ -226,6 +229,8 @@ function selectCountry(dropdownNum, country) {
     `;
     
     options.classList.remove('active');
+    search.value = '';
+    filterCountryOptions(dropdownNum, '');
     
     if (dropdownNum === 1) {
         comparisonCountries.country1 = country;
@@ -369,14 +374,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Custom dropdown handlers
     dropdown1.querySelector('.select-display').addEventListener('click', function() {
         const options = document.getElementById('country1-options');
+        const search = document.getElementById('country1-search');
         options.classList.toggle('active');
         document.getElementById('country2-options').classList.remove('active');
+        if (options.classList.contains('active')) {
+            setTimeout(() => search.focus(), 100);
+        }
     });
     
     dropdown2.querySelector('.select-display').addEventListener('click', function() {
         const options = document.getElementById('country2-options');
+        const search = document.getElementById('country2-search');
         options.classList.toggle('active');
         document.getElementById('country1-options').classList.remove('active');
+        if (options.classList.contains('active')) {
+            setTimeout(() => search.focus(), 100);
+        }
+    });
+    
+    // Search functionality
+    document.getElementById('country1-search').addEventListener('input', function(e) {
+        filterCountryOptions(1, e.target.value);
+    });
+    
+    document.getElementById('country2-search').addEventListener('input', function(e) {
+        filterCountryOptions(2, e.target.value);
+    });
+    
+    // Prevent dropdown close when clicking on search input
+    document.getElementById('country1-search').addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+    
+    document.getElementById('country2-search').addEventListener('click', function(e) {
+        e.stopPropagation();
     });
     
     // Close dropdowns when clicking outside
@@ -396,3 +427,17 @@ document.addEventListener('DOMContentLoaded', function() {
         updateComparisonTimes();
     }, 1000);
 });
+
+function filterCountryOptions(dropdownNum, query) {
+    const list = document.getElementById(`country${dropdownNum}-list`);
+    const options = list.querySelectorAll('.select-option');
+    
+    options.forEach(option => {
+        const countryName = option.dataset.name;
+        if (countryName.includes(query.toLowerCase())) {
+            option.classList.remove('hidden');
+        } else {
+            option.classList.add('hidden');
+        }
+    });
+}
