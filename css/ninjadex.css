@@ -62,10 +62,15 @@
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     font-family: var(--font-family);
-    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    padding: 1rem 3rem 1rem 1.5rem;
     border-radius: 4px;
     position: relative;
     transition: all 0.3s ease;
+    font-size: 1.1rem;
+    min-height: 50px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
 
 .select-trigger:after {
