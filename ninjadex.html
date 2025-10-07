@@ -60,19 +60,25 @@
                     <input type="text" class="search__input" id="searchInput" placeholder="Search monsters by name or location...">
                 </div>
                 <div class="filter-controls">
-                    <select id="typeFilter" class="filter-select">
-                        <option value="all">All Types</option>
-                        <option value="regular">Regular</option>
-                        <option value="cursed">Cursed Land</option>
-                    </select>
-                    <select id="tierFilter" class="filter-select">
-                        <option value="all">All Tiers</option>
-                        <option value="beginner">Beginner (1-10)</option>
-                        <option value="intermediate">Intermediate (11-30)</option>
-                        <option value="advanced">Advanced (31-60)</option>
-                        <option value="expert">Expert (61-100)</option>
-                        <option value="master">Master (100+)</option>
-                    </select>
+                    <div class="custom-select" id="typeFilter">
+                        <div class="select-trigger">All Types</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Types</div>
+                            <div class="select-option" data-value="regular">Regular</div>
+                            <div class="select-option" data-value="cursed">Cursed Land</div>
+                        </div>
+                    </div>
+                    <div class="custom-select" id="tierFilter">
+                        <div class="select-trigger">All Tiers</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Tiers</div>
+                            <div class="select-option" data-value="beginner">Beginner (1-10)</div>
+                            <div class="select-option" data-value="intermediate">Intermediate (11-30)</div>
+                            <div class="select-option" data-value="advanced">Advanced (31-60)</div>
+                            <div class="select-option" data-value="expert">Expert (61-100)</div>
+                            <div class="select-option" data-value="master">Master (100+)</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -100,11 +106,14 @@
                     <input type="text" class="search__input" id="mapSearchInput" placeholder="Search maps by name...">
                 </div>
                 <div class="filter-controls">
-                    <select id="mapTypeFilter" class="filter-select">
-                        <option value="all">All Areas</option>
-                        <option value="regular">Regular Areas</option>
-                        <option value="cursed">Cursed Land</option>
-                    </select>
+                    <div class="custom-select" id="mapTypeFilter">
+                        <div class="select-trigger">All Areas</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Areas</div>
+                            <div class="select-option" data-value="regular">Regular Areas</div>
+                            <div class="select-option" data-value="cursed">Cursed Land</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

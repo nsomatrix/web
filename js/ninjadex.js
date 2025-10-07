@@ -37,26 +37,27 @@ class Ninjadex {
             this.filterMonsters();
         });
 
-        document.getElementById('typeFilter').addEventListener('change', () => {
-            this.filterMonsters();
-        });
+        this.setupCustomSelect('typeFilter', () => this.filterMonsters());
+        this.setupCustomSelect('tierFilter', () => this.filterMonsters());
+        this.setupCustomSelect('mapTypeFilter', () => this.filterMaps());
 
-        document.getElementById('tierFilter').addEventListener('change', () => {
-            this.filterMonsters();
-        });
-
-        // Maps search and filters
+        // Maps search
         document.getElementById('mapSearchInput').addEventListener('input', () => {
-            this.filterMaps();
-        });
-
-        document.getElementById('mapTypeFilter').addEventListener('change', () => {
             this.filterMaps();
         });
 
         // Planner
         document.getElementById('generatePlan').addEventListener('click', () => {
             this.generateTrainingPlan();
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-select')) {
+                document.querySelectorAll('.custom-select').forEach(select => {
+                    select.classList.remove('open');
+                });
+            }
         });
     }
 
@@ -79,10 +80,44 @@ class Ninjadex {
         }
     }
 
+    setupCustomSelect(selectId, callback) {
+        const select = document.getElementById(selectId);
+        const trigger = select.querySelector('.select-trigger');
+        const options = select.querySelectorAll('.select-option');
+
+        trigger.addEventListener('click', () => {
+            // Close other dropdowns
+            document.querySelectorAll('.custom-select').forEach(s => {
+                if (s !== select) s.classList.remove('open');
+            });
+            select.classList.toggle('open');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                // Update active state
+                options.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Update trigger text
+                trigger.textContent = option.textContent;
+                
+                // Store selected value
+                select.dataset.value = option.dataset.value;
+                
+                // Close dropdown
+                select.classList.remove('open');
+                
+                // Execute callback
+                if (callback) callback();
+            });
+        });
+    }
+
     filterMonsters() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const typeFilter = document.getElementById('typeFilter').value;
-        const tierFilter = document.getElementById('tierFilter').value;
+        const typeFilter = document.getElementById('typeFilter').dataset.value || 'all';
+        const tierFilter = document.getElementById('tierFilter').dataset.value || 'all';
 
         this.filteredMonsters = this.monsters.filter(monster => {
             // Search filter
@@ -286,7 +321,7 @@ class Ninjadex {
 
     filterMaps() {
         const searchTerm = document.getElementById('mapSearchInput').value.toLowerCase();
-        const typeFilter = document.getElementById('mapTypeFilter').value;
+        const typeFilter = document.getElementById('mapTypeFilter').dataset.value || 'all';
 
         this.filteredMaps = this.maps.filter(map => {
             const matchesSearch = map.name.toLowerCase().includes(searchTerm);
