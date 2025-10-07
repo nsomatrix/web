@@ -391,7 +391,7 @@ class Ninjadex {
     }
 
     formatNumber(num) {
-        return num.toLocaleString();
+        return num.toString();
     }
 }
 
