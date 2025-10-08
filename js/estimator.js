@@ -2,7 +2,19 @@ class KinsEstimator {
     constructor() {
         this.countdownInterval = null;
         this.calculationData = null;
+        this.levelRequirements = null;
+        this.loadLevelRequirements();
         this.initializeEventListeners();
+    }
+
+    async loadLevelRequirements() {
+        try {
+            const response = await fetch('json/level_requirements.json');
+            const data = await response.json();
+            this.levelRequirements = data.levels;
+        } catch (error) {
+            console.error('Failed to load level requirements:', error);
+        }
     }
 
     initializeEventListeners() {
@@ -110,15 +122,31 @@ class KinsEstimator {
         this.setLoadingState(button, true);
 
         setTimeout(() => {
+            if (!this.levelRequirements) {
+                alert('Level data not loaded yet. Please try again.');
+                this.setLoadingState(button, false);
+                return;
+            }
+
             const expNeeded = 100 - currentExp;
             const secondsNeeded = Math.ceil((expNeeded / expPerHour) * 3600);
+            
+            const currentLevelTotalExp = this.levelRequirements[currentLevel.toString()] || 0;
+            const nextLevelTotalExp = this.levelRequirements[(currentLevel + 1).toString()] || 0;
+            const expForThisLevel = nextLevelTotalExp - currentLevelTotalExp;
+            const actualExpNeeded = Math.ceil((expNeeded / 100) * expForThisLevel);
 
-            this.calculationData = { expNeeded, expPerHour };
+            this.calculationData = { 
+                expNeeded: expNeeded, 
+                expPerHour,
+                actualExpNeeded,
+                expForThisLevel
+            };
 
             this.displayLevelResults({
                 fromLevel: currentLevel,
                 toLevel: currentLevel + 1,
-                expNeeded: expNeeded.toFixed(2),
+                expNeeded: (100 - currentExp).toFixed(2),
                 secondsRemaining: secondsNeeded
             });
 
@@ -146,7 +174,13 @@ class KinsEstimator {
         document.getElementById('levelResults').style.display = 'block';
         document.getElementById('fromLevel').textContent = `Level ${results.fromLevel}`;
         document.getElementById('toLevel').textContent = `Level ${results.toLevel}`;
-        document.getElementById('expNeeded').textContent = `${results.expNeeded}%`;
+        
+        if (this.levelRequirements && results.fromLevel < 130) {
+            const actualExpNeeded = Math.ceil(this.calculationData.actualExpNeeded);
+            document.getElementById('expNeeded').textContent = `${results.expNeeded}% (${actualExpNeeded.toLocaleString()} EXP)`;
+        } else {
+            document.getElementById('expNeeded').textContent = `${results.expNeeded}%`;
+        }
 
         this.startCountdown(results.secondsRemaining);
         document.getElementById('levelResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -164,7 +198,11 @@ class KinsEstimator {
         const updateCountdown = () => {
             if (remainingMs <= 0) {
                 countdownElement.textContent = 'Level Up!';
-                expNeededElement.textContent = '0.00%';
+                if (this.levelRequirements) {
+                    expNeededElement.textContent = '0.00% (0 EXP)';
+                } else {
+                    expNeededElement.textContent = '0.00%';
+                }
                 clearInterval(this.countdownInterval);
                 return;
             }
@@ -184,7 +222,14 @@ class KinsEstimator {
             countdownElement.textContent = timeString;
             
             currentExpNeeded -= expPerMs * 100;
-            expNeededElement.textContent = `${Math.max(0, currentExpNeeded).toFixed(2)}%`;
+            const currentPercentage = Math.max(0, currentExpNeeded);
+            
+            if (this.levelRequirements) {
+                const actualExpRemaining = Math.ceil((currentPercentage / 100) * this.calculationData.expForThisLevel);
+                expNeededElement.textContent = `${currentPercentage.toFixed(2)}% (${Math.max(0, actualExpRemaining).toLocaleString()} EXP)`;
+            } else {
+                expNeededElement.textContent = `${currentPercentage.toFixed(2)}%`;
+            }
             
             remainingMs -= 100;
         };
