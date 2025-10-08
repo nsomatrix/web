@@ -726,7 +726,7 @@
 }
 
 .monster-item-name {
-    color: var(--text-primary);
+    color: #ffff00;
     font-weight: bold;
 }
 
