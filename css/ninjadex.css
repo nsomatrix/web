@@ -471,6 +471,141 @@
     font-size: 0.9rem;
 }
 
+/* Equipment Grid */
+.equipments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+}
+
+.equipment-card {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.equipment-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.equipment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.equipment-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.equipment-type {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.equipment-type.equipment {
+    background: #2d4a5a;
+    color: #90d5ff;
+}
+
+.equipment-type.weapon {
+    background: #5a2d4a;
+    color: #ff90d5;
+}
+
+.equipment-category {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.75rem;
+    background: var(--tertiary-bg);
+    color: var(--accent-color);
+    border: 1px solid var(--border-color);
+}
+
+.equipment-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.weapon-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    background: var(--tertiary-bg);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.attribute-fire {
+    color: #ff6b6b !important;
+}
+
+.attribute-water {
+    color: #4dabf7 !important;
+}
+
+.attribute-wind {
+    color: #69db7c !important;
+}
+
+.equipment-upgrades {
+    margin-top: 0.75rem;
+}
+
+.upgrades-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.upgrades-list {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.upgrade-item {
+    background: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.upgrade-level {
+    background: var(--accent-color);
+    color: var(--text-primary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 0.75rem;
+    min-width: 24px;
+    text-align: center;
+}
+
+.upgrade-desc {
+    color: var(--text-secondary);
+    flex: 1;
+}
+
 /* Maps Grid */
 .maps-grid {
     display: grid;
@@ -582,7 +717,19 @@
         grid-template-columns: 1fr;
     }
     
+    .equipments-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .monster-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .equipment-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .weapon-stats {
         grid-template-columns: 1fr;
     }
     

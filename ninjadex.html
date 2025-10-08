@@ -50,6 +50,7 @@
 
         <div class="ninjadex-tabs">
             <button class="tab-btn active" data-tab="monsters">Monsters</button>
+            <button class="tab-btn" data-tab="equipments">Equipments</button>
             <button class="tab-btn" data-tab="maps">Maps</button>
             <button class="tab-btn" data-tab="planner">BluePrint</button>
         </div>
@@ -98,6 +99,70 @@
             </div>
 
             <div class="monsters-grid" id="monstersGrid"></div>
+        </div>
+
+        <div id="equipments-tab" class="tab-content">
+            <div class="filters-section">
+                <div class="search">
+                    <input type="text" class="search__input" id="equipmentSearchInput" placeholder="Search equipments by name">
+                </div>
+                <div class="filter-controls">
+                    <div class="custom-select" id="equipmentTypeFilter">
+                        <div class="select-trigger">All Types</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Types</div>
+                            <div class="select-option" data-value="equipment">Equipment</div>
+                            <div class="select-option" data-value="weapon">Weapons</div>
+                        </div>
+                    </div>
+                    <div class="custom-select" id="equipmentCategoryFilter">
+                        <div class="select-trigger">All Categories</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Categories</div>
+                            <div class="select-option" data-value="cord">Cord</div>
+                            <div class="select-option" data-value="armor">Armor</div>
+                            <div class="select-option" data-value="gloves">Gloves</div>
+                            <div class="select-option" data-value="shoes">Shoes</div>
+                            <div class="select-option" data-value="necklace">Necklace</div>
+                            <div class="select-option" data-value="ring">Ring</div>
+                            <div class="select-option" data-value="gem">Gem</div>
+                            <div class="select-option" data-value="charm">Charm</div>
+                            <div class="select-option" data-value="sword">Sword</div>
+                            <div class="select-option" data-value="kunai">Kunai</div>
+                            <div class="select-option" data-value="blade">Blade</div>
+                            <div class="select-option" data-value="shuriken">Shuriken</div>
+                            <div class="select-option" data-value="bow">Bow</div>
+                            <div class="select-option" data-value="fan">Fan</div>
+                        </div>
+                    </div>
+                    <div class="custom-select" id="equipmentAttributeFilter">
+                        <div class="select-trigger">All Attributes</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Attributes</div>
+                            <div class="select-option" data-value="Fire">Fire</div>
+                            <div class="select-option" data-value="Water">Water</div>
+                            <div class="select-option" data-value="Wind">Wind</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalEquipments">0</span>
+                    <span class="stat-label">Total Items</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="equipmentCount">0</span>
+                    <span class="stat-label">Equipment</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="weaponCount">0</span>
+                    <span class="stat-label">Weapons</span>
+                </div>
+            </div>
+
+            <div class="equipments-grid" id="equipmentsGrid"></div>
         </div>
 
         <div id="maps-tab" class="tab-content">

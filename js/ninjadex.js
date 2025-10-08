@@ -4,11 +4,14 @@ class Ninjadex {
         this.filteredMonsters = [];
         this.maps = [];
         this.filteredMaps = [];
+        this.equipments = [];
+        this.filteredEquipments = [];
         this.init();
     }
 
     async init() {
         await this.loadMonsters();
+        await this.loadEquipments();
         this.processMaps();
         this.setupEventListeners();
         this.updateStats();
@@ -32,6 +35,28 @@ class Ninjadex {
         }
     }
 
+    async loadEquipments() {
+        try {
+            const response = await fetch('json/structured_equipment_data.json');
+            const data = await response.json();
+            this.equipments = [];
+            
+            // Flatten all equipment categories into a single array
+            Object.keys(data.categories).forEach(category => {
+                data.categories[category].forEach(item => {
+                    this.equipments.push({
+                        ...item,
+                        category: category
+                    });
+                });
+            });
+            
+            this.filteredEquipments = [...this.equipments];
+        } catch (error) {
+            console.error('Failed to load equipments:', error);
+        }
+    }
+
     setupEventListeners() {
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -46,11 +71,19 @@ class Ninjadex {
         this.setupCustomSelect('typeFilter', () => this.filterMonsters());
         this.setupCustomSelect('tierFilter', () => this.filterMonsters());
         this.setupCustomSelect('mapTypeFilter', () => this.filterMaps());
+        this.setupCustomSelect('equipmentTypeFilter', () => this.filterEquipments());
+        this.setupCustomSelect('equipmentCategoryFilter', () => this.filterEquipments());
+        this.setupCustomSelect('equipmentAttributeFilter', () => this.filterEquipments());
         this.setupCustomSelect('objective', null);
 
         // Maps search
         document.getElementById('mapSearchInput').addEventListener('input', () => {
             this.filterMaps();
+        });
+
+        // Equipment search
+        document.getElementById('equipmentSearchInput').addEventListener('input', () => {
+            this.filterEquipments();
         });
 
         // Planner
@@ -84,6 +117,12 @@ class Ninjadex {
         // Load maps data when maps tab is opened
         if (tabName === 'maps' && this.maps.length > 0) {
             this.renderMaps();
+        }
+        
+        // Load equipment data when equipments tab is opened
+        if (tabName === 'equipments' && this.equipments.length > 0) {
+            this.updateEquipmentStats();
+            this.renderEquipments();
         }
     }
 
@@ -152,6 +191,110 @@ class Ninjadex {
         document.getElementById('totalMonsters').textContent = total;
         document.getElementById('regularCount').textContent = regular;
         document.getElementById('cursedCount').textContent = cursed;
+    }
+
+    updateEquipmentStats() {
+        const total = this.filteredEquipments.length;
+        const equipment = this.filteredEquipments.filter(e => e.type === 'equipment').length;
+        const weapons = this.filteredEquipments.filter(e => e.type === 'weapon').length;
+
+        document.getElementById('totalEquipments').textContent = total;
+        document.getElementById('equipmentCount').textContent = equipment;
+        document.getElementById('weaponCount').textContent = weapons;
+    }
+
+    filterEquipments() {
+        const searchTerm = document.getElementById('equipmentSearchInput').value.toLowerCase();
+        const typeFilter = document.getElementById('equipmentTypeFilter').dataset.value || 'all';
+        const categoryFilter = document.getElementById('equipmentCategoryFilter').dataset.value || 'all';
+        const attributeFilter = document.getElementById('equipmentAttributeFilter').dataset.value || 'all';
+
+        this.filteredEquipments = this.equipments.filter(equipment => {
+            // Search filter
+            const matchesSearch = equipment.name.toLowerCase().includes(searchTerm);
+
+            // Type filter
+            const matchesType = typeFilter === 'all' || equipment.type === typeFilter;
+
+            // Category filter
+            const matchesCategory = categoryFilter === 'all' || equipment.category === categoryFilter;
+
+            // Attribute filter
+            const matchesAttribute = attributeFilter === 'all' || equipment.attribute === attributeFilter;
+
+            return matchesSearch && matchesType && matchesCategory && matchesAttribute;
+        });
+
+        this.updateEquipmentStats();
+        this.renderEquipments();
+    }
+
+    renderEquipments() {
+        const grid = document.getElementById('equipmentsGrid');
+        grid.innerHTML = '';
+
+        this.filteredEquipments.forEach(equipment => {
+            const card = this.createEquipmentCard(equipment);
+            grid.appendChild(card);
+        });
+    }
+
+    createEquipmentCard(equipment) {
+        const card = document.createElement('div');
+        card.className = 'equipment-card';
+
+        const upgradesHtml = equipment.upgrades.map(upgrade => 
+            `<div class="upgrade-item">
+                <span class="upgrade-level">+${upgrade.upgrade_level}</span>
+                <span class="upgrade-desc">${upgrade.description}: ${upgrade.value}</span>
+            </div>`
+        ).join('');
+
+        const weaponStats = equipment.type === 'weapon' ? 
+            `<div class="weapon-stats">
+                <div class="stat-item">
+                    <span class="stat-label">External:</span>
+                    <span class="stat-value">${equipment.external_strike || 'N/A'}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Internal:</span>
+                    <span class="stat-value">${equipment.internal_strike || 'N/A'}</span>
+                </div>
+            </div>` : '';
+
+        card.innerHTML = `
+            <div class="equipment-header">
+                <div class="equipment-name">${equipment.name}</div>
+                <div class="equipment-type ${equipment.type}">${equipment.type.toUpperCase()}</div>
+            </div>
+            
+            <div class="equipment-category ${equipment.category}">
+                ${equipment.category.toUpperCase()}
+            </div>
+            
+            <div class="equipment-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Level:</span>
+                    <span class="stat-value">${equipment.level}</span>
+                </div>
+                ${equipment.attribute ? `
+                <div class="stat-item">
+                    <span class="stat-label">Attribute:</span>
+                    <span class="stat-value attribute-${equipment.attribute.toLowerCase()}">${equipment.attribute}</span>
+                </div>` : ''}
+            </div>
+            
+            ${weaponStats}
+            
+            <div class="equipment-upgrades">
+                <div class="upgrades-label">Upgrades:</div>
+                <div class="upgrades-list">
+                    ${upgradesHtml}
+                </div>
+            </div>
+        `;
+
+        return card;
     }
 
     renderMonsters() {
@@ -459,6 +602,23 @@ class Ninjadex {
 
     formatNumber(num) {
         return num.toString();
+    }
+
+    getCategoryDisplayName(category) {
+        const categoryNames = {
+            'cord': 'Cord',
+            'top_armor': 'Top Armor',
+            'bottom_armor': 'Bottom Armor',
+            'gloves': 'Gloves',
+            'shoes': 'Shoes',
+            'necklace': 'Necklace',
+            'rings': 'Ring',
+            'gems': 'Gem',
+            'charms': 'Charm',
+            'sword': 'Sword',
+            'weapons': 'Weapons'
+        };
+        return categoryNames[category] || category;
     }
 }
 

@@ -1,0 +1,344 @@
+CORD DATA
+
+Blue Silk Cord,19,Fire,+4_Each 5 seconds to recover MP : +5
+Blue Silk Cord,19,Water,+4_Each 5 seconds to recover MP : +5
+Blue Silk Cord,19,Wind,+4_Each 5 seconds to recover MP : +5
+Red Silk Cord,29,Fire,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Red Silk Cord,29,Water,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Red Silk Cord,29,Wind,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Golden Silk Cord,39,Fire,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Golden Silk Cord,39,Water,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Golden Silk Cord,39,Wind,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Ebony Cord,49,Fire,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Ebony Cord,49,Water,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Ebony Cord,49,Wind,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Silver Ultra Cord,59,Fire,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Wind Resistance : +100
+Silver Ultra Cord,59,Water,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Fire Resistance : +100
+Silver Ultra Cord,59,Wind,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Ice Resistance : +100
+Reinforced Iron Cord,69,Fire,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Wind Resistance : +120,+16_Wind Damage Reduced : +500
+Reinforced Iron Cord,69,Water,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Fire Resistance : +120,+16_Fire Damage Reduced : +500
+Reinforced Iron Cord,69,Wind,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Ice Resistance : +120,+16_Ice Damage Reduced : +500
+Quality Silver Cord,79,Fire,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Wind Damage Reduced : +500
+Quality Silver Cord,79,Water,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Fire Damage Reduced : +500
+Quality Silver Cord,79,Wind,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Ice Damage Reduced : +500
+Assassin Cord,85,Fire,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Wind Damage Reduced : +500
+Assassin Cord,85,Water,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Fire Damage Reduced : +500
+Assassin Cord,85,Wind,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Ice Damage Reduced : +500
+Shinobi Cord,99,Fire,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Wind Damage Reduced : +500
+Shinobi Cord,99,Water,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Fire Damage Reduced : +500
+Shinobi Cord,99,Wind,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Ice Damage Reduced : +500
+
+TOP ARMOR DATA
+
+Fabric Cloth,17,Fire,+4_Each 5 seconds to recover MP : +5
+Fabric Cloth,17,Water,+4_Each 5 seconds to recover MP : +5
+Fabric Cloth,17,Wind,+4_Each 5 seconds to recover MP : +5
+Cotton Cloth,27,Fire,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Cotton Cloth,27,Water,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Cotton Cloth,27,Wind,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Silk Cloth,37,Fire,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Silk Cloth,37,Water,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Silk Cloth,37,Wind,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Black Armor,47,Fire,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Black Armor,47,Water,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Black Armor,47,Wind,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Gold Armor,57,Fire,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Wind Resistance : +100
+Gold Armor,57,Water,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Fire Resistance : +100
+Gold Armor,57,Wind,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Ice Resistance : +100
+Reinforced Iron Top Armor,67,Fire,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Wind Resistance : +120,+16_Wind Damage Reduced : +500
+Reinforced Iron Top Armor,67,Water,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Fire Resistance : +120,+16_Fire Damage Reduced : +500
+Reinforced Iron Top Armor,67,Wind,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Ice Resistance : +120,+16_Ice Damage Reduced : +500
+Quality Silver Top Armor,77,Fire,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Wind Damage Reduced : +500
+Quality Silver Top Armor,77,Water,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Fire Damage Reduced : +500
+Quality Silver Top Armor,77,Wind,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Ice Damage Reduced : +500
+Assassin Top Armor,85,Fire,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Wind Damage Reduced : +500
+Assassin Top Armor,85,Water,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Fire Damage Reduced : +500
+Assassin Top Armor,85,Wind,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Ice Damage Reduced : +500
+Shinobi Armor,97,Fire,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Wind Damage Reduced : +500
+Shinobi Armor,97,Water,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Fire Damage Reduced : +500
+Shinobi Armor,97,Wind,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Ice Damage Reduced : +500
+
+GLOVES DATA
+
+Warrior Horse Gloves,15,Fire,+4_Each 5 seconds to recover MP : +5
+Warrior Horse Gloves,15,Water,+4_Each 5 seconds to recover MP : +5
+Warrior Horse Gloves,15,Wind,+4_Each 5 seconds to recover MP : +5
+Furry Tiger Gloves,25,Fire,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Furry Tiger Gloves,25,Water,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Furry Tiger Gloves,25,Wind,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Gold Dragon Gloves,35,Fire,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Gold Dragon Gloves,35,Water,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Gold Dragon Gloves,35,Wind,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Black Iron Gloves,45,Fire,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Black Iron Gloves,45,Water,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Black Iron Gloves,45,Wind,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Golden Hand Gloves,55,Fire,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Wind Resistance : +100
+Golden Hand Gloves,55,Water,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Fire Resistance : +100
+Golden Hand Gloves,55,Wind,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Ice Resistance : +100
+Reinforced Iron Gloves,65,Fire,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Wind Resistance : +120,+16_Wind Damage Reduced : +500
+Reinforced Iron Gloves,65,Water,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Fire Resistance : +120,+16_Fire Damage Reduced : +500
+Reinforced Iron Gloves,65,Wind,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Ice Resistance : +120,+16_Ice Damage Reduced : +500
+Quality Silver Gloves,75,Fire,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Wind Damage Reduced : +500
+Quality Silver Gloves,75,Water,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Fire Damage Reduced : +500
+Quality Silver Gloves,75,Wind,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Ice Damage Reduced : +500
+Assassin Gloves,85,Fire,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Wind Damage Reduced : +500
+Assassin Gloves,85,Water,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Fire Damage Reduced : +500
+Assassin Gloves,85,Wind,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Ice Damage Reduced : +500
+Shinobi Gloves,95,Fire,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Wind Damage Reduced : +500
+Shinobi Gloves,95,Water,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Fire Damage Reduced : +500
+Shinobi Gloves,95,Wind,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Ice Damage Reduced : +500
+
+BOTTOM ARMOR DATA
+
+Fabric Pants,13,Fire,+4_Each 5 seconds to recover MP : +5
+Fabric Pants,13,Water,+4_Each 5 seconds to recover MP : +5
+Fabric Pants,13,Wind,+4_Each 5 seconds to recover MP : +5
+Cotton Pants,23,Fire,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Cotton Pants,23,Water,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Cotton Pants,23,Wind,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Silk Pants,33,Fire,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Silk Pants,33,Water,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Silk Pants,33,Wind,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Iron Armor,43,Fire,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Iron Armor,43,Water,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Iron Armor,43,Wind,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Golden Armor,53,Fire,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Wind Resistance : +100
+Golden Armor,53,Water,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Fire Resistance : +100
+Golden Armor,53,Wind,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Ice Resistance : +100
+Reinforced Iron Bottom Armor,63,Fire,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Wind Resistance : +120,+16_Wind Damage Reduced : +500
+Reinforced Iron Bottom Armor,63,Water,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Fire Resistance : +120,+16_Fire Damage Reduced : +500
+Reinforced Iron Bottom Armor,63,Wind,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Ice Resistance : +120,+16_Ice Damage Reduced : +500
+Quality Silver Bottom Armor,73,Fire,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Wind Damage Reduced : +500
+Quality Silver Bottom Armor,73,Water,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Fire Damage Reduced : +500
+Quality Silver Bottom Armor,73,Wind,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Ice Damage Reduced : +500
+Assassin Bottom Armor,85,Fire,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Wind Damage Reduced : +500
+Assassin Bottom Armor,85,Water,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Fire Damage Reduced : +500
+Assassin Bottom Armor,85,Wind,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Ice Damage Reduced : +500
+Shinobi Bottom Armor,93,Fire,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Wind Damage Reduced : +500
+Shinobi Bottom Armor,93,Water,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Fire Damage Reduced : +500
+Shinobi Bottom Armor,93,Wind,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Ice Damage Reduced : +500
+
+SHOES DATA
+
+Bamboo Shoes,11,Fire,+4_Each 5 seconds to recover MP : +5
+Bamboo Shoes,11,Water,+4_Each 5 seconds to recover MP : +5
+Bamboo Shoes,11,Wind,+4_Each 5 seconds to recover MP : +5
+Wooden Shoes,21,Fire,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Wooden Shoes,21,Water,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Wooden Shoes,21,Wind,+4_Each 5 seconds to recover MP : +6,+8_Rate of Max MP : +2%
+Silk Shoes,31,Fire,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Silk Shoes,31,Water,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Silk Shoes,31,Wind,+4_Each 5 seconds to recover MP : +7,+8_Rate of Max MP : +3%
+Black Snake Scale Shoes,41,Fire,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Black Snake Scale Shoes,41,Water,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+Black Snake Scale Shoes,41,Wind,+4_Each 5 seconds to recover MP : +8,+8_Rate of Max MP : +4%,+12_Max MP : +300
+White Snake Scale Shoes,51,Fire,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Wind Resistance : +100
+White Snake Scale Shoes,51,Water,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Fire Resistance : +100
+White Snake Scale Shoes,51,Wind,+4_Each 5 seconds to recover MP : +9,+8_Rate of Max MP : +5%,+12_Max MP : +350,+14_Ice Resistance : +100
+Reinforced Iron Shoes,61,Fire,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Wind Resistance : +120,+16_Wind Damage Reduced : +500
+Reinforced Iron Shoes,61,Water,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Fire Resistance : +120,+16_Fire Damage Reduced : +500
+Reinforced Iron Shoes,61,Wind,+4_Each 5 seconds to recover MP : +10,+8_Rate of Max MP : +6%,+12_Max MP : +400,+14_Ice Resistance : +120,+16_Ice Damage Reduced : +500
+Quality Silver Shoes,71,Fire,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Wind Damage Reduced : +500
+Quality Silver Shoes,71,Water,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Fire Damage Reduced : +500
+Quality Silver Shoes,71,Wind,+4_Each 5 seconds to recover MP : +12,+8_Rate of Max MP : +7%,+12_Max MP : +450,+14_Wind Resistance : +140,+16_Ice Damage Reduced : +500
+Assassin Shoes,85,Fire,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Wind Damage Reduced : +500
+Assassin Shoes,85,Water,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Fire Damage Reduced : +500
+Assassin Shoes,85,Wind,+4_Each 5 seconds to recover MP : +14,+8_Rate of Max MP : +8%,+12_Max MP : +500,+14_Wind Resistance : +160,+16_Ice Damage Reduced : +500
+Shinobi Shoes,91,Fire,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Wind Damage Reduced : +500
+Shinobi Shoes,91,Water,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Fire Damage Reduced : +500
+Shinobi Shoes,91,Wind,+4_Each 5 seconds to recover MP : +16,+8_Rate of Max MP : +9%,+12_Max MP : +550,+14_Wind Resistance : +180,+16_Ice Damage Reduced : +500
+
+NECKLACE DATA
+
+
+Silver Necklace,18,Fire,+4_Each 5 seconds to recover HP : +5
+Silver Necklace,18,Water,+4_Each 5 seconds to recover HP : +5
+Silver Necklace,18,Wind,+4_Each 5 seconds to recover HP : +5
+White Gold Necklace,28,Fire,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+White Gold Necklace,28,Water,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+White Gold Necklace,28,Wind,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Gold Necklace,38,Fire,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Gold Necklace,38,Water,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Gold Necklace,38,Wind,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Emerald Necklace,48,Fire,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Emerald Necklace,48,Water,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Emerald Necklace,48,Wind,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Jade Necklace,58,Fire,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Ice Resistance : +100
+Jade Necklace,58,Water,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Wind Resistance : +100
+Jade Necklace,58,Wind,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Fire Resistance : +100
+Secret Necklace,68,Fire,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Ice Resistance : +120,+16_Ice Damage Increased : +800
+Secret Necklace,68,Water,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Wind Resistance : +120,+16_Wind Damage Increased : +800
+Secret Necklace,68,Wind,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Fire Resistance : +120,+16_Fire Damage Increased : +800
+Quality Silver Necklace,78,Fire,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Ice Resistance : +140,+16_Ice Damage Increased : +800
+Quality Silver Necklace,78,Water,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Wind Resistance : +140,+16_Wind Damage Increased : +800
+Quality Silver Necklace,78,Wind,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Fire Resistance : +140,+16_Fire Damage Increased : +800
+Assassin Necklace,80,Fire,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Ice Resistance : +160,+16_Ice Damage Increased : +800
+Assassin Necklace,80,Water,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Wind Resistance : +160,+16_Wind Damage Increased : +800
+Assassin Necklace,80,Wind,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Fire Resistance : +160,+16_Fire Damage Increased : +800
+Shinobi Necklace,98,Fire,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Ice Resistance : +180,+16_Ice Damage Increased : +800
+Shinobi Necklace,98,Water,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Wind Resistance : +180,+16_Wind Damage Increased : +800
+Shinobi Necklace,98,Wind,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Fire Resistance : +180,+16_Fire Damage Increased : +800
+
+RINGS DATA
+
+Silver Ring,16,Fire,+4_Each 5 seconds to recover HP : +5
+Silver Ring,16,Water,+4_Each 5 seconds to recover HP : +5
+Silver Ring,16,Wind,+4_Each 5 seconds to recover HP : +5
+Cat Eye Ring,26,Fire,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Cat Eye Ring,26,Water,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Cat Eye Ring,26,Wind,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Sapphire Ring,36,Fire,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Sapphire Ring,36,Water,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Sapphire Ring,36,Wind,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Opal Ring,46,Fire,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Opal Ring,46,Water,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Opal Ring,46,Wind,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Diamond Ring,56,Fire,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Ice Resistance : +100
+Diamond Ring,56,Water,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Wind Resistance : +100
+Diamond Ring,56,Wind,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Fire Resistance : +100
+Secret Ring,66,Fire,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Ice Resistance : +120,+16_Ice Damage Increased : +800
+Secret Ring,66,Water,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Wind Resistance : +120,+16_Wind Damage Increased : +800
+Secret Ring,66,Wind,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Fire Resistance : +120,+16_Fire Damage Increased : +800
+Quality Silver Ring,76,Fire,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Ice Resistance : +140,+16_Ice Damage Increased : +800
+Quality Silver Ring,76,Water,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Wind Resistance : +140,+16_Wind Damage Increased : +800
+Quality Silver Ring,76,Wind,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Fire Resistance : +140,+16_Fire Damage Increased : +800
+Assassin Ring,85,Fire,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Ice Resistance : +160,+16_Ice Damage Increased : +800
+Assassin Ring,85,Water,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Wind Resistance : +160,+16_Wind Damage Increased : +800
+Assassin Ring,85,Wind,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Fire Resistance : +160,+16_Fire Damage Increased : +800
+Shinobi Ring,96,Fire,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Ice Resistance : +180,+16_Ice Damage Increased : +800
+Shinobi Ring,96,Water,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Wind Resistance : +180,+16_Wind Damage Increased : +800
+Shinobi Ring,96,Wind,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Fire Resistance : +180,+16_Fire Damage Increased : +800
+
+GEMS DATA
+
+Marble Gems,14,Fire,+4_Each 5 seconds to recover HP : +5
+Marble Gems,14,Water,+4_Each 5 seconds to recover HP : +5
+Marble Gems,14,Wind,+4_Each 5 seconds to recover HP : +5
+Cloudy Gems,24,Fire,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Cloudy Gems,24,Water,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Cloudy Gems,24,Wind,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Ivory Gems,34,Fire,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Ivory Gems,34,Water,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Ivory Gems,34,Wind,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Amber Gems,44,Fire,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Amber Gems,44,Water,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Amber Gems,44,Wind,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Pebble Gems,54,Fire,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Ice Resistance : +100
+Pebble Gems,54,Water,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Wind Resistance : +100
+Pebble Gems,54,Wind,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_Fire Resistance : +100
+Secret Gem,64,Fire,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Ice Resistance : +120,+16_Ice Damage Increased : +800
+Secret Gem,64,Water,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Wind Resistance : +120,+16_Wind Damage Increased : +800
+Secret Gem,64,Wind,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_Fire Resistance : +120,+16_Fire Damage Increased : +800
+Quality Silver Gem,74,Fire,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Ice Resistance : +140,+16_Ice Damage Increased : +800
+Quality Silver Gem,74,Water,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Wind Resistance : +140,+16_Wind Damage Increased : +800
+Quality Silver Gem,74,Wind,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_Fire Resistance : +140,+16_Fire Damage Increased : +800
+Assassin Gem,85,Fire,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Ice Resistance : +160,+16_Ice Damage Increased : +800
+Assassin Gem,85,Water,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Wind Resistance : +160,+16_Wind Damage Increased : +800
+Assassin Gem,85,Wind,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_Fire Resistance : +160,+16_Fire Damage Increased : +800
+Shinobi Gem,94,Fire,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Ice Resistance : +180,+16_Ice Damage Increased : +800
+Shinobi Gem,94,Water,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Wind Resistance : +180,+16_Wind Damage Increased : +800
+Shinobi Gem,94,Wind,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_Fire Resistance : +180,+16_Fire Damage Increased : +800
+
+CHARMS DATA
+
+God Body Charm,12,Fire,+4_Each 5 seconds to recover HP : +5
+God Body Charm,12,Water,+4_Each 5 seconds to recover HP : +5
+God Body Charm,12,Wind,+4_Each 5 seconds to recover HP : +5
+Anti Ghost Charm,22,Fire,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Anti Ghost Charm,22,Water,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Anti Ghost Charm,22,Wind,+4_Each 5 seconds to recover HP : +6,+8_Rate of Max HP : +2%
+Happy Ideal Charm,32,Fire,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Happy Ideal Charm,32,Water,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Happy Ideal Charm,32,Wind,+4_Each 5 seconds to recover HP : +7,+8_Rate of Max HP : +3%
+Saint Mind Charm,42,Fire,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Saint Mind Charm,42,Water,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+Saint Mind Charm,42,Wind,+4_Each 5 seconds to recover HP : +8,+8_Rate of Max HP : +4%,+12_Max HP : +300
+God Blessed Charm,52,Fire,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_All Resistance : +50
+God Blessed Charm,52,Water,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_All Resistance : +50
+God Blessed Charm,52,Wind,+4_Each 5 seconds to recover HP : +9,+8_Rate of Max HP : +5%,+12_Max HP : +350,+14_All Resistance : +50
+Secret Charm,62,Fire,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_All Resistance : +60,+16_Damage when being critical strike : -25%
+Secret Charm,62,Water,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_All Resistance : +60,+16_Damage when being critical strike : -25%
+Secret Charm,62,Wind,+4_Each 5 seconds to recover HP : +10,+8_Rate of Max HP : +6%,+12_Max HP : +400,+14_All Resistance : +60,+16_Damage when being critical strike : -25%
+Quality Silver Charm,72,Fire,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_All Resistance : +80,+16_Damage when being critical strike : -35%
+Quality Silver Charm,72,Water,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_All Resistance : +80,+16_Damage when being critical strike : -35%
+Quality Silver Charm,72,Wind,+4_Each 5 seconds to recover HP : +12,+8_Rate of Max HP : +7%,+12_Max HP : +450,+14_All Resistance : +80,+16_Damage when being critical strike : -35%
+Assassin Charm,85,Fire,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_All Resistance : +100,+16_Damage when being critical strike : -45%
+Assassin Charm,85,Water,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_All Resistance : +100,+16_Damage when being critical strike : -45%
+Assassin Charm,85,Wind,+4_Each 5 seconds to recover HP : +14,+8_Rate of Max HP : +8%,+12_Max HP : +500,+14_All Resistance : +100,+16_Damage when being critical strike : -45%
+Shinobi Charm,92,Fire,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_All Resistance : +120,+16_Damage when being critical strike : -55%
+Shinobi Charm,92,Water,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_All Resistance : +120,+16_Damage when being critical strike : -55%
+Shinobi Charm,92,Wind,+4_Each 5 seconds to recover HP : +16,+8_Rate of Max HP : +9%,+12_Max HP : +550,+14_All Resistance : +120,+16_Damage when being critical strike : -55%
+
+WEAPONS DATA
+
+SWORD
+
+White Crane Sword,10,External_Strike : 100,Internal_Strike : 100,+4_Each 5 seconds to recover HP : +5
+Heavy Thunder Sword,20,External_Strike : 120,Internal_Strike : 120,+4_Each 5 seconds to recover HP : +6,+8_Critical : +20
+Sealed Ghost Sword,30,External_Strike : 140,Internal_Strike : 140,+4_Each 5 seconds to recover HP : +7,+8_Critical : +30
+Death Live Sword,40,External_Strike : 160,Internal_Strike : 160,+4_Each 5 seconds to recover HP : +8,+8_Critical : +40,+12_Basic Strike of Weapon : +400
+Tomb Tiger Sword,50,External_Strike : 180,Internal_Strike : 180,+4_Each 5 seconds to recover HP : +9,+8_Critical : +50,+12_Basic Strike of Weapon : +500,+14_Critical Strike : +70%
+Light Fire Sword,60,External_Strike : 200,Internal_Strike : 200,+4_Each 5 seconds to recover HP : +10,+8_Critical : +60,+12_Basic Strike of Weapon : +600,+14_Critical Strike : +80%,+16_Inflict Damage on Ice : +40%
+Fire for God Sword,70,External_Strike : 240,Internal_Strike : 240,+4_Each 5 seconds to recover HP : +12,+8_Critical : +70,+12_Basic Strike of Weapon : +700,+14_Critical Strike : +100%,+16_Inflict Damage on Ice : +40%
+Blood Sword,80,External_Strike : 280,Internal_Strike : 280,+4_Each 5 seconds to recover HP : +14,+8_Critical : +80,+12_Basic Strike of Weapon : +800,+14_Critical Strike : +120%,+16_Inflict Damage on Ice : +40%
+Sword of Fire Dragon,90,External_Strike : 500,Internal_Strike : 500,+4_Each 5 seconds to recover HP : +16,+8_Critical : +90,+12_Basic Strike of Weapon : +900,+14_Critical Strike : +140%,+16_Inflict Damage on Ice : +40%
+
+KUNAI
+
+Black Fang Kunai,10,External_Strike : 100,Internal_Strike : 100,+4_Each 5 seconds to recover HP : +5
+Snake Eye Kunai,20,External_Strike : 120,Internal_Strike : 120,+4_Each 5 seconds to recover HP : +6,+8_Critical : +20
+Under Storm Kunai,30,External_Strike : 140,Internal_Strike : 140,+4_Each 5 seconds to recover HP : +7,+8_Critical : +30
+Hollow Soul Kunai,40,External_Strike : 160,Internal_Strike : 160,+4_Each 5 seconds to recover HP : +8,+8_Critical : +40,+12_Basic Strike of Weapon : +400
+Pheonix Kunai,50,External_Strike : 180,Internal_Strike : 180,+4_Each 5 seconds to recover HP : +9,+8_Critical : +50,+12_Basic Strike of Weapon : +500,+14_Critical Strike : +70%
+Dragon Water Kunai,60,External_Strike : 200,Internal_Strike : 200,+4_Each 5 seconds to recover HP : +10,+8_Critical : +60,+12_Basic Strike of Weapon : +600,+14_Critical Strike : +80%,+16_Inflict Damage on Wind : +40%
+Marine Knife,70,External_Strike : 240,Internal_Strike : 240,+4_Each 5 seconds to recover HP : +12,+8_Critical : +70,+12_Basic Strike of Weapon : +700,+14_Critical Strike : +100%,+16_Inflict Damage on Wind : +40%
+Glacier Knife,80,External_Strike : 280,Internal_Strike : 280,+4_Each 5 seconds to recover HP : +14,+8_Critical : +80,+12_Basic Strike of Weapon : +800,+14_Critical Strike : +120%,+16_Inflict Damage on Wind : +40%
+Kunai of Snowburst,90,External_Strike : 500,Internal_Strike : 500,+4_Each 5 seconds to recover HP : +16,+8_Critical : +90,+12_Basic Strike of Weapon : +900,+14_Critical Strike : +140%,+16_Inflict Damage on Wind : +40%
+
+BLADE
+
+Slash Horse Blade,10,External_Strike : 100,Internal_Strike : 100,+4_Each 5 seconds to recover HP : +5
+Slash Tiger Blade,20,External_Strike : 120,Internal_Strike : 120,+4_Each 5 seconds to recover HP : +6,+8_Critical : +20
+Huge Blade,30,External_Strike : 140,Internal_Strike : 140,+4_Each 5 seconds to recover HP : +7,+8_Critical : +30
+Wrath of Heaven Blade,40,External_Strike : 160,Internal_Strike : 160,+4_Each 5 seconds to recover HP : +8,+8_Critical : +40,+12_Basic Strike of Weapon : +400
+Blue Dragon Blade,50,External_Strike : 180,Internal_Strike : 180,+4_Each 5 seconds to recover HP : +9,+8_Critical : +50,+12_Basic Strike of Weapon : +500,+14_Critical Strike : +70%
+Thunder Sky Blade,60,External_Strike : 200,Internal_Strike : 200,+4_Each 5 seconds to recover HP : +10,+8_Critical : +60,+12_Basic Strike of Weapon : +600,+14_Critical Strike : +80%,+16_Inflict Damage on Fire : +40%
+Spirit Blade,70,External_Strike : 240,Internal_Strike : 240,+4_Each 5 seconds to recover HP : +12,+8_Critical : +70,+12_Basic Strike of Weapon : +700,+14_Critical Strike : +100%,+16_Inflict Damage on Fire : +40%
+Thunder Blade,80,External_Strike : 280,Internal_Strike : 280,+4_Each 5 seconds to recover HP : +14,+8_Critical : +80,+12_Basic Strike of Weapon : +800,+14_Critical Strike : +120%,+16_Inflict Damage on Fire : +40%
+Blade of Thunder,90,External_Strike : 500,Internal_Strike : 500,+4_Each 5 seconds to recover HP : +16,+8_Critical : +90,+12_Basic Strike of Weapon : +900,+14_Critical Strike : +140%,+16_Inflict Damage on Fire : +40%
+
+SHURIKEN
+
+Hero Shuriken,10,External_Strike : 100,Internal_Strike : 100,+4_Each 5 seconds to recover HP : +5
+Eagle Eye Shuriken,20,External_Strike : 120,Internal_Strike : 120,+4_Each 5 seconds to recover HP : +6,+8_Critical : +20
+Ultra Sorrow Shuriken,30,External_Strike : 140,Internal_Strike : 140,+4_Each 5 seconds to recover HP : +7,+8_Critical : +30
+Badass Shuriken,40,External_Strike : 160,Internal_Strike : 160,+4_Each 5 seconds to recover HP : +8,+8_Critical : +40,+12_Basic Strike of Weapon : +400
+OSun Shuriken,50,External_Strike : 180,Internal_Strike : 180,+4_Each 5 seconds to recover HP : +9,+8_Critical : +50,+12_Basic Strike of Weapon : +500,+14_Critical Strike : +70%
+Sunshine Shuriken,60,External_Strike : 200,Internal_Strike : 200,+4_Each 5 seconds to recover HP : +10,+8_Critical : +60,+12_Basic Strike of Weapon : +600,+14_Critical Strike : +80%,+16_Inflict Damage on Ice : +40%
+Fire Darts,70,External_Strike : 240,Internal_Strike : 240,+4_Each 5 seconds to recover HP : +12,+8_Critical : +70,+12_Basic Strike of Weapon : +700,+14_Critical Strike : +100%,+16_Inflict Damage on Ice : +40%
+Extermination Shuriken,80,External_Strike : 280,Internal_Strike : 280,+4_Each 5 seconds to recover HP : +14,+8_Critical : +80,+12_Basic Strike of Weapon : +800,+14_Critical Strike : +120%,+16_Inflict Damage on Ice : +40%
+Shuriken of Phoenix,90,External_Strike : 500,Internal_Strike : 500,+4_Each 5 seconds to recover HP : +16,+8_Critical : +90,+12_Basic Strike of Weapon : +900,+14_Critical Strike : +140%,+16_Inflict Damage on Ice : +40%
+
+BOW
+
+Bright Moon Bow,10,External_Strike : 100,Internal_Strike : 100,+4_Each 5 seconds to recover HP : +5
+Eye Cloud Bow,20,External_Strike : 120,Internal_Strike : 120,+4_Each 5 seconds to recover HP : +6,+8_Critical : +20
+Pheonix Feather Bow,30,External_Strike : 140,Internal_Strike : 140,+4_Each 5 seconds to recover HP : +7,+8_Critical : +30
+Hell Mind Bow,40,External_Strike : 160,Internal_Strike : 160,+4_Each 5 seconds to recover HP : +8,+8_Critical : +40,+12_Basic Strike of Weapon : +400
+Heaven Mind Bow,50,External_Strike : 180,Internal_Strike : 180,+4_Each 5 seconds to recover HP : +9,+8_Critical : +50,+12_Basic Strike of Weapon : +500,+14_Critical Strike : +70%
+Steal Heart Bow,60,External_Strike : 200,Internal_Strike : 200,+4_Each 5 seconds to recover HP : +10,+8_Critical : +60,+12_Basic Strike of Weapon : +600,+14_Critical Strike : +80%,+16_Inflict Damage on Wind : +40%
+Legendary Bow,70,External_Strike : 240,Internal_Strike : 240,+4_Each 5 seconds to recover HP : +12,+8_Critical : +70,+12_Basic Strike of Weapon : +700,+14_Critical Strike : +100%,+16_Inflict Damage on Wind : +40%
+Glacier Bow,80,External_Strike : 280,Internal_Strike : 280,+4_Each 5 seconds to recover HP : +14,+8_Critical : +80,+12_Basic Strike of Weapon : +800,+14_Critical Strike : +120%,+16_Inflict Damage on Wind : +40%
+Bow of Frost King,90,External_Strike : 500,Internal_Strike : 500,+4_Each 5 seconds to recover HP : +16,+8_Critical : +90,+12_Basic Strike of Weapon : +900,+14_Critical Strike : +140%,+16_Inflict Damage on Wind : +40%
+
+FAN
+
+Wind Mind Fan,10,External_Strike : 100,Internal_Strike : 100,+4_Each 5 seconds to recover HP : +5
+Breath of Heaven Fan,20,External_Strike : 120,Internal_Strike : 120,+4_Each 5 seconds to recover HP : +6,+8_Critical : +20
+Vulcano Wind Fan,30,External_Strike : 140,Internal_Strike : 140,+4_Each 5 seconds to recover HP : +7,+8_Critical : +30
+Hell Fire Fury Fan,40,External_Strike : 160,Internal_Strike : 160,+4_Each 5 seconds to recover HP : +8,+8_Critical : +40,+12_Basic Strike of Weapon : +400
+Storm Hurricane Fan,50,External_Strike : 180,Internal_Strike : 180,+4_Each 5 seconds to recover HP : +9,+8_Critical : +50,+12_Basic Strike of Weapon : +500,+14_Critical Strike : +70%
+Yin Wind Fan,60,External_Strike : 200,Internal_Strike : 200,+4_Each 5 seconds to recover HP : +10,+8_Critical : +60,+12_Basic Strike of Weapon : +600,+14_Critical Strike : +80%,+16_Inflict Damage on Fire : +40%
+Yin Yang Fan,70,External_Strike : 240,Internal_Strike : 240,+4_Each 5 seconds to recover HP : +12,+8_Critical : +70,+12_Basic Strike of Weapon : +700,+14_Critical Strike : +100%,+16_Inflict Damage on Fire: +40%
+Ghost Wind Fan,80,External_Strike : 280,Internal_Strike : 280,+4_Each 5 seconds to recover HP : +14,+8_Critical : +80,+12_Basic Strike of Weapon : +800,+14_Critical Strike : +120%,+16_Inflict Damage on Fire : +40%
+Fan of Supernova,90,External_Strike : 500,Internal_Strike : 500,+4_Each 5 seconds to recover HP : +16,+8_Critical : +90,+12_Basic Strike of Weapon : +900,+14_Critical Strike : +140%,+16_Inflict Damage on Fire : +40%
