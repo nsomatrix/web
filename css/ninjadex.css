@@ -621,11 +621,11 @@
 }
 
 #equipments-tab .upgrade-desc {
-    color: #00ff00;
+    color: #ffff00;
 }
 
 .upgrade-desc .number {
-    color: #ffa500;
+    color: #00ff00;
     font-weight: bold;
 }
 
