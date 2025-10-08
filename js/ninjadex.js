@@ -260,8 +260,8 @@ class Ninjadex {
 
         const upgradesHtml = equipment.upgrades.map(upgrade => 
             `<div class="upgrade-item">
-                <span class="upgrade-level">+${upgrade.upgrade_level}</span>
-                <span class="upgrade-desc">${upgrade.description}: ${upgrade.value}</span>
+                <span class="upgrade-level" data-level="${upgrade.upgrade_level}">+${upgrade.upgrade_level}</span>
+                <span class="upgrade-desc">${upgrade.description.replace(/(\+?\d+%?)/g, '<span class="number">$1</span>')}: <span class="number">${upgrade.value}</span></span>
             </div>`
         ).join('');
 

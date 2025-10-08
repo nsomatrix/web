@@ -591,7 +591,6 @@
 }
 
 .upgrade-level {
-    background: var(--accent-color);
     color: var(--text-primary);
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
@@ -601,9 +600,34 @@
     text-align: center;
 }
 
+.upgrade-level[data-level="4"] {
+    background: #28a745;
+}
+
+.upgrade-level[data-level="8"] {
+    background: #8b4513;
+}
+
+.upgrade-level[data-level="12"] {
+    background: #9370db;
+}
+
+.upgrade-level[data-level="14"] {
+    background: #4b0082;
+}
+
+.upgrade-level[data-level="16"] {
+    background: var(--accent-color);
+}
+
 .upgrade-desc {
     color: var(--text-secondary);
     flex: 1;
+}
+
+.upgrade-desc .number {
+    color: #ffa500;
+    font-weight: bold;
 }
 
 /* Maps Grid */
