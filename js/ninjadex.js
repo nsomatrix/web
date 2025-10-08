@@ -129,6 +129,7 @@ class Ninjadex {
         
         // Load maps data when maps tab is opened
         if (tabName === 'maps' && this.maps.length > 0) {
+            this.updateMapStats();
             this.renderMaps();
         }
         
@@ -209,6 +210,11 @@ class Ninjadex {
     updateEquipmentStats() {
         const total = this.filteredEquipments.length;
         document.getElementById('totalEquipments').textContent = total;
+    }
+
+    updateMapStats() {
+        const total = this.filteredMaps.length;
+        document.getElementById('totalMaps').textContent = total;
     }
 
     updateWeaponTypeFilter() {
@@ -567,6 +573,7 @@ class Ninjadex {
             return matchesSearch && matchesType;
         });
 
+        this.updateMapStats();
         this.renderMaps();
     }
 
