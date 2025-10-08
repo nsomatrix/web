@@ -232,7 +232,19 @@ class Ninjadex {
             let matchesWeaponType = true;
             if (categoryFilter === 'sword' && weaponTypeFilter !== 'all') {
                 const weaponName = equipment.name.toLowerCase();
-                matchesWeaponType = weaponName.includes(weaponTypeFilter);
+                if (weaponTypeFilter === 'sword') {
+                    matchesWeaponType = weaponName.includes('sword');
+                } else if (weaponTypeFilter === 'kunai') {
+                    matchesWeaponType = weaponName.includes('kunai') || weaponName.includes('knife');
+                } else if (weaponTypeFilter === 'blade') {
+                    matchesWeaponType = weaponName.includes('blade');
+                } else if (weaponTypeFilter === 'shuriken') {
+                    matchesWeaponType = weaponName.includes('shuriken') || weaponName.includes('darts');
+                } else if (weaponTypeFilter === 'bow') {
+                    matchesWeaponType = weaponName.includes('bow');
+                } else if (weaponTypeFilter === 'fan') {
+                    matchesWeaponType = weaponName.includes('fan');
+                }
             }
 
             // Attribute filter
