@@ -43,12 +43,25 @@ class Ninjadex {
             
             // Flatten all equipment categories into a single array
             Object.keys(data.categories).forEach(category => {
-                data.categories[category].forEach(item => {
-                    this.equipments.push({
-                        ...item,
-                        category: category
+                if (category === 'weapons') {
+                    // Handle nested weapon structure
+                    Object.keys(data.categories.weapons).forEach(weaponType => {
+                        data.categories.weapons[weaponType].forEach(item => {
+                            this.equipments.push({
+                                ...item,
+                                category: 'sword', // Keep as 'sword' for filter compatibility
+                                weapon_type: weaponType
+                            });
+                        });
                     });
-                });
+                } else if (Array.isArray(data.categories[category])) {
+                    data.categories[category].forEach(item => {
+                        this.equipments.push({
+                            ...item,
+                            category: category
+                        });
+                    });
+                }
             });
             
             this.filteredEquipments = [...this.equipments];
@@ -284,7 +297,7 @@ class Ninjadex {
             </div>
             
             <div class="equipment-category ${equipment.category}">
-                ${equipment.category.toUpperCase()}
+                ${equipment.type === 'weapon' && equipment.weapon_type ? equipment.weapon_type.toUpperCase() : equipment.category.toUpperCase()}
             </div>
             
             <div class="equipment-stats">
