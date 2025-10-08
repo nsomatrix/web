@@ -6300,7 +6300,8 @@
             "value": "+5"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Heavy Thunder Sword",
@@ -6320,7 +6321,8 @@
             "value": "+20"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Sealed Ghost Sword",
@@ -6340,7 +6342,8 @@
             "value": "+30"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Death Live Sword",
@@ -6365,7 +6368,8 @@
             "value": "+400"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Tomb Tiger Sword",
@@ -6395,7 +6399,8 @@
             "value": "+70%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Light Fire Sword",
@@ -6430,7 +6435,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Fire for God Sword",
@@ -6465,7 +6471,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Blood Sword",
@@ -6500,7 +6507,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Sword of Fire Dragon",
@@ -6535,7 +6543,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "sword"
       },
       {
         "name": "Black Fang Kunai",
@@ -6550,7 +6559,8 @@
             "value": "+5"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Snake Eye Kunai",
@@ -6570,7 +6580,8 @@
             "value": "+20"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Under Storm Kunai",
@@ -6590,7 +6601,8 @@
             "value": "+30"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Hollow Soul Kunai",
@@ -6615,7 +6627,8 @@
             "value": "+400"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Pheonix Kunai",
@@ -6645,7 +6658,8 @@
             "value": "+70%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Dragon Water Kunai",
@@ -6680,7 +6694,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Marine Knife",
@@ -6715,7 +6730,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Glacier Knife",
@@ -6750,7 +6766,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Kunai of Snowburst",
@@ -6785,7 +6802,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "kunai"
       },
       {
         "name": "Slash Horse Blade",
@@ -6800,7 +6818,8 @@
             "value": "+5"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Slash Tiger Blade",
@@ -6820,7 +6839,8 @@
             "value": "+20"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Huge Blade",
@@ -6840,7 +6860,8 @@
             "value": "+30"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Wrath of Heaven Blade",
@@ -6865,7 +6886,8 @@
             "value": "+400"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Blue Dragon Blade",
@@ -6895,7 +6917,8 @@
             "value": "+70%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Thunder Sky Blade",
@@ -6930,7 +6953,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Spirit Blade",
@@ -6965,7 +6989,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Thunder Blade",
@@ -7000,7 +7025,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Blade of Thunder",
@@ -7035,7 +7061,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "blade"
       },
       {
         "name": "Hero Shuriken",
@@ -7050,7 +7077,8 @@
             "value": "+5"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Eagle Eye Shuriken",
@@ -7070,7 +7098,8 @@
             "value": "+20"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Ultra Sorrow Shuriken",
@@ -7090,7 +7119,8 @@
             "value": "+30"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Badass Shuriken",
@@ -7115,7 +7145,8 @@
             "value": "+400"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "OSun Shuriken",
@@ -7145,7 +7176,8 @@
             "value": "+70%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Sunshine Shuriken",
@@ -7180,7 +7212,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Fire Darts",
@@ -7215,7 +7248,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Extermination Shuriken",
@@ -7250,7 +7284,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Shuriken of Phoenix",
@@ -7285,7 +7320,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Fire"
+        "attribute": "Fire",
+        "weapon_type": "shuriken"
       },
       {
         "name": "Bright Moon Bow",
@@ -7300,7 +7336,8 @@
             "value": "+5"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Eye Cloud Bow",
@@ -7320,7 +7357,8 @@
             "value": "+20"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Pheonix Feather Bow",
@@ -7340,7 +7378,8 @@
             "value": "+30"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Hell Mind Bow",
@@ -7365,7 +7404,8 @@
             "value": "+400"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Heaven Mind Bow",
@@ -7395,7 +7435,8 @@
             "value": "+70%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Steal Heart Bow",
@@ -7430,7 +7471,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Legendary Bow",
@@ -7465,7 +7507,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Glacier Bow",
@@ -7500,7 +7543,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Bow of Frost King",
@@ -7535,7 +7579,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Water"
+        "attribute": "Water",
+        "weapon_type": "bow"
       },
       {
         "name": "Wind Mind Fan",
@@ -7550,7 +7595,8 @@
             "value": "+5"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Breath of Heaven Fan",
@@ -7570,7 +7616,8 @@
             "value": "+20"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Vulcano Wind Fan",
@@ -7590,7 +7637,8 @@
             "value": "+30"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Hell Fire Fury Fan",
@@ -7615,7 +7663,8 @@
             "value": "+400"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Storm Hurricane Fan",
@@ -7645,7 +7694,8 @@
             "value": "+70%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Yin Wind Fan",
@@ -7680,7 +7730,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Yin Yang Fan",
@@ -7715,7 +7766,8 @@
             "value": ""
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Ghost Wind Fan",
@@ -7750,7 +7802,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       },
       {
         "name": "Fan of Supernova",
@@ -7785,7 +7838,8 @@
             "value": "+40%"
           }
         ],
-        "attribute": "Wind"
+        "attribute": "Wind",
+        "weapon_type": "fan"
       }
     ]
   }
