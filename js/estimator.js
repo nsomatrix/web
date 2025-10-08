@@ -87,8 +87,8 @@ class KinsEstimator {
         const kinsPerHour = this.parseKinsInput(document.getElementById('kinsPerHour').value.trim());
         const days = parseInt(document.getElementById('days').value.trim());
 
-        if (!kinsPerHour || !days || kinsPerHour <= 0 || days <= 0) {
-            alert('Please enter valid numbers');
+        if (!kinsPerHour || !days || kinsPerHour <= 0 || days <= 0 || days > 365) {
+            this.showPopup('Invalid Input', 'Please enter valid numbers:\n• Kins per Hour: > 0\n• Days: 1-365');
             return;
         }
 
@@ -117,10 +117,10 @@ class KinsEstimator {
         const expPerHour = parseFloat(document.getElementById('expPerHour').value);
 
         if (!currentLevel || currentExp === '' || !expPerHour ||
-            currentLevel < 1 || currentLevel > 130 ||
+            currentLevel < 1 || currentLevel > 129 ||
             currentExp < -50 || currentExp > 99.99 ||
             expPerHour <= 0) {
-            alert('Please enter valid values within the specified ranges');
+            this.showPopup('Invalid Input', 'Please enter valid values within the specified ranges:\n• Level: 1-129 (can calculate to level 130)\n• Experience: -50% to 99.99%\n• EXP per Hour: > 0');
             return;
         }
 
@@ -128,7 +128,7 @@ class KinsEstimator {
 
         setTimeout(() => {
             if (!this.levelRequirements) {
-                alert('Level data not loaded yet. Please try again.');
+                this.showPopup('Data Loading', 'Level data not loaded yet. Please try again in a moment.');
                 this.setLoadingState(button, false);
                 return;
             }
@@ -136,9 +136,7 @@ class KinsEstimator {
             const expNeeded = 100 - currentExp;
             const secondsNeeded = Math.ceil((expNeeded / expPerHour) * 3600);
             
-            const currentLevelTotalExp = this.levelRequirements[currentLevel.toString()] || 0;
-            const nextLevelTotalExp = this.levelRequirements[(currentLevel + 1).toString()] || 0;
-            const expForThisLevel = nextLevelTotalExp - currentLevelTotalExp;
+            const expForThisLevel = this.levelRequirements[(currentLevel + 1).toString()] || 0;
             const actualExpNeeded = Math.ceil((expNeeded / 100) * expForThisLevel);
 
             this.calculationData = { 
@@ -281,6 +279,16 @@ class KinsEstimator {
         document.getElementById('currentLevel').placeholder = randomLevel.toString();
         document.getElementById('currentExp').placeholder = randomExp;
         document.getElementById('expPerHour').placeholder = randomExpPerHour;
+    }
+    
+    showPopup(title, message) {
+        document.getElementById('popupTitle').textContent = title;
+        document.getElementById('popupMessage').textContent = message;
+        document.getElementById('customPopup').style.display = 'flex';
+    }
+    
+    hidePopup() {
+        document.getElementById('customPopup').style.display = 'none';
     }
 }
 
