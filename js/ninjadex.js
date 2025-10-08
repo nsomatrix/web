@@ -294,8 +294,8 @@ class Ninjadex {
                 </div>
                 ${equipment.attribute ? `
                 <div class="stat-item">
-                    <span class="stat-label">Attribute:</span>
-                    <span class="stat-value attribute-${equipment.attribute.toLowerCase()}">${equipment.attribute}</span>
+                    <span class="stat-label ${equipment.attribute.toLowerCase()}">Attribute:</span>
+                    <span class="stat-value">${equipment.attribute}</span>
                 </div>` : ''}
             </div>
             

@@ -630,6 +630,19 @@
     font-weight: bold;
 }
 
+/* Attribute colors */
+.stat-item .stat-label.fire + .stat-value {
+    color: orange;
+}
+
+.stat-item .stat-label.water + .stat-value {
+    color: #4dabf7;
+}
+
+.stat-item .stat-label.wind + .stat-value {
+    color: gray;
+}
+
 /* Maps Grid */
 .maps-grid {
     display: grid;
