@@ -551,17 +551,7 @@
     border: 1px solid var(--border-color);
 }
 
-.attribute-fire {
-    color: #ff6b6b !important;
-}
 
-.attribute-water {
-    color: #4dabf7 !important;
-}
-
-.attribute-wind {
-    color: #69db7c !important;
-}
 
 .equipment-upgrades {
     margin-top: 0.75rem;
@@ -617,7 +607,8 @@
 }
 
 .upgrade-level[data-level="16"] {
-    background: var(--accent-color);
+    background: #ff4444;
+    color: white;
 }
 
 .upgrade-desc {
