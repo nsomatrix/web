@@ -6,12 +6,15 @@ class Ninjadex {
         this.filteredMaps = [];
         this.equipments = [];
         this.filteredEquipments = [];
+        this.items = [];
+        this.filteredItems = [];
         this.init();
     }
 
     async init() {
         await this.loadMonsters();
         await this.loadEquipments();
+        await this.loadItems();
         this.processMaps();
         this.setupEventListeners();
         this.updateStats();
@@ -70,6 +73,17 @@ class Ninjadex {
         }
     }
 
+    async loadItems() {
+        try {
+            const response = await fetch('data/items.json');
+            const data = await response.json();
+            this.items = data;
+            this.filteredItems = [...this.items];
+        } catch (error) {
+            console.error('Failed to load items:', error);
+        }
+    }
+
     setupEventListeners() {
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -97,6 +111,11 @@ class Ninjadex {
         // Equipment search
         document.getElementById('equipmentSearchInput').addEventListener('input', () => {
             this.filterEquipments();
+        });
+
+        // Items search
+        document.getElementById('itemSearchInput').addEventListener('input', () => {
+            this.filterItems();
         });
 
         // Planner
@@ -137,6 +156,12 @@ class Ninjadex {
         if (tabName === 'equipments' && this.equipments.length > 0) {
             this.updateEquipmentStats();
             this.renderEquipments();
+        }
+        
+        // Load items data when items tab is opened
+        if (tabName === 'items' && this.items.length > 0) {
+            this.updateItemStats();
+            this.renderItems();
         }
     }
 
@@ -215,6 +240,46 @@ class Ninjadex {
     updateMapStats() {
         const total = this.filteredMaps.length;
         document.getElementById('totalMaps').textContent = total;
+    }
+
+    updateItemStats() {
+        const total = this.filteredItems.length;
+        document.getElementById('totalItems').textContent = total;
+    }
+
+    filterItems() {
+        const searchTerm = document.getElementById('itemSearchInput').value.toLowerCase();
+        
+        this.filteredItems = this.items.filter(item => {
+            return item.name.toLowerCase().includes(searchTerm);
+        });
+
+        this.updateItemStats();
+        this.renderItems();
+    }
+
+    renderItems() {
+        const grid = document.getElementById('itemsGrid');
+        grid.innerHTML = '';
+
+        this.filteredItems.forEach(item => {
+            const card = this.createItemCard(item);
+            grid.appendChild(card);
+        });
+    }
+
+    createItemCard(item) {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+
+        card.innerHTML = `
+            <div class="item-header">
+                <div class="item-name">${item.name}</div>
+                <div class="item-id">ID: ${item.id}</div>
+            </div>
+        `;
+
+        return card;
     }
 
     updateWeaponTypeFilter() {

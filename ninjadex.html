@@ -52,6 +52,7 @@
             <button class="tab-btn active" data-tab="monsters">Monsters</button>
             <button class="tab-btn" data-tab="equipments">Equipments</button>
             <button class="tab-btn" data-tab="maps">Maps</button>
+            <button class="tab-btn" data-tab="items">Items</button>
             <button class="tab-btn" data-tab="planner">BluePrint</button>
         </div>
 
@@ -183,6 +184,23 @@
             </div>
 
             <div class="maps-grid" id="mapsGrid"></div>
+        </div>
+
+        <div id="items-tab" class="tab-content">
+            <div class="filters-section">
+                <div class="search">
+                    <input type="text" class="search__input" id="itemSearchInput" placeholder="Search items by name">
+                </div>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalItems">0</span>
+                    <span class="stat-label">Total Items</span>
+                </div>
+            </div>
+
+            <div class="items-grid" id="itemsGrid"></div>
         </div>
 
         <div id="planner-tab" class="tab-content">
