@@ -6299,7 +6299,8 @@
             "description": "Each 5 seconds to recover HP",
             "value": "+5"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Heavy Thunder Sword",
@@ -6318,7 +6319,8 @@
             "description": "Critical",
             "value": "+20"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Sealed Ghost Sword",
@@ -6337,7 +6339,8 @@
             "description": "Critical",
             "value": "+30"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Death Live Sword",
@@ -6361,7 +6364,8 @@
             "description": "Basic Strike of Weapon",
             "value": "+400"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Tomb Tiger Sword",
@@ -6390,7 +6394,8 @@
             "description": "Critical Strike",
             "value": "+70%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Light Fire Sword",
@@ -6424,7 +6429,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Fire for God Sword",
@@ -6458,7 +6464,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Blood Sword",
@@ -6492,7 +6499,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Sword of Fire Dragon",
@@ -6526,7 +6534,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Black Fang Kunai",
@@ -6540,7 +6549,8 @@
             "description": "Each 5 seconds to recover HP",
             "value": "+5"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Snake Eye Kunai",
@@ -6559,7 +6569,8 @@
             "description": "Critical",
             "value": "+20"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Under Storm Kunai",
@@ -6578,7 +6589,8 @@
             "description": "Critical",
             "value": "+30"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Hollow Soul Kunai",
@@ -6602,7 +6614,8 @@
             "description": "Basic Strike of Weapon",
             "value": "+400"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Pheonix Kunai",
@@ -6631,7 +6644,8 @@
             "description": "Critical Strike",
             "value": "+70%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Dragon Water Kunai",
@@ -6665,7 +6679,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Marine Knife",
@@ -6699,7 +6714,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Glacier Knife",
@@ -6733,7 +6749,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Kunai of Snowburst",
@@ -6767,7 +6784,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Slash Horse Blade",
@@ -6781,7 +6799,8 @@
             "description": "Each 5 seconds to recover HP",
             "value": "+5"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Slash Tiger Blade",
@@ -6800,7 +6819,8 @@
             "description": "Critical",
             "value": "+20"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Huge Blade",
@@ -6819,7 +6839,8 @@
             "description": "Critical",
             "value": "+30"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Wrath of Heaven Blade",
@@ -6843,7 +6864,8 @@
             "description": "Basic Strike of Weapon",
             "value": "+400"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Blue Dragon Blade",
@@ -6872,7 +6894,8 @@
             "description": "Critical Strike",
             "value": "+70%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Thunder Sky Blade",
@@ -6906,7 +6929,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Spirit Blade",
@@ -6940,7 +6964,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Thunder Blade",
@@ -6974,7 +6999,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Blade of Thunder",
@@ -7008,7 +7034,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Hero Shuriken",
@@ -7022,7 +7049,8 @@
             "description": "Each 5 seconds to recover HP",
             "value": "+5"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Eagle Eye Shuriken",
@@ -7041,7 +7069,8 @@
             "description": "Critical",
             "value": "+20"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Ultra Sorrow Shuriken",
@@ -7060,7 +7089,8 @@
             "description": "Critical",
             "value": "+30"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Badass Shuriken",
@@ -7084,7 +7114,8 @@
             "description": "Basic Strike of Weapon",
             "value": "+400"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "OSun Shuriken",
@@ -7113,7 +7144,8 @@
             "description": "Critical Strike",
             "value": "+70%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Sunshine Shuriken",
@@ -7147,7 +7179,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Fire Darts",
@@ -7181,7 +7214,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Extermination Shuriken",
@@ -7215,7 +7249,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Shuriken of Phoenix",
@@ -7249,7 +7284,8 @@
             "description": "Inflict Damage on Ice",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Fire"
       },
       {
         "name": "Bright Moon Bow",
@@ -7263,7 +7299,8 @@
             "description": "Each 5 seconds to recover HP",
             "value": "+5"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Eye Cloud Bow",
@@ -7282,7 +7319,8 @@
             "description": "Critical",
             "value": "+20"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Pheonix Feather Bow",
@@ -7301,7 +7339,8 @@
             "description": "Critical",
             "value": "+30"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Hell Mind Bow",
@@ -7325,7 +7364,8 @@
             "description": "Basic Strike of Weapon",
             "value": "+400"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Heaven Mind Bow",
@@ -7354,7 +7394,8 @@
             "description": "Critical Strike",
             "value": "+70%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Steal Heart Bow",
@@ -7388,7 +7429,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Legendary Bow",
@@ -7422,7 +7464,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Glacier Bow",
@@ -7456,7 +7499,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Bow of Frost King",
@@ -7490,7 +7534,8 @@
             "description": "Inflict Damage on Wind",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Water"
       },
       {
         "name": "Wind Mind Fan",
@@ -7504,7 +7549,8 @@
             "description": "Each 5 seconds to recover HP",
             "value": "+5"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Breath of Heaven Fan",
@@ -7523,7 +7569,8 @@
             "description": "Critical",
             "value": "+20"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Vulcano Wind Fan",
@@ -7542,7 +7589,8 @@
             "description": "Critical",
             "value": "+30"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Hell Fire Fury Fan",
@@ -7566,7 +7614,8 @@
             "description": "Basic Strike of Weapon",
             "value": "+400"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Storm Hurricane Fan",
@@ -7595,7 +7644,8 @@
             "description": "Critical Strike",
             "value": "+70%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Yin Wind Fan",
@@ -7629,7 +7679,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Yin Yang Fan",
@@ -7663,7 +7714,8 @@
             "description": "Inflict Damage on Fire: +40%",
             "value": ""
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Ghost Wind Fan",
@@ -7697,7 +7749,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       },
       {
         "name": "Fan of Supernova",
@@ -7731,7 +7784,8 @@
             "description": "Inflict Damage on Fire",
             "value": "+40%"
           }
-        ]
+        ],
+        "attribute": "Wind"
       }
     ]
   }

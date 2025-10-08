@@ -71,8 +71,8 @@ class Ninjadex {
         this.setupCustomSelect('typeFilter', () => this.filterMonsters());
         this.setupCustomSelect('tierFilter', () => this.filterMonsters());
         this.setupCustomSelect('mapTypeFilter', () => this.filterMaps());
-        this.setupCustomSelect('equipmentTypeFilter', () => this.filterEquipments());
-        this.setupCustomSelect('equipmentCategoryFilter', () => this.filterEquipments());
+        this.setupCustomSelect('equipmentCategoryFilter', () => this.updateWeaponTypeFilter());
+        this.setupCustomSelect('equipmentWeaponTypeFilter', () => this.filterEquipments());
         this.setupCustomSelect('equipmentAttributeFilter', () => this.filterEquipments());
         this.setupCustomSelect('objective', null);
 
@@ -195,34 +195,50 @@ class Ninjadex {
 
     updateEquipmentStats() {
         const total = this.filteredEquipments.length;
-        const equipment = this.filteredEquipments.filter(e => e.type === 'equipment').length;
-        const weapons = this.filteredEquipments.filter(e => e.type === 'weapon').length;
-
         document.getElementById('totalEquipments').textContent = total;
-        document.getElementById('equipmentCount').textContent = equipment;
-        document.getElementById('weaponCount').textContent = weapons;
+    }
+
+    updateWeaponTypeFilter() {
+        const categoryFilter = document.getElementById('equipmentCategoryFilter').dataset.value || 'all';
+        const weaponTypeFilter = document.getElementById('equipmentWeaponTypeFilter');
+        
+        if (categoryFilter === 'sword') {
+            weaponTypeFilter.style.display = 'block';
+        } else {
+            weaponTypeFilter.style.display = 'none';
+            weaponTypeFilter.dataset.value = 'all';
+            weaponTypeFilter.querySelector('.select-trigger').textContent = 'All Weapon Types';
+            weaponTypeFilter.querySelectorAll('.select-option').forEach(opt => opt.classList.remove('active'));
+            weaponTypeFilter.querySelector('[data-value="all"]').classList.add('active');
+        }
+        
+        this.filterEquipments();
     }
 
     filterEquipments() {
         const searchTerm = document.getElementById('equipmentSearchInput').value.toLowerCase();
-        const typeFilter = document.getElementById('equipmentTypeFilter').dataset.value || 'all';
         const categoryFilter = document.getElementById('equipmentCategoryFilter').dataset.value || 'all';
+        const weaponTypeFilter = document.getElementById('equipmentWeaponTypeFilter').dataset.value || 'all';
         const attributeFilter = document.getElementById('equipmentAttributeFilter').dataset.value || 'all';
 
         this.filteredEquipments = this.equipments.filter(equipment => {
             // Search filter
             const matchesSearch = equipment.name.toLowerCase().includes(searchTerm);
 
-            // Type filter
-            const matchesType = typeFilter === 'all' || equipment.type === typeFilter;
-
             // Category filter
             const matchesCategory = categoryFilter === 'all' || equipment.category === categoryFilter;
+
+            // Weapon type filter (only for weapons)
+            let matchesWeaponType = true;
+            if (categoryFilter === 'sword' && weaponTypeFilter !== 'all') {
+                const weaponName = equipment.name.toLowerCase();
+                matchesWeaponType = weaponName.includes(weaponTypeFilter);
+            }
 
             // Attribute filter
             const matchesAttribute = attributeFilter === 'all' || equipment.attribute === attributeFilter;
 
-            return matchesSearch && matchesType && matchesCategory && matchesAttribute;
+            return matchesSearch && matchesCategory && matchesWeaponType && matchesAttribute;
         });
 
         this.updateEquipmentStats();
