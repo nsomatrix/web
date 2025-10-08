@@ -197,6 +197,22 @@
     text-shadow: 0 0 10px var(--accent-color);
 }
 
+.neon-exp {
+    color: #00ffff;
+    text-shadow: 0 0 3px #00ffff;
+    font-weight: 700;
+}
+
+.flash-red {
+    animation: flashRed 0.2s ease-in-out;
+}
+
+@keyframes flashRed {
+    0% { color: inherit; }
+    50% { color: #ff4444; text-shadow: 0 0 5px #ff4444; }
+    100% { color: inherit; }
+}
+
 .coming-soon {
     color: var(--text-secondary);
     font-style: italic;

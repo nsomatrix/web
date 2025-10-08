@@ -177,7 +177,7 @@ class KinsEstimator {
         
         if (this.levelRequirements && results.fromLevel < 130) {
             const actualExpNeeded = Math.ceil(this.calculationData.actualExpNeeded);
-            document.getElementById('expNeeded').textContent = `${results.expNeeded}% (${actualExpNeeded.toLocaleString()} EXP)`;
+            document.getElementById('expNeeded').innerHTML = `${results.expNeeded}% (<span class="neon-exp">${actualExpNeeded} EXP</span>)`;
         } else {
             document.getElementById('expNeeded').textContent = `${results.expNeeded}%`;
         }
@@ -194,6 +194,7 @@ class KinsEstimator {
         const expPerMs = this.calculationData.expPerHour / 3600000;
         let currentExpNeeded = this.calculationData.expNeeded;
         let remainingMs = seconds * 1000;
+        let lastDisplayedText = '';
 
         const updateCountdown = () => {
             if (remainingMs <= 0) {
@@ -223,13 +224,19 @@ class KinsEstimator {
             
             currentExpNeeded -= expPerMs * 100;
             const currentPercentage = Math.max(0, currentExpNeeded);
+            const displayedPercentage = currentPercentage.toFixed(2);
+            const percentageChanged = displayedPercentage !== lastDisplayedText;
             
             if (this.levelRequirements) {
                 const actualExpRemaining = Math.ceil((currentPercentage / 100) * this.calculationData.expForThisLevel);
-                expNeededElement.textContent = `${currentPercentage.toFixed(2)}% (${Math.max(0, actualExpRemaining).toLocaleString()} EXP)`;
+                const flashClass = percentageChanged ? 'flash-red' : '';
+                expNeededElement.innerHTML = `<span class="${flashClass}">${displayedPercentage}%</span> (<span class="neon-exp">${Math.max(0, actualExpRemaining)} EXP</span>)`;
             } else {
-                expNeededElement.textContent = `${currentPercentage.toFixed(2)}%`;
+                const flashClass = percentageChanged ? 'flash-red' : '';
+                expNeededElement.innerHTML = `<span class="${flashClass}">${displayedPercentage}%</span>`;
             }
+            
+            lastDisplayedText = displayedPercentage;
             
             remainingMs -= 100;
         };
