@@ -5,6 +5,7 @@ class KinsEstimator {
         this.levelRequirements = null;
         this.loadLevelRequirements();
         this.initializeEventListeners();
+        this.setRandomPlaceholders();
     }
 
     async loadLevelRequirements() {
@@ -264,6 +265,22 @@ class KinsEstimator {
             clearInterval(this.countdownInterval);
             this.countdownInterval = null;
         }
+    }
+    
+    setRandomPlaceholders() {
+        // Kins estimator placeholders
+        const randomKins = Math.floor(Math.random() * 999000) + 1000;
+        const randomDays = Math.floor(Math.random() * 365) + 1;
+        document.getElementById('kinsPerHour').placeholder = this.formatKins(randomKins);
+        document.getElementById('days').placeholder = randomDays.toString();
+        
+        // Level estimator placeholders
+        const randomLevel = Math.floor(Math.random() * 129) + 1;
+        const randomExp = (Math.random() * 99.98 + 0.01).toFixed(2);
+        const randomExpPerHour = (Math.random() * 99.98 + 0.01).toFixed(2);
+        document.getElementById('currentLevel').placeholder = randomLevel.toString();
+        document.getElementById('currentExp').placeholder = randomExp;
+        document.getElementById('expPerHour').placeholder = randomExpPerHour;
     }
 }
 
