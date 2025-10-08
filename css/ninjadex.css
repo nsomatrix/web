@@ -187,7 +187,7 @@
 .monster-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: var(--text-primary);
+    color: #ffa500;
 }
 
 .monster-type {
@@ -426,7 +426,7 @@
 
 .blueprint-map-name {
     font-weight: bold;
-    color: #ffff00;
+    color: #ffa500;
     font-size: 1.1rem;
 }
 
@@ -463,7 +463,7 @@
 
 .blueprint-monster-name {
     font-weight: bold;
-    color: var(--text-primary);
+    color: #ffa500;
 }
 
 .blueprint-monster-stats {
@@ -501,7 +501,7 @@
 .equipment-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: var(--text-primary);
+    color: #ffa500;
 }
 
 .equipment-type {
@@ -549,6 +549,10 @@
     background: var(--tertiary-bg);
     border-radius: 4px;
     border: 1px solid var(--border-color);
+}
+
+.weapon-stats .stat-value {
+    color: #00ffff;
 }
 
 
@@ -668,7 +672,7 @@
 .map-name {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #ffff00;
+    color: #ffa500;
 }
 
 .map-type {
