@@ -130,6 +130,31 @@
     transform: translateY(0);
 }
 
+.button-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.reset-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.reset-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-color);
+    background: rgba(179, 60, 60, 0.1);
+}
+
 .results-section {
     margin-top: 2rem;
     padding-top: 2rem;
@@ -257,7 +282,12 @@
         padding: 1rem;
     }
     
-    .calculate-btn {
+    .button-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .calculate-btn, .reset-btn {
         width: 100%;
         padding: 1rem;
     }

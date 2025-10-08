@@ -26,6 +26,10 @@ class KinsEstimator {
         // Calculate buttons
         document.getElementById('calculateKins').addEventListener('click', () => this.calculateKins());
         document.getElementById('calculateLevel').addEventListener('click', () => this.calculateLevel());
+        
+        // Reset buttons
+        document.getElementById('resetKins').addEventListener('click', () => this.resetKins());
+        document.getElementById('resetLevel').addEventListener('click', () => this.resetLevel());
 
         // Auto-format kins input
         document.getElementById('kinsPerHour').addEventListener('input', (e) => {
@@ -243,6 +247,23 @@ class KinsEstimator {
 
         updateCountdown();
         this.countdownInterval = setInterval(updateCountdown, 100);
+    }
+    
+    resetKins() {
+        document.getElementById('kinsPerHour').value = '';
+        document.getElementById('days').value = '';
+        document.getElementById('kinsResults').style.display = 'none';
+    }
+    
+    resetLevel() {
+        document.getElementById('currentLevel').value = '';
+        document.getElementById('currentExp').value = '';
+        document.getElementById('expPerHour').value = '';
+        document.getElementById('levelResults').style.display = 'none';
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
     }
 }
 
