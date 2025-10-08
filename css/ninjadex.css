@@ -616,6 +616,10 @@
     flex: 1;
 }
 
+#equipments-tab .upgrade-desc {
+    color: #00ff00;
+}
+
 .upgrade-desc .number {
     color: #ffa500;
     font-weight: bold;
