@@ -672,7 +672,7 @@
 .skill-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: var(--text-primary);
+    color: orange;
 }
 
 .skill-level {
@@ -699,8 +699,19 @@
 
 .skill-class {
     background: var(--tertiary-bg);
-    color: var(--accent-color);
     border: 1px solid var(--border-color);
+}
+
+.skill-class.blade, .skill-class.fan {
+    color: gray;
+}
+
+.skill-class.sword, .skill-class.shuriken {
+    color: orange;
+}
+
+.skill-class.kunai, .skill-class.bow {
+    color: #20b2aa;
 }
 
 .skill-school {
@@ -710,7 +721,7 @@
 }
 
 .skill-description {
-    color: var(--text-secondary);
+    color: yellow;
     line-height: 1.4;
     font-size: 0.9rem;
 }
