@@ -8,6 +8,8 @@ class Ninjadex {
         this.filteredEquipments = [];
         this.items = [];
         this.filteredItems = [];
+        this.skillsets = [];
+        this.filteredSkillsets = [];
         this.init();
     }
 
@@ -15,6 +17,7 @@ class Ninjadex {
         await this.loadMonsters();
         await this.loadEquipments();
         await this.loadItems();
+        await this.loadSkillsets();
         this.processMaps();
         this.setupEventListeners();
         this.updateStats();
@@ -84,6 +87,29 @@ class Ninjadex {
         }
     }
 
+    async loadSkillsets() {
+        try {
+            const response = await fetch('structured_skillsets.json');
+            const data = await response.json();
+            this.skillsets = [];
+            
+            Object.keys(data.classes).forEach(className => {
+                const classData = data.classes[className];
+                classData.skills.forEach(skill => {
+                    this.skillsets.push({
+                        ...skill,
+                        class: className,
+                        school: classData.school
+                    });
+                });
+            });
+            
+            this.filteredSkillsets = [...this.skillsets];
+        } catch (error) {
+            console.error('Failed to load skillsets:', error);
+        }
+    }
+
     setupEventListeners() {
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -117,6 +143,14 @@ class Ninjadex {
         document.getElementById('itemSearchInput').addEventListener('input', () => {
             this.filterItems();
         });
+
+        // Skillsets search and filters
+        document.getElementById('skillsetSearchInput').addEventListener('input', () => {
+            this.filterSkillsets();
+        });
+        this.setupCustomSelect('schoolFilter', () => this.filterSkillsets());
+        this.setupCustomSelect('classFilter', () => this.filterSkillsets());
+        this.setupCustomSelect('skillLevelFilter', () => this.filterSkillsets());
 
         // Planner
         document.getElementById('generatePlan').addEventListener('click', () => {
@@ -162,6 +196,19 @@ class Ninjadex {
         if (tabName === 'items' && this.items.length > 0) {
             this.updateItemStats();
             this.renderItems();
+        }
+        
+        // Load skillsets data when skillsets tab is opened
+        if (tabName === 'skillsets') {
+            if (this.skillsets.length === 0) {
+                this.loadSkillsets().then(() => {
+                    this.updateSkillsetStats();
+                    this.renderSkillsets();
+                });
+            } else {
+                this.updateSkillsetStats();
+                this.renderSkillsets();
+            }
         }
     }
 
@@ -245,6 +292,69 @@ class Ninjadex {
     updateItemStats() {
         const total = this.filteredItems.length;
         document.getElementById('totalItems').textContent = total;
+    }
+
+    updateSkillsetStats() {
+        const total = this.filteredSkillsets.length;
+        document.getElementById('totalSkills').textContent = total;
+    }
+
+    filterSkillsets() {
+        const searchTerm = document.getElementById('skillsetSearchInput').value.toLowerCase();
+        const schoolFilter = document.getElementById('schoolFilter').dataset.value || 'all';
+        const classFilter = document.getElementById('classFilter').dataset.value || 'all';
+        const levelFilter = document.getElementById('skillLevelFilter').dataset.value || 'all';
+
+        this.filteredSkillsets = this.skillsets.filter(skill => {
+            const matchesSearch = skill.name.toLowerCase().includes(searchTerm) ||
+                                skill.description.toLowerCase().includes(searchTerm);
+            const matchesSchool = schoolFilter === 'all' || skill.school === schoolFilter;
+            const matchesClass = classFilter === 'all' || skill.class === classFilter;
+            
+            let matchesLevel = true;
+            if (levelFilter !== 'all') {
+                const [min, max] = levelFilter.split('-').map(Number);
+                matchesLevel = skill.level >= min && skill.level <= max;
+            }
+
+            return matchesSearch && matchesSchool && matchesClass && matchesLevel;
+        });
+
+        this.updateSkillsetStats();
+        this.renderSkillsets();
+    }
+
+    renderSkillsets() {
+        const grid = document.getElementById('skillsetsGrid');
+        grid.innerHTML = '';
+
+        this.filteredSkillsets.forEach(skill => {
+            const card = this.createSkillCard(skill);
+            grid.appendChild(card);
+        });
+    }
+
+    createSkillCard(skill) {
+        const card = document.createElement('div');
+        card.className = 'skill-card';
+
+        card.innerHTML = `
+            <div class="skill-header">
+                <div class="skill-name">${skill.name}</div>
+                <div class="skill-level">Level ${skill.level}</div>
+            </div>
+            
+            <div class="skill-class-info">
+                <span class="skill-class ${skill.class}">${skill.class.toUpperCase()}</span>
+                <span class="skill-school ${skill.school}">${skill.school.toUpperCase()}</span>
+            </div>
+            
+            <div class="skill-description">
+                ${skill.description}
+            </div>
+        `;
+
+        return card;
     }
 
     filterItems() {

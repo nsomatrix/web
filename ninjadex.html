@@ -53,6 +53,7 @@
             <button class="tab-btn" data-tab="equipments">Equipments</button>
             <button class="tab-btn" data-tab="maps">Maps</button>
             <button class="tab-btn" data-tab="items">Items</button>
+            <button class="tab-btn" data-tab="skillsets">Skill Sets</button>
             <button class="tab-btn" data-tab="planner">BluePrint</button>
         </div>
 
@@ -201,6 +202,63 @@
             </div>
 
             <div class="items-grid" id="itemsGrid"></div>
+        </div>
+
+        <div id="skillsets-tab" class="tab-content">
+            <div class="filters-section">
+                <div class="search">
+                    <input type="text" class="search__input" id="skillsetSearchInput" placeholder="Search skills by name">
+                </div>
+                <div class="filter-controls">
+                    <div class="custom-select" id="schoolFilter">
+                        <div class="select-trigger">All Schools</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Schools</div>
+                            <div class="select-option" data-value="haruna">Haruna</div>
+                            <div class="select-option" data-value="ookaza">Ookaza</div>
+                            <div class="select-option" data-value="hirosaki">Hirosaki</div>
+                        </div>
+                    </div>
+                    <div class="custom-select" id="classFilter">
+                        <div class="select-trigger">All Classes</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Classes</div>
+                            <div class="select-option" data-value="blade">Blade</div>
+                            <div class="select-option" data-value="fan">Fan</div>
+                            <div class="select-option" data-value="bow">Bow</div>
+                            <div class="select-option" data-value="kunai">Kunai</div>
+                            <div class="select-option" data-value="sword">Sword</div>
+                            <div class="select-option" data-value="shuriken">Shuriken</div>
+                        </div>
+                    </div>
+                    <div class="custom-select" id="skillLevelFilter">
+                        <div class="select-trigger">All Levels</div>
+                        <div class="select-options">
+                            <div class="select-option active" data-value="all">All Levels</div>
+                            <div class="select-option" data-value="10-30">Basic (10-30)</div>
+                            <div class="select-option" data-value="35-60">Intermediate (35-60)</div>
+                            <div class="select-option" data-value="70-100">Advanced (70-100)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalSkills">0</span>
+                    <span class="stat-label">Total Skills</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalClasses">6</span>
+                    <span class="stat-label">Classes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalSchools">3</span>
+                    <span class="stat-label">Schools</span>
+                </div>
+            </div>
+
+            <div class="skillsets-grid" id="skillsetsGrid"></div>
         </div>
 
         <div id="planner-tab" class="tab-content">
