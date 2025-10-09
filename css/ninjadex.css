@@ -187,7 +187,7 @@
 .monster-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #ffa500;
+    color: yellow;
 }
 
 .monster-type {
@@ -261,7 +261,7 @@
 
 .location-tag {
     background: var(--tertiary-bg);
-    color: #ffff00;
+    color: orange;
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
     font-size: 0.8rem;
@@ -501,7 +501,7 @@
 .equipment-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #ffa500;
+    color: yellow;
 }
 
 .equipment-type {
@@ -621,7 +621,7 @@
 }
 
 #equipments-tab .upgrade-desc {
-    color: #ffff00;
+    color: orange;
 }
 
 .upgrade-desc .number {
@@ -672,7 +672,7 @@
 .skill-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: orange;
+    color: yellow;
 }
 
 .skill-level {
@@ -721,7 +721,7 @@
 }
 
 .skill-description {
-    color: yellow;
+    color: orange;
     line-height: 1.4;
     font-size: 0.9rem;
 }
@@ -756,7 +756,7 @@
 .map-name {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #ffa500;
+    color: yellow;
 }
 
 .map-type {
@@ -810,7 +810,7 @@
 }
 
 .monster-item-name {
-    color: #ffff00;
+    color: orange;
     font-weight: bold;
 }
 
@@ -850,7 +850,7 @@
 .item-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #ffa500;
+    color: yellow;
 }
 
 .item-id {
