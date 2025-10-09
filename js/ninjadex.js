@@ -17,7 +17,6 @@ class Ninjadex {
         await this.loadMonsters();
         await this.loadEquipments();
         await this.loadItems();
-        await this.loadSkillsets();
         this.processMaps();
         this.setupEventListeners();
         this.updateStats();
@@ -144,13 +143,16 @@ class Ninjadex {
             this.filterItems();
         });
 
-        // Skillsets search and filters
-        document.getElementById('skillsetSearchInput').addEventListener('input', () => {
-            this.filterSkillsets();
-        });
-        this.setupCustomSelect('schoolFilter', () => this.filterSkillsets());
-        this.setupCustomSelect('classFilter', () => this.filterSkillsets());
-        this.setupCustomSelect('skillLevelFilter', () => this.filterSkillsets());
+        // Skillsets search and filters (only if elements exist)
+        const skillsetSearchInput = document.getElementById('skillsetSearchInput');
+        if (skillsetSearchInput) {
+            skillsetSearchInput.addEventListener('input', () => {
+                this.filterSkillsets();
+            });
+            this.setupCustomSelect('schoolFilter', () => this.filterSkillsets());
+            this.setupCustomSelect('classFilter', () => this.filterSkillsets());
+            this.setupCustomSelect('skillLevelFilter', () => this.filterSkillsets());
+        }
 
         // Planner
         document.getElementById('generatePlan').addEventListener('click', () => {
@@ -214,6 +216,7 @@ class Ninjadex {
 
     setupCustomSelect(selectId, callback) {
         const select = document.getElementById(selectId);
+        if (!select) return;
         const trigger = select.querySelector('.select-trigger');
         const options = select.querySelectorAll('.select-option');
 
