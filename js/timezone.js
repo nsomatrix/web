@@ -191,7 +191,368 @@ window.countries = [
 const countries = window.countries;
 let searchResults = [];
 let comparisonCountries = { country1: null, country2: null };
+let worldClockTimezones = [];
+let meetingParticipants = [];
+let converterState = { from: null, to: null };
 
+// Tab Management
+function initializeTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(targetTab).classList.add('active');
+        });
+    });
+}
+
+// World Clock Functions
+function addTimezoneToWorldClock(country) {
+    if (worldClockTimezones.find(tz => tz.timezone === country.timezone)) return;
+    
+    worldClockTimezones.push(country);
+    updateWorldClockDisplay();
+}
+
+function removeTimezoneFromWorldClock(timezone) {
+    worldClockTimezones = worldClockTimezones.filter(tz => tz.timezone !== timezone);
+    updateWorldClockDisplay();
+}
+
+function updateWorldClockDisplay() {
+    const grid = document.getElementById('world-clock-grid');
+    grid.innerHTML = '';
+    
+    worldClockTimezones.forEach(country => {
+        const widget = createClockWidget(country);
+        grid.appendChild(widget);
+    });
+}
+
+function createClockWidget(country) {
+    const widget = document.createElement('div');
+    widget.className = 'clock-widget';
+    widget.innerHTML = `
+        <button class="remove-btn" onclick="removeTimezoneFromWorldClock('${country.timezone}')">×</button>
+        <div class="timezone-name">
+            <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+            ${country.name}
+        </div>
+        <div class="current-time" id="clock-${country.timezone.replace(/\//g, '-')}"></div>
+        <div class="current-date" id="date-${country.timezone.replace(/\//g, '-')}"></div>
+        <div class="time-offset" id="offset-${country.timezone.replace(/\//g, '-')}"></div>
+    `;
+    return widget;
+}
+
+function updateWorldClockTimes() {
+    const now = new Date();
+    
+    worldClockTimezones.forEach(country => {
+        const safeId = country.timezone.replace(/\//g, '-');
+        try {
+            const localTime = new Date(now.toLocaleString("en-US", {timeZone: country.timezone}));
+            const timeEl = document.getElementById(`clock-${safeId}`);
+            const dateEl = document.getElementById(`date-${safeId}`);
+            const offsetEl = document.getElementById(`offset-${safeId}`);
+            
+            if (timeEl && dateEl && offsetEl) {
+                timeEl.textContent = localTime.toLocaleTimeString();
+                dateEl.textContent = localTime.toLocaleDateString();
+                
+                const offset = getTimezoneOffset(country.timezone);
+                offsetEl.textContent = `UTC${offset >= 0 ? '+' : ''}${offset}`;
+            }
+        } catch (error) {
+            console.error(`Error updating time for ${country.name}:`, error);
+        }
+    });
+}
+
+function getTimezoneOffset(timezone) {
+    const now = new Date();
+    const utc = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
+    const local = new Date(utc.toLocaleString("en-US", {timeZone: timezone}));
+    return Math.round((local.getTime() - utc.getTime()) / (1000 * 60 * 60));
+}
+
+// Time Converter Functions
+function setupTimeConverter() {
+    populateConverterDropdowns();
+    
+    const sourceTimeInput = document.getElementById('source-time');
+    sourceTimeInput.addEventListener('change', updateConvertedTime);
+    
+    // Set current time as default
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+    sourceTimeInput.value = localDateTime;
+}
+
+function populateConverterDropdowns() {
+    const fromList = document.getElementById('from-list');
+    const toList = document.getElementById('to-list');
+    
+    countries.forEach(country => {
+        const fromOption = createConverterOption(country, 'from');
+        const toOption = createConverterOption(country, 'to');
+        fromList.appendChild(fromOption);
+        toList.appendChild(toOption);
+    });
+}
+
+function createConverterOption(country, type) {
+    const option = document.createElement('div');
+    option.className = 'select-option';
+    option.innerHTML = `
+        <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+        ${country.name}
+    `;
+    option.addEventListener('click', () => selectConverterTimezone(type, country));
+    return option;
+}
+
+function selectConverterTimezone(type, country) {
+    const display = document.querySelector(`#${type}-timezone .select-display`);
+    const options = document.getElementById(`${type}-options`);
+    
+    display.innerHTML = `
+        <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+        ${country.name}
+    `;
+    
+    options.classList.remove('active');
+    converterState[type] = country;
+    updateConvertedTime();
+}
+
+function updateConvertedTime() {
+    if (!converterState.from || !converterState.to) {
+        document.getElementById('converted-time').textContent = 'Select both timezones';
+        return;
+    }
+    
+    const sourceTime = document.getElementById('source-time').value;
+    if (!sourceTime) {
+        document.getElementById('converted-time').textContent = 'Select a time';
+        return;
+    }
+    
+    try {
+        const sourceDate = new Date(sourceTime);
+        const utcTime = new Date(sourceDate.getTime() + (sourceDate.getTimezoneOffset() * 60000));
+        const targetTime = new Date(utcTime.toLocaleString("en-US", {timeZone: converterState.to.timezone}));
+        
+        const formattedTime = targetTime.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: converterState.to.timezone
+        });
+        
+        document.getElementById('converted-time').textContent = formattedTime;
+    } catch (error) {
+        document.getElementById('converted-time').textContent = 'Invalid time';
+    }
+}
+
+// Meeting Planner Functions
+function setupMeetingPlanner() {
+    populateMeetingDropdown();
+    
+    const meetingDate = document.getElementById('meeting-date');
+    const today = new Date().toISOString().split('T')[0];
+    meetingDate.value = today;
+    meetingDate.min = today;
+    
+    document.getElementById('add-participant-btn').addEventListener('click', addParticipant);
+    document.getElementById('meeting-date').addEventListener('change', generateMeetingSuggestions);
+    document.getElementById('meeting-duration').addEventListener('change', generateMeetingSuggestions);
+}
+
+function populateMeetingDropdown() {
+    const list = document.getElementById('participant-list');
+    
+    countries.forEach(country => {
+        const option = document.createElement('div');
+        option.className = 'select-option';
+        option.innerHTML = `
+            <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+            ${country.name}
+        `;
+        option.addEventListener('click', () => selectParticipantTimezone(country));
+        list.appendChild(option);
+    });
+}
+
+function selectParticipantTimezone(country) {
+    const display = document.querySelector('#participant-timezone .select-display');
+    const options = document.getElementById('participant-options');
+    
+    display.innerHTML = `
+        <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
+        ${country.name}
+    `;
+    
+    options.classList.remove('active');
+    window.selectedParticipantTimezone = country;
+}
+
+function addParticipant() {
+    if (!window.selectedParticipantTimezone) return;
+    
+    const country = window.selectedParticipantTimezone;
+    if (meetingParticipants.find(p => p.timezone === country.timezone)) return;
+    
+    meetingParticipants.push(country);
+    updateParticipantsList();
+    generateMeetingSuggestions();
+    
+    // Reset selection
+    document.querySelector('#participant-timezone .select-display').textContent = 'Select timezone';
+    window.selectedParticipantTimezone = null;
+}
+
+function removeParticipant(timezone) {
+    meetingParticipants = meetingParticipants.filter(p => p.timezone !== timezone);
+    updateParticipantsList();
+    generateMeetingSuggestions();
+}
+
+function updateParticipantsList() {
+    const list = document.getElementById('participants-list');
+    list.innerHTML = '';
+    
+    meetingParticipants.forEach(participant => {
+        const item = document.createElement('div');
+        item.className = 'participant-item';
+        item.innerHTML = `
+            <div class="participant-info">
+                <img src="https://flagcdn.com/24x18/${participant.flag}.png" alt="${participant.name}" class="country-flag">
+                ${participant.name}
+                <span class="participant-time" id="participant-${participant.timezone.replace(/\//g, '-')}"></span>
+            </div>
+            <button class="remove-participant" onclick="removeParticipant('${participant.timezone}')">Remove</button>
+        `;
+        list.appendChild(item);
+    });
+    
+    updateParticipantTimes();
+}
+
+function updateParticipantTimes() {
+    const now = new Date();
+    
+    meetingParticipants.forEach(participant => {
+        const safeId = participant.timezone.replace(/\//g, '-');
+        try {
+            const localTime = new Date(now.toLocaleString("en-US", {timeZone: participant.timezone}));
+            const timeEl = document.getElementById(`participant-${safeId}`);
+            
+            if (timeEl) {
+                timeEl.textContent = localTime.toLocaleTimeString();
+            }
+        } catch (error) {
+            console.error(`Error updating participant time for ${participant.name}:`, error);
+        }
+    });
+}
+
+function generateMeetingSuggestions() {
+    if (meetingParticipants.length < 2) {
+        document.getElementById('meeting-suggestions').innerHTML = '<p style="color: #666; text-align: center;">Add at least 2 participants to see suggestions</p>';
+        return;
+    }
+    
+    const meetingDate = document.getElementById('meeting-date').value;
+    const duration = parseFloat(document.getElementById('meeting-duration').value);
+    
+    if (!meetingDate) return;
+    
+    const suggestions = findBestMeetingTimes(meetingDate, duration);
+    displayMeetingSuggestions(suggestions);
+}
+
+function findBestMeetingTimes(dateStr, duration) {
+    const suggestions = [];
+    const date = new Date(dateStr);
+    
+    // Check every hour from 6 AM to 10 PM UTC
+    for (let hour = 6; hour <= 22; hour++) {
+        const meetingTime = new Date(date);
+        meetingTime.setUTCHours(hour, 0, 0, 0);
+        
+        const participantTimes = meetingParticipants.map(participant => {
+            const localTime = new Date(meetingTime.toLocaleString("en-US", {timeZone: participant.timezone}));
+            return {
+                participant,
+                localTime,
+                hour: localTime.getHours(),
+                isBusinessHours: localTime.getHours() >= 9 && localTime.getHours() <= 17
+            };
+        });
+        
+        const businessHoursCount = participantTimes.filter(pt => pt.isBusinessHours).length;
+        const score = businessHoursCount / meetingParticipants.length;
+        
+        if (score > 0) {
+            suggestions.push({
+                utcTime: meetingTime,
+                participantTimes,
+                score,
+                businessHoursCount
+            });
+        }
+    }
+    
+    return suggestions.sort((a, b) => b.score - a.score).slice(0, 5);
+}
+
+function displayMeetingSuggestions(suggestions) {
+    const container = document.getElementById('meeting-suggestions');
+    
+    if (suggestions.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center;">No suitable meeting times found</p>';
+        return;
+    }
+    
+    container.innerHTML = '<h4>Best Meeting Times</h4>';
+    
+    suggestions.forEach((suggestion, index) => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        
+        const utcTimeStr = suggestion.utcTime.toLocaleString('en-US', {
+            weekday: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'UTC'
+        });
+        
+        const participantTimesStr = suggestion.participantTimes.map(pt => 
+            `${pt.participant.name}: ${pt.localTime.toLocaleTimeString()}`
+        ).join(' | ');
+        
+        item.innerHTML = `
+            <div class="suggestion-time">${utcTimeStr} UTC (${Math.round(suggestion.score * 100)}% in business hours)</div>
+            <div class="suggestion-details">${participantTimesStr}</div>
+        `;
+        
+        container.appendChild(item);
+    });
+}
+
+// Original comparison functions (updated)
 function populateCountrySelects() {
     const list1 = document.getElementById('country1-list');
     const list2 = document.getElementById('country2-list');
@@ -248,7 +609,6 @@ function updateComparison() {
         return;
     }
     
-    const now = new Date();
     const container = document.getElementById('comparison-results');
     
     container.innerHTML = `
@@ -321,6 +681,7 @@ function displaySearchResults(results) {
             <div class="label">
                 <img src="https://flagcdn.com/24x18/${country.flag}.png" alt="${country.name}" class="country-flag">
                 ${country.name}
+                <button onclick="addTimezoneToWorldClock(countries[${countries.indexOf(country)}])" class="action-btn" style="margin-left: auto; padding: 5px 10px; font-size: 12px;">Add to Clock</button>
             </div>
             <div class="time" id="result-time-${index}"></div>
             <div class="date" id="result-date-${index}"></div>
@@ -360,75 +721,6 @@ function updateSearchResults() {
     });
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('country-search');
-    const dropdown1 = document.getElementById('country1-dropdown');
-    const dropdown2 = document.getElementById('country2-dropdown');
-    
-    populateCountrySelects();
-    
-    searchInput.addEventListener('input', function() {
-        searchCountries(this.value);
-    });
-    
-    // Custom dropdown handlers
-    dropdown1.querySelector('.select-display').addEventListener('click', function() {
-        const options = document.getElementById('country1-options');
-        const search = document.getElementById('country1-search');
-        options.classList.toggle('active');
-        document.getElementById('country2-options').classList.remove('active');
-        if (options.classList.contains('active')) {
-            setTimeout(() => search.focus(), 100);
-        }
-    });
-    
-    dropdown2.querySelector('.select-display').addEventListener('click', function() {
-        const options = document.getElementById('country2-options');
-        const search = document.getElementById('country2-search');
-        options.classList.toggle('active');
-        document.getElementById('country1-options').classList.remove('active');
-        if (options.classList.contains('active')) {
-            setTimeout(() => search.focus(), 100);
-        }
-    });
-    
-    // Search functionality
-    document.getElementById('country1-search').addEventListener('input', function(e) {
-        filterCountryOptions(1, e.target.value);
-    });
-    
-    document.getElementById('country2-search').addEventListener('input', function(e) {
-        filterCountryOptions(2, e.target.value);
-    });
-    
-    // Prevent dropdown close when clicking on search input
-    document.getElementById('country1-search').addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-    
-    document.getElementById('country2-search').addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!dropdown1.contains(e.target)) {
-            document.getElementById('country1-options').classList.remove('active');
-        }
-        if (!dropdown2.contains(e.target)) {
-            document.getElementById('country2-options').classList.remove('active');
-        }
-    });
-    
-    updateUTCTime();
-    setInterval(() => {
-        updateUTCTime();
-        updateSearchResults();
-        updateComparisonTimes();
-    }, 1000);
-});
-
 function filterCountryOptions(dropdownNum, query) {
     const list = document.getElementById(`country${dropdownNum}-list`);
     const options = list.querySelectorAll('.select-option');
@@ -441,4 +733,170 @@ function filterCountryOptions(dropdownNum, query) {
             option.classList.add('hidden');
         }
     });
+}
+
+function filterDropdownOptions(listId, query) {
+    const list = document.getElementById(listId);
+    const options = list.querySelectorAll('.select-option');
+    
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        if (text.includes(query.toLowerCase())) {
+            option.style.display = 'flex';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+// Initialize everything
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTabs();
+    
+    const searchInput = document.getElementById('country-search');
+    searchInput.addEventListener('input', function() {
+        searchCountries(this.value);
+    });
+    
+    // World Clock setup
+    document.getElementById('add-timezone-btn').addEventListener('click', () => {
+        const modal = prompt('Enter country name to add:');
+        if (modal) {
+            const country = countries.find(c => c.name.toLowerCase().includes(modal.toLowerCase()));
+            if (country) {
+                addTimezoneToWorldClock(country);
+            }
+        }
+    });
+    
+    document.getElementById('clear-all-btn').addEventListener('click', () => {
+        worldClockTimezones = [];
+        updateWorldClockDisplay();
+    });
+    
+    // Setup other features
+    setupTimeConverter();
+    setupMeetingPlanner();
+    populateCountrySelects();
+    
+    // Setup dropdown handlers
+    setupDropdownHandlers();
+    
+    // Start time updates
+    updateUTCTime();
+    setInterval(() => {
+        updateUTCTime();
+        updateSearchResults();
+        updateComparisonTimes();
+        updateWorldClockTimes();
+        updateParticipantTimes();
+    }, 1000);
+});
+
+function setupDropdownHandlers() {
+    // Comparison dropdowns
+    const dropdown1 = document.getElementById('country1-dropdown');
+    const dropdown2 = document.getElementById('country2-dropdown');
+    
+    if (dropdown1) {
+        dropdown1.querySelector('.select-display').addEventListener('click', function() {
+            const options = document.getElementById('country1-options');
+            const search = document.getElementById('country1-search');
+            options.classList.toggle('active');
+            document.getElementById('country2-options').classList.remove('active');
+            if (options.classList.contains('active')) {
+                setTimeout(() => search.focus(), 100);
+            }
+        });
+    }
+    
+    if (dropdown2) {
+        dropdown2.querySelector('.select-display').addEventListener('click', function() {
+            const options = document.getElementById('country2-options');
+            const search = document.getElementById('country2-search');
+            options.classList.toggle('active');
+            document.getElementById('country1-options').classList.remove('active');
+            if (options.classList.contains('active')) {
+                setTimeout(() => search.focus(), 100);
+            }
+        });
+    }
+    
+    // Converter dropdowns
+    setupConverterDropdowns();
+    
+    // Meeting planner dropdown
+    setupMeetingDropdowns();
+    
+    // Search functionality
+    document.getElementById('country1-search').addEventListener('input', function(e) {
+        filterCountryOptions(1, e.target.value);
+    });
+    
+    document.getElementById('country2-search').addEventListener('input', function(e) {
+        filterCountryOptions(2, e.target.value);
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdowns = document.querySelectorAll('.custom-select');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.querySelector('.select-options').classList.remove('active');
+            }
+        });
+    });
+}
+
+function setupConverterDropdowns() {
+    const fromDropdown = document.getElementById('from-timezone');
+    const toDropdown = document.getElementById('to-timezone');
+    
+    if (fromDropdown) {
+        fromDropdown.querySelector('.select-display').addEventListener('click', function() {
+            document.getElementById('from-options').classList.toggle('active');
+            document.getElementById('to-options').classList.remove('active');
+        });
+    }
+    
+    if (toDropdown) {
+        toDropdown.querySelector('.select-display').addEventListener('click', function() {
+            document.getElementById('to-options').classList.toggle('active');
+            document.getElementById('from-options').classList.remove('active');
+        });
+    }
+    
+    // Add search functionality
+    const fromSearch = document.querySelector('#from-options .dropdown-search');
+    const toSearch = document.querySelector('#to-options .dropdown-search');
+    
+    if (fromSearch) {
+        fromSearch.addEventListener('input', function(e) {
+            filterDropdownOptions('from-list', e.target.value);
+        });
+    }
+    
+    if (toSearch) {
+        toSearch.addEventListener('input', function(e) {
+            filterDropdownOptions('to-list', e.target.value);
+        });
+    }
+}
+
+function setupMeetingDropdowns() {
+    const participantDropdown = document.getElementById('participant-timezone');
+    
+    if (participantDropdown) {
+        participantDropdown.querySelector('.select-display').addEventListener('click', function() {
+            document.getElementById('participant-options').classList.toggle('active');
+        });
+    }
+    
+    // Add search functionality
+    const participantSearch = document.querySelector('#participant-options .dropdown-search');
+    if (participantSearch) {
+        participantSearch.addEventListener('input', function(e) {
+            filterDropdownOptions('participant-list', e.target.value);
+        });
+    }
 }

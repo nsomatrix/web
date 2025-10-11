@@ -58,26 +58,102 @@
             <div id="search-results" class="search-results"></div>
         </div>
 
-        <div class="comparison-section">
-            <h2 class="comparison-title">Compare Times</h2>
-            <div class="comparison-selectors">
-                <div class="custom-select" id="country1-dropdown">
-                    <div class="select-display">Select first country</div>
-                    <div class="select-options" id="country1-options">
-                        <input type="text" class="dropdown-search" id="country1-search" placeholder="Search countries...">
-                        <div class="options-list" id="country1-list"></div>
+        <div class="feature-tabs">
+            <button class="tab-btn active" data-tab="world-clock">World Clock</button>
+            <button class="tab-btn" data-tab="converter">Time Converter</button>
+            <button class="tab-btn" data-tab="meeting-planner">Meeting Planner</button>
+            <button class="tab-btn" data-tab="comparison">Compare Times</button>
+        </div>
+
+        <div class="tab-content active" id="world-clock">
+            <div class="world-clock-controls">
+                <button id="add-timezone-btn" class="action-btn">+ Add Timezone</button>
+                <button id="clear-all-btn" class="action-btn secondary">Clear All</button>
+            </div>
+            <div id="world-clock-grid" class="world-clock-grid"></div>
+        </div>
+
+        <div class="tab-content" id="converter">
+            <div class="converter-section">
+                <h3>Time Zone Converter</h3>
+                <div class="converter-inputs">
+                    <div class="input-group">
+                        <label>From:</label>
+                        <div class="custom-select" id="from-timezone">
+                            <div class="select-display">Select timezone</div>
+                            <div class="select-options" id="from-options">
+                                <input type="text" class="dropdown-search" placeholder="Search...">
+                                <div class="options-list" id="from-list"></div>
+                            </div>
+                        </div>
+                        <input type="datetime-local" id="source-time" class="time-input">
                     </div>
-                </div>
-                <span class="vs-text">VS</span>
-                <div class="custom-select" id="country2-dropdown">
-                    <div class="select-display">Select second country</div>
-                    <div class="select-options" id="country2-options">
-                        <input type="text" class="dropdown-search" id="country2-search" placeholder="Search countries...">
-                        <div class="options-list" id="country2-list"></div>
+                    <div class="input-group">
+                        <label>To:</label>
+                        <div class="custom-select" id="to-timezone">
+                            <div class="select-display">Select timezone</div>
+                            <div class="select-options" id="to-options">
+                                <input type="text" class="dropdown-search" placeholder="Search...">
+                                <div class="options-list" id="to-list"></div>
+                            </div>
+                        </div>
+                        <div id="converted-time" class="converted-result">Select timezones and time</div>
                     </div>
                 </div>
             </div>
-            <div id="comparison-results" class="comparison-results"></div>
+        </div>
+
+        <div class="tab-content" id="meeting-planner">
+            <div class="meeting-planner-section">
+                <h3>Meeting Time Planner</h3>
+                <div class="planner-controls">
+                    <div class="input-group">
+                        <label>Meeting Date:</label>
+                        <input type="date" id="meeting-date" class="date-input">
+                    </div>
+                    <div class="input-group">
+                        <label>Duration (hours):</label>
+                        <input type="number" id="meeting-duration" min="0.5" max="12" step="0.5" value="1" class="duration-input">
+                    </div>
+                </div>
+                <div class="timezone-selector">
+                    <h4>Add Participants' Timezones:</h4>
+                    <div class="custom-select" id="participant-timezone">
+                        <div class="select-display">Select timezone</div>
+                        <div class="select-options" id="participant-options">
+                            <input type="text" class="dropdown-search" placeholder="Search...">
+                            <div class="options-list" id="participant-list"></div>
+                        </div>
+                    </div>
+                    <button id="add-participant-btn" class="action-btn">Add Participant</button>
+                </div>
+                <div id="participants-list" class="participants-list"></div>
+                <div id="meeting-suggestions" class="meeting-suggestions"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="comparison">
+            <div class="comparison-section">
+                <h3>Compare Times</h3>
+                <div class="comparison-selectors">
+                    <div class="custom-select" id="country1-dropdown">
+                        <div class="select-display">Select first country</div>
+                        <div class="select-options" id="country1-options">
+                            <input type="text" class="dropdown-search" id="country1-search" placeholder="Search countries...">
+                            <div class="options-list" id="country1-list"></div>
+                        </div>
+                    </div>
+                    <span class="vs-text">VS</span>
+                    <div class="custom-select" id="country2-dropdown">
+                        <div class="select-display">Select second country</div>
+                        <div class="select-options" id="country2-options">
+                            <input type="text" class="dropdown-search" id="country2-search" placeholder="Search countries...">
+                            <div class="options-list" id="country2-list"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="comparison-results" class="comparison-results"></div>
+            </div>
         </div>
     </div>
 
