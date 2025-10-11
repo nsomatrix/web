@@ -57,8 +57,9 @@
 
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
-
-
+    
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
@@ -91,8 +92,15 @@
                     <i class="fa fa-eye"></i>
                 </span>
             </div>
+            <!-- Cloudflare Turnstile -->
+            <div class="inputBx" style="display: flex; justify-content: center; margin: 20px 0;">
+                <div class="cf-turnstile" 
+                     data-sitekey="0x4AAAAAAB6AxJBsBeZyr7Mv" 
+                     data-callback="onTurnstileSuccess"
+                     data-theme="dark"></div>
+            </div>
             <div class="inputBx">
-                <button id="primaryBtn" type="submit">Sign in</button>
+                <button id="primaryBtn" type="submit" disabled>Sign in</button>
             </div>
             <div class="inputBx">
                 <button id="switchBtn" type="button">Sign Up</button>

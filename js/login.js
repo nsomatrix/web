@@ -32,6 +32,22 @@ const togglePassword = document.getElementById("togglePassword");
 const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
 let isSignupMode = false;
+let turnstileToken = null;
+
+// Turnstile callback function (must be global)
+window.onTurnstileSuccess = function(token) {
+    turnstileToken = token;
+    document.getElementById('primaryBtn').disabled = false;
+};
+
+// Reset Turnstile when switching modes
+function resetTurnstile() {
+    turnstileToken = null;
+    document.getElementById('primaryBtn').disabled = true;
+    if (window.turnstile) {
+        window.turnstile.reset();
+    }
+}
 
 function setupPasswordToggle(toggleElement, inputElement) {
     if (toggleElement) {
@@ -63,6 +79,7 @@ function switchMode() {
         confirmPasswordContainer.style.display = "none";
         forgotPasswordLink.style.display = "block";
     }
+    resetTurnstile();
 }
 
 switchBtn.addEventListener("click", switchMode);
@@ -158,6 +175,11 @@ async function handleLogin() {
         showMessageBox('Please fill in all fields', 'error');
         return;
     }
+    
+    if (!turnstileToken) {
+        showMessageBox('Please complete the security verification', 'error');
+        return;
+    }
 
     if (!email.includes('@')) {
         showMessageBox('Please enter a valid email address', 'error');
@@ -240,6 +262,11 @@ async function handleSignup() {
 
     if (!email || !password || !confirmPassword) {
         showMessageBox('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (!turnstileToken) {
+        showMessageBox('Please complete the security verification', 'error');
         return;
     }
 
