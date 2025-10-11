@@ -495,8 +495,17 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
                     const playerDoc = await db.collection('players').doc(user.uid).get();
                     const playerData = playerDoc.data();
                     
-                    if (playerData) {
+                    if (playerData && playerData.salt && playerData.masterPasswordHash) {
                         sessionStorage.setItem('tempLoginPassword', password);
+                        
+                        // Derive encryption key like the GUI login does
+                        const derivedKey = await this.deriveKey(password, playerData.salt);
+                        const derivedKeyHex = derivedKey.toString();
+                        
+                        if (derivedKeyHex === playerData.masterPasswordHash) {
+                            sessionStorage.setItem('currentEncryptionKeyHex', derivedKeyHex);
+                        }
+                        
                         this.addOutput(`REAL LOGIN SUCCESS: ${user.email}`, 'success-text');
                         this.addOutput(`Level: ${playerData.level || 1}`, 'output-text');
                         this.addOutput('System-wide authentication active', 'success-text');
@@ -508,6 +517,9 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
                     this.addOutput(`REAL LOGIN SUCCESS: ${user.email}`, 'success-text');
                     this.addOutput('System-wide authentication active', 'success-text');
                 }
+                
+                // Update navbar auth state
+                this.updateNavbarAuth(user);
                 
             } else {
                 this.addOutput('Firebase not loaded yet - try again in a moment', 'warning-text');
@@ -645,7 +657,25 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             localStorage.removeItem('userLoggedIn');
             sessionStorage.clear();
             
+            // Update navbar to show login state
+            const authLink = document.getElementById('authLink');
+            const mobileAuthLink = document.getElementById('mobileAuthLink');
+            const loginSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 17v-3H3v-4h7V7l5 5-5 5M10 2h9a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-2h2v2h9V4h-9v2H8V4a2 2 0 0 1 2-2z"/></svg>';
+            
+            if (authLink) {
+                authLink.innerHTML = loginSvg + ' LOGIN';
+                authLink.href = 'login.html';
+                authLink.onclick = null;
+            }
+            
+            if (mobileAuthLink) {
+                mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
+                mobileAuthLink.href = 'login.html';
+                mobileAuthLink.onclick = null;
+            }
+            
             this.addOutput('System-wide logout complete', 'success-text');
+            this.addOutput('Navbar updated - now shows login state', 'info-text');
             
         } catch (error) {
             this.addOutput(`Logout error: ${error.message}`, 'error-text');
@@ -653,6 +683,47 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             sessionStorage.clear();
             this.addOutput('Local session cleared', 'warning-text');
         }
+    }
+
+    async deriveKey(password, salt) {
+        // Load CryptoJS if not available
+        if (!window.CryptoJS) {
+            await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js');
+        }
+        
+        return CryptoJS.PBKDF2(password, CryptoJS.enc.Hex.parse(salt), {
+            keySize: 256 / 32,
+            iterations: 200000,
+            hasher: CryptoJS.algo.SHA256
+        });
+    }
+    
+    updateNavbarAuth(user) {
+        // Update navbar auth state
+        const authLink = document.getElementById('authLink');
+        const mobileAuthLink = document.getElementById('mobileAuthLink');
+        
+        const logoutSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.08 15.59L16.67 13H7v-2h9.67l-2.59-2.59L15.5 7l5 5-5 5-1.42-1.41M19 3a2 2 0 0 1 2 2v4.67l-2-2V5H5v14h14v-2.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z"/></svg>';
+        
+        if (authLink) {
+            authLink.innerHTML = logoutSvg + ' LOGOUT';
+            authLink.href = '#';
+            authLink.onclick = (e) => {
+                e.preventDefault();
+                this.runLogout();
+            };
+        }
+        
+        if (mobileAuthLink) {
+            mobileAuthLink.innerHTML = logoutSvg + ' LOGOUT';
+            mobileAuthLink.href = '#';
+            mobileAuthLink.onclick = (e) => {
+                e.preventDefault();
+                this.runLogout();
+            };
+        }
+        
+        this.addOutput('Navbar updated - now shows logged in state', 'info-text');
     }
 
     addOutput(text, className = 'output-text') {
