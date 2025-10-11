@@ -116,8 +116,48 @@ class MatrixTerminal {
                     this.runDashboard();
                 }
                 break;
+            case 'friends':
+                this.runDashboardCommand('friends');
+                break;
+            case 'notes':
+                this.runDashboardCommand('notes');
+                break;
+            case 'passwords':
+                this.runDashboardCommand('passwords');
+                break;
+            case 'server':
+                this.runDashboardCommand('server');
+                break;
             case 'logout':
                 this.runLogout();
+                break;
+            case 'friends':
+                if (args.length > 0) {
+                    this.runDashboardCommand('friends');
+                } else {
+                    this.addOutput('Use: dashboard friends', 'info-text');
+                }
+                break;
+            case 'notes':
+                if (args.length > 0) {
+                    this.runDashboardCommand('notes');
+                } else {
+                    this.addOutput('Use: dashboard notes', 'info-text');
+                }
+                break;
+            case 'passwords':
+                if (args.length > 0) {
+                    this.runDashboardCommand('passwords');
+                } else {
+                    this.addOutput('Use: dashboard passwords', 'info-text');
+                }
+                break;
+            case 'server':
+                if (args.length > 0) {
+                    this.runDashboardCommand('server');
+                } else {
+                    this.addOutput('Use: dashboard server', 'info-text');
+                }
                 break;
             case 'items':
                 this.runItems();
@@ -557,6 +597,11 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
                 this.addOutput(`User: ${auth.currentUser.email}`, 'output-text');
                 this.addOutput(`Level: ${playerData?.level || 1}`, 'output-text');
                 this.addOutput('\nDashboard Commands:', 'info-text');
+                this.addOutput('• dashboard friends - Manage friends', 'output-text');
+                this.addOutput('• dashboard notes - Access notes', 'output-text');
+                this.addOutput('• dashboard passwords - Password manager', 'output-text');
+                this.addOutput('• dashboard server - Game server', 'output-text');
+                this.addOutput('• dashboard delete - Delete account', 'output-text');
                 this.addOutput('• dashboard profile - View profile', 'output-text');
                 this.addOutput('• logout - Sign out', 'output-text');
             } else {
@@ -619,29 +664,194 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
     }
     
     async runDashboardCommand(command) {
-        const auth = window.firebaseAuth || (window.firebase && window.firebase.auth());
-        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        const auth = window.firebaseAuth;
+        const db = window.firebaseDb;
         
-        if (!isLoggedIn && (!auth || !auth.currentUser)) {
+        if (!auth || !auth.currentUser) {
             this.addOutput('Login required for dashboard commands', 'error-text');
             return;
         }
         
         switch(command.toLowerCase()) {
-            case 'profile':
-                if (auth && auth.currentUser) {
-                    this.addOutput('USER PROFILE:', 'success-text');
-                    this.addOutput(`Email: ${auth.currentUser.email}`, 'output-text');
-                    this.addOutput(`UID: ${auth.currentUser.uid}`, 'output-text');
+            case 'friends':
+                this.addOutput('Loading friends...', 'info-text');
+                await this.loadFriends();
+                break;
+            case 'notes':
+                this.addOutput('Loading notes...', 'info-text');
+                await this.loadNotes();
+                break;
+            case 'passwords':
+                this.addOutput('Loading password manager...', 'info-text');
+                await this.loadPasswords();
+                break;
+            case 'server':
+                this.addOutput('Opening game server...', 'success-text');
+                window.open('https://support.teamobi.com/login-game-3.html', '_blank');
+                break;
+            case 'delete':
+                this.addOutput('Account deletion requires confirmation', 'warning-text');
+                const confirm = prompt('Type "DELETE" to confirm account deletion:');
+                if (confirm === 'DELETE') {
+                    await this.deleteAccount();
                 } else {
-                    this.addOutput('Profile data not available in demo mode', 'warning-text');
+                    this.addOutput('Account deletion cancelled', 'info-text');
                 }
                 break;
-            case 'logout':
-                this.runLogout();
+            case 'profile':
+                this.addOutput('USER PROFILE:', 'success-text');
+                this.addOutput(`Email: ${auth.currentUser.email}`, 'output-text');
+                this.addOutput(`UID: ${auth.currentUser.uid}`, 'output-text');
                 break;
             default:
                 this.addOutput(`Unknown dashboard command: ${command}`, 'error-text');
+        }
+    }
+    
+    async loadFriends() {
+        const auth = window.firebaseAuth;
+        const db = window.firebaseDb;
+        
+        try {
+            const snapshot = await db.collection('players').doc(auth.currentUser.uid)
+                .collection('friends').where('status', '==', 'accepted').get();
+            
+            if (snapshot.empty) {
+                this.addOutput('No friends found', 'info-text');
+                return;
+            }
+            
+            this.addOutput('FRIENDS LIST:', 'success-text');
+            for (const doc of snapshot.docs) {
+                const friend = doc.data();
+                this.addOutput(`• @${friend.username} (${friend.friendId})`, 'output-text');
+            }
+        } catch (error) {
+            this.addOutput(`Error loading friends: ${error.message}`, 'error-text');
+        }
+    }
+    
+    async loadNotes() {
+        const auth = window.firebaseAuth;
+        const db = window.firebaseDb;
+        
+        // Check if encryption key is available
+        const encryptionKey = sessionStorage.getItem('currentEncryptionKeyHex');
+        if (!encryptionKey) {
+            this.addOutput('Master password required for encrypted notes', 'error-text');
+            this.addOutput('Please unlock from dashboard first', 'info-text');
+            return;
+        }
+        
+        try {
+            const snapshot = await db.collection('players').doc(auth.currentUser.uid)
+                .collection('notes').orderBy('createdAt', 'desc').get();
+            
+            if (snapshot.empty) {
+                this.addOutput('No notes found', 'info-text');
+                return;
+            }
+            
+            this.addOutput('NOTES:', 'success-text');
+            snapshot.forEach(doc => {
+                const note = doc.data();
+                const decrypted = this.decryptData(note.content, encryptionKey);
+                const date = note.createdAt ? note.createdAt.toDate().toLocaleDateString() : 'Unknown';
+                this.addOutput(`[${date}] ${decrypted}`, 'output-text');
+            });
+        } catch (error) {
+            this.addOutput(`Error loading notes: ${error.message}`, 'error-text');
+        }
+    }
+    
+    async loadPasswords() {
+        const auth = window.firebaseAuth;
+        const db = window.firebaseDb;
+        
+        // Check if encryption key is available
+        const encryptionKey = sessionStorage.getItem('currentEncryptionKeyHex');
+        if (!encryptionKey) {
+            this.addOutput('Master password required for encrypted passwords', 'error-text');
+            this.addOutput('Please unlock from dashboard first', 'info-text');
+            return;
+        }
+        
+        try {
+            const snapshot = await db.collection('players').doc(auth.currentUser.uid)
+                .collection('passwords').orderBy('createdAt', 'desc').get();
+            
+            if (snapshot.empty) {
+                this.addOutput('No passwords found', 'info-text');
+                return;
+            }
+            
+            this.addOutput('PASSWORD MANAGER:', 'success-text');
+            snapshot.forEach(doc => {
+                const pwd = doc.data();
+                const decryptedPassword = this.decryptData(pwd.password, encryptionKey);
+                this.addOutput(`${pwd.serviceName}: ${pwd.username} | ${decryptedPassword}`, 'output-text');
+            });
+        } catch (error) {
+            this.addOutput(`Error loading passwords: ${error.message}`, 'error-text');
+        }
+    }
+    
+    async deleteAccount() {
+        const auth = window.firebaseAuth;
+        const db = window.firebaseDb;
+        
+        try {
+            this.addOutput('Deleting account data...', 'warning-text');
+            
+            // Delete notes
+            const notesRef = db.collection('players').doc(auth.currentUser.uid).collection('notes');
+            const notesSnapshot = await notesRef.get();
+            const deleteNotesPromises = [];
+            notesSnapshot.forEach(doc => {
+                deleteNotesPromises.push(doc.ref.delete());
+            });
+            await Promise.all(deleteNotesPromises);
+            
+            // Delete passwords
+            const passwordsRef = db.collection('players').doc(auth.currentUser.uid).collection('passwords');
+            const passwordsSnapshot = await passwordsRef.get();
+            const deletePasswordsPromises = [];
+            passwordsSnapshot.forEach(doc => {
+                deletePasswordsPromises.push(doc.ref.delete());
+            });
+            await Promise.all(deletePasswordsPromises);
+            
+            // Delete player document
+            await db.collection('players').doc(auth.currentUser.uid).delete();
+            
+            // Delete user account
+            await auth.currentUser.delete();
+            
+            this.addOutput('Account deleted successfully', 'success-text');
+            this.addOutput('Redirecting to login...', 'info-text');
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 3000);
+            
+        } catch (error) {
+            this.addOutput(`Error deleting account: ${error.message}`, 'error-text');
+        }
+    }
+    
+    decryptData(encryptedData, keyHex) {
+        try {
+            if (!window.CryptoJS) {
+                return '[CryptoJS not loaded]';
+            }
+            
+            const key = CryptoJS.enc.Hex.parse(keyHex);
+            const parts = encryptedData.split(':');
+            const iv = CryptoJS.enc.Hex.parse(parts[0]);
+            const decrypted = CryptoJS.AES.decrypt(parts[1], key, { iv: iv });
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            return '[DECRYPTION ERROR]';
         }
     }
     
