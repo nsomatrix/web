@@ -126,7 +126,7 @@ class MatrixTerminal {
                 this.runDownload(args);
                 break;
             case 'emulators':
-                this.runEmulators();
+                this.runEmulators(args);
                 break;
             case 'login':
                 this.runLogin();
@@ -784,27 +784,90 @@ class MatrixTerminal {
         }
     }
     
-    runEmulators() {
-        const androidEmus = [
-            'CoffeeVM.apk', 'J2MELoader.apk', 'JLMod.apk', 
-            'NetMite.apk', 'nsomatrix.apk', 'PhoneME.apk'
-        ];
-        const desktopEmus = [
-            'AngelChipEmulator.jar', 'KEmulatorLite.exe', 'microemulator.jar'
-        ];
-        
-        this.addOutput('EMULATOR DOWNLOADS:', 'success-text');
-        this.addOutput('\nAndroid:', 'info-text');
-        androidEmus.forEach(emu => {
-            this.addOutput(`• ${emu}`, 'output-text');
-        });
-        
-        this.addOutput('\nDesktop:', 'info-text');
-        desktopEmus.forEach(emu => {
-            this.addOutput(`• ${emu}`, 'output-text');
-        });
-        
-        this.addOutput('\nUsage: download <emulator_name>', 'info-text');
+    async runEmulators(args) {
+        try {
+            // Initialize terminal emulators if not already done
+            if (!window.terminalEmulators) {
+                window.terminalEmulators = new TerminalEmulatorsHandler();
+            }
+            
+            if (!args.length) {
+                const emulators = window.terminalEmulators.getAllEmulators();
+                this.addOutput(`EMULATORS (${emulators.length} available):`, 'success-text');
+                emulators.forEach((emu, i) => {
+                    this.addOutput(`${i+1}. ${emu.name} - ${emu.version} (${emu.size})`, 'output-text');
+                });
+                this.addOutput('\nUsage: emulators <search> | emulators download <name> | emulators download <number>', 'info-text');
+            } else if (args[0].toLowerCase() === 'download') {
+                if (args.length < 2) {
+                    this.addOutput('Usage: emulators download <emulator_name> or emulators download <number>', 'error-text');
+                    return;
+                }
+                
+                const identifier = args.slice(1).join(' ');
+                let emulator = null;
+                
+                // Check if it's a number
+                if (/^\d+$/.test(identifier)) {
+                    const index = parseInt(identifier) - 1;
+                    // First try from last search results, then from full list
+                    const searchResults = window.terminalEmulators.lastSearchResults;
+                    if (searchResults && index >= 0 && index < searchResults.length) {
+                        emulator = searchResults[index];
+                    } else {
+                        const emulators = window.terminalEmulators.getAllEmulators();
+                        if (index >= 0 && index < emulators.length) {
+                            emulator = emulators[index];
+                        }
+                    }
+                } else {
+                    // Search by name
+                    emulator = window.terminalEmulators.findEmulator(identifier);
+                }
+                
+                if (!emulator) {
+                    this.addOutput(`Emulator not found: ${identifier}`, 'error-text');
+                    this.addOutput('Use "emulators" to see available emulators', 'info-text');
+                    return;
+                }
+                
+                const downloadSpinner = this.showSpinner(`Downloading ${emulator.name}`);
+                
+                setTimeout(() => {
+                    this.hideSpinner(downloadSpinner);
+                    
+                    // Trigger actual download
+                    const link = document.createElement('a');
+                    link.href = emulator.download_url;
+                    link.download = '';
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    this.addOutput(`Download started: ${emulator.name}`, 'success-text');
+                }, 1000);
+                
+            } else {
+                const search = args.join(' ');
+                const results = window.terminalEmulators.searchEmulators(search);
+                
+                if (results.length > 0) {
+                    // Store search results for numbered downloads
+                    window.terminalEmulators.lastSearchResults = results;
+                    this.addOutput(`SEARCH RESULTS (${results.length} found):`, 'success-text');
+                    results.forEach((emu, i) => {
+                        this.addOutput(`${i+1}. ${emu.name} - ${emu.version} (${emu.size})`, 'output-text');
+                    });
+                    this.addOutput('\nUse: emulators download <number> to download from these results', 'info-text');
+                } else {
+                    this.addOutput(`No emulators found matching: ${search}`, 'error-text');
+                }
+            }
+            
+        } catch (error) {
+            this.addOutput(`Failed to load emulators: ${error.message}`, 'error-text');
+        }
     }
     
     runLogin() {
@@ -1496,6 +1559,79 @@ class TerminalModsHandler {
     findMod(modName) {
         return this.modsData.find(mod => 
             mod.name.toLowerCase().includes(modName.toLowerCase())
+        );
+    }
+}
+
+// Terminal version of EmulatorsHandler
+class TerminalEmulatorsHandler {
+    constructor() {
+        this.emulatorsData = [
+            {
+                name: 'CoffeeVM',
+                version: 'v1.4.7',
+                size: '3.56 MB',
+                download_url: 'data/EMU/Android/CoffeeVM.apk'
+            },
+            {
+                name: 'Microemulator',
+                version: 'v2.0.4',
+                size: '629 KB',
+                download_url: 'data/EMU/Desktop/microemulator.jar'
+            },
+            {
+                name: 'J2ME Loader',
+                version: 'v1.7.9',
+                size: '8.28 MB',
+                download_url: 'data/EMU/Android/J2MELoader.apk'
+            },
+            {
+                name: 'KEmulator',
+                version: 'v0.9.8',
+                size: '2.51 MB',
+                download_url: 'data/EMU/Desktop/KEmulatorLite.exe'
+            },
+            {
+                name: 'PhoneME',
+                version: 'v1.0.0',
+                size: '3.7 MB',
+                download_url: 'data/EMU/Android/PhoneME.apk'
+            },
+            {
+                name: 'AngelChip',
+                version: 'v1.0.0',
+                size: '479 KB',
+                download_url: 'data/EMU/Desktop/AngelChipEmulator.jar'
+            },
+            {
+                name: 'JLMod',
+                version: 'v0.86',
+                size: '10.2 MB',
+                download_url: 'data/EMU/Android/JLMod.apk'
+            },
+            {
+                name: 'NetMite',
+                version: 'v2.0.3.7',
+                size: '809 KB',
+                download_url: 'data/EMU/Android/NetMite.apk'
+            }
+        ];
+        this.lastSearchResults = null;
+    }
+
+    getAllEmulators() {
+        return this.emulatorsData;
+    }
+
+    searchEmulators(searchTerm) {
+        return this.emulatorsData.filter(emu => 
+            emu.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
+    findEmulator(emuName) {
+        return this.emulatorsData.find(emu => 
+            emu.name.toLowerCase().includes(emuName.toLowerCase())
         );
     }
 }
