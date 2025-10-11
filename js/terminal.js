@@ -78,15 +78,17 @@ class MatrixTerminal {
     }
 
     executeCommand(command) {
-        this.addOutput(`matrix@web:~$ ${command}`, 'command');
-        
         const [cmd, ...args] = command.split(' ');
         
-        // Handle login with credentials
+        // Handle login with credentials - mask password in display
         if (cmd.toLowerCase() === 'login' && args.length >= 2) {
+            this.addOutput(`matrix@web:~$ login ${args[0]} ********`, 'command');
+            this.commandHistory.pop(); // Remove login command from history
             this.handleLogin(args[0], args[1]);
             return;
         }
+        
+        this.addOutput(`matrix@web:~$ ${command}`, 'command');
         
         switch(cmd.toLowerCase()) {
             case 'help':
@@ -954,8 +956,6 @@ class MatrixTerminal {
                     const playerData = playerDoc.data();
                     
                     if (playerData && playerData.salt && playerData.masterPasswordHash) {
-                        sessionStorage.setItem('tempLoginPassword', password);
-                        
                         // Derive encryption key like the GUI login does
                         const derivedKey = await this.deriveKey(password, playerData.salt);
                         const derivedKeyHex = derivedKey.toString();
