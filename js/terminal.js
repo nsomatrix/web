@@ -190,21 +190,21 @@ class MatrixTerminal {
   clear                   - Clear terminal screen
   matrix                  - Display Matrix animation
   
-  TOOLS (Real functionality):
-  estimate <args>         - Run actual estimator calculations
-  ninjadex <args>         - Access real monster/equipment database
-  timezone <country>      - Real timezone functionality
+  TOOLS:
+  estimate                - Run estimator calculations
+  ninjadex                - Access monster/equipment database
+  timezone                - Timezone functionality
   
-  PAGES (Real data & downloads):
-  mods [search]           - Browse and download real mods
-  emulators              - Download actual emulators
-  login                  - Real authentication system
-  dashboard              - Access user dashboard
-  items                  - Real items database
-  docs                   - Access documentation
+  PAGES:
+  mods                    - Browse and download mods
+  emulators               - Download emulators
+  login                   - Authentication system
+  dashboard               - Access user dashboard
+  items                   - Items database
+  docs                    - Access documentation
   
   SYSTEM:
-  whoami, date, uptime   - System information`;
+  whoami, date, uptime    - System information`;
         this.addOutput(help, 'output-text');
     }
 
@@ -647,57 +647,87 @@ class MatrixTerminal {
     }
     
     async runMods(args) {
-        const mods = [
-            { name: 'Matrix Enhanced', file: 'matrix-enhanced.zip', size: '2.3MB' },
-            { name: 'UI Theme Pack', file: 'ui-themes.zip', size: '1.8MB' },
-            { name: 'Gameplay Mods', file: 'gameplay-mods.zip', size: '4.1MB' }
-        ];
+        const modsSpinner = this.showSpinner('Loading MODs repository');
         
-        if (!args.length) {
-            this.addOutput('AVAILABLE MODS:', 'success-text');
-            mods.forEach((mod, i) => {
-                this.addOutput(`${i+1}. ${mod.name} (${mod.size})`, 'output-text');
-            });
-            this.addOutput('\nUsage: download <mod_name>', 'info-text');
-        } else {
-            const search = args.join(' ').toLowerCase();
-            const found = mods.filter(m => m.name.toLowerCase().includes(search));
-            
-            if (found.length) {
-                this.addOutput(`SEARCH RESULTS (${found.length}):`, 'success-text');
-                found.forEach(mod => {
-                    this.addOutput(`• ${mod.name} (${mod.size})`, 'output-text');
-                });
-            } else {
-                this.addOutput(`No mods found for: ${search}`, 'error-text');
+        try {
+            // Initialize terminal mods if not already done
+            if (!window.terminalMods) {
+                window.terminalMods = new TerminalModsHandler();
+                await window.terminalMods.fetchMods();
             }
+            
+            this.hideSpinner(modsSpinner);
+            
+            if (!args.length) {
+                const mods = window.terminalMods.getAllMods();
+                this.addOutput(`MODS REPOSITORY (${mods.length} available):`, 'success-text');
+                mods.forEach((mod, i) => {
+                    this.addOutput(`${i+1}. ${mod.name}`, 'output-text');
+                });
+                this.addOutput('\nUsage: mods <search_term> or download <mod_name>', 'info-text');
+            } else {
+                const search = args.join(' ');
+                const results = window.terminalMods.searchMods(search);
+                
+                if (results.length > 0) {
+                    this.addOutput(`SEARCH RESULTS (${results.length} found):`, 'success-text');
+                    results.forEach((mod, i) => {
+                        this.addOutput(`${i+1}. ${mod.name}`, 'output-text');
+                    });
+                } else {
+                    this.addOutput(`No mods found matching: ${search}`, 'error-text');
+                }
+            }
+            
+        } catch (error) {
+            this.hideSpinner(modsSpinner);
+            this.addOutput(`Failed to load mods: ${error.message}`, 'error-text');
         }
     }
     
-    runDownload(args) {
+    async runDownload(args) {
         if (!args.length) {
-            this.addOutput('Usage: download <item_name>', 'error-text');
+            this.addOutput('Usage: download <mod_name>', 'error-text');
             return;
         }
         
-        const item = args.join(' ');
-        this.addOutput(`Downloading: ${item}`, 'success-text');
-        this.addOutput('█████████████████████████ 100%', 'success-text');
-        this.addOutput(`Download complete: ${item}`, 'success-text');
+        const itemName = args.join(' ');
         
-        // Trigger actual download if file exists
-        const downloadMap = {
-            'matrix enhanced': 'mods/matrix-enhanced.zip',
-            'coffeevm': 'data/EMU/Android/CoffeeVM.apk',
-            'j2meloader': 'data/EMU/Android/J2MELoader.apk'
-        };
-        
-        const file = downloadMap[item.toLowerCase()];
-        if (file) {
-            const a = document.createElement('a');
-            a.href = file;
-            a.download = file.split('/').pop();
-            a.click();
+        try {
+            // Initialize mods if not already done
+            if (!window.terminalMods) {
+                window.terminalMods = new TerminalModsHandler();
+                await window.terminalMods.fetchMods();
+            }
+            
+            const mod = window.terminalMods.findMod(itemName);
+            
+            if (!mod) {
+                this.addOutput(`Mod not found: ${itemName}`, 'error-text');
+                this.addOutput('Use "mods" to see available mods', 'info-text');
+                return;
+            }
+            
+            const downloadSpinner = this.showSpinner(`Downloading ${mod.name}`);
+            
+            // Simulate download progress
+            setTimeout(() => {
+                this.hideSpinner(downloadSpinner);
+                
+                // Trigger actual download
+                const link = document.createElement('a');
+                link.href = mod.download_url;
+                link.download = mod.name;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.addOutput(`Download started: ${mod.name}`, 'success-text');
+            }, 1000);
+            
+        } catch (error) {
+            this.addOutput(`Download failed: ${error.message}`, 'error-text');
         }
     }
     
@@ -1355,6 +1385,64 @@ class TerminalKinsEstimator {
             actualExpNeeded,
             timeString: timeString.trim()
         };
+    }
+}
+
+// Terminal version of ModsHandler
+class TerminalModsHandler {
+    constructor() {
+        this.modsData = [];
+        this.API_CONFIG = {
+            itemId: 'nsomtx-active-mods',
+            baseUrl: 'https://archive.org/download/'
+        };
+    }
+
+    async fetchMods() {
+        try {
+            const apiUrl = `https://archive.org/metadata/${this.API_CONFIG.itemId}`;
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.files) {
+                throw new Error('No files found in archive');
+            }
+            
+            // Filter for .jar files only
+            const jarFiles = data.files.filter(file => file.name.endsWith('.jar'));
+            const maxItems = Math.min(jarFiles.length, 100);
+            
+            // Transform to match expected format
+            this.modsData = jarFiles.slice(0, maxItems).map(file => ({
+                name: file.name,
+                download_url: `${this.API_CONFIG.baseUrl}${this.API_CONFIG.itemId}/${file.name}`
+            }));
+            
+        } catch (error) {
+            console.error('Error fetching MODs:', error);
+            throw error;
+        }
+    }
+
+    getAllMods() {
+        return this.modsData;
+    }
+
+    searchMods(searchTerm) {
+        return this.modsData.filter(mod => 
+            mod.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
+    findMod(modName) {
+        return this.modsData.find(mod => 
+            mod.name.toLowerCase().includes(modName.toLowerCase())
+        );
     }
 }
 
