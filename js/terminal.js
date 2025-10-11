@@ -675,7 +675,6 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             }
             
             this.addOutput('System-wide logout complete', 'success-text');
-            this.addOutput('Navbar updated - now shows login state', 'info-text');
             
         } catch (error) {
             this.addOutput(`Logout error: ${error.message}`, 'error-text');
@@ -723,7 +722,7 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             };
         }
         
-        this.addOutput('Navbar updated - now shows logged in state', 'info-text');
+
     }
 
     addOutput(text, className = 'output-text') {
