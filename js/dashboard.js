@@ -543,7 +543,7 @@ function setupDeleteHandlers() {
     if (confirmDeleteAccountBtn) {
         confirmDeleteAccountBtn.onclick = async () => {
             closeModal(document.getElementById('deleteAccountConfirmModal'));
-            showMessageBox("Initiating account deletion...", 'info', 0);
+            showMessageBox("Initiating complete account deletion...", 'info', 0);
 
             if (!authManager.currentUser) {
                 showMessageBox("Please login first", "error", 3000);
@@ -551,31 +551,38 @@ function setupDeleteHandlers() {
             }
 
             try {
-                const idToken = await authManager.currentUser.getIdToken();
+                const uid = authManager.currentUser.uid;
+                const deletePromises = [];
 
+                // Delete all subcollections
+                const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications'];
+                for (const collectionName of collections) {
+                    const snapshot = await db.collection('players').doc(uid).collection(collectionName).get();
+                    snapshot.forEach(doc => {
+                        deletePromises.push(doc.ref.delete());
+                    });
+                }
 
-
-                // Delete Firebase data
-                const notesRef = db.collection('players').doc(authManager.currentUser.uid).collection('notes');
-                const notesSnapshot = await notesRef.get();
-                const deleteNotesPromises = [];
-                notesSnapshot.forEach(doc => {
-                    deleteNotesPromises.push(doc.ref.delete());
+                // Delete messages where user is participant
+                const messagesSnapshot = await db.collection('messages')
+                    .where('participants', 'array-contains', uid).get();
+                messagesSnapshot.forEach(doc => {
+                    deletePromises.push(doc.ref.delete());
                 });
-                await Promise.all(deleteNotesPromises);
 
-                const passwordsRef = db.collection('players').doc(authManager.currentUser.uid).collection('passwords');
-                const passwordsSnapshot = await passwordsRef.get();
-                const deletePasswordsPromises = [];
-                passwordsSnapshot.forEach(doc => {
-                    deletePasswordsPromises.push(doc.ref.delete());
-                });
-                await Promise.all(deletePasswordsPromises);
+                // Delete presence
+                deletePromises.push(db.collection('presence').doc(uid).delete());
 
-                await db.collection('players').doc(authManager.currentUser.uid).delete();
+                // Execute all deletions
+                await Promise.all(deletePromises);
+
+                // Delete player document
+                await db.collection('players').doc(uid).delete();
+
+                // Delete Firebase user account
                 await authManager.currentUser.delete();
 
-                showMessageBox("Account deleted successfully", "success", 3000);
+                showMessageBox("All account data deleted successfully", "success", 3000);
                 setTimeout(() => {
                     window.location.href = "login.html";
                 }, 3000);

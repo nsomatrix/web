@@ -119,7 +119,7 @@ class MatrixTerminal {
                 break;
             case 'dashboard':
                 if (args.length > 0) {
-                    this.runDashboardCommand(args[0]);
+                    this.runDashboardCommand(args[0], args.slice(1));
                 } else {
                     this.runDashboard();
                 }
@@ -671,7 +671,7 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         this.addOutput(`System uptime: ${uptime} seconds`, 'output-text');
     }
     
-    async runDashboardCommand(command) {
+    async runDashboardCommand(command, args = []) {
         const auth = window.firebaseAuth;
         const db = window.firebaseDb;
         
@@ -680,7 +680,9 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             return;
         }
         
-        switch(command.toLowerCase()) {
+        const fullCommand = [command, ...args].join(' ').toLowerCase();
+        
+        switch(fullCommand) {
             case 'friends':
                 this.addOutput('Loading friends...', 'info-text');
                 await this.loadFriends();
@@ -698,13 +700,10 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
                 window.open('https://support.teamobi.com/login-game-3.html', '_blank');
                 break;
             case 'delete':
-                this.addOutput('Account deletion requires confirmation', 'warning-text');
-                const confirm = prompt('Type "DELETE" to confirm account deletion:');
-                if (confirm === 'DELETE') {
-                    await this.deleteAccount();
-                } else {
-                    this.addOutput('Account deletion cancelled', 'info-text');
-                }
+                this.addOutput('Type "dashboard delete confirm" to delete account', 'warning-text');
+                break;
+            case 'delete confirm':
+                await this.deleteAccount();
                 break;
             case 'profile':
                 this.addOutput('USER PROFILE:', 'success-text');
@@ -850,33 +849,40 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         const db = window.firebaseDb;
         
         try {
-            this.addOutput('Deleting account data...', 'warning-text');
+            this.addOutput('Deleting all account data...', 'warning-text');
             
-            // Delete notes
-            const notesRef = db.collection('players').doc(auth.currentUser.uid).collection('notes');
-            const notesSnapshot = await notesRef.get();
-            const deleteNotesPromises = [];
-            notesSnapshot.forEach(doc => {
-                deleteNotesPromises.push(doc.ref.delete());
-            });
-            await Promise.all(deleteNotesPromises);
+            const uid = auth.currentUser.uid;
+            const deletePromises = [];
             
-            // Delete passwords
-            const passwordsRef = db.collection('players').doc(auth.currentUser.uid).collection('passwords');
-            const passwordsSnapshot = await passwordsRef.get();
-            const deletePasswordsPromises = [];
-            passwordsSnapshot.forEach(doc => {
-                deletePasswordsPromises.push(doc.ref.delete());
+            // Delete all subcollections
+            const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications'];
+            for (const collectionName of collections) {
+                const snapshot = await db.collection('players').doc(uid).collection(collectionName).get();
+                snapshot.forEach(doc => {
+                    deletePromises.push(doc.ref.delete());
+                });
+            }
+            
+            // Delete messages where user is participant
+            const messagesSnapshot = await db.collection('messages')
+                .where('participants', 'array-contains', uid).get();
+            messagesSnapshot.forEach(doc => {
+                deletePromises.push(doc.ref.delete());
             });
-            await Promise.all(deletePasswordsPromises);
+            
+            // Delete presence
+            deletePromises.push(db.collection('presence').doc(uid).delete());
+            
+            // Execute all deletions
+            await Promise.all(deletePromises);
             
             // Delete player document
-            await db.collection('players').doc(auth.currentUser.uid).delete();
+            await db.collection('players').doc(uid).delete();
             
-            // Delete user account
+            // Delete Firebase user account
             await auth.currentUser.delete();
             
-            this.addOutput('Account deleted successfully', 'success-text');
+            this.addOutput('All account data deleted successfully', 'success-text');
             this.addOutput('Redirecting to login...', 'info-text');
             
             setTimeout(() => {
