@@ -13,6 +13,14 @@ class MatrixTerminal {
         this.input.focus();
         this.input.addEventListener('keydown', (e) => this.handleKeyDown(e));
         this.showWelcome();
+        
+        // Check if user is already logged in and update navbar
+        setTimeout(() => {
+            const auth = window.firebaseAuth;
+            if (auth && auth.currentUser) {
+                this.updateNavbarAuth(auth.currentUser);
+            }
+        }, 1000);
     }
 
     async loadScript(src) {
@@ -735,21 +743,30 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         const auth = window.firebaseAuth;
         const db = window.firebaseDb;
         
-        // Check if encryption key is available
-        const encryptionKey = sessionStorage.getItem('currentEncryptionKeyHex');
-        if (!encryptionKey) {
-            this.addOutput('Master password required for encrypted notes', 'error-text');
-            this.addOutput('Please unlock from dashboard first', 'info-text');
-            return;
-        }
-        
         try {
             const snapshot = await db.collection('players').doc(auth.currentUser.uid)
-                .collection('notes').orderBy('createdAt', 'desc').get();
+                .collection('notes').get();
             
             if (snapshot.empty) {
                 this.addOutput('No notes found', 'info-text');
                 return;
+            }
+            
+            // Check if encryption key is available
+            const encryptionKey = sessionStorage.getItem('currentEncryptionKeyHex');
+            if (!encryptionKey) {
+                this.addOutput('ENCRYPTED NOTES FOUND:', 'success-text');
+                snapshot.forEach(doc => {
+                    const date = doc.data().createdAt ? doc.data().createdAt.toDate().toLocaleDateString() : 'Unknown';
+                    this.addOutput(`[${date}] [ENCRYPTED - Master password required]`, 'warning-text');
+                });
+                this.addOutput('\nUse dashboard to unlock with master password', 'info-text');
+                return;
+            }
+            
+            // Load CryptoJS if not available
+            if (!window.CryptoJS) {
+                await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js');
             }
             
             this.addOutput('NOTES:', 'success-text');
@@ -768,21 +785,30 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         const auth = window.firebaseAuth;
         const db = window.firebaseDb;
         
-        // Check if encryption key is available
-        const encryptionKey = sessionStorage.getItem('currentEncryptionKeyHex');
-        if (!encryptionKey) {
-            this.addOutput('Master password required for encrypted passwords', 'error-text');
-            this.addOutput('Please unlock from dashboard first', 'info-text');
-            return;
-        }
-        
         try {
             const snapshot = await db.collection('players').doc(auth.currentUser.uid)
-                .collection('passwords').orderBy('createdAt', 'desc').get();
+                .collection('passwords').get();
             
             if (snapshot.empty) {
                 this.addOutput('No passwords found', 'info-text');
                 return;
+            }
+            
+            // Check if encryption key is available
+            const encryptionKey = sessionStorage.getItem('currentEncryptionKeyHex');
+            if (!encryptionKey) {
+                this.addOutput('ENCRYPTED PASSWORDS FOUND:', 'success-text');
+                snapshot.forEach(doc => {
+                    const pwd = doc.data();
+                    this.addOutput(`${pwd.serviceName}: ${pwd.username} | [ENCRYPTED]`, 'warning-text');
+                });
+                this.addOutput('\nUse dashboard to unlock with master password', 'info-text');
+                return;
+            }
+            
+            // Load CryptoJS if not available
+            if (!window.CryptoJS) {
+                await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js');
             }
             
             this.addOutput('PASSWORD MANAGER:', 'success-text');
