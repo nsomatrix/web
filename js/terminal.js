@@ -664,16 +664,69 @@ class MatrixTerminal {
                 mods.forEach((mod, i) => {
                     this.addOutput(`${i+1}. ${mod.name}`, 'output-text');
                 });
-                this.addOutput('\nUsage: mods <search_term> or download <mod_name>', 'info-text');
+                this.addOutput('\nUsage: mods <search> | mods download <name> | mods download <number>', 'info-text');
+            } else if (args[0].toLowerCase() === 'download') {
+                if (args.length < 2) {
+                    this.addOutput('Usage: mods download <mod_name> or mods download <number>', 'error-text');
+                    return;
+                }
+                
+                const identifier = args.slice(1).join(' ');
+                let mod = null;
+                
+                // Check if it's a number
+                if (/^\d+$/.test(identifier)) {
+                    const index = parseInt(identifier) - 1;
+                    // First try from last search results, then from full list
+                    const searchResults = window.terminalMods.lastSearchResults;
+                    if (searchResults && index >= 0 && index < searchResults.length) {
+                        mod = searchResults[index];
+                    } else {
+                        const mods = window.terminalMods.getAllMods();
+                        if (index >= 0 && index < mods.length) {
+                            mod = mods[index];
+                        }
+                    }
+                } else {
+                    // Search by name
+                    mod = window.terminalMods.findMod(identifier);
+                }
+                
+                if (!mod) {
+                    this.addOutput(`Mod not found: ${identifier}`, 'error-text');
+                    this.addOutput('Use "mods" to see available mods', 'info-text');
+                    return;
+                }
+                
+                const downloadSpinner = this.showSpinner(`Downloading ${mod.name}`);
+                
+                setTimeout(() => {
+                    this.hideSpinner(downloadSpinner);
+                    
+                    // Trigger actual download
+                    const link = document.createElement('a');
+                    link.href = mod.download_url;
+                    link.download = mod.name;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    this.addOutput(`Download started: ${mod.name}`, 'success-text');
+                }, 1000);
+                
             } else {
                 const search = args.join(' ');
                 const results = window.terminalMods.searchMods(search);
                 
                 if (results.length > 0) {
+                    // Store search results for numbered downloads
+                    window.terminalMods.lastSearchResults = results;
                     this.addOutput(`SEARCH RESULTS (${results.length} found):`, 'success-text');
                     results.forEach((mod, i) => {
                         this.addOutput(`${i+1}. ${mod.name}`, 'output-text');
                     });
+                    this.addOutput('\nUse: mods download <number> to download from these results', 'info-text');
                 } else {
                     this.addOutput(`No mods found matching: ${search}`, 'error-text');
                 }
@@ -1392,6 +1445,7 @@ class TerminalKinsEstimator {
 class TerminalModsHandler {
     constructor() {
         this.modsData = [];
+        this.lastSearchResults = null;
         this.API_CONFIG = {
             itemId: 'nsomtx-active-mods',
             baseUrl: 'https://archive.org/download/'
