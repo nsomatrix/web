@@ -170,7 +170,10 @@ class MatrixTerminal {
                 }
                 break;
             case 'items':
-                this.runItems();
+                this.runItems(args);
+                break;
+            case 'item':
+                this.runItems(args);
                 break;
             case 'docs':
                 this.runDocs();
@@ -635,21 +638,40 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         }
     }
     
-    async runItems() {
+    async runItems(args) {
         const itemsSpinner = this.showSpinner('Loading items database');
         
         try {
             const itemsData = await fetch('data/items.json').then(r => r.json()).catch(() => null);
             this.hideSpinner(itemsSpinner);
             
-            if (itemsData) {
-                this.addOutput('ITEMS DATABASE LOADED', 'success-text');
-                this.addOutput(`Total items: ${Object.keys(itemsData).length}`, 'output-text');
-                this.addOutput('Real game items data available', 'info-text');
+            if (!args.length) {
+                if (itemsData) {
+                    this.addOutput('ITEMS DATABASE LOADED', 'success-text');
+                    this.addOutput(`Total items: ${Object.keys(itemsData).length}`, 'output-text');
+                    this.addOutput('Usage: item <itemid> e.g. item 573', 'info-text');
+                } else {
+                    this.addOutput('Items database loaded from equipmentsdata.json', 'success-text');
+                    this.addOutput('Equipment, weapons, and armor data available', 'output-text');
+                    this.addOutput('Use: ninjadex equipment <name> to search', 'info-text');
+                }
+                return;
+            }
+            
+            const itemId = args[0];
+            if (itemsData && itemsData[itemId]) {
+                const item = itemsData[itemId];
+                this.addOutput(`ITEM ${itemId}:`, 'success-text');
+                this.addOutput(`Name: ${item.name || 'Unknown'}`, 'output-text');
+                if (item.description) this.addOutput(`Description: ${item.description}`, 'output-text');
+                if (item.stats) {
+                    this.addOutput('Stats:', 'info-text');
+                    Object.entries(item.stats).forEach(([stat, value]) => {
+                        this.addOutput(`  ${stat}: ${value}`, 'output-text');
+                    });
+                }
             } else {
-                this.addOutput('Items database loaded from equipmentsdata.json', 'success-text');
-                this.addOutput('Equipment, weapons, and armor data available', 'output-text');
-                this.addOutput('Use: ninjadex equipment <name> to search', 'info-text');
+                this.addOutput(`Item ${itemId} not found`, 'error-text');
             }
             
         } catch (error) {
