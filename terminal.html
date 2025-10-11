@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Matrix Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="css/terminal.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span class="btn-close"></span>
+                <span class="btn-minimize"></span>
+                <span class="btn-maximize"></span>
+            </div>
+            <div class="terminal-title">Matrix Terminal v1.0</div>
+        </div>
+        
+        <div class="terminal-body" id="terminal">
+            <div class="terminal-output" id="output"></div>
+            <div class="terminal-input-line">
+                <span class="prompt">matrix@web:~$ </span>
+                <input type="text" id="commandInput" class="terminal-input" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
+            authDomain: 'nsomatrix-web.firebaseapp.com',
+            projectId: 'nsomatrix-web',
+            storageBucket: 'nsomatrix-web.firebasestorage.app',
+            messagingSenderId: '320519296982',
+            appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
+            measurementId: 'G-GK3J5PZW85'
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.firebaseAuth = firebase.auth();
+        window.firebaseDb = firebase.firestore();
+    </script>
+    <script src="js/terminal.js"></script>
+    <script>
+        // Load navbar
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+            });
+    </script>
+</body>
+</html>
