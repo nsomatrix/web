@@ -254,6 +254,18 @@
             outQuad: function (t, b, c, d) { return -c *(t/=d)*(t-2) + b; },
             inOutCubic:function(t, b, c, d) { t /= d/2; if (t < 1) return c/2*t*t*t + b; t -= 2; return c/2*(t*t*t + 2) + b; }
         };
+        
+        // Suppress Cloudflare console errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            const message = args.join(' ');
+            // Only filter very specific Cloudflare beacon errors
+            if (message.includes('static.cloudflareinsights.com/beacon.min.js') && 
+                (message.includes('CORS') || message.includes('integrity'))) {
+                return;
+            }
+            originalError.apply(console, args);
+        };
     </script>
 </body>
 </html>
