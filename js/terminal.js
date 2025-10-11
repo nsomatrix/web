@@ -154,15 +154,7 @@ class MatrixTerminal {
                 this.runLogout();
                 break;
 
-            case 'items':
-                this.runItems(args);
-                break;
-            case 'item':
-                this.runItems(args);
-                break;
-            case 'docs':
-                this.runDocs();
-                break;
+
             case 'whoami':
                 this.addOutput('matrix-user', 'success-text');
                 break;
@@ -200,8 +192,6 @@ class MatrixTerminal {
   emulators               - Download emulators
   login                   - Authentication system
   dashboard               - Access user dashboard
-  items                   - Items database
-  docs                    - Access documentation
   
   SYSTEM:
   whoami, date, uptime    - System information`;
@@ -623,26 +613,86 @@ class MatrixTerminal {
             if (!args.length) {
                 const now = new Date();
                 this.addOutput('TIMEZONE TOOL LOADED', 'success-text');
-                this.addOutput(`NSO Server Time (UTC): ${now.toUTCString()}`, 'output-text');
+                this.addOutput(`NSO Server Time (UTC): ${now.toUTCString().slice(17, 25)} ${now.toUTCString().slice(0, 16)}`, 'output-text');
                 this.addOutput('Usage: timezone <country_name>', 'info-text');
                 return;
             }
             
-            const country = args.join(' ');
-            this.addOutput(`Searching timezone for: ${country}`, 'info-text');
+            const query = args.join(' ');
             
-            // Load actual timezone data if available
-            try {
-                const timezoneData = await fetch('assets/countryTimezones.json').then(r => r.json());
-                this.addOutput('Timezone database loaded successfully', 'success-text');
-                this.addOutput(`Search results for "${country}" would appear here`, 'output-text');
-            } catch {
-                this.addOutput('Using basic timezone calculation', 'warning-text');
+            // Wait for countries to be available
+            if (!window.countries) {
+                await new Promise(resolve => {
+                    const checkCountries = () => {
+                        if (window.countries) {
+                            resolve();
+                        } else {
+                            setTimeout(checkCountries, 100);
+                        }
+                    };
+                    checkCountries();
+                });
             }
+            
+            const results = window.countries.filter(country => 
+                country.name.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (results.length === 0) {
+                this.addOutput(`No countries found matching: ${query}`, 'error-text');
+                return;
+            }
+            
+            this.addOutput(`Found ${results.length} country(ies) matching "${query}":`, 'success-text');
+            this.addOutput('', 'output-text');
+            
+            const now = new Date();
+            results.forEach(country => {
+                try {
+                    const localTime = new Date(now.toLocaleString("en-US", {timeZone: country.timezone}));
+                    const time = localTime.toLocaleTimeString();
+                    const date = localTime.toLocaleDateString();
+                    this.addOutput(`${country.name}: ${time} ${date}`, 'output-text');
+                } catch (error) {
+                    this.addOutput(`${country.name}: Timezone unavailable`, 'warning-text');
+                }
+            });
             
         } catch (error) {
             this.hideSpinner(tzSpinner);
-            this.addOutput(`Failed to load timezone tool: ${error.message}`, 'error-text');
+            // Fallback with hardcoded countries if script fails
+            const query = args.join(' ');
+            const fallbackCountries = [
+                { name: "India", timezone: "Asia/Kolkata" },
+                { name: "United States (New York)", timezone: "America/New_York" },
+                { name: "United Kingdom", timezone: "Europe/London" },
+                { name: "Japan", timezone: "Asia/Tokyo" },
+                { name: "Germany", timezone: "Europe/Berlin" },
+                { name: "Australia (Sydney)", timezone: "Australia/Sydney" },
+                { name: "China", timezone: "Asia/Shanghai" },
+                { name: "France", timezone: "Europe/Paris" }
+            ];
+            
+            const results = fallbackCountries.filter(country => 
+                country.name.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (results.length > 0) {
+                this.addOutput(`Found ${results.length} country(ies) matching "${query}":`, 'success-text');
+                const now = new Date();
+                results.forEach(country => {
+                    try {
+                        const localTime = new Date(now.toLocaleString("en-US", {timeZone: country.timezone}));
+                        const time = localTime.toLocaleTimeString();
+                        const date = localTime.toLocaleDateString();
+                        this.addOutput(`${country.name}: ${time} ${date}`, 'output-text');
+                    } catch (error) {
+                        this.addOutput(`${country.name}: Timezone unavailable`, 'warning-text');
+                    }
+                });
+            } else {
+                this.addOutput(`No countries found matching: ${query}`, 'error-text');
+            }
         }
     }
     
@@ -987,70 +1037,9 @@ class MatrixTerminal {
         }
     }
     
-    async runItems(args) {
-        const itemsSpinner = this.showSpinner('Loading items database');
-        
-        try {
-            const itemsData = await fetch('data/items.json').then(r => r.json()).catch(() => null);
-            this.hideSpinner(itemsSpinner);
-            
-            if (!args.length) {
-                if (itemsData) {
-                    this.addOutput('ITEMS DATABASE LOADED', 'success-text');
-                    this.addOutput(`Total items: ${Object.keys(itemsData).length}`, 'output-text');
-                    this.addOutput('Usage: item <itemid> e.g. item 573', 'info-text');
-                } else {
-                    this.addOutput('Items database loaded from equipmentsdata.json', 'success-text');
-                    this.addOutput('Equipment, weapons, and armor data available', 'output-text');
-                    this.addOutput('Use: ninjadex equipment <name> to search', 'info-text');
-                }
-                return;
-            }
-            
-            const itemId = args[0];
-            if (itemsData && itemsData[itemId]) {
-                const item = itemsData[itemId];
-                this.addOutput(`ITEM ${itemId}:`, 'success-text');
-                this.addOutput(`Name: ${item.name || 'Unknown'}`, 'output-text');
-                if (item.description) this.addOutput(`Description: ${item.description}`, 'output-text');
-                if (item.stats) {
-                    this.addOutput('Stats:', 'info-text');
-                    Object.entries(item.stats).forEach(([stat, value]) => {
-                        this.addOutput(`  ${stat}: ${value}`, 'output-text');
-                    });
-                }
-            } else {
-                this.addOutput(`Item ${itemId} not found`, 'error-text');
-            }
-            
-        } catch (error) {
-            this.hideSpinner(itemsSpinner);
-            this.addOutput(`Failed to load items: ${error.message}`, 'error-text');
-        }
-    }
+
     
-    async runDocs() {
-        const docsSpinner = this.showSpinner('Loading documentation');
-        
-        try {
-            const docsData = await this.loadPageData('docs.html');
-            this.hideSpinner(docsSpinner);
-            
-            if (docsData) {
-                this.addOutput('DOCUMENTATION LOADED', 'success-text');
-                this.addOutput('Available documentation:', 'output-text');
-                this.addOutput('• Game guides and tutorials', 'output-text');
-                this.addOutput('• API documentation', 'output-text');
-                this.addOutput('• Terminal commands reference', 'output-text');
-                this.addOutput('• Database schemas', 'output-text');
-                this.addOutput('\nFull docs available at docs.html', 'info-text');
-            }
-            
-        } catch (error) {
-            this.hideSpinner(docsSpinner);
-            this.addOutput(`Failed to load documentation: ${error.message}`, 'error-text');
-        }
-    }
+
     
 
 

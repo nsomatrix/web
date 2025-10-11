@@ -1,4 +1,4 @@
-const countries = [
+window.countries = [
     { name: "Afghanistan", timezone: "Asia/Kabul", flag: "af" },
     { name: "Albania", timezone: "Europe/Tirane", flag: "al" },
     { name: "Algeria", timezone: "Africa/Algiers", flag: "dz" },
@@ -188,6 +188,7 @@ const countries = [
     { name: "Zimbabwe", timezone: "Africa/Harare", flag: "zw" }
 ];
 
+const countries = window.countries;
 let searchResults = [];
 let comparisonCountries = { country1: null, country2: null };
 
