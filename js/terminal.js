@@ -104,6 +104,18 @@ class MatrixTerminal {
             case 'ninjadex':
                 this.runNinjadex(args);
                 break;
+            case 'monster':
+                this.runNinjadex(['monster', ...args]);
+                break;
+            case 'equipment':
+                this.runNinjadex(['equipment', ...args]);
+                break;
+            case 'map':
+                this.runNinjadex(['map', ...args]);
+                break;
+            case 'skill':
+                this.runNinjadex(['skill', ...args]);
+                break;
             case 'timezone':
                 this.runTimezone(args);
                 break;
@@ -141,34 +153,7 @@ class MatrixTerminal {
             case 'logout':
                 this.runLogout();
                 break;
-            case 'friends':
-                if (args.length > 0) {
-                    this.runDashboardCommand('friends');
-                } else {
-                    this.addOutput('Use: dashboard friends', 'info-text');
-                }
-                break;
-            case 'notes':
-                if (args.length > 0) {
-                    this.runDashboardCommand('notes');
-                } else {
-                    this.addOutput('Use: dashboard notes', 'info-text');
-                }
-                break;
-            case 'passwords':
-                if (args.length > 0) {
-                    this.runDashboardCommand('passwords');
-                } else {
-                    this.addOutput('Use: dashboard passwords', 'info-text');
-                }
-                break;
-            case 'server':
-                if (args.length > 0) {
-                    this.runDashboardCommand('server');
-                } else {
-                    this.addOutput('Use: dashboard server', 'info-text');
-                }
-                break;
+
             case 'items':
                 this.runItems(args);
                 break;
@@ -233,34 +218,7 @@ class MatrixTerminal {
         this.addOutput(help, 'output-text');
     }
 
-    listFiles() {
-        const files = `total 12
-drwxr-xr-x 3 matrix matrix 4096 Dec 15 10:30 data/
-drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
--rw-r--r-- 1 matrix matrix   64 Dec 15 10:25 readme.txt
--rw-r--r-- 1 matrix matrix  128 Dec 15 10:25 help.txt
--rw-r--r-- 1 matrix matrix  256 Dec 15 10:25 commands.txt`;
-        this.addOutput(files, 'output-text');
-    }
 
-    catFile(filename) {
-        if (!filename) {
-            this.addOutput('Usage: cat <filename>', 'error-text');
-            return;
-        }
-        
-        const files = {
-            'readme.txt': 'Welcome to Matrix Terminal!\nThis terminal provides full access to all Matrix-WEB features.\nType "help" for available commands.',
-            'help.txt': 'Matrix Terminal Help:\n• Use "monster <name>" to search monsters\n• Use "equipment <name>" to search equipment\n• Use "estimate" for calculations\n• Use "timezone" for time information',
-            'commands.txt': 'Available command categories:\n• Tools: estimate, monster, equipment, timezone\n• Pages: login, mods, emulators, items, docs\n• System: help, clear, matrix, whoami, date, uptime, stats'
-        };
-        
-        if (files[filename]) {
-            this.addOutput(files[filename], 'output-text');
-        } else {
-            this.addOutput(`cat: ${filename}: No such file or directory`, 'error-text');
-        }
-    }
 
     clearTerminal() {
         this.output.innerHTML = '';
@@ -349,64 +307,302 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         const ninjaSpinner = this.showSpinner('Loading Ninjadex database');
         
         try {
-            await this.loadScript('js/ninjadex.js');
+            // Initialize ninjadex if not already done
+            if (!window.terminalNinjadex) {
+                window.terminalNinjadex = {
+                    monsters: [],
+                    equipments: [],
+                    maps: [],
+                    items: [],
+                    skillsets: []
+                };
+                
+                // Load data using same methods as ninjadex.js
+                await this.loadNinjadexData();
+            }
             
-            // Load actual monster data
-            const monstersData = await fetch('json/monsters_database.json').then(r => r.json());
-            const equipmentData = await fetch('equipmentsdata.json').then(r => r.text());
             this.hideSpinner(ninjaSpinner);
             
             if (!args.length) {
-                this.addOutput('Ninjadex loaded successfully', 'success-text');
-                this.addOutput('Usage:', 'output-text');
-                this.addOutput('  ninjadex monsters [search_term]', 'output-text');
-                this.addOutput('  ninjadex equipment [search_term]', 'output-text');
-                this.addOutput('  ninjadex stats', 'output-text');
+                this.addOutput('NINJADEX DATABASE LOADED', 'success-text');
+                this.addOutput('Available categories:', 'output-text');
+                this.addOutput('  ninjadex monster [name] - search/list monsters', 'output-text');
+                this.addOutput('  ninjadex equipment [name] - search/list equipment', 'output-text');
+                this.addOutput('  ninjadex map [name] - search/list maps', 'output-text');
+                this.addOutput('  ninjadex item [name] - search/list items', 'output-text');
+                this.addOutput('  ninjadex skill [name] - search/list skills', 'output-text');
                 return;
             }
             
-            const command = args[0].toLowerCase();
+            const category = args[0].toLowerCase();
             const searchTerm = args.slice(1).join(' ');
             
-            if (command === 'monsters') {
-                const allMonsters = [...monstersData.monsters.regular, ...monstersData.monsters.cursed];
-                
-                if (!searchTerm) {
-                    this.addOutput(`MONSTER DATABASE (${allMonsters.length} total):`, 'success-text');
-                    allMonsters.slice(0, 10).forEach(monster => {
-                        this.addOutput(`${monster.name} - Lv.${monster.level} HP:${monster.hp.toLocaleString()} [${monster.type}]`, 'output-text');
-                    });
-                    this.addOutput('Use: ninjadex monsters <name> to search', 'info-text');
-                } else {
-                    const results = allMonsters.filter(m => 
-                        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        m.locations.some(loc => loc.toLowerCase().includes(searchTerm.toLowerCase()))
-                    );
-                    
-                    if (results.length === 0) {
-                        this.addOutput(`No monsters found matching: ${searchTerm}`, 'error-text');
-                    } else {
-                        this.addOutput(`SEARCH RESULTS (${results.length} found):`, 'success-text');
-                        results.forEach(monster => {
-                            this.addOutput(`${monster.name} - Lv.${monster.level} HP:${monster.hp.toLocaleString()} [${monster.type}]`, 'output-text');
-                            this.addOutput(`  Locations: ${monster.locations.join(', ')}`, 'info-text');
-                        });
-                    }
-                }
-            } else if (command === 'equipment') {
-                this.addOutput('Equipment database loaded from real data', 'success-text');
-                this.addOutput('Equipment search functionality active', 'output-text');
-            } else if (command === 'stats') {
-                this.addOutput('DATABASE STATISTICS:', 'success-text');
-                this.addOutput(`Total Monsters: ${monstersData.total_monsters}`, 'output-text');
-                this.addOutput(`Regular: ${monstersData.statistics.regular_monsters}`, 'output-text');
-                this.addOutput(`Cursed: ${monstersData.statistics.cursed_monsters}`, 'output-text');
-                this.addOutput(`Level Range: ${monstersData.statistics.level_range.min}-${monstersData.statistics.level_range.max}`, 'output-text');
+            switch(category) {
+                case 'monster':
+                case 'monsters':
+                    this.searchMonsters(window.terminalNinjadex.monsters, searchTerm);
+                    break;
+                case 'equipment':
+                case 'equipments':
+                    this.searchEquipment(window.terminalNinjadex.equipments, searchTerm);
+                    break;
+                case 'map':
+                case 'maps':
+                    this.searchMaps(window.terminalNinjadex.maps, searchTerm);
+                    break;
+                case 'item':
+                case 'items':
+                    this.searchItems(window.terminalNinjadex.items, searchTerm);
+                    break;
+                case 'skill':
+                case 'skills':
+                case 'skillset':
+                    this.searchSkills(window.terminalNinjadex.skillsets, searchTerm);
+                    break;
+                default:
+                    this.addOutput(`Unknown category: ${category}`, 'error-text');
+                    this.addOutput('Use: ninjadex monster/equipment/map/item/skill [name]', 'info-text');
             }
             
         } catch (error) {
             this.hideSpinner(ninjaSpinner);
             this.addOutput(`Failed to load Ninjadex: ${error.message}`, 'error-text');
+        }
+    }
+    
+    async loadNinjadexData() {
+        try {
+            // Load monsters
+            const monstersResponse = await fetch('json/monsters_database.json');
+            const monstersData = await monstersResponse.json();
+            window.terminalNinjadex.monsters = [...monstersData.monsters.regular, ...monstersData.monsters.cursed];
+            
+            // Load equipment
+            const equipmentResponse = await fetch('json/structured_equipment_data.json');
+            const equipmentData = await equipmentResponse.json();
+            window.terminalNinjadex.equipments = [];
+            
+            Object.keys(equipmentData.categories).forEach(category => {
+                if (category === 'weapons') {
+                    Object.keys(equipmentData.categories.weapons).forEach(weaponType => {
+                        equipmentData.categories.weapons[weaponType].forEach(item => {
+                            window.terminalNinjadex.equipments.push({
+                                ...item,
+                                category: 'sword',
+                                weapon_type: weaponType
+                            });
+                        });
+                    });
+                } else if (Array.isArray(equipmentData.categories[category])) {
+                    equipmentData.categories[category].forEach(item => {
+                        window.terminalNinjadex.equipments.push({
+                            ...item,
+                            category: category
+                        });
+                    });
+                }
+            });
+            
+            // Load items
+            const itemsResponse = await fetch('data/items.json');
+            window.terminalNinjadex.items = await itemsResponse.json();
+            
+            // Load skillsets
+            const skillsResponse = await fetch('structured_skillsets.json');
+            const skillsData = await skillsResponse.json();
+            window.terminalNinjadex.skillsets = [];
+            
+            Object.keys(skillsData.classes).forEach(className => {
+                const classData = skillsData.classes[className];
+                classData.skills.forEach(skill => {
+                    window.terminalNinjadex.skillsets.push({
+                        ...skill,
+                        class: className,
+                        school: classData.school
+                    });
+                });
+            });
+            
+            // Process maps from monster locations
+            const mapData = new Map();
+            window.terminalNinjadex.monsters.forEach(monster => {
+                monster.locations.forEach(location => {
+                    if (!mapData.has(location)) {
+                        mapData.set(location, {
+                            name: location,
+                            type: this.getMapType(location),
+                            monsters: []
+                        });
+                    }
+                    mapData.get(location).monsters.push(monster);
+                });
+            });
+            window.terminalNinjadex.maps = Array.from(mapData.values());
+            
+        } catch (error) {
+            console.error('Failed to load ninjadex data:', error);
+        }
+    }
+    
+    getMapType(mapName) {
+        const cursedKeywords = ['death', 'nightmare', 'horror', 'skeleton', 'cannibal', 'dread', 'heartbreak', 'suicide', 'secrets'];
+        const lowerName = mapName.toLowerCase();
+        return cursedKeywords.some(keyword => lowerName.includes(keyword)) ? 'cursed' : 'regular';
+    }
+    
+    searchMonsters(monsters, searchTerm) {
+        if (!monsters || monsters.length === 0) {
+            this.addOutput('Monster database not available', 'error-text');
+            return;
+        }
+        
+        if (!searchTerm) {
+            this.addOutput(`MONSTERS LIST (${monsters.length} total):`, 'success-text');
+            monsters.forEach(monster => {
+                this.addOutput(`• ${monster.name} (Lv.${monster.level})`, 'output-text');
+            });
+            return;
+        }
+        
+        const results = monsters.filter(m => 
+            m.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        if (results.length === 0) {
+            this.addOutput(`No monsters found matching: ${searchTerm}`, 'error-text');
+        } else {
+            results.forEach(monster => {
+                this.addOutput(`MONSTER: ${monster.name}`, 'success-text');
+                this.addOutput(`Level: ${monster.level}`, 'output-text');
+                this.addOutput(`HP: ${monster.hp.toLocaleString()}`, 'output-text');
+                this.addOutput(`Type: ${monster.type}`, 'output-text');
+                this.addOutput(`Locations: ${monster.locations.join(', ')}`, 'output-text');
+                if (results.length > 1) this.addOutput('', 'output-text');
+            });
+        }
+    }
+    
+    searchEquipment(equipments, searchTerm) {
+        if (!equipments || equipments.length === 0) {
+            this.addOutput('Equipment database not available', 'error-text');
+            return;
+        }
+        
+        if (!searchTerm) {
+            this.addOutput(`EQUIPMENT LIST (${equipments.length} total):`, 'success-text');
+            equipments.forEach(item => {
+                this.addOutput(`• ${item.name} (Lv.${item.level})`, 'output-text');
+            });
+            return;
+        }
+        
+        const results = equipments.filter(item => 
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        if (results.length === 0) {
+            this.addOutput(`No equipment found matching: ${searchTerm}`, 'error-text');
+        } else {
+            results.forEach(item => {
+                this.addOutput(`EQUIPMENT: ${item.name}`, 'success-text');
+                this.addOutput(`Level: ${item.level}`, 'output-text');
+                this.addOutput(`Category: ${item.category}`, 'output-text');
+                if (item.weapon_type) this.addOutput(`Type: ${item.weapon_type}`, 'output-text');
+                if (item.attribute) this.addOutput(`Attribute: ${item.attribute}`, 'output-text');
+                if (results.length > 1) this.addOutput('', 'output-text');
+            });
+        }
+    }
+    
+    searchMaps(maps, searchTerm) {
+        if (!maps || maps.length === 0) {
+            this.addOutput('Maps database not available', 'error-text');
+            return;
+        }
+        
+        if (!searchTerm) {
+            this.addOutput(`MAPS LIST (${maps.length} total):`, 'success-text');
+            maps.forEach(map => {
+                this.addOutput(`• ${map.name} (${map.monsters.length} monsters)`, 'output-text');
+            });
+            return;
+        }
+        
+        const results = maps.filter(map => 
+            map.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        if (results.length === 0) {
+            this.addOutput(`No maps found matching: ${searchTerm}`, 'error-text');
+        } else {
+            results.forEach(map => {
+                this.addOutput(`MAP: ${map.name}`, 'success-text');
+                this.addOutput(`Type: ${map.type}`, 'output-text');
+                this.addOutput(`Monsters: ${map.monsters.length}`, 'output-text');
+                this.addOutput(`Creatures: ${map.monsters.map(m => m.name).join(', ')}`, 'output-text');
+                if (results.length > 1) this.addOutput('', 'output-text');
+            });
+        }
+    }
+    
+    searchItems(items, searchTerm) {
+        if (!items || items.length === 0) {
+            this.addOutput('Items database not available', 'error-text');
+            return;
+        }
+        
+        if (!searchTerm) {
+            this.addOutput(`ITEMS LIST (${items.length} total):`, 'success-text');
+            items.forEach(item => {
+                this.addOutput(`• ${item.name} (ID: ${item.id})`, 'output-text');
+            });
+            return;
+        }
+        
+        const results = items.filter(item => 
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        if (results.length === 0) {
+            this.addOutput(`No items found matching: ${searchTerm}`, 'error-text');
+        } else {
+            results.forEach(item => {
+                this.addOutput(`ITEM: ${item.name}`, 'success-text');
+                this.addOutput(`ID: ${item.id}`, 'output-text');
+                if (results.length > 1) this.addOutput('', 'output-text');
+            });
+        }
+    }
+    
+    searchSkills(skills, searchTerm) {
+        if (!skills || skills.length === 0) {
+            this.addOutput('Skills database not available', 'error-text');
+            return;
+        }
+        
+        if (!searchTerm) {
+            this.addOutput(`SKILLS LIST (${skills.length} total):`, 'success-text');
+            skills.forEach(skill => {
+                this.addOutput(`• ${skill.name} (${skill.class})`, 'output-text');
+            });
+            return;
+        }
+        
+        const results = skills.filter(skill => 
+            skill.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        if (results.length === 0) {
+            this.addOutput(`No skills found matching: ${searchTerm}`, 'error-text');
+        } else {
+            results.forEach(skill => {
+                this.addOutput(`SKILL: ${skill.name}`, 'success-text');
+                this.addOutput(`Class: ${skill.class}`, 'output-text');
+                this.addOutput(`School: ${skill.school}`, 'output-text');
+                if (skill.level) this.addOutput(`Level: ${skill.level}`, 'output-text');
+                if (skill.description) this.addOutput(`Description: ${skill.description}`, 'output-text');
+                if (results.length > 1) this.addOutput('', 'output-text');
+            });
         }
     }
     
