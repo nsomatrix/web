@@ -178,18 +178,8 @@ class MatrixTerminal {
     }
 
     showWelcome() {
-        const ascii = `
- ███▄ ▄███▓ ▄▄▄     ▄▄▄█████▓ ██▀███   ██▓▒██   ██▒
-▓██▒▀█▀ ██▒▒████▄   ▓  ██▒ ▓▒▓██ ▒ ██▒▓██▒▒▒ █ █ ▒░
-▓██    ▓██░▒██  ▀█▄ ▒ ▓██░ ▒░▓██ ░▄█ ▒▒██▒░░  █   ░
-▒██    ▒██ ░██▄▄▄▄██░ ▓██▓ ░ ▒██▀▀█▄  ░██░ ░ █ █ ▒ 
-▒██▒   ░██▒ ▓█   ▓██▒ ▒██▒ ░ ░██▓ ▒██▒░██░▒██▒ ▒██▒
-░ ▒░   ░  ░ ▒▒   ▓▒█░ ▒ ░░   ░ ▒▓ ░▒▓░░▓  ▒▒ ░ ░▓ ░
-░  ░      ░  ▒   ▒▒ ░   ░      ░▒ ░ ▒░ ▒ ░░░   ░▒ ░
-░      ░     ░   ▒    ░        ░░   ░  ▒ ░ ░    ░  
-       ░         ░  ░           ░      ░   ░    ░  
-`;
-        this.addOutput(ascii, 'ascii-art');
+        const imageHtml = '<img src="data/Pictures/matrix.png" alt="Matrix Logo" style="max-width: 300px; height: auto; display: block; margin: 10px 0;">';
+        this.addOutput(imageHtml, 'ascii-art');
         this.addOutput('Welcome to Matrix Terminal v1.0', 'success-text');
         this.addOutput('Type "help" for available commands\n', 'info-text');
     }
@@ -237,11 +227,17 @@ class MatrixTerminal {
         const estSpinner = this.showSpinner('Loading estimator');
         
         try {
-            await this.loadScript('js/estimator.js');
+            // Initialize terminal estimator if not already done
+            if (!window.terminalEstimator) {
+                window.terminalEstimator = new TerminalKinsEstimator();
+                await window.terminalEstimator.loadLevelRequirements();
+            }
+            
             this.hideSpinner(estSpinner);
             
             if (!args.length) {
-                this.addOutput('Estimator loaded Usage:', 'success-text');
+                this.addOutput('ESTIMATOR LOADED', 'success-text');
+                this.addOutput('Usage:', 'output-text');
                 this.addOutput('  estimate kins <per_hour> <days>', 'output-text');
                 this.addOutput('  estimate level <current_level> <current_exp> <exp_per_hour>', 'output-text');
                 return;
@@ -250,51 +246,52 @@ class MatrixTerminal {
             const type = args[0].toLowerCase();
             
             if (type === 'kins') {
-                const perHour = parseFloat(args[1]);
+                const perHour = args[1] ? window.terminalEstimator.parseKinsInput(args[1]) : 0;
                 const days = parseInt(args[2]);
                 
-                if (!perHour || !days) {
-                    this.addOutput('Usage: estimate kins <per_hour> <days>', 'error-text');
+                if (!perHour || !days || perHour <= 0 || days <= 0 || days > 365) {
+                    this.addOutput('Invalid input. Please enter valid numbers:', 'error-text');
+                    this.addOutput('• Kins per Hour: > 0', 'output-text');
+                    this.addOutput('• Days: 1-365', 'output-text');
                     return;
                 }
                 
-                // Use actual estimator logic if available
-                const total = perHour * 24 * days;
-                const breakdown = {
-                    perDay: perHour * 24,
-                    perWeek: perHour * 24 * 7,
-                    perMonth: perHour * 24 * 30,
-                    perYear: perHour * 24 * 365
-                };
+                const results = window.terminalEstimator.calculateKinsResults(perHour, days);
                 
                 this.addOutput('KINS ESTIMATION RESULTS:', 'success-text');
-                this.addOutput(`Total Kins (${days} days): ${total.toLocaleString()}`, 'output-text');
-                this.addOutput(`Per Day: ${breakdown.perDay.toLocaleString()}`, 'output-text');
-                this.addOutput(`Per Week: ${breakdown.perWeek.toLocaleString()}`, 'output-text');
-                this.addOutput(`Per Month: ${breakdown.perMonth.toLocaleString()}`, 'output-text');
-                this.addOutput(`Per Year: ${breakdown.perYear.toLocaleString()}`, 'output-text');
+                this.addOutput(`Total Kins (${days} days): ${window.terminalEstimator.formatKins(results.total)} kins`, 'output-text');
+                this.addOutput('', 'output-text');
+                this.addOutput('Accumulation Breakdown:', 'info-text');
+                this.addOutput(`Per Day: ${window.terminalEstimator.formatKins(results.perDay)} kins`, 'output-text');
+                this.addOutput(`Per Week: ${window.terminalEstimator.formatKins(results.perWeek)} kins`, 'output-text');
+                this.addOutput(`Per Month: ${window.terminalEstimator.formatKins(results.perMonth)} kins`, 'output-text');
+                this.addOutput(`Per Year: ${window.terminalEstimator.formatKins(results.perYear)} kins`, 'output-text');
                 
             } else if (type === 'level') {
                 const currentLevel = parseInt(args[1]);
                 const currentExp = parseFloat(args[2]);
                 const expPerHour = parseFloat(args[3]);
                 
-                if (!currentLevel || currentExp === undefined || !expPerHour) {
-                    this.addOutput('Usage: estimate level <current_level> <current_exp> <exp_per_hour>', 'error-text');
+                if (!currentLevel || currentExp === '' || !expPerHour ||
+                    currentLevel < 1 || currentLevel > 129 ||
+                    currentExp < -50 || currentExp > 99.99 ||
+                    expPerHour <= 0) {
+                    this.addOutput('Invalid input. Please enter valid values:', 'error-text');
+                    this.addOutput('• Level: 1-129 (can calculate to level 130)', 'output-text');
+                    this.addOutput('• Experience: -50% to 99.99%', 'output-text');
+                    this.addOutput('• EXP per Hour: > 0', 'output-text');
                     return;
                 }
                 
-                const expNeeded = 100 - currentExp;
-                const hoursNeeded = expNeeded / expPerHour;
-                const days = Math.floor(hoursNeeded / 24);
-                const hours = Math.floor(hoursNeeded % 24);
-                const minutes = Math.floor((hoursNeeded % 1) * 60);
+                const results = window.terminalEstimator.calculateLevelResults(currentLevel, currentExp, expPerHour);
                 
                 this.addOutput('LEVEL ESTIMATION RESULTS:', 'success-text');
-                this.addOutput(`From Level: ${currentLevel} (${currentExp}%)`, 'output-text');
-                this.addOutput(`To Level: ${currentLevel + 1}`, 'output-text');
-                this.addOutput(`Experience Needed: ${expNeeded.toFixed(2)}%`, 'output-text');
-                this.addOutput(`Time Required: ${days}d ${hours}h ${minutes}m`, 'output-text');
+                this.addOutput(`From Level: ${results.fromLevel} (${currentExp}%)`, 'output-text');
+                this.addOutput(`To Level: ${results.toLevel}`, 'output-text');
+                this.addOutput(`Experience Needed: ${results.expNeeded}%${results.actualExpNeeded ? ` (${results.actualExpNeeded} EXP)` : ''}`, 'output-text');
+                this.addOutput(`Time Required: ${results.timeString}`, 'output-text');
+            } else {
+                this.addOutput('Unknown estimation type. Use "kins" or "level"', 'error-text');
             }
             
         } catch (error) {
@@ -1279,6 +1276,85 @@ class MatrixTerminal {
         line.innerHTML = text;
         this.output.appendChild(line);
         this.output.scrollTop = this.output.scrollHeight;
+    }
+}
+
+// Terminal version of KinsEstimator
+class TerminalKinsEstimator {
+    constructor() {
+        this.levelRequirements = null;
+    }
+
+    async loadLevelRequirements() {
+        try {
+            const response = await fetch('json/level_requirements.json');
+            const data = await response.json();
+            this.levelRequirements = data.levels;
+        } catch (error) {
+            console.error('Failed to load level requirements:', error);
+        }
+    }
+
+    parseKinsInput(input) {
+        return parseFloat(input.replace(/\./g, '')) || 0;
+    }
+
+    formatKins(number) {
+        const numStr = number.toString();
+        let formatted = '';
+        
+        for (let i = 0; i < numStr.length; i++) {
+            if (i > 0 && (numStr.length - i) % 3 === 0) {
+                formatted += '.';
+            }
+            formatted += numStr[i];
+        }
+        
+        return formatted;
+    }
+
+    calculateKinsResults(kinsPerHour, days) {
+        const kinsPerDay = kinsPerHour * 24;
+        const totalKins = kinsPerDay * days;
+
+        return {
+            total: totalKins,
+            perDay: kinsPerDay,
+            perWeek: kinsPerDay * 7,
+            perMonth: kinsPerDay * 30,
+            perYear: kinsPerDay * 365
+        };
+    }
+
+    calculateLevelResults(currentLevel, currentExp, expPerHour) {
+        const expNeeded = 100 - currentExp;
+        const secondsNeeded = Math.ceil((expNeeded / expPerHour) * 3600);
+        
+        let actualExpNeeded = null;
+        if (this.levelRequirements && currentLevel < 130) {
+            const expForThisLevel = this.levelRequirements[(currentLevel + 1).toString()] || 0;
+            actualExpNeeded = Math.ceil((expNeeded / 100) * expForThisLevel);
+        }
+
+        const totalSeconds = Math.floor(secondsNeeded);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
+        let timeString = '';
+        if (days > 0) timeString += `${days}d `;
+        if (hours > 0) timeString += `${hours}h `;
+        if (minutes > 0) timeString += `${minutes}m `;
+        timeString += `${secs}s`;
+
+        return {
+            fromLevel: currentLevel,
+            toLevel: currentLevel + 1,
+            expNeeded: expNeeded.toFixed(2),
+            actualExpNeeded,
+            timeString: timeString.trim()
+        };
     }
 }
 
