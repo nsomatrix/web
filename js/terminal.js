@@ -559,9 +559,19 @@ class MatrixTerminal {
             return;
         }
         
-        const results = items.filter(item => 
-            item.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        // Check if searchTerm is a number (ID lookup)
+        const isIdSearch = /^\d+$/.test(searchTerm);
+        let results;
+        
+        if (isIdSearch) {
+            // Search by ID
+            results = items.filter(item => item.id == searchTerm);
+        } else {
+            // Search by name
+            results = items.filter(item => 
+                item.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
         
         if (results.length === 0) {
             this.addOutput(`No items found matching: ${searchTerm}`, 'error-text');
