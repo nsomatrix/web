@@ -773,8 +773,31 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             snapshot.forEach(doc => {
                 const note = doc.data();
                 const decrypted = this.decryptData(note.content, encryptionKey);
-                const date = note.createdAt ? note.createdAt.toDate().toLocaleDateString() : 'Unknown';
-                this.addOutput(`[${date}] ${decrypted}`, 'output-text');
+                let dateStr = 'No Date';
+                if (note.createdAt) {
+                    const date = note.createdAt.toDate();
+                    dateStr = date.toLocaleString('en-GB', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit', 
+                        hour12: true 
+                    });
+                } else if (note.timestamp) {
+                    const date = note.timestamp.toDate();
+                    dateStr = date.toLocaleString('en-GB', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit', 
+                        hour12: true 
+                    });
+                }
+                this.addOutput(`${dateStr} ${decrypted}`, 'output-text');
             });
         } catch (error) {
             this.addOutput(`Error loading notes: ${error.message}`, 'error-text');
