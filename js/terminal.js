@@ -5,6 +5,8 @@ class MatrixTerminal {
         this.commandHistory = [];
         this.historyIndex = -1;
         this.loadedScripts = new Set();
+        this.spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+        this.activeSpinners = new Map();
         
         this.init();
     }
@@ -201,7 +203,7 @@ class MatrixTerminal {
 `;
         this.addOutput(ascii, 'ascii-art');
         this.addOutput('Welcome to Matrix Terminal v1.0', 'success-text');
-        this.addOutput('Type "help" for available commands.\n', 'info-text');
+        this.addOutput('Type "help" for available commands\n', 'info-text');
     }
 
     showHelp() {
@@ -267,17 +269,18 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
 01000001 01100011 01100011 01100101 01110011 01110011 01101001 01101110 01100111
 01001101 01100001 01110100 01110010 01101001 01111000 00101110 00101110 00101110`;
         this.addOutput(matrix, 'success-text');
-        this.addOutput('The Matrix has you...', 'info-text');
+        this.addOutput('The Matrix has you', 'info-text');
     }
 
     async runEstimator(args) {
-        this.addOutput('Loading estimator...', 'info-text');
+        const estSpinner = this.showSpinner('Loading estimator');
         
         try {
             await this.loadScript('js/estimator.js');
+            this.hideSpinner(estSpinner);
             
             if (!args.length) {
-                this.addOutput('Estimator loaded. Usage:', 'success-text');
+                this.addOutput('Estimator loaded Usage:', 'success-text');
                 this.addOutput('  estimate kins <per_hour> <days>', 'output-text');
                 this.addOutput('  estimate level <current_level> <current_exp> <exp_per_hour>', 'output-text');
                 return;
@@ -334,12 +337,13 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             }
             
         } catch (error) {
+            this.hideSpinner(estSpinner);
             this.addOutput(`Failed to load estimator: ${error.message}`, 'error-text');
         }
     }
     
     async runNinjadex(args) {
-        this.addOutput('Loading Ninjadex database...', 'info-text');
+        const ninjaSpinner = this.showSpinner('Loading Ninjadex database');
         
         try {
             await this.loadScript('js/ninjadex.js');
@@ -347,9 +351,10 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             // Load actual monster data
             const monstersData = await fetch('json/monsters_database.json').then(r => r.json());
             const equipmentData = await fetch('equipmentsdata.json').then(r => r.text());
+            this.hideSpinner(ninjaSpinner);
             
             if (!args.length) {
-                this.addOutput('Ninjadex loaded successfully!', 'success-text');
+                this.addOutput('Ninjadex loaded successfully', 'success-text');
                 this.addOutput('Usage:', 'output-text');
                 this.addOutput('  ninjadex monsters [search_term]', 'output-text');
                 this.addOutput('  ninjadex equipment [search_term]', 'output-text');
@@ -397,15 +402,17 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             }
             
         } catch (error) {
+            this.hideSpinner(ninjaSpinner);
             this.addOutput(`Failed to load Ninjadex: ${error.message}`, 'error-text');
         }
     }
     
     async runTimezone(args) {
-        this.addOutput('Loading timezone functionality...', 'info-text');
+        const tzSpinner = this.showSpinner('Loading timezone functionality');
         
         try {
             await this.loadScript('js/timezone.js');
+            this.hideSpinner(tzSpinner);
             
             if (!args.length) {
                 const now = new Date();
@@ -428,6 +435,7 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             }
             
         } catch (error) {
+            this.hideSpinner(tzSpinner);
             this.addOutput(`Failed to load timezone tool: ${error.message}`, 'error-text');
         }
     }
@@ -523,7 +531,7 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         this.addOutput('Example: login user@example.com mypassword', 'info-text');
         
         this.loginMode = true;
-        this.addOutput('Or type your email and press Enter:', 'info-text');
+        this.addOutput('Or type your email and press Enter', 'info-text');
     }
     
     async handleLogin(email, password) {
@@ -531,7 +539,7 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         const db = window.firebaseDb;
         
         try {
-            this.addOutput('Authenticating...', 'info-text');
+            const authSpinner = this.showSpinner('Authenticating');
             
             if (auth) {
                 const userCred = await auth.signInWithEmailAndPassword(email, password);
@@ -568,12 +576,15 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
                 
                 // Update navbar auth state
                 this.updateNavbarAuth(user);
+                this.hideSpinner(authSpinner);
                 
             } else {
+                this.hideSpinner(authSpinner);
                 this.addOutput('Firebase not loaded yet - try again in a moment', 'warning-text');
             }
             
         } catch (error) {
+            this.hideSpinner(authSpinner);
             let errorMessage = 'Login failed';
             if (error.code === 'auth/user-not-found') {
                 errorMessage = 'No account found with this email';
@@ -598,8 +609,10 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         
         try {
             if (db) {
+                const dashSpinner = this.showSpinner('Loading dashboard');
                 const playerDoc = await db.collection('players').doc(auth.currentUser.uid).get();
                 const playerData = playerDoc.data();
+                this.hideSpinner(dashSpinner);
                 
                 this.addOutput('REAL DASHBOARD ACCESS GRANTED', 'success-text');
                 this.addOutput(`User: ${auth.currentUser.email}`, 'output-text');
@@ -623,10 +636,11 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
     }
     
     async runItems() {
-        this.addOutput('Loading items database...', 'info-text');
+        const itemsSpinner = this.showSpinner('Loading items database');
         
         try {
             const itemsData = await fetch('data/items.json').then(r => r.json()).catch(() => null);
+            this.hideSpinner(itemsSpinner);
             
             if (itemsData) {
                 this.addOutput('ITEMS DATABASE LOADED', 'success-text');
@@ -639,15 +653,17 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             }
             
         } catch (error) {
+            this.hideSpinner(itemsSpinner);
             this.addOutput(`Failed to load items: ${error.message}`, 'error-text');
         }
     }
     
     async runDocs() {
-        this.addOutput('Loading documentation...', 'info-text');
+        const docsSpinner = this.showSpinner('Loading documentation');
         
         try {
             const docsData = await this.loadPageData('docs.html');
+            this.hideSpinner(docsSpinner);
             
             if (docsData) {
                 this.addOutput('DOCUMENTATION LOADED', 'success-text');
@@ -660,6 +676,7 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             }
             
         } catch (error) {
+            this.hideSpinner(docsSpinner);
             this.addOutput(`Failed to load documentation: ${error.message}`, 'error-text');
         }
     }
@@ -684,26 +701,30 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         
         switch(fullCommand) {
             case 'friends':
-                this.addOutput('Loading friends...', 'info-text');
+                const friendsSpinner = this.showSpinner('Loading friends');
                 await this.loadFriends();
+                this.hideSpinner(friendsSpinner);
                 break;
             case 'notes':
-                this.addOutput('Loading notes...', 'info-text');
+                const notesSpinner = this.showSpinner('Loading notes');
                 await this.loadNotes();
+                this.hideSpinner(notesSpinner);
                 break;
             case 'passwords':
-                this.addOutput('Loading password manager...', 'info-text');
+                const passwordsSpinner = this.showSpinner('Loading password manager');
                 await this.loadPasswords();
+                this.hideSpinner(passwordsSpinner);
                 break;
             case 'server':
-                this.addOutput('Opening game server...', 'success-text');
+                this.addOutput('Opening game server', 'success-text');
                 window.open('https://support.teamobi.com/login-game-3.html', '_blank');
                 break;
             case 'delete':
                 this.addOutput('Type "dashboard delete confirm" to delete account', 'warning-text');
                 break;
             case 'delete confirm':
-                await this.deleteAccount();
+                const deleteSpinner = this.showSpinner('Deleting all account data', 'warning-text');
+                await this.deleteAccount(deleteSpinner);
                 break;
             case 'profile':
                 this.addOutput('USER PROFILE:', 'success-text');
@@ -844,12 +865,11 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         }
     }
     
-    async deleteAccount() {
+    async deleteAccount(spinnerId) {
         const auth = window.firebaseAuth;
         const db = window.firebaseDb;
         
         try {
-            this.addOutput('Deleting all account data...', 'warning-text');
             
             const uid = auth.currentUser.uid;
             const deletePromises = [];
@@ -882,14 +902,16 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
             // Delete Firebase user account
             await auth.currentUser.delete();
             
+            this.hideSpinner(spinnerId);
             this.addOutput('All account data deleted successfully', 'success-text');
-            this.addOutput('Redirecting to login...', 'info-text');
+            this.addOutput('Redirecting to login', 'info-text');
             
             setTimeout(() => {
                 window.location.href = 'login.html';
             }, 3000);
             
         } catch (error) {
+            this.hideSpinner(spinnerId);
             this.addOutput(`Error deleting account: ${error.message}`, 'error-text');
         }
     }
@@ -988,6 +1010,39 @@ drwxr-xr-x 2 matrix matrix 4096 Dec 15 10:30 tools/
         }
         
 
+    }
+
+    showSpinner(text, className = 'info-text') {
+        const spinnerId = Date.now() + Math.random();
+        const line = document.createElement('div');
+        line.className = `command-line ${className}`;
+        line.id = `spinner-${spinnerId}`;
+        
+        let frameIndex = 0;
+        const updateSpinner = () => {
+            if (this.activeSpinners.has(spinnerId)) {
+                line.innerHTML = `${this.spinnerFrames[frameIndex]} ${text}`;
+                frameIndex = (frameIndex + 1) % this.spinnerFrames.length;
+            }
+        };
+        
+        const interval = setInterval(updateSpinner, 80);
+        this.activeSpinners.set(spinnerId, { line, interval });
+        
+        this.output.appendChild(line);
+        this.output.scrollTop = this.output.scrollHeight;
+        updateSpinner();
+        
+        return spinnerId;
+    }
+    
+    hideSpinner(spinnerId) {
+        const spinner = this.activeSpinners.get(spinnerId);
+        if (spinner) {
+            clearInterval(spinner.interval);
+            spinner.line.remove();
+            this.activeSpinners.delete(spinnerId);
+        }
     }
 
     addOutput(text, className = 'output-text') {
