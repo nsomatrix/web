@@ -933,9 +933,6 @@ class MatrixTerminal {
         this.addOutput('LOGIN REQUIRED', 'info-text');
         this.addOutput('Usage: login <email> <password>', 'output-text');
         this.addOutput('Example: login user@example.com mypassword', 'info-text');
-        
-        this.loginMode = true;
-        this.addOutput('Or type your email and press Enter', 'info-text');
     }
     
     async handleLogin(email, password) {
