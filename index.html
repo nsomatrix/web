@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/homepage-enhancements.css">
+
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
 
@@ -94,18 +94,146 @@
             <p>Ninja grid streamlined</p>
         </div>
         
-        <div class="stats-card">
-            <div id="ut" class="uptime-display">
-                <span>System Uptime: Loading...</span>
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-number" id="playersOnline">1,337</span>
+                <span class="stat-label">Players Online</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="totalKills">42,069</span>
+                <span class="stat-label">Total Kills</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="activeClans">156</span>
+                <span class="stat-label">Active Clans</span>
             </div>
         </div>
         
-        <div id="rpg-dialogue-box" class="dialogue-card">
-            <div class="dialogue-avatar">
-                <img src="avatars/Therewasnosorrow.gif" alt="Character">
+        <div class="content-feed">
+            <!-- Quick Actions Section -->
+            <div class="feed-section">
+                <h2><i class="fas fa-rocket"></i> Launch Game Tools</h2>
+                <div class="action-grid">
+                    <div class="action-card" onclick="location.href='terminal.html'">
+                        <i class="fas fa-terminal"></i>
+                        <span>Matrix Terminal</span>
+                        <small>Command interface</small>
+                    </div>
+                    <div class="action-card" onclick="location.href='ninjadex.html'">
+                        <i class="fas fa-database"></i>
+                        <span>NinjaDex Database</span>
+                        <small>Monsters & equipment</small>
+                    </div>
+                    <div class="action-card" onclick="location.href='estimator.html'">
+                        <i class="fas fa-calculator"></i>
+                        <span>Stats Calculator</span>
+                        <small>Level & kins estimator</small>
+                    </div>
+                    <div class="action-card" onclick="location.href='mods.html'">
+                        <i class="fas fa-download"></i>
+                        <span>Download Center</span>
+                        <small>Mods & emulators</small>
+                    </div>
+                </div>
             </div>
-            <div class="dialogue-text">
-                <p id="dialogue-text"></p>
+            
+            <!-- Latest Updates Section -->
+            <div class="feed-section">
+                <h2><i class="fas fa-fire"></i> Latest Updates & Media</h2>
+                <div class="feed-grid">
+                    <div class="feed-card video-card" onclick="playVideo('matrix-trailer')">
+                        <div class="video-thumbnail">
+                            <img src="data/Pictures/matrix.png" alt="Matrix Trailer">
+                            <div class="play-button"><i class="fas fa-play"></i></div>
+                            <span class="video-duration">2:15</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Matrix Terminal v2.0 Trailer</h3>
+                            <p>New commands, enhanced performance, and better UI</p>
+                            <span class="views">1.2K views • 2 days ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-card news-card">
+                        <div class="news-image">
+                            <img src="data/Pictures/nso.webp" alt="NSO Update">
+                            <span class="news-tag">NEW</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>JLMod v0.86 Released</h3>
+                            <p>Enhanced graphics, better compatibility, and new features</p>
+                            <span class="timestamp">3 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-card news-card">
+                        <div class="news-image">
+                            <img src="data/Pictures/microemulator.png" alt="Emulator Update">
+                            <span class="news-tag">UPDATE</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>New Emulator Support</h3>
+                            <p>Added support for multiple J2ME emulators and improved performance</p>
+                            <span class="timestamp">1 day ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements & Progress Section -->
+            <div class="feed-section">
+                <h2><i class="fas fa-trophy"></i> Your Progress</h2>
+                <div class="achievements-grid">
+                    <div class="feed-card achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Terminal Master</h3>
+                            <p>Execute 100 terminal commands</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 73%"></div>
+                            </div>
+                            <span class="progress-text">73/100 commands</span>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-card achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Database Explorer</h3>
+                            <p>Search 50 different monsters</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 86%"></div>
+                            </div>
+                            <span class="progress-text">43/50 searches</span>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-card achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Mod Collector</h3>
+                            <p>Download 10 different mods</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 60%"></div>
+                            </div>
+                            <span class="progress-text">6/10 downloads</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Community Activity Section -->
+            <div class="feed-section">
+                <h2><i class="fas fa-users"></i> Community Activity</h2>
+                <div class="community-feed" id="communityFeed">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
@@ -116,7 +244,87 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/challenge-logic.js"></script>
-    <script src="js/homepage-enhancements.js"></script>
+    <script>
+        // Interactive homepage functionality
+        function animateStats() {
+            const stats = {
+                playersOnline: { target: 1337, current: 0 },
+                totalKills: { target: 42069, current: 0 },
+                activeClans: { target: 156, current: 0 }
+            };
+            
+            Object.keys(stats).forEach(key => {
+                const element = document.getElementById(key);
+                const increment = stats[key].target / 100;
+                const timer = setInterval(() => {
+                    stats[key].current += increment;
+                    if (stats[key].current >= stats[key].target) {
+                        stats[key].current = stats[key].target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(stats[key].current).toLocaleString();
+                }, 20);
+            });
+        }
+        
+        function playVideo(videoId) {
+            // Simulate video player
+            const modal = document.createElement('div');
+            modal.className = 'video-modal';
+            modal.innerHTML = `
+                <div class="video-player">
+                    <div class="video-header">
+                        <span>Matrix Terminal v2.0 Trailer</span>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+                    </div>
+                    <div class="video-content">
+                        <div class="fake-video">
+                            <i class="fas fa-play-circle"></i>
+                            <p>Video Player Simulation</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function loadCommunityFeed() {
+            const feed = document.getElementById('communityFeed');
+            const activities = [
+                { user: 'NinjaKiller99', action: 'defeated', target: 'Shadow Dragon', time: '5m ago', avatar: 'avatars/nk0000.gif' },
+                { user: 'MatrixHacker', action: 'unlocked', target: 'Terminal Master achievement', time: '12m ago', avatar: 'avatars/akariharata.gif' },
+                { user: 'CodeWarrior', action: 'downloaded', target: 'JLMod v0.86', time: '18m ago', avatar: 'avatars/garen997.gif' },
+                { user: 'DataMiner', action: 'discovered', target: 'rare equipment', time: '25m ago', avatar: 'avatars/hung2kvjp.gif' }
+            ];
+            
+            activities.forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <img src="${activity.avatar}" alt="${activity.user}" class="activity-avatar">
+                    <div class="activity-content">
+                        <span class="activity-user">${activity.user}</span>
+                        <span class="activity-action">${activity.action}</span>
+                        <span class="activity-target">${activity.target}</span>
+                        <span class="activity-time">${activity.time}</span>
+                    </div>
+                `;
+                feed.appendChild(item);
+            });
+        }
+        
+        // Initialize interactive elements
+        setTimeout(() => {
+            animateStats();
+            loadCommunityFeed();
+        }, 1000);
+        
+        // Update stats periodically
+        setInterval(() => {
+            document.getElementById('playersOnline').textContent = (1337 + Math.floor(Math.random() * 100)).toLocaleString();
+        }, 5000);
+    </script>
+
     <script src="components/navbar.js"></script>
     <script>
         // Load navbar component
