@@ -166,6 +166,15 @@ class MatrixTerminal {
             case 'uptime':
                 this.showUptime();
                 break;
+            case 'wget':
+                this.runWget(args);
+                break;
+            case 'curl':
+                this.runCurl(args);
+                break;
+            case 'ping':
+                this.runPing(args);
+                break;
             default:
                 this.addOutput(`Command not found: ${cmd}. Type 'help' for available commands.`, 'error-text');
         }
@@ -194,6 +203,11 @@ class MatrixTerminal {
   emulators               - Download emulators
   login                   - Authentication system
   dashboard               - Access user dashboard
+  
+  NETWORK:
+  wget <url>              - Download files
+  curl <url>              - Fetch URL content
+  ping <host>             - Test connectivity
   
   SYSTEM:
   whoami, date, uptime    - System information`;
@@ -1043,6 +1057,128 @@ class MatrixTerminal {
     showUptime() {
         const uptime = Math.floor(Math.random() * 1000000);
         this.addOutput(`System uptime: ${uptime} seconds`, 'output-text');
+    }
+    
+    async runWget(args) {
+        if (!args.length) {
+            this.addOutput('Usage: wget <url> [--proxy] [--direct]', 'error-text');
+            this.addOutput('  --proxy: Try CORS proxy services', 'info-text');
+            this.addOutput('  --direct: Open direct download link', 'info-text');
+            return;
+        }
+        
+        const originalUrl = args[0];
+        const useProxy = args.includes('--proxy');
+        const useDirect = args.includes('--direct');
+        
+        if (useDirect) {
+            const filename = originalUrl.split('/').pop() || 'download';
+            this.addOutput(`Opening direct download: ${filename}`, 'success-text');
+            window.open(originalUrl, '_blank');
+            return;
+        }
+        
+        const proxies = [
+            originalUrl, // Try direct first
+            `https://cors-anywhere.herokuapp.com/${originalUrl}`,
+            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(originalUrl)}`,
+            `https://thingproxy.freeboard.io/fetch/${originalUrl}`
+        ];
+        
+        if (useProxy) {
+            proxies.shift(); // Remove direct URL, start with proxies
+        }
+        
+        const wgetSpinner = this.showSpinner(`Downloading ${originalUrl}`);
+        
+        for (let i = 0; i < proxies.length; i++) {
+            try {
+                const response = await fetch(proxies[i]);
+                
+                if (response.ok) {
+                    const filename = originalUrl.split('/').pop() || 'download';
+                    const blob = await response.blob();
+                    const size = (blob.size / 1024).toFixed(2);
+                    
+                    // Trigger download
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    
+                    this.hideSpinner(wgetSpinner);
+                    this.addOutput(`Downloaded: ${filename} (${size} KB)`, 'success-text');
+                    return;
+                }
+            } catch (error) {
+                // Try next proxy
+                continue;
+            }
+        }
+        
+        this.hideSpinner(wgetSpinner);
+        this.addOutput('All download methods failed. Try:', 'error-text');
+        this.addOutput(`wget ${originalUrl} --direct`, 'info-text');
+    }
+    
+    async runCurl(args) {
+        if (!args.length) {
+            this.addOutput('Usage: curl <url>', 'error-text');
+            return;
+        }
+        
+        const url = args[0];
+        const curlSpinner = this.showSpinner(`Fetching ${url}`);
+        
+        try {
+            const response = await fetch(url);
+            this.hideSpinner(curlSpinner);
+            
+            const text = await response.text();
+            const lines = text.split('\n');
+            const preview = lines.slice(0, 20).join('\n');
+            
+            this.addOutput(`HTTP ${response.status} ${response.statusText}`, 'success-text');
+            this.addOutput(preview, 'output-text');
+            
+            if (lines.length > 20) {
+                this.addOutput(`... (${lines.length - 20} more lines)`, 'info-text');
+            }
+            
+        } catch (error) {
+            this.hideSpinner(curlSpinner);
+            this.addOutput(`curl: ${error.message}`, 'error-text');
+        }
+    }
+    
+    async runPing(args) {
+        if (!args.length) {
+            this.addOutput('Usage: ping <host>', 'error-text');
+            return;
+        }
+        
+        const host = args[0];
+        this.addOutput(`PING ${host}:`, 'info-text');
+        
+        for (let i = 1; i <= 4; i++) {
+            const pingSpinner = this.showSpinner(`Pinging ${host} (${i}/4)`);
+            
+            try {
+                const start = Date.now();
+                await fetch(`https://${host}`, { mode: 'no-cors' });
+                const time = Date.now() - start;
+                
+                this.hideSpinner(pingSpinner);
+                this.addOutput(`Reply from ${host}: time=${time}ms`, 'success-text');
+                
+            } catch (error) {
+                this.hideSpinner(pingSpinner);
+                this.addOutput(`Request timeout for ${host}`, 'warning-text');
+            }
+            
+            if (i < 4) await new Promise(resolve => setTimeout(resolve, 1000));
+        }
     }
     
     async runDashboardCommand(command, args = []) {
