@@ -1,6 +1,12 @@
 class YouTubeFeed {
     constructor() {
-        this.API_KEY = 'AIzaSyB8Gbml84v3dSwJA5uYi3WmNh9BRSMoBtw';
+        this.API_KEYS = [
+            'AIzaSyB8Gbml84v3dSwJA5uYi3WmNh9BRSMoBtw',
+            // Add more API keys here
+        ];
+        this.currentKeyIndex = 0;
+        this.CACHE_KEY = 'youtube_feed_cache';
+        this.CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
         // NSO Gaming channels
         this.channels = [
             'UCOfsd43LZ_SMw4AFmG0L3KQ', // NSOMatrix™
@@ -28,72 +34,105 @@ class YouTubeFeed {
     }
     
     async loadVideos() {
-        console.log('🎥 Loading YouTube videos...');
+        // Check cache first
+        const cached = this.getFromCache();
+        if (cached) {
+            this.videos = cached;
+            return;
+        }
         
         try {
             this.videos = await this.fetchFromAPI();
-            if (this.videos.length === 0) {
-                console.log('⚠️ No videos from API, using fallback');
+            if (this.videos.length > 0) {
+                this.saveToCache(this.videos);
+            } else {
                 this.videos = this.getFallbackVideos();
             }
         } catch (error) {
-            console.log('❌ YouTube API failed:', error);
             this.videos = this.getFallbackVideos();
         }
-        
-        console.log(`✅ Loaded ${this.videos.length} videos`);
+    }
+    
+    getFromCache() {
+        try {
+            const cached = localStorage.getItem(this.CACHE_KEY);
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (Date.now() - data.timestamp < this.CACHE_DURATION) {
+                    return data.videos;
+                }
+            }
+        } catch (error) {
+            console.log('Cache read error:', error);
+        }
+        return null;
+    }
+    
+    saveToCache(videos) {
+        try {
+            localStorage.setItem(this.CACHE_KEY, JSON.stringify({
+                videos,
+                timestamp: Date.now()
+            }));
+        } catch (error) {
+            console.log('Cache save error:', error);
+        }
     }
     
     async fetchFromAPI() {
-        const allVideos = [];
-        
-        // Try first channel as test
-        const testChannelId = this.channels[0];
-        const testUrl = `https://www.googleapis.com/youtube/v3/search?key=${this.API_KEY}&channelId=${testChannelId}&part=snippet&order=date&maxResults=2&type=video`;
-        
-        console.log('🔍 Testing API with:', testUrl);
-        
-        try {
-            const response = await fetch(testUrl);
-            const data = await response.json();
-            
-            console.log('📡 API Response:', data);
-            
-            if (data.error) {
-                console.log('❌ API Error:', data.error.message);
-                throw new Error(data.error.message);
-            }
-            
-            if (data.items && data.items.length > 0) {
-                // API works, fetch from all channels
-                for (const channelId of this.channels) {
-                    try {
-                        const response = await fetch(
-                            `https://www.googleapis.com/youtube/v3/search?key=${this.API_KEY}&channelId=${channelId}&part=snippet&order=date&maxResults=3&type=video`
-                        );
-                        const channelData = await response.json();
-                        
-                        if (channelData.items) {
-                            allVideos.push(...channelData.items.map(item => ({
+        for (let keyIndex = 0; keyIndex < this.API_KEYS.length; keyIndex++) {
+            const apiKey = this.API_KEYS[keyIndex];
+            try {
+                const allVideos = [];
+                const batchSize = 3; // Process 3 channels at a time
+                
+                // Process channels in batches to avoid rate limits
+                for (let i = 0; i < this.channels.length; i += batchSize) {
+                    const batch = this.channels.slice(i, i + batchSize);
+                    const promises = batch.map(async (channelId) => {
+                        try {
+                            await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+                            const response = await fetch(
+                                `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&order=date&maxResults=2&type=video`
+                            );
+                            const data = await response.json();
+                            
+                            if (data.error) {
+                                if (data.error.message.includes('quota')) {
+                                    throw new Error('quota_exceeded');
+                                }
+                                return [];
+                            }
+                            
+                            return data.items ? data.items.map(item => ({
                                 id: item.id.videoId,
                                 title: item.snippet.title,
                                 thumbnail: item.snippet.thumbnails.medium.url,
                                 channel: item.snippet.channelTitle,
                                 publishedAt: item.snippet.publishedAt,
                                 description: item.snippet.description
-                            })));
+                            })) : [];
+                        } catch (error) {
+                            if (error.message === 'quota_exceeded') throw error;
+                            return [];
                         }
-                    } catch (error) {
-                        console.log(`❌ Failed to fetch from channel ${channelId}:`, error);
-                    }
+                    });
+                    
+                    const batchResults = await Promise.all(promises);
+                    allVideos.push(...batchResults.flat());
                 }
+                
+                return allVideos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+                
+            } catch (error) {
+                if (error.message === 'quota_exceeded') {
+                    continue; // Try next API key
+                }
+                console.log(`API key ${keyIndex + 1} failed:`, error.message);
             }
-        } catch (error) {
-            console.log('❌ API test failed:', error);
-            throw error;
         }
         
-        return allVideos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+        throw new Error('All API keys exhausted');
     }
     
     getFallbackVideos() {
