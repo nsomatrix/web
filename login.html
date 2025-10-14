@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://challenges.cloudflare.com https://code.jquery.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com;">
     <title>NinjaBase Login</title>
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
@@ -28,6 +29,7 @@
         import { getFirestore } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
         
+        // Firebase config - these are public client-side keys, safe to expose
         const firebaseConfig = {
             apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
             authDomain: 'nsomatrix-web.firebaseapp.com',

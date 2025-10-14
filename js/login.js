@@ -36,39 +36,24 @@ let turnstileToken = null;
 let turnstileWidgetId = null;
 let turnstileInitialized = false;
 
-// Debug function
-function debugLog(message, data = null) {
-    console.log(`[LOGIN DEBUG] ${message}`, data || '');
-}
-
 // Turnstile callback functions (must be global)
 window.onTurnstileSuccess = function(token) {
-    debugLog('Turnstile verification successful', token.substring(0, 20) + '...');
     turnstileToken = token;
     const btn = document.getElementById('primaryBtn');
-    if (btn) {
-        btn.disabled = false;
-        debugLog('Primary button enabled');
-    }
+    if (btn) btn.disabled = false;
 };
 
 window.onTurnstileError = function(error) {
-    debugLog('Turnstile error occurred', error);
     turnstileToken = null;
     const btn = document.getElementById('primaryBtn');
     if (btn) btn.disabled = true;
     if (typeof showMessageBox === 'function') {
         showMessageBox('Security verification failed. Please try again.', 'error');
     }
-    // Try to re-render after error
-    setTimeout(() => {
-        debugLog('Attempting to re-render Turnstile after error');
-        renderTurnstile();
-    }, 2000);
+    setTimeout(() => renderTurnstile(), 2000);
 };
 
 window.onTurnstileExpired = function() {
-    console.warn('Turnstile token expired');
     turnstileToken = null;
     const btn = document.getElementById('primaryBtn');
     if (btn) btn.disabled = true;
@@ -100,13 +85,7 @@ function resetTurnstile() {
 // Render Turnstile widget
 function renderTurnstile() {
     const container = document.getElementById('turnstile-container');
-    if (!container) {
-        console.warn('Turnstile container not found');
-        return;
-    }
-    
-    if (!window.turnstile) {
-        console.warn('Turnstile API not loaded yet');
+    if (!container || !window.turnstile) {
         setTimeout(renderTurnstile, 500);
         return;
     }
@@ -121,10 +100,7 @@ function renderTurnstile() {
             theme: 'dark',
             size: 'normal'
         });
-        console.log('Turnstile widget rendered with ID:', turnstileWidgetId);
     } catch (e) {
-        console.error('Failed to render Turnstile:', e);
-        // Retry after a delay
         setTimeout(renderTurnstile, 1000);
     }
 }
@@ -136,20 +112,27 @@ function initTurnstile() {
     
     const checkTurnstile = () => {
         attempts++;
-        debugLog(`Checking Turnstile API (attempt ${attempts}/${maxAttempts})`);
-        
         if (window.turnstile && typeof window.turnstile.render === 'function') {
-            debugLog('Turnstile API loaded successfully');
             turnstileInitialized = true;
             renderTurnstile();
         } else if (attempts < maxAttempts) {
             setTimeout(checkTurnstile, 200);
         } else {
-            debugLog('Turnstile failed to load after maximum attempts', 'ERROR');
-            // Show fallback message
             const container = document.getElementById('turnstile-container');
             if (container) {
-                container.innerHTML = '<p style="color: red; text-align: center;">Security verification failed to load. Please <a href="javascript:location.reload()">refresh the page</a>.</p>';
+                const errorMsg = document.createElement('p');
+                errorMsg.style.cssText = 'color: red; text-align: center;';
+                errorMsg.textContent = 'Security verification failed to load. Please ';
+                
+                const refreshLink = document.createElement('a');
+                refreshLink.href = '#';
+                refreshLink.textContent = 'refresh the page';
+                refreshLink.onclick = () => location.reload();
+                
+                errorMsg.appendChild(refreshLink);
+                errorMsg.appendChild(document.createTextNode('.'));
+                container.innerHTML = '';
+                container.appendChild(errorMsg);
             }
         }
     };
@@ -231,7 +214,7 @@ function showMessageBox(message, type = 'info', duration = 4000) {
         document.body.appendChild(messageBox);
     }
 
-    messageText.innerText = message;
+    messageText.textContent = message;
     messageBox.style.display = 'block';
 
     if (type === 'error') {
@@ -256,16 +239,24 @@ function showMessageBox(message, type = 'info', duration = 4000) {
 
 function setButtonLoading(button, isLoading, originalText) {
     if (isLoading) {
-        button.innerHTML = `
-            <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"></circle>
-                <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
-            </svg>
-            <span style="margin-left: 8px;">${originalText === 'Sign in' ? 'Signing in' : 'Signing up'}</span>
-        `;
+        const spinner = document.createElement('svg');
+        spinner.className = 'animate-spin';
+        spinner.setAttribute('width', '16');
+        spinner.setAttribute('height', '16');
+        spinner.setAttribute('viewBox', '0 0 24 24');
+        spinner.setAttribute('fill', 'none');
+        spinner.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"></circle><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>';
+        
+        const span = document.createElement('span');
+        span.style.marginLeft = '8px';
+        span.textContent = originalText === 'Sign in' ? 'Signing in' : 'Signing up';
+        
+        button.innerHTML = '';
+        button.appendChild(spinner);
+        button.appendChild(span);
         button.disabled = true;
     } else {
-        button.innerHTML = originalText;
+        button.textContent = originalText;
         button.disabled = false;
     }
 }
@@ -283,11 +274,17 @@ async function handlePrimaryAction() {
 
 // --- Login Functionality ---
 async function handleLogin() {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
+    const email = emailInput?.value?.trim() || '';
+    const password = passwordInput?.value || '';
 
+    // Input validation
     if (!email || !password) {
         showMessageBox('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (email.length > 254 || password.length > 128) {
+        showMessageBox('Input too long', 'error');
         return;
     }
     
@@ -297,13 +294,10 @@ async function handleLogin() {
         const hasWidget = container && container.querySelector('iframe');
         
         if (!hasWidget && turnstileInitialized) {
-            debugLog('Turnstile widget missing, attempting to re-render');
             renderTurnstile();
         }
         
-        // For debugging: allow bypass if Turnstile completely fails
         if (!turnstileInitialized && window.location.hostname === 'localhost') {
-            debugLog('DEVELOPMENT MODE: Bypassing Turnstile verification');
             turnstileToken = 'dev-bypass-token';
         } else {
             showMessageBox('Please complete the security verification', 'error');
@@ -324,12 +318,8 @@ async function handleLogin() {
     setButtonLoading(primaryBtn, true, 'Sign in');
 
     try {
-        console.log('Attempting login with Turnstile token:', turnstileToken.substring(0, 20) + '...');
-        
         const userCred = await signInWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
-        
-        console.log('Firebase authentication successful for user:', user.uid);
 
         const playerDoc = await getDoc(doc(db, "players", user.uid));
         const playerData = playerDoc.data();
@@ -361,7 +351,6 @@ async function handleLogin() {
         }
 
         localStorage.setItem('userLoggedIn', 'true');
-        console.log('Login process completed successfully');
         showMessageBox('Login successful! Redirecting', 'success');
         
         // Clean up temp password after a delay (dashboard will use it if needed)
@@ -376,13 +365,28 @@ async function handleLogin() {
         }, 1000);
     } catch (err) {
         let errorMessage = 'Login failed. Please try again.';
-        if (err.code === 'auth/user-not-found') {
-            errorMessage = 'No account found with this email.';
-        } else if (err.code === 'auth/wrong-password') {
-            errorMessage = 'Incorrect password.';
-        } else if (err.code === 'auth/invalid-credential') {
-            errorMessage = 'Invalid credentials. Check your email and password.';
+        
+        // Handle specific Firebase auth errors
+        switch (err?.code) {
+            case 'auth/user-not-found':
+                errorMessage = 'No account found with this email.';
+                break;
+            case 'auth/wrong-password':
+                errorMessage = 'Incorrect password.';
+                break;
+            case 'auth/invalid-credential':
+                errorMessage = 'Invalid credentials. Check your email and password.';
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = 'Too many failed attempts. Please try again later.';
+                break;
+            case 'auth/network-request-failed':
+                errorMessage = 'Network error. Please check your connection.';
+                break;
+            default:
+                console.error('Login error:', err);
         }
+        
         showMessageBox(errorMessage, 'error');
     } finally {
         setButtonLoading(primaryBtn, false, 'Sign in');
@@ -391,12 +395,18 @@ async function handleLogin() {
 
 // --- Signup Functionality ---
 async function handleSignup() {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
+    const email = emailInput?.value?.trim() || '';
+    const password = passwordInput?.value || '';
+    const confirmPassword = confirmPasswordInput?.value || '';
 
+    // Input validation
     if (!email || !password || !confirmPassword) {
         showMessageBox('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (email.length > 254 || password.length > 128) {
+        showMessageBox('Input too long', 'error');
         return;
     }
     
@@ -454,11 +464,25 @@ async function handleSignup() {
 
     } catch (err) {
         let errorMessage = 'Account creation failed. Please try again.';
-        if (err.code === 'auth/email-already-in-use') {
-            errorMessage = 'An account with this email already exists.';
-        } else if (err.code === 'auth/weak-password') {
-            errorMessage = 'Password is too weak. Please choose a stronger password.';
+        
+        // Handle specific Firebase auth errors
+        switch (err?.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = 'An account with this email already exists.';
+                break;
+            case 'auth/weak-password':
+                errorMessage = 'Password is too weak. Please choose a stronger password.';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'Please enter a valid email address.';
+                break;
+            case 'auth/network-request-failed':
+                errorMessage = 'Network error. Please check your connection.';
+                break;
+            default:
+                console.error('Signup error:', err);
         }
+        
         showMessageBox(errorMessage, 'error');
     } finally {
         setButtonLoading(primaryBtn, false, 'Sign Up');
@@ -503,19 +527,56 @@ function encryptWithRecoveryKey(data, recoveryKey) {
 function showRecoveryKey(recoveryKey) {
     const modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;';
-    modal.innerHTML = `
-        <div style="background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;border:1px solid #333;">
-            <h3 style="color:#e74c3c;margin-bottom:20px;">⚠️ SAVE YOUR RECOVERY KEY</h3>
-            <p style="margin-bottom:20px;color:white;">This is your ONLY way to recover access if you reset your password:</p>
-            <div id="recoveryKeyDisplay" style="background:#2d2d2d;color:#00ff00;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;">${recoveryKey}</div>
-            <div style="margin:15px 0;">
-                <button id="copyKeyBtn" style="background:#007bff;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;margin-right:10px;">Copy to Clipboard</button>
-                <button id="downloadKeyBtn" style="background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;">Download as TXT</button>
-            </div>
-            <p style="color:#e74c3c;font-weight:bold;margin-bottom:20px;">Write this down and store it safely offline!</p>
-            <button id="recoveryKeySaved" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">I've Saved It Safely</button>
-        </div>
-    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = 'background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:500px;text-align:center;border:1px solid #333;';
+    
+    const title = document.createElement('h3');
+    title.style.cssText = 'color:#e74c3c;margin-bottom:20px;';
+    title.textContent = '⚠️ SAVE YOUR RECOVERY KEY';
+    
+    const description = document.createElement('p');
+    description.style.cssText = 'margin-bottom:20px;color:white;';
+    description.textContent = 'This is your ONLY way to recover access if you reset your password:';
+    
+    const keyDisplay = document.createElement('div');
+    keyDisplay.id = 'recoveryKeyDisplay';
+    keyDisplay.style.cssText = 'background:#2d2d2d;color:#00ff00;padding:15px;border:2px solid #007bff;border-radius:5px;font-family:monospace;font-size:18px;font-weight:bold;margin:20px 0;word-break:break-all;';
+    keyDisplay.textContent = recoveryKey;
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = 'margin:15px 0;';
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.id = 'copyKeyBtn';
+    copyBtn.style.cssText = 'background:#007bff;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;margin-right:10px;';
+    copyBtn.textContent = 'Copy to Clipboard';
+    
+    const downloadBtn = document.createElement('button');
+    downloadBtn.id = 'downloadKeyBtn';
+    downloadBtn.style.cssText = 'background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;';
+    downloadBtn.textContent = 'Download as TXT';
+    
+    const warning = document.createElement('p');
+    warning.style.cssText = 'color:#e74c3c;font-weight:bold;margin-bottom:20px;';
+    warning.textContent = 'Write this down and store it safely offline!';
+    
+    const savedBtn = document.createElement('button');
+    savedBtn.id = 'recoveryKeySaved';
+    savedBtn.style.cssText = 'background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;';
+    savedBtn.textContent = "I've Saved It Safely";
+    
+    buttonContainer.appendChild(copyBtn);
+    buttonContainer.appendChild(downloadBtn);
+    
+    modalContent.appendChild(title);
+    modalContent.appendChild(description);
+    modalContent.appendChild(keyDisplay);
+    modalContent.appendChild(buttonContainer);
+    modalContent.appendChild(warning);
+    modalContent.appendChild(savedBtn);
+    
+    modal.appendChild(modalContent);
     document.body.appendChild(modal);
     
     document.getElementById('copyKeyBtn').onclick = () => {
