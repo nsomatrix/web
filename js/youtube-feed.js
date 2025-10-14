@@ -2,7 +2,11 @@ class YouTubeFeed {
     constructor() {
         this.API_KEYS = [
             'AIzaSyB8Gbml84v3dSwJA5uYi3WmNh9BRSMoBtw',
-            // Add more API keys here
+            'AIzaSyD9onmJQwNsBM-f0n-G2tujcd74pWwLKBg',
+            'AIzaSyC-s18NaLKiYvKcd7lM16MsfMe5FmGOnR8',
+            'AIzaSyBrutiYoT8YDBpZtIjdHLyCRVs4Yz5gcAc',
+            'AIzaSyDgXTCT4fWlUaRTEXD1bDWb3wBr5-SrmjU',
+            'AIzaSyBfMTEM0qCDv747fqxPTtMT4YPJndKDjcc'
         ];
         this.currentKeyIndex = 0;
         this.CACHE_KEY = 'youtube_feed_cache';
