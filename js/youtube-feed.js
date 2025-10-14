@@ -151,9 +151,10 @@ class YouTubeFeed {
     
     render() {
         const feedContainer = document.getElementById('youtubeFeed');
-        const visibleVideos = this.videos.slice(this.currentIndex, this.currentIndex + this.videosPerView);
+        const isMobile = window.innerWidth <= 768;
+        const videosToShow = isMobile ? this.videos : this.videos.slice(this.currentIndex, this.currentIndex + this.videosPerView);
         
-        feedContainer.innerHTML = visibleVideos.map(video => `
+        feedContainer.innerHTML = videosToShow.map(video => `
             <div class="youtube-video-card" onclick="window.youtubeFeed.playVideo('${video.id}', '${video.title.replace(/'/g, '').replace(/"/g, '')}')">
                 <div class="video-thumbnail">
                     <img src="${video.thumbnail}" alt="${video.title}" onerror="this.src='data/Pictures/matrix.png'">
