@@ -1,13 +1,18 @@
 class YouTubeFeed {
     constructor() {
         this.API_KEY = 'AIzaSyB8Gbml84v3dSwJA5uYi3WmNh9BRSMoBtw';
-        // Gaming & Tech channels - customize these
+        // NSO Gaming channels
         this.channels = [
-            'UCXuqSBlHAE6Xw-yeJA0Tunw', // Linus Tech Tips
-            'UCBJycsmduvYEL83R_U4JriQ', // Marques Brownlee
-            'UCsooa4yRKGN_zEE8iknghZA', // TechCrunch
-            'UCR-DXc1voovS8nhAvccRZhg', // Jeff Geerling
-            'UC0vBXGSyV14uvJ4hECDOl0Q'  // Unbox Therapy
+            'UCOfsd43LZ_SMw4AFmG0L3KQ', // NSOMatrix™
+            'UC8XfQiVVvi2DGG7avYaSMow', // NSOCAN TV
+            'UCo8MMloNcTf27xo1iBbfq6g', // Hoàng Phong Monster
+            'UCRAogED-p7L2MDwQtmehBiQ', // Trung Đức TV
+            'UCuI4SZYHNkOBz62br7A9IuA', // Kẹo Mút Chơi Bời
+            'UCaA5P81BI_gZyAQdaHm1YKw', // Dứa NSO
+            'UCZk0odBlWeBMrOCS7t7PHVQ', // VIETSO1
+            'UCnO7e8itjKx_3rExMX64LTw', // Hậu Đần NSO
+            'UCOOJb8dRZ0uLrltM0u3y5JA', // TRẦN THƯ NSO
+            'UCFsBOEMym3kboXz9EiYAkDw'  // Nguyễn Khải Nso
         ];
         this.videos = [];
         this.currentIndex = 0;
@@ -95,43 +100,43 @@ class YouTubeFeed {
         return [
             {
                 id: 'dQw4w9WgXcQ',
-                title: 'Matrix Terminal Advanced Features',
+                title: 'NSO Matrix Gaming Highlights',
                 thumbnail: 'data/Pictures/matrix.png',
-                channel: 'Matrix Gaming',
+                channel: 'NSOMatrix™',
                 publishedAt: '2024-01-15T10:00:00Z',
-                description: 'Learn advanced terminal commands and features'
+                description: 'Best NSO gaming moments and highlights'
             },
             {
                 id: 'jNQXAC9IVRw',
-                title: 'NSO Mobile Gaming Setup Guide',
+                title: 'NSO Mobile Gaming Guide',
                 thumbnail: 'data/Pictures/nso.webp',
-                channel: 'Mobile Gaming Pro',
+                channel: 'NSOCAN TV',
                 publishedAt: '2024-01-14T15:30:00Z',
-                description: 'Complete setup guide for mobile gaming'
+                description: 'Complete NSO mobile gaming setup'
             },
             {
                 id: 'y6120QOlsfU',
-                title: 'J2ME Emulator Comparison 2024',
+                title: 'Monster Hunter NSO Tips',
                 thumbnail: 'data/Pictures/microemulator.png',
-                channel: 'Retro Gaming Hub',
+                channel: 'Hoàng Phong Monster',
                 publishedAt: '2024-01-13T12:00:00Z',
-                description: 'Best J2ME emulators compared and reviewed'
+                description: 'Advanced monster hunting strategies'
             },
             {
                 id: 'kJQP7kiw5Fk',
-                title: 'Database Optimization Tips',
+                title: 'NSO PvP Battle Compilation',
                 thumbnail: 'data/Pictures/char.gif',
-                channel: 'Dev Tips',
+                channel: 'Trung Đức TV',
                 publishedAt: '2024-01-12T09:15:00Z',
-                description: 'Optimize your database queries for better performance'
+                description: 'Epic PvP battles and combat tips'
             },
             {
                 id: 'L_jWHffIx5E',
-                title: 'Gaming Statistics Analysis',
+                title: 'NSO Equipment Guide',
                 thumbnail: 'data/Pictures/youtube.png',
-                channel: 'Game Analytics',
+                channel: 'Kẹo Mút Chơi Bời',
                 publishedAt: '2024-01-11T14:45:00Z',
-                description: 'Deep dive into gaming statistics and trends'
+                description: 'Best equipment and upgrade strategies'
             }
         ];
     }
