@@ -1,13 +1,13 @@
 // Configuration constants - Industry standard approach
-export const FIREBASE_CONFIG = {
-    apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
-    authDomain: 'nsomatrix-web.firebaseapp.com',
-    projectId: 'nsomatrix-web',
-    storageBucket: 'nsomatrix-web.firebasestorage.app',
-    messagingSenderId: '320519296982',
-    appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
-    measurementId: 'G-GK3J5PZW85'
-};
+// Firebase config now loaded from secure Cloudflare Worker
+export async function getFirebaseConfig() {
+    if (window.firebaseConfigLoader) {
+        return await window.firebaseConfigLoader.loadConfig();
+    }
+    // Fallback for modules that load before firebase-config.js
+    const loader = new (await import('../firebase-config.js')).default();
+    return await loader.loadConfig();
+}
 
 
 

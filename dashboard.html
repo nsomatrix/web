@@ -340,6 +340,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="js/firebase-config.js"></script>
     <script src="js/bootstrap.min.js"></script>
     
     <!-- Suppress Cloudflare console errors -->
@@ -393,21 +394,13 @@
         });
         
         // Initialize Firebase first
-        const firebaseConfig = {
-            apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
-            authDomain: 'nsomatrix-web.firebaseapp.com',
-            projectId: 'nsomatrix-web',
-            storageBucket: 'nsomatrix-web.firebasestorage.app',
-            messagingSenderId: '320519296982',
-            appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
-            measurementId: 'G-GK3J5PZW85'
-        };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        window.firebaseAuth = firebase.auth();
-        window.firebaseDb = firebase.firestore();
+        window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            window.firebaseAuth = firebase.auth();
+            window.firebaseDb = firebase.firestore();
+        });
         
         // Then load navbar
         fetch('components/navbar.html')

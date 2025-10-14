@@ -1,5 +1,5 @@
 // Unified Dashboard JavaScript
-import { FIREBASE_CONFIG } from './modules/config.js';
+import { getFirebaseConfig } from './modules/config.js';
 import { AuthManager } from './modules/auth.js';
 import { FileManager } from './modules/files.js';
 import { NotesManager } from './modules/notes.js';
@@ -11,10 +11,42 @@ import { encryptData, decryptData } from './modules/crypto.js';
 window.closeModal = closeModal;
 window.openModal = openModal;
 
-// Initialize Firebase
-firebase.initializeApp(FIREBASE_CONFIG);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Initialize Firebase with config from worker
+let auth, db;
+getFirebaseConfig().then(firebaseConfig => {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    auth = firebase.auth();
+    db = firebase.firestore();
+    
+    // Initialize managers after Firebase is ready
+    initializeManagers();
+    
+    // Set up auth state listener after Firebase is initialized
+    setupAuthStateListener();
+});
+
+function setupAuthStateListener() {
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            if (authManager) {
+                authManager.currentUser = user;
+            }
+            setTimeout(() => {
+                setupDashboard(user);
+            }, 2000);
+        } else {
+            console.log("No user logged in. Redirecting to login.html.");
+            document.getElementById('setup-section').style.display = 'none';
+            document.getElementById('main-dashboard').style.display = 'none';
+            authManager?.clearSession();
+            if (window.location.pathname !== '/login.html') {
+                window.location.href = "login.html";
+            }
+        }
+    });
+}
 
 
 // Global variables
@@ -690,25 +722,7 @@ function setupSearchAndMessaging() {
 
 
 
-// Authentication state listener
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        if (authManager) {
-            authManager.currentUser = user;
-        }
-        setTimeout(() => {
-            setupDashboard(user);
-        }, 2000);
-    } else {
-        console.log("No user logged in. Redirecting to login.html.");
-        document.getElementById('setup-section').style.display = 'none';
-        document.getElementById('main-dashboard').style.display = 'none';
-        authManager?.clearSession();
-        if (window.location.pathname !== '/login.html') {
-            window.location.href = "login.html";
-        }
-    }
-});
+
 
 // Username tag functionality
 function setupUsernameTag(usernameTag, displayName) {
@@ -2017,7 +2031,6 @@ async function showMasterPasswordPrompt(targetModal) {
 
 // Initialize application
 $(document).ready(function() {
-    initializeManagers();
     setupEventListeners();
     loadAvatars();
     new DesktopDashboard();

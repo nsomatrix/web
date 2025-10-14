@@ -23,22 +23,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/lib-typedarrays.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/pbkdf2.min.js"></script>
 
+    <script src="js/firebase-config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
         
-        // Firebase config - these are public client-side keys, safe to expose
-        const firebaseConfig = {
-            apiKey: 'AIzaSyDp8p_wgeKO_WJAyewYiZhc3en7kF6RXs0',
-            authDomain: 'nsomatrix-web.firebaseapp.com',
-            projectId: 'nsomatrix-web',
-            storageBucket: 'nsomatrix-web.firebasestorage.app',
-            messagingSenderId: '320519296982',
-            appId: '1:320519296982:web:1ab1b009aeaf7755b13677',
-            measurementId: 'G-GK3J5PZW85'
-        };
+        // Load Firebase config from Cloudflare Worker
+        const firebaseConfig = await window.firebaseConfigLoader.loadConfig();
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
