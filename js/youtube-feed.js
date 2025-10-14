@@ -198,6 +198,10 @@ class YouTubeFeed {
         const isMobile = window.innerWidth <= 768;
         const videosToShow = isMobile ? this.videos : this.videos.slice(this.currentIndex, this.currentIndex + this.videosPerView);
         
+        if (!isMobile) {
+            feedContainer.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        }
+        
         feedContainer.innerHTML = videosToShow.map(video => `
             <div class="youtube-video-card" onclick="window.youtubeFeed.playVideo('${video.id}', '${video.title.replace(/'/g, '').replace(/"/g, '')}')">
                 <div class="video-thumbnail">
@@ -232,8 +236,15 @@ class YouTubeFeed {
             feedContainer.scrollBy({ left: -300, behavior: 'smooth' });
         } else {
             if (this.currentIndex > 0) {
-                this.currentIndex = Math.max(0, this.currentIndex - this.videosPerView);
-                this.render();
+                feedContainer.style.opacity = '0.7';
+                feedContainer.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    this.currentIndex = Math.max(0, this.currentIndex - this.videosPerView);
+                    this.render();
+                    feedContainer.style.opacity = '1';
+                    feedContainer.style.transform = 'translateX(0)';
+                }, 200);
             }
         }
     }
@@ -244,8 +255,15 @@ class YouTubeFeed {
             feedContainer.scrollBy({ left: 300, behavior: 'smooth' });
         } else {
             if (this.currentIndex + this.videosPerView < this.videos.length) {
-                this.currentIndex = Math.min(this.videos.length - this.videosPerView, this.currentIndex + this.videosPerView);
-                this.render();
+                feedContainer.style.opacity = '0.7';
+                feedContainer.style.transform = 'translateX(20px)';
+                
+                setTimeout(() => {
+                    this.currentIndex = Math.min(this.videos.length - this.videosPerView, this.currentIndex + this.videosPerView);
+                    this.render();
+                    feedContainer.style.opacity = '1';
+                    feedContainer.style.transform = 'translateX(0)';
+                }, 200);
             }
         }
     }
