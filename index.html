@@ -333,35 +333,7 @@
         }
         
         function openTool(url, title) {
-            const isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                // On mobile, open in new tab for better experience
-                window.open(url, '_blank');
-                return;
-            }
-            
-            // Desktop iframe modal
-            const modal = document.createElement('div');
-            modal.className = 'video-modal';
-            modal.innerHTML = `
-                <div class="video-player" style="width: 90vw; height: 80vh; max-width: none;">
-                    <div class="video-header">
-                        <span>${title}</span>
-                        <button onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
-                    </div>
-                    <div class="video-content">
-                        <iframe 
-                            width="100%" 
-                            height="600px" 
-                            src="${url}" 
-                            frameborder="0" 
-                            style="border-radius: 0 0 6px 6px;">
-                        </iframe>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            window.open(url, '_blank');
         }
         
         function loadCommunityFeed() {
