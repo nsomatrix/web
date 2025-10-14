@@ -1,14 +1,7 @@
 class YouTubeFeed {
     constructor() {
-        this.API_KEYS = [
-            'AIzaSyB8Gbml84v3dSwJA5uYi3WmNh9BRSMoBtw',
-            'AIzaSyD9onmJQwNsBM-f0n-G2tujcd74pWwLKBg',
-            'AIzaSyC-s18NaLKiYvKcd7lM16MsfMe5FmGOnR8',
-            'AIzaSyBrutiYoT8YDBpZtIjdHLyCRVs4Yz5gcAc',
-            'AIzaSyDgXTCT4fWlUaRTEXD1bDWb3wBr5-SrmjU',
-            'AIzaSyBfMTEM0qCDv747fqxPTtMT4YPJndKDjcc'
-        ];
-        this.currentKeyIndex = 0;
+        // Use Cloudflare Worker URL instead of hardcoded API keys
+        this.WORKER_URL = 'https://youtube-proxy.nsomtx.workers.dev';
         this.CACHE_KEY = 'youtube_feed_cache';
         this.CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
         // NSO Gaming channels
@@ -87,59 +80,44 @@ class YouTubeFeed {
     }
     
     async fetchFromAPI() {
-        for (let keyIndex = 0; keyIndex < this.API_KEYS.length; keyIndex++) {
-            const apiKey = this.API_KEYS[keyIndex];
-            try {
-                const allVideos = [];
-                const batchSize = 3; // Process 3 channels at a time
+        try {
+            const allVideos = [];
+            const batchSize = 3;
+            
+            for (let i = 0; i < this.channels.length; i += batchSize) {
+                const batch = this.channels.slice(i, i + batchSize);
+                const promises = batch.map(async (channelId) => {
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        const response = await fetch(
+                            `${this.WORKER_URL}/youtube-search?channelId=${channelId}&maxResults=2`
+                        );
+                        const data = await response.json();
+                        
+                        if (data.error) return [];
+                        
+                        return data.items ? data.items.map(item => ({
+                            id: item.id.videoId,
+                            title: item.snippet.title,
+                            thumbnail: item.snippet.thumbnails.medium.url,
+                            channel: item.snippet.channelTitle,
+                            publishedAt: item.snippet.publishedAt,
+                            description: item.snippet.description
+                        })) : [];
+                    } catch (error) {
+                        return [];
+                    }
+                });
                 
-                // Process channels in batches to avoid rate limits
-                for (let i = 0; i < this.channels.length; i += batchSize) {
-                    const batch = this.channels.slice(i, i + batchSize);
-                    const promises = batch.map(async (channelId) => {
-                        try {
-                            await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-                            const response = await fetch(
-                                `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&order=date&maxResults=2&type=video`
-                            );
-                            const data = await response.json();
-                            
-                            if (data.error) {
-                                if (data.error.message.includes('quota')) {
-                                    throw new Error('quota_exceeded');
-                                }
-                                return [];
-                            }
-                            
-                            return data.items ? data.items.map(item => ({
-                                id: item.id.videoId,
-                                title: item.snippet.title,
-                                thumbnail: item.snippet.thumbnails.medium.url,
-                                channel: item.snippet.channelTitle,
-                                publishedAt: item.snippet.publishedAt,
-                                description: item.snippet.description
-                            })) : [];
-                        } catch (error) {
-                            if (error.message === 'quota_exceeded') throw error;
-                            return [];
-                        }
-                    });
-                    
-                    const batchResults = await Promise.all(promises);
-                    allVideos.push(...batchResults.flat());
-                }
-                
-                return allVideos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-                
-            } catch (error) {
-                if (error.message === 'quota_exceeded') {
-                    continue; // Try next API key
-                }
-                console.log(`API key ${keyIndex + 1} failed:`, error.message);
+                const batchResults = await Promise.all(promises);
+                allVideos.push(...batchResults.flat());
             }
+            
+            return allVideos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+            
+        } catch (error) {
+            throw new Error('Worker request failed');
         }
-        
-        throw new Error('All API keys exhausted');
     }
     
     getFallbackVideos() {
