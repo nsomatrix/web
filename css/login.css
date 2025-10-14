@@ -293,7 +293,7 @@ body {
 /* Form validation styles */
 .login .inputBx input.error {
     border-color: #ef4444;
-    background: #fef2f2;
+    background: rgba(239, 68, 68, 0.1);
 }
 
 .login .inputBx input.error:focus {

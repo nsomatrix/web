@@ -33,20 +33,83 @@ const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
 let isSignupMode = false;
 let turnstileToken = null;
+let turnstileWidgetId = null;
 
-// Turnstile callback function (must be global)
+// Turnstile callback functions (must be global)
 window.onTurnstileSuccess = function(token) {
+    console.log('Turnstile verification successful');
     turnstileToken = token;
     document.getElementById('primaryBtn').disabled = false;
+};
+
+window.onTurnstileError = function(error) {
+    console.error('Turnstile error:', error);
+    turnstileToken = null;
+    document.getElementById('primaryBtn').disabled = true;
+    showMessageBox('Security verification failed. Please try again.', 'error');
+};
+
+window.onTurnstileExpired = function() {
+    console.warn('Turnstile token expired');
+    turnstileToken = null;
+    document.getElementById('primaryBtn').disabled = true;
+    showMessageBox('Security verification expired. Please verify again.', 'error');
 };
 
 // Reset Turnstile when switching modes
 function resetTurnstile() {
     turnstileToken = null;
     document.getElementById('primaryBtn').disabled = true;
-    if (window.turnstile) {
-        window.turnstile.reset();
+    
+    if (window.turnstile && turnstileWidgetId !== null) {
+        try {
+            window.turnstile.reset(turnstileWidgetId);
+        } catch (e) {
+            console.warn('Turnstile reset failed:', e);
+            // Force re-render if reset fails
+            renderTurnstile();
+        }
+    } else {
+        // If no widget ID, re-render
+        renderTurnstile();
     }
+}
+
+// Render Turnstile widget
+function renderTurnstile() {
+    const container = document.getElementById('turnstile-container');
+    if (container && window.turnstile) {
+        container.innerHTML = '';
+        
+        try {
+            turnstileWidgetId = window.turnstile.render(container, {
+                sitekey: '0x4AAAAAAB6AxJBsBeZyr7Mv',
+                callback: 'onTurnstileSuccess',
+                'error-callback': 'onTurnstileError',
+                'expired-callback': 'onTurnstileExpired',
+                theme: 'dark'
+            });
+        } catch (e) {
+            console.error('Failed to render Turnstile:', e);
+        }
+    }
+}
+
+// Initialize Turnstile when script loads
+function initTurnstile() {
+    if (window.turnstile) {
+        renderTurnstile();
+    } else {
+        // Wait for Turnstile to load
+        setTimeout(initTurnstile, 100);
+    }
+}
+
+// Start initialization after DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTurnstile);
+} else {
+    initTurnstile();
 }
 
 function setupPasswordToggle(toggleElement, inputElement) {

@@ -59,7 +59,7 @@
     <script src="js/essentials.js"></script>
     
     <!-- Cloudflare Turnstile -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
@@ -94,10 +94,7 @@
             </div>
             <!-- Cloudflare Turnstile -->
             <div class="inputBx" style="display: flex; justify-content: center; margin: 20px 0;">
-                <div class="cf-turnstile" 
-                     data-sitekey="0x4AAAAAAB6AxJBsBeZyr7Mv" 
-                     data-callback="onTurnstileSuccess"
-                     data-theme="dark"></div>
+                <div id="turnstile-container"></div>
             </div>
             <div class="inputBx">
                 <button id="primaryBtn" type="submit" disabled>Sign in</button>
