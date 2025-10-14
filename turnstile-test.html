@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnstile Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 10px;
+        }
+        #status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #28a745; }
+        .error { background: #dc3545; }
+        .info { background: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cloudflare Turnstile Test</h1>
+        <div id="status" class="info">Loading Turnstile...</div>
+        <div id="turnstile-widget"></div>
+        <button id="test-btn" disabled>Test Button</button>
+        
+        <div style="margin-top: 30px;">
+            <h3>Debug Info:</h3>
+            <div id="debug-info"></div>
+        </div>
+    </div>
+
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    
+    <script>
+        let turnstileToken = null;
+        let widgetId = null;
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = type;
+        }
+        
+        function updateDebug(info) {
+            document.getElementById('debug-info').innerHTML = info;
+        }
+        
+        window.onTurnstileLoad = function() {
+            updateStatus('Turnstile API loaded successfully', 'success');
+            renderWidget();
+        };
+        
+        window.onTurnstileSuccess = function(token) {
+            turnstileToken = token;
+            updateStatus('Turnstile verification successful!', 'success');
+            document.getElementById('test-btn').disabled = false;
+            updateDebug(`Token: ${token.substring(0, 20)}...`);
+        };
+        
+        window.onTurnstileError = function(error) {
+            updateStatus('Turnstile verification failed', 'error');
+            updateDebug(`Error: ${JSON.stringify(error)}`);
+        };
+        
+        window.onTurnstileExpired = function() {
+            turnstileToken = null;
+            updateStatus('Turnstile token expired', 'error');
+            document.getElementById('test-btn').disabled = true;
+        };
+        
+        function renderWidget() {
+            const container = document.getElementById('turnstile-widget');
+            
+            if (!window.turnstile) {
+                updateStatus('Turnstile API not available', 'error');
+                return;
+            }
+            
+            try {
+                widgetId = window.turnstile.render(container, {
+                    sitekey: '0x4AAAAAAB6AxJBsBeZyr7Mv',
+                    callback: window.onTurnstileSuccess,
+                    'error-callback': window.onTurnstileError,
+                    'expired-callback': window.onTurnstileExpired,
+                    theme: 'dark'
+                });
+                
+                updateStatus('Turnstile widget rendered', 'success');
+                updateDebug(`Widget ID: ${widgetId}`);
+            } catch (e) {
+                updateStatus('Failed to render Turnstile widget', 'error');
+                updateDebug(`Render Error: ${e.message}`);
+            }
+        }
+        
+        // Check if Turnstile is already loaded
+        function checkTurnstile() {
+            let attempts = 0;
+            const maxAttempts = 50;
+            
+            const check = () => {
+                attempts++;
+                if (window.turnstile && typeof window.turnstile.render === 'function') {
+                    window.onTurnstileLoad();
+                } else if (attempts < maxAttempts) {
+                    setTimeout(check, 200);
+                } else {
+                    updateStatus('Turnstile failed to load after 10 seconds', 'error');
+                    updateDebug('Max attempts reached. Check network connectivity and site key.');
+                }
+            };
+            
+            check();
+        }
+        
+        // Start checking when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkTurnstile);
+        } else {
+            checkTurnstile();
+        }
+        
+        document.getElementById('test-btn').onclick = function() {
+            if (turnstileToken) {
+                alert('Success! Token: ' + turnstileToken.substring(0, 20) + '...');
+            } else {
+                alert('No token available');
+            }
+        };
+    </script>
+</body>
+</html>
