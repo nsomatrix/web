@@ -23,6 +23,8 @@ class YouTubeFeed {
         this.videos = [];
         this.currentIndex = 0;
         this.videosPerView = window.innerWidth <= 768 ? 1 : 3;
+        this.autoSwipeTimer = null;
+        this.isVideoPlaying = false;
         
         this.init();
     }
@@ -31,6 +33,7 @@ class YouTubeFeed {
         await this.loadVideos();
         this.setupNavigation();
         this.render();
+        this.startAutoSwipe();
     }
     
     async loadVideos() {
@@ -279,14 +282,48 @@ class YouTubeFeed {
         rightBtn.style.pointerEvents = this.currentIndex + this.videosPerView >= this.videos.length ? 'none' : 'auto';
     }
     
+    startAutoSwipe() {
+        this.autoSwipeTimer = setInterval(() => {
+            if (!this.isVideoPlaying && this.videos.length > 0) {
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    const feedContainer = document.getElementById('youtubeFeed');
+                    const maxScroll = feedContainer.scrollWidth - feedContainer.clientWidth;
+                    if (feedContainer.scrollLeft >= maxScroll) {
+                        feedContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                    } else {
+                        feedContainer.scrollBy({ left: 300, behavior: 'smooth' });
+                    }
+                } else {
+                    if (this.currentIndex + this.videosPerView >= this.videos.length) {
+                        this.currentIndex = 0;
+                        this.render();
+                    } else {
+                        this.scrollRight();
+                    }
+                }
+            }
+        }, 4000);
+    }
+    
+    stopAutoSwipe() {
+        if (this.autoSwipeTimer) {
+            clearInterval(this.autoSwipeTimer);
+            this.autoSwipeTimer = null;
+        }
+    }
+    
     playVideo(videoId, title) {
+        this.isVideoPlaying = true;
+        this.stopAutoSwipe();
+        
         const modal = document.createElement('div');
         modal.className = 'video-modal';
         modal.innerHTML = `
             <div class="video-player">
                 <div class="video-header">
                     <span>${title}</span>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                    <button onclick="window.youtubeFeed.closeVideo(this)">&times;</button>
                 </div>
                 <div class="video-content">
                     <iframe 
@@ -301,6 +338,12 @@ class YouTubeFeed {
             </div>
         `;
         document.body.appendChild(modal);
+    }
+    
+    closeVideo(button) {
+        this.isVideoPlaying = false;
+        button.parentElement.parentElement.parentElement.remove();
+        this.startAutoSwipe();
     }
     
     // Method to change channels dynamically
