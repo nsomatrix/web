@@ -61,5 +61,16 @@ function calculateUptime() {
     setTimeout(calculateUptime, 1000);
 }
 
+function openTool(url, title) {
+    window.open(url, '_blank');
+}
+
+
+
 // Start the counter when the window loads
-window.addEventListener('load', calculateUptime);
+window.addEventListener('load', () => {
+    calculateUptime();
+    if (window.challengeSystem) {
+        window.challengeSystem.init();
+    }
+});
