@@ -189,14 +189,7 @@
   margin-right: auto;
 }
 
-.uptime-label {
-  color: #ff0000;
-  font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace;
-  font-size: 0.9rem;
-  display: block;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
+
 
 .uptime-counter {
   color: #ffffff;
@@ -683,9 +676,7 @@
     max-width: 100%;
   }
   
-  .uptime-label {
-    font-size: 0.8rem;
-  }
+
   
   .uptime-counter {
     font-size: 0.7rem;
