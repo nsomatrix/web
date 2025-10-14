@@ -145,46 +145,15 @@
                 </div>
             </div>
             
-            <!-- Latest Updates Section -->
+            <!-- FireFeed Section -->
             <div class="feed-section">
-                <h2><i class="fas fa-fire"></i> Latest Updates & Media</h2>
-                <div class="feed-grid">
-                    <div class="feed-card video-card" onclick="playVideo('matrix-trailer')">
-                        <div class="video-thumbnail">
-                            <img src="data/Pictures/matrix.png" alt="Matrix Trailer">
-                            <div class="play-button"><i class="fas fa-play"></i></div>
-                            <span class="video-duration">2:15</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Matrix Terminal v2.0 Trailer</h3>
-                            <p>New commands, enhanced performance, and better UI</p>
-                            <span class="views">1.2K views • 2 days ago</span>
-                        </div>
+                <h2><i class="fas fa-fire"></i> FireFeed</h2>
+                <div class="youtube-feed-container">
+                    <button class="nav-btn nav-left" id="scrollLeft"><i class="fas fa-chevron-left"></i></button>
+                    <div class="youtube-feed" id="youtubeFeed">
+                        <div class="loading-placeholder">Loading videos...</div>
                     </div>
-                    
-                    <div class="feed-card news-card">
-                        <div class="news-image">
-                            <img src="data/Pictures/nso.webp" alt="NSO Update">
-                            <span class="news-tag">NEW</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>JLMod v0.86 Released</h3>
-                            <p>Enhanced graphics, better compatibility, and new features</p>
-                            <span class="timestamp">3 hours ago</span>
-                        </div>
-                    </div>
-                    
-                    <div class="feed-card news-card">
-                        <div class="news-image">
-                            <img src="data/Pictures/microemulator.png" alt="Emulator Update">
-                            <span class="news-tag">UPDATE</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>New Emulator Support</h3>
-                            <p>Added support for multiple J2ME emulators and improved performance</p>
-                            <span class="timestamp">1 day ago</span>
-                        </div>
-                    </div>
+                    <button class="nav-btn nav-right" id="scrollRight"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
             
@@ -252,6 +221,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/challenge-system.js"></script>
+    <script src="js/youtube-feed.js"></script>
     <script>
         // Interactive homepage functionality
         async function queryGameServer(ip, port) {
