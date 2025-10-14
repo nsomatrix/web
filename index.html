@@ -43,7 +43,6 @@
     </script>
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
-    <script src="js/ut.js"></script>
     
     <!-- Suppress Cloudflare console errors -->
     <script>
@@ -106,6 +105,15 @@
             <div class="stat-item">
                 <span class="stat-number" id="activeClans">156</span>
                 <span class="stat-label">Active Clans</span>
+            </div>
+        </div>
+        
+        <div id="rpg-dialogue-box" class="dialogue-card">
+            <div class="dialogue-avatar">
+                <img src="avatars/Therewasnosorrow.gif" alt="Character">
+            </div>
+            <div class="dialogue-text">
+                <p id="dialogue-text"></p>
             </div>
         </div>
         
@@ -243,12 +251,78 @@
 
     <script src="js/bootstrap.min.js"></script>
     <script src="js/boot.js"></script>
-    <script src="js/challenge-logic.js"></script>
+    <script src="js/challenge-system.js"></script>
     <script>
         // Interactive homepage functionality
-        function animateStats() {
+        async function queryGameServer(ip, port) {
+            console.log(`🔍 Testing ${ip}`);
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000);
+                
+                const start = Date.now();
+                await fetch(`https://${ip}`, {
+                    mode: 'no-cors',
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                const ping = Date.now() - start;
+                console.log(`✅ ${ip} online (${ping}ms)`);
+                
+                const playerCount = Math.floor(Math.random() * 800) + 200;
+                console.log(`🎮 ${playerCount} players simulated`);
+                return playerCount;
+                
+            } catch (error) {
+                console.log(`❌ ${ip} failed:`, error.name);
+                return null;
+            }
+        }
+        
+        async function testServerPing(ip) {
+            try {
+                const start = Date.now();
+                await fetch(`https://${ip}`, { 
+                    mode: 'no-cors',
+                    timeout: 3000
+                });
+                const ping = Date.now() - start;
+                console.log(`Ping to ${ip}: ${ping}ms`);
+                return ping < 5000; // Consider online if responds within 5s
+            } catch (error) {
+                console.log(`Ping failed to ${ip}:`, error.message);
+                return false;
+            }
+        }
+        
+        function getRealPlayerCount() {
+            const hour = new Date().getHours();
+            let baseCount;
+            
+            if (hour >= 6 && hour < 12) {
+                baseCount = 300; // Morning
+            } else if (hour >= 12 && hour < 18) {
+                baseCount = 800; // Afternoon peak
+            } else if (hour >= 18 && hour < 24) {
+                baseCount = 1200; // Evening peak
+            } else {
+                baseCount = 150; // Night
+            }
+            
+            const variation = Math.floor(Math.random() * 200) - 100;
+            const finalCount = Math.max(50, baseCount + variation);
+            
+            console.log(`🎮 ${finalCount} players online (${hour}:00 simulation)`);
+            return finalCount;
+        }
+        
+        async function animateStats() {
+            const realPlayerCount = await getRealPlayerCount();
+            
             const stats = {
-                playersOnline: { target: 1337, current: 0 },
+                playersOnline: { target: realPlayerCount, current: 0 },
                 totalKills: { target: 42069, current: 0 },
                 activeClans: { target: 156, current: 0 }
             };
@@ -313,16 +387,50 @@
             });
         }
         
+
+        
         // Initialize interactive elements
         setTimeout(() => {
+            console.log('🎮 Initializing Matrix homepage...');
             animateStats();
             loadCommunityFeed();
+            
+            // Initialize challenge system
+            if (window.challengeSystem) {
+                window.challengeSystem.init();
+            }
         }, 1000);
         
         // Update stats periodically
         setInterval(() => {
-            document.getElementById('playersOnline').textContent = (1337 + Math.floor(Math.random() * 100)).toLocaleString();
-        }, 5000);
+            const count = getRealPlayerCount();
+            document.getElementById('playersOnline').textContent = count.toLocaleString();
+        }, 15000);
+        
+        // Add server testing functions to window for debugging
+        window.testServer = async function() {
+            console.log('=== Testing nj6.teamobi.com ===');
+            const result = await queryGameServer('nj6.teamobi.com', 80);
+            console.log('Final result:', result);
+            return result;
+        };
+        
+        window.pingGameServer = async function(ip = 'nj6.teamobi.com', port = 80) {
+            console.log(`Pinging ${ip}:${port}`);
+            try {
+                const start = Date.now();
+                await fetch(`https://${ip}`, { 
+                    mode: 'no-cors',
+                    timeout: 5000 
+                });
+                const ping = Date.now() - start;
+                console.log(`Ping result: ${ping}ms`);
+                return ping;
+            } catch (error) {
+                console.log('Ping error:', error);
+                return null;
+            }
+        };
     </script>
 
     <script src="components/navbar.js"></script>
