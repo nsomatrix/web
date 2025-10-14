@@ -371,15 +371,6 @@ async function handleLogin() {
             }
         }, 10000);
         
-        // Reset turnstile after successful login
-        if (window.turnstile && turnstileWidgetId !== null) {
-            try {
-                window.turnstile.reset(turnstileWidgetId);
-            } catch (e) {
-                console.warn('Failed to reset turnstile after login:', e);
-            }
-        }
-        
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
