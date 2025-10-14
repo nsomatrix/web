@@ -129,7 +129,7 @@ class NavbarAuth {
       
       // Try different Firebase auth instances
       let auth = null;
-      if (window.firebase && window.firebase.auth) {
+      if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
         auth = window.firebase.auth();
       } else if (window.firebaseAuth) {
         auth = window.firebaseAuth;
@@ -202,7 +202,7 @@ class NavbarAuth {
       
       // Find and use the appropriate Firebase auth instance
       let auth = null;
-      if (window.firebase && window.firebase.auth) {
+      if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
         auth = window.firebase.auth();
       } else if (window.firebaseAuth) {
         auth = window.firebaseAuth;
