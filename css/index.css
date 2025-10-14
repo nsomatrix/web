@@ -609,13 +609,14 @@
 }
 
 .youtube-video-card {
-  flex: 0 0 300px;
+  flex: 1;
   background: rgba(10, 10, 10, 0.7);
   border: 1px solid #333;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 300px;
 }
 
 .youtube-video-card:hover {
