@@ -243,17 +243,16 @@ body {
     text-decoration: underline;
 }
 
-.braille-spinner {
+.login-spinner {
     display: inline-block;
-    margin-left: 5px;
-    font-weight: bold;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.d-none {
-    display: none !important;
-}
-
-/* Loading spinner animation */
 @keyframes spin {
     from {
         transform: rotate(0deg);
@@ -261,10 +260,6 @@ body {
     to {
         transform: rotate(360deg);
     }
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
 }
 
 /* Message box animations */

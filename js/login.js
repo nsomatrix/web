@@ -72,7 +72,7 @@ function resetTurnstile() {
         try {
             window.turnstile.reset(turnstileWidgetId);
         } catch (e) {
-            console.warn('Turnstile reset failed:', e);
+
             // Force re-render if reset fails
             setTimeout(renderTurnstile, 100);
         }
@@ -239,13 +239,8 @@ function showMessageBox(message, type = 'info', duration = 4000) {
 
 function setButtonLoading(button, isLoading, originalText) {
     if (isLoading) {
-        const spinner = document.createElement('svg');
-        spinner.className = 'animate-spin';
-        spinner.setAttribute('width', '16');
-        spinner.setAttribute('height', '16');
-        spinner.setAttribute('viewBox', '0 0 24 24');
-        spinner.setAttribute('fill', 'none');
-        spinner.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"></circle><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>';
+        const spinner = document.createElement('div');
+        spinner.className = 'login-spinner';
         
         const span = document.createElement('span');
         span.style.marginLeft = '8px';
@@ -384,7 +379,7 @@ async function handleLogin() {
                 errorMessage = 'Network error. Please check your connection.';
                 break;
             default:
-                console.error('Login error:', err);
+
         }
         
         showMessageBox(errorMessage, 'error');
@@ -480,7 +475,7 @@ async function handleSignup() {
                 errorMessage = 'Network error. Please check your connection.';
                 break;
             default:
-                console.error('Signup error:', err);
+
         }
         
         showMessageBox(errorMessage, 'error');
