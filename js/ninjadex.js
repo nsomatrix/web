@@ -176,6 +176,13 @@ class Ninjadex {
                 const mapName = e.target.dataset.mapName;
                 this.showFullscreenImage(imageUrl, mapName);
             }
+            
+            // Handle location tag clicks
+            if (e.target.classList.contains('location-tag')) {
+                const locationName = e.target.dataset.location;
+                const imageUrl = this.getMapImageUrl(locationName);
+                this.showFullscreenImage(imageUrl, locationName);
+            }
         });
     }
 
@@ -557,7 +564,7 @@ class Ninjadex {
             <div class="monster-locations">
                 <div class="locations-label">Found in:</div>
                 <div class="locations-list">
-                    ${monster.locations.map(loc => `<span class="location-tag">${loc}</span>`).join('')}
+                    ${monster.locations.map(loc => `<span class="location-tag" data-location="${loc}">${loc}</span>`).join('')}
                 </div>
             </div>
         `;
