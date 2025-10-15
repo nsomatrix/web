@@ -14,6 +14,18 @@
       "max": 12000000
     }
   },
+  "additional_maps": [
+    {"name": "Chakumi Village", "type": "regular"},
+    {"name": "Echigo Village", "type": "regular"},
+    {"name": "Fish Village", "type": "regular"},
+    {"name": "Kojin Village", "type": "regular"},
+    {"name": "Oshin Village", "type": "regular"},
+    {"name": "Sanzu Village", "type": "regular"},
+    {"name": "Tone Village", "type": "regular"},
+    {"name": "Haruna School", "type": "regular"},
+    {"name": "Hirosaki School", "type": "regular"},
+    {"name": "Ookaza School", "type": "regular"}
+  ],
   "monsters": {
     "regular": [
       {

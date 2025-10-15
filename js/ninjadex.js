@@ -35,6 +35,7 @@ class Ninjadex {
             const data = await response.json();
             this.monsters = [...data.monsters.regular, ...data.monsters.cursed];
             this.filteredMonsters = [...this.monsters];
+            this.additionalMaps = data.additional_maps || [];
         } catch (error) {
             console.error('Failed to load monsters:', error);
         }
@@ -85,6 +86,8 @@ class Ninjadex {
             console.error('Failed to load items:', error);
         }
     }
+
+
 
     async loadSkillsets() {
         try {
@@ -731,6 +734,17 @@ class Ninjadex {
             });
         });
         
+        // Add additional maps without monsters
+        this.additionalMaps.forEach(map => {
+            if (!mapData.has(map.name)) {
+                mapData.set(map.name, {
+                    name: map.name,
+                    type: map.type,
+                    monsters: []
+                });
+            }
+        });
+        
         this.maps = Array.from(mapData.values()).sort((a, b) => a.name.localeCompare(b.name));
         this.filteredMaps = [...this.maps];
     }
@@ -769,8 +783,8 @@ class Ninjadex {
         const card = document.createElement('div');
         card.className = 'map-card';
 
-        const levelRange = this.getMapLevelRange(map.monsters);
         const monsterCount = map.monsters.length;
+        const levelRange = monsterCount > 0 ? this.getMapLevelRange(map.monsters) : null;
 
         card.innerHTML = `
             <div class="map-header">
@@ -778,6 +792,7 @@ class Ninjadex {
                 <div class="map-type ${map.type}">${map.type.toUpperCase()}</div>
             </div>
             
+            ${monsterCount > 0 ? `
             <div class="map-stats">
                 <div class="stat-item">
                     <span class="stat-label">Monsters:</span>
@@ -787,8 +802,9 @@ class Ninjadex {
                     <span class="stat-label">Level Range:</span>
                     <span class="stat-value">${levelRange.min}-${levelRange.max}</span>
                 </div>
-            </div>
+            </div>` : ''}
             
+            ${monsterCount > 0 ? `
             <div class="map-monsters">
                 <div class="monsters-label">Monsters Found Here:</div>
                 <div class="monsters-list">
@@ -799,13 +815,14 @@ class Ninjadex {
                         </div>
                     `).join('')}
                 </div>
-            </div>
+            </div>` : ''}
         `;
 
         return card;
     }
 
     getMapLevelRange(monsters) {
+        if (monsters.length === 0) return null;
         const levels = monsters.map(m => m.level);
         return {
             min: Math.min(...levels),
