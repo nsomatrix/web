@@ -58,12 +58,8 @@
 
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
-    <link rel="stylesheet" href="components/loader.css">
 </head>
 <body>
-    <!-- Global Loader -->
-    <div id="loader-container"></div>
-    
     <!-- Navbar Component -->
     <div id="navbar-container"></div>
 
@@ -113,13 +109,6 @@
     <script type="module" src="js/login.js"></script>
     <script src="components/loader.js"></script>
     <script>
-        // Load loader first
-        fetch('components/loader.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('loader-container').innerHTML = html;
-            });
-        
         const script = document.createElement('script');
         script.src = 'components/navbar.js';
         script.onload = () => {

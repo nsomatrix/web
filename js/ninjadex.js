@@ -869,30 +869,11 @@ class Ninjadex {
     }
 
     showLoading(text = 'Loading') {
-        const overlay = document.createElement('div');
-        overlay.className = 'loading-overlay';
-        overlay.id = 'loading-overlay';
-        overlay.innerHTML = `
-            <div>
-                <div class="loading-spinner">
-                    <svg viewBox="0 0 50 50">
-                        <circle cx="25" cy="25" r="20" fill="none" stroke="#ff4444" stroke-width="3" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
-                </div>
-                <div class="loading-text">${text}</div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
+        window.showLoading(text);
     }
 
     hideLoading() {
-        const overlay = document.getElementById('loading-overlay');
-        if (overlay) {
-            document.body.removeChild(overlay);
-        }
+        window.hideLoading();
     }
 
     showFullscreenImage(imageUrl, mapName) {

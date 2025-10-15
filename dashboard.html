@@ -16,12 +16,8 @@
 
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
-    <link rel="stylesheet" href="components/loader.css">
 </head>
 <body>
-    <!-- Global Loader -->
-    <div id="loader-container"></div>
-
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
 
 
@@ -365,13 +361,6 @@
     <script type="module" src="js/dashboard.js"></script>
     
     <script>
-        // Load loader first
-        fetch('components/loader.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('loader-container').innerHTML = html;
-            });
-        
         // Desktop dashboard card functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Make cards clickable
