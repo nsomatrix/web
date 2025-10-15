@@ -1,0 +1,19 @@
+.map-image {
+    width: 100%;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 10px;
+}
+
+.map-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.map-card .map-header {
+    position: relative;
+    z-index: 1;
+}

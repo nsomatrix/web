@@ -785,8 +785,10 @@ class Ninjadex {
 
         const monsterCount = map.monsters.length;
         const levelRange = monsterCount > 0 ? this.getMapLevelRange(map.monsters) : null;
+        const imageUrl = this.getMapImageUrl(map.name);
 
         card.innerHTML = `
+            <div class="map-image" style="background-image: url('${imageUrl}');"></div>
             <div class="map-header">
                 <div class="map-name">${map.name}</div>
                 <div class="map-type ${map.type}">${map.type.toUpperCase()}</div>
@@ -832,6 +834,12 @@ class Ninjadex {
 
     formatNumber(num) {
         return num.toString();
+    }
+
+    getMapImageUrl(mapName) {
+        const filename = mapName.replace(/ /g, '-').toLowerCase()
+            .replace(/-(i|ii|iii|iv|v)$/i, (match, roman) => `-${roman.toUpperCase()}`) + '.png';
+        return `https://archive.org/download/nsomtx-maps/${filename}`;
     }
 
     getCategoryDisplayName(category) {
