@@ -7,7 +7,7 @@
             background: rgba(0, 0, 0, 0.8); display: none; justify-content: center;
             align-items: center; z-index: 10000; backdrop-filter: blur(5px);
         }
-        .loading-overlay > div { text-align: center; color: #ff4444; font-family: 'Courier New', monospace; }
+        .loading-overlay > div { text-align: center; color: #ff4444; font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace; }
         .loading-spinner { width: 60px; height: 60px; margin: 0 auto 20px; }
         .loading-spinner svg { width: 100%; height: 100%; }
         .loading-text { font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
