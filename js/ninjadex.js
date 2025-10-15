@@ -169,6 +169,13 @@ class Ninjadex {
                     select.classList.remove('open');
                 });
             }
+            
+            // Handle map image clicks
+            if (e.target.classList.contains('map-image')) {
+                const imageUrl = e.target.dataset.imageUrl;
+                const mapName = e.target.dataset.mapName;
+                this.showFullscreenImage(imageUrl, mapName);
+            }
         });
     }
 
@@ -788,7 +795,7 @@ class Ninjadex {
         const imageUrl = this.getMapImageUrl(map.name);
 
         card.innerHTML = `
-            <div class="map-image" style="background-image: url('${imageUrl}');"></div>
+            <div class="map-image" style="background-image: url('${imageUrl}');" data-image-url="${imageUrl}" data-map-name="${map.name}"></div>
             <div class="map-header">
                 <div class="map-name">${map.name}</div>
                 <div class="map-type ${map.type}">${map.type.toUpperCase()}</div>
@@ -840,6 +847,26 @@ class Ninjadex {
         const filename = mapName.replace(/ /g, '-').toLowerCase()
             .replace(/-(i|ii|iii|iv|v)$/i, (match, roman) => `-${roman.toUpperCase()}`) + '.png';
         return `https://archive.org/download/nsomtx-maps/${filename}`;
+    }
+
+    showFullscreenImage(imageUrl, mapName) {
+        const modal = document.createElement('div');
+        modal.className = 'fullscreen-modal';
+        modal.innerHTML = `
+            <div class="fullscreen-content">
+                <span class="close-btn">&times;</span>
+                <img src="${imageUrl}" alt="${mapName}" class="fullscreen-image">
+                <div class="image-title">${mapName}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const closeBtn = modal.querySelector('.close-btn');
+        closeBtn.onclick = () => document.body.removeChild(modal);
+        modal.onclick = (e) => {
+            if (e.target === modal) document.body.removeChild(modal);
+        };
     }
 
     getCategoryDisplayName(category) {
