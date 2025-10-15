@@ -8,9 +8,8 @@
             align-items: center; z-index: 10000; backdrop-filter: blur(5px);
         }
         .loading-overlay > div { text-align: center; color: #ff4444; font-family: DOS, Monaco, Menlo, Consolas, "Courier New", monospace; }
-        .loading-spinner { width: 60px; height: 60px; margin: 0 auto 20px; }
+        .loading-spinner { width: 60px; height: 60px; margin: 0 auto; }
         .loading-spinner svg { width: 100%; height: 100%; }
-        .loading-text { font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
     `;
     
     // Inject CSS
@@ -32,14 +31,12 @@
                     </circle>
                 </svg>
             </div>
-            <div class="loading-text" id="loading-text">Loading</div>
         </div>
     `;
     document.body.appendChild(loader);
     
     // Global functions
-    window.showLoading = function(text = 'Loading') {
-        document.getElementById('loading-text').textContent = text;
+    window.showLoading = function() {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
     
@@ -50,15 +47,7 @@
     // Intercept fetch
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
-        const url = args[0];
-        let text = 'Loading';
-        if (typeof url === 'string') {
-            if (url.includes('firebase')) text = 'Loading Firebase data';
-            else if (url.includes('cloudflare')) text = 'Loading Cloudflare data';
-            else if (url.includes('.json')) text = 'Loading JSON data';
-            else if (url.includes('api')) text = 'Loading API data';
-        }
-        window.showLoading(text);
+        window.showLoading();
         return originalFetch.apply(this, args).finally(() => {
             setTimeout(() => window.hideLoading(), 300);
         });
@@ -67,7 +56,7 @@
     // Intercept XMLHttpRequest
     const originalXHRSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function(...args) {
-        window.showLoading('Loading data');
+        window.showLoading();
         this.addEventListener('loadend', () => {
             setTimeout(() => window.hideLoading(), 300);
         });
