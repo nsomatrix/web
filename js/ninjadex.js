@@ -30,6 +30,7 @@ class Ninjadex {
     }
 
     async loadMonsters() {
+        this.showLoading('Loading monsters database');
         try {
             const response = await fetch('json/monsters_database.json');
             const data = await response.json();
@@ -38,10 +39,13 @@ class Ninjadex {
             this.additionalMaps = data.additional_maps || [];
         } catch (error) {
             console.error('Failed to load monsters:', error);
+        } finally {
+            this.hideLoading();
         }
     }
 
     async loadEquipments() {
+        this.showLoading('Loading equipment data');
         try {
             const response = await fetch('json/structured_equipment_data.json');
             const data = await response.json();
@@ -73,10 +77,13 @@ class Ninjadex {
             this.filteredEquipments = [...this.equipments];
         } catch (error) {
             console.error('Failed to load equipments:', error);
+        } finally {
+            this.hideLoading();
         }
     }
 
     async loadItems() {
+        this.showLoading('Loading items data');
         try {
             const response = await fetch('data/items.json');
             const data = await response.json();
@@ -84,12 +91,15 @@ class Ninjadex {
             this.filteredItems = [...this.items];
         } catch (error) {
             console.error('Failed to load items:', error);
+        } finally {
+            this.hideLoading();
         }
     }
 
 
 
     async loadSkillsets() {
+        this.showLoading('Loading skillsets data');
         try {
             const response = await fetch('structured_skillsets.json');
             const data = await response.json();
@@ -109,6 +119,8 @@ class Ninjadex {
             this.filteredSkillsets = [...this.skillsets];
         } catch (error) {
             console.error('Failed to load skillsets:', error);
+        } finally {
+            this.hideLoading();
         }
     }
 
@@ -856,13 +868,42 @@ class Ninjadex {
         return `https://archive.org/download/nsomtx-maps/${filename}`;
     }
 
+    showLoading(text = 'Loading') {
+        const overlay = document.createElement('div');
+        overlay.className = 'loading-overlay';
+        overlay.id = 'loading-overlay';
+        overlay.innerHTML = `
+            <div>
+                <div class="loading-spinner">
+                    <svg viewBox="0 0 50 50">
+                        <circle cx="25" cy="25" r="20" fill="none" stroke="#00ff88" stroke-width="3" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </div>
+                <div class="loading-text">${text}</div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+
+    hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            document.body.removeChild(overlay);
+        }
+    }
+
     showFullscreenImage(imageUrl, mapName) {
+        this.showLoading('Loading map image');
+        
         const modal = document.createElement('div');
         modal.className = 'fullscreen-modal';
         modal.innerHTML = `
             <div class="fullscreen-content">
                 <span class="close-btn">&times;</span>
-                <img src="${imageUrl}" alt="${mapName}" class="fullscreen-image">
+                <img src="${imageUrl}" alt="${mapName}" class="fullscreen-image" onload="window.ninjadexInstance.hideLoading()" onerror="window.ninjadexInstance.hideLoading()">
                 <div class="image-title">${mapName}</div>
             </div>
         `;
@@ -896,5 +937,5 @@ class Ninjadex {
 
 // Initialize Ninjadex when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new Ninjadex();
+    window.ninjadexInstance = new Ninjadex();
 });
