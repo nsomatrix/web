@@ -1362,3 +1362,71 @@
 .upgrade-desc {
     color: var(--text-secondary);
 }
+/* Responsive Blueprint Layout */
+.results-section {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.blueprint-compact {
+    max-width: 100%;
+    padding: 0;
+}
+
+.blueprint-compact > div {
+    margin-bottom: 1rem;
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .planner-card {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .blueprint-inputs {
+        padding: 0;
+    }
+    
+    .input-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .compact-equipment-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .equipment-image-section {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .equipment-image {
+        width: 50px;
+        height: 50px;
+        align-self: center;
+    }
+    
+    .skill-card {
+        max-width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
+    .estimator-section {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Ensure no horizontal overflow */
+* {
+    box-sizing: border-box;
+}
+
+.tab-content {
+    max-width: 100%;
+    overflow-x: hidden;
+}
