@@ -27,7 +27,7 @@
           "name": "Enchokuto",
           "level": 10,
           "description": "Basic blade skill to slash a target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Konoitoame",
@@ -39,7 +39,7 @@
           "name": "Maroyakato",
           "level": 20,
           "description": "Slash a given target two times.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Magumandari",
@@ -51,7 +51,7 @@
           "name": "Chousouto",
           "level": 30,
           "description": "Combine Wind and Blade to produce a powerful blade that can damage up to 3 targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Aisubaagu",
@@ -75,7 +75,7 @@
           "name": "Raikouto",
           "level": 50,
           "description": "Lightning slash to damage up to 4 nearby targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Ikennotto",
@@ -87,13 +87,13 @@
           "name": "Baasutosutoomu",
           "level": 70,
           "description": "Use the power of wind to destroy your enemy , including the chance to stun your enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kaminari",
           "level": 80,
           "description": "Release lightning to use thunder hitting enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kage Bunshin no Jutsu",
@@ -105,7 +105,7 @@
           "name": "Raijin",
           "level": 100,
           "description": "Wind - Lightning Release.",
-          "classification": "active"
+          "classification": "auto"
         }
       ]
     },
@@ -116,7 +116,7 @@
           "name": "Uzusa",
           "level": 10,
           "description": "Basic bow skill to damage a given target with arrows.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Washihitomi",
@@ -128,7 +128,7 @@
           "name": "Kinkinsa",
           "level": 20,
           "description": "Shoot Ice Arrows to damage a target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Sogekihei",
@@ -140,7 +140,7 @@
           "name": "Nikinkinsa",
           "level": 30,
           "description": "Shoot two arrows at once to damage up to 3 enemies.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Joutenhitomi",
@@ -164,7 +164,7 @@
           "name": "Chousoukinkinsa",
           "level": 50,
           "description": "Shoot three ice arrows to damage up to 4 nearby targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Totaaigo",
@@ -176,13 +176,13 @@
           "name": "Furoozunkyuusen",
           "level": 70,
           "description": "Shoot long range ice arrows from far away to attack the enemy , with the chance to freeze your enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Aisu Meiku",
           "level": 80,
           "description": "Shot Ice Arrows to hit the enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kage Bunshin no Jutsu",
@@ -194,7 +194,7 @@
           "name": "Kogoraseru",
           "level": 100,
           "description": "Ice Release.",
-          "classification": "active"
+          "classification": "auto"
         }
       ]
     },
@@ -205,7 +205,7 @@
           "name": "Otama",
           "level": 10,
           "description": "Entry-level Shuriken throwing skill to damage a given target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Itotama",
@@ -217,7 +217,7 @@
           "name": "Kasoushuriken",
           "level": 20,
           "description": "Throw 2 Shurikens continuously at a given target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Taiyoutama",
@@ -229,7 +229,7 @@
           "name": "Bikoushuriken",
           "level": 30,
           "description": "Magic fire will burn all enemies and protect against any thrown shurikens.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Hoshitama",
@@ -253,7 +253,7 @@
           "name": "Choukou Shuriken",
           "level": 50,
           "description": "Magic fire burns big shurikens and up to 4 enemies at the same time.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Totogai",
@@ -265,13 +265,13 @@
           "name": "Baaningufukiya",
           "level": 70,
           "description": "Thrown Illusion Shuriken with hellish fire toward enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Hibashiri",
           "level": 80,
           "description": "Throw fire shuriken to destroy the enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kage Bunshin no Jutsu",
@@ -283,7 +283,7 @@
           "name": "Tsumabeni",
           "level": 100,
           "description": "Fire Release",
-          "classification": "active"
+          "classification": "auto"
         }
       ]
     },
@@ -294,7 +294,7 @@
           "name": "Yokobatan",
           "level": 10,
           "description": "Basic Kunai skill to damage a given target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Akaiame",
@@ -306,7 +306,7 @@
           "name": "Mizuibatan",
           "level": 20,
           "description": "Continuous damage caused by repeated slashing of target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Aoiame",
@@ -318,7 +318,7 @@
           "name": "Uzubatan",
           "level": 30,
           "description": "Create a massive air blade to damage up to 3 targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Hibikou",
@@ -342,7 +342,7 @@
           "name": "Choukoukogo",
           "level": 50,
           "description": "Create a ball of ice roll over and damage up to 4 enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kitsukemaguma",
@@ -354,13 +354,13 @@
           "name": "Furiizukatto",
           "level": 70,
           "description": "Produces powerful rings of ice that cause tremendous damage , including the chance to freeze your enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Saihyoken",
           "level": 80,
           "description": "Summon ice stone to hit the enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kage Bunshin no Jutsu",
@@ -372,7 +372,7 @@
           "name": "Shabondama",
           "level": 100,
           "description": "Ice Release",
-          "classification": "active"
+          "classification": "auto"
         }
       ]
     },
@@ -383,7 +383,7 @@
           "name": "Hiyoko",
           "level": 10,
           "description": "Basic Sword skill to damage target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Amagedon",
@@ -395,7 +395,7 @@
           "name": "Jizokuzan",
           "level": 20,
           "description": "3 continuous strikes to damage a given target.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kakyuu",
@@ -407,7 +407,7 @@
           "name": "X Zangeki",
           "level": 30,
           "description": "Damage up to 3 targets with quick slashing technique.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Raikou",
@@ -431,7 +431,7 @@
           "name": "Choukouhirenzo",
           "level": 50,
           "description": "Power 3 fire damage within a certain range (max 4 targets).",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Pawaraikou",
@@ -443,13 +443,13 @@
           "name": "Maajizangeki",
           "level": 70,
           "description": "Transform three Fire Swords into an Illusion Sword to explosively destroy your enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Ikkakujuu",
           "level": 80,
           "description": "Release the fire with Qilin form to burn the enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kage Bunshin no Jutsu",
@@ -461,7 +461,7 @@
           "name": "Enko Bakusatsu",
           "level": 100,
           "description": "Fire Release.",
-          "classification": "active"
+          "classification": "auto"
         }
       ]
     },
@@ -472,7 +472,7 @@
           "name": "Ouchia",
           "level": 10,
           "description": "Basic Fan skill to produce a heavy wind at targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Suishou",
@@ -484,7 +484,7 @@
           "name": "Oouchia",
           "level": 20,
           "description": "Shinobi mind skill to increase MP , HP and experience in battle.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kusenmono",
@@ -496,7 +496,7 @@
           "name": "Bakkuuchiha",
           "level": 30,
           "description": "Throw rotating fan for immediate damage for up to 3 nearby targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Hayatemi",
@@ -520,7 +520,7 @@
           "name": "Tatsumaki",
           "level": 50,
           "description": "Make Tornadoes and thunder to critically damage up to four targets.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Ooenjo",
@@ -532,13 +532,13 @@
           "name": "Kougekitenrai",
           "level": 70,
           "description": "Create a powerful explosion to destroy your enemy , including the chance to stun your enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kokaze",
           "level": 80,
           "description": "Summon lightning tornado to destroy the enemy.",
-          "classification": "active"
+          "classification": "auto"
         },
         {
           "name": "Kage Bunshin no Jutsu",
@@ -550,7 +550,7 @@
           "name": "Kamikaze",
           "level": 100,
           "description": "Wind - Lightning Release.",
-          "classification": "active"
+          "classification": "auto"
         }
       ]
     }
