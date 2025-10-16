@@ -481,9 +481,10 @@
 .equipment-card {
     background: var(--secondary-bg);
     border: 1px solid var(--border-color);
-    padding: 1rem;
+    padding: 0;
     border-radius: 8px;
     transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .equipment-card:hover {
@@ -491,11 +492,27 @@
     box-shadow: 0 4px 8px var(--shadow-color);
 }
 
+.equipment-image {
+    width: 100%;
+    height: 120px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.equipment-image:hover {
+    transform: scale(1.02);
+}
+
 .equipment-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.75rem;
+    padding: 1rem 1rem 0 1rem;
 }
 
 .equipment-name {
@@ -527,7 +544,7 @@
     font-size: 0.8rem;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 0.75rem;
+    margin: 0 1rem 0.75rem 1rem;
     background: var(--tertiary-bg);
     color: var(--accent-color);
     border: 1px solid var(--border-color);
@@ -537,14 +554,14 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin: 0 1rem 0.75rem 1rem;
 }
 
 .weapon-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin: 0 1rem 0.75rem 1rem;
     padding: 0.5rem;
     background: var(--tertiary-bg);
     border-radius: 4px;
@@ -559,6 +576,7 @@
 
 .equipment-upgrades {
     margin-top: 0.75rem;
+    padding: 0 1rem 1rem 1rem;
 }
 
 .upgrades-label {

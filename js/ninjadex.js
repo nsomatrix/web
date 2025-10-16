@@ -202,6 +202,13 @@ class Ninjadex {
                 const skillName = e.target.dataset.skillName;
                 this.showFullscreenImage(imageUrl, skillName);
             }
+            
+            // Handle equipment image clicks
+            if (e.target.classList.contains('equipment-image')) {
+                const imageUrl = e.target.dataset.imageUrl;
+                const equipmentName = e.target.dataset.equipmentName;
+                this.showFullscreenImage(imageUrl, equipmentName);
+            }
         });
     }
 
@@ -492,6 +499,7 @@ class Ninjadex {
     createEquipmentCard(equipment) {
         const card = document.createElement('div');
         card.className = 'equipment-card';
+        const imageUrl = this.getEquipmentImageUrl(equipment.name);
 
         const upgradesHtml = equipment.upgrades.map(upgrade => 
             `<div class="upgrade-item">
@@ -513,6 +521,7 @@ class Ninjadex {
             </div>` : '';
 
         card.innerHTML = `
+            <div class="equipment-image" style="background-image: url('${imageUrl}');" data-image-url="${imageUrl}" data-equipment-name="${equipment.name}"></div>
             <div class="equipment-header">
                 <div class="equipment-name">${equipment.name}</div>
                 <div class="equipment-type ${equipment.type}">${equipment.type.toUpperCase()}</div>
@@ -892,6 +901,11 @@ class Ninjadex {
         if (skillName === 'Kage Bunshin no Jutsu') filename = 'kage-bunshin-no-jutsu';
         
         return `https://archive.org/download/nsomtx-skills/${filename}.png`;
+    }
+
+    getEquipmentImageUrl(equipmentName) {
+        const filename = equipmentName.replace(/ /g, '-').toLowerCase() + '.png';
+        return `https://archive.org/download/nsomtx-equips/${filename}`;
     }
 
     showLoading(text = 'Loading') {
