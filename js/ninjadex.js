@@ -17,11 +17,22 @@ class Ninjadex {
         await this.loadMonsters();
         await this.loadEquipments();
         await this.loadItems();
+        await this.loadLevelRequirements();
         this.processMaps();
         this.setupEventListeners();
         this.updateStats();
         this.renderMonsters();
         this.setRandomLevel();
+    }
+
+    async loadLevelRequirements() {
+        try {
+            const response = await fetch('json/level_requirements.json');
+            const data = await response.json();
+            this.levelRequirements = data.levels;
+        } catch (error) {
+            console.error('Failed to load level requirements:', error);
+        }
     }
 
     setRandomLevel() {
@@ -141,7 +152,16 @@ class Ninjadex {
         this.setupCustomSelect('equipmentCategoryFilter', () => this.updateWeaponTypeFilter());
         this.setupCustomSelect('equipmentWeaponTypeFilter', () => this.filterEquipments());
         this.setupCustomSelect('equipmentAttributeFilter', () => this.filterEquipments());
-        this.setupCustomSelect('objective', null);
+
+        // Format kins inputs
+        document.getElementById('currentKins').addEventListener('input', (e) => {
+            this.formatKinsInput(e.target);
+        });
+        document.getElementById('kinsPerHour').addEventListener('input', (e) => {
+            this.formatKinsInput(e.target);
+        });
+
+
 
         // Maps search
         document.getElementById('mapSearchInput').addEventListener('input', () => {
@@ -173,6 +193,12 @@ class Ninjadex {
         document.getElementById('generatePlan').addEventListener('click', () => {
             this.generateTrainingPlan();
         });
+        
+        // Setup blueprint custom selects after DOM is ready
+        setTimeout(() => {
+            this.setupCustomSelect('playerClass', null);
+            this.setupCustomSelect('objective', null);
+        }, 100);
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
@@ -602,13 +628,51 @@ class Ninjadex {
         return card;
     }
 
+    formatKinsInput(input) {
+        const value = input.value.replace(/\D/g, '');
+        input.value = this.formatKins(value);
+    }
+
+    parseKinsInput(input) {
+        return parseFloat(input.replace(/\./g, '')) || 0;
+    }
+
+    formatKins(number) {
+        const numStr = number.toString();
+        let formatted = '';
+        
+        for (let i = 0; i < numStr.length; i++) {
+            if (i > 0 && (numStr.length - i) % 3 === 0) {
+                formatted += '.';
+            }
+            formatted += numStr[i];
+        }
+        
+        return formatted;
+    }
+
+
+
     generateTrainingPlan() {
+        const playerClass = document.getElementById('playerClass').dataset.value;
         const ninjaLevel = parseInt(document.getElementById('ninjaLevel').value);
+        const currentKins = this.parseKinsInput(document.getElementById('currentKins').value || '0');
+        const kinsPerHour = this.parseKinsInput(document.getElementById('kinsPerHour').value || '0');
         const objective = document.getElementById('objective').dataset.value || 'kins';
         const button = document.getElementById('generatePlan');
 
+        if (!playerClass) {
+            alert('Please select your class');
+            return;
+        }
+
         if (!ninjaLevel || ninjaLevel < 1 || ninjaLevel > 130) {
             alert('Please enter a valid ninja level (1-130)');
+            return;
+        }
+
+        if (objective === 'kins' && (!kinsPerHour || kinsPerHour <= 0)) {
+            alert('Please enter your kins per hour for kins farming objective');
             return;
         }
 
@@ -616,83 +680,292 @@ class Ninjadex {
         button.classList.add('loading');
         
         // Simulate processing time
-        setTimeout(() => {
-            const blueprint = this.generateBluePrint(ninjaLevel, objective);
-            this.renderBluePrint(blueprint);
+        setTimeout(async () => {
+            const blueprint = await this.generateAdvancedBluePrint({
+                playerClass,
+                ninjaLevel,
+                currentKins,
+                kinsPerHour,
+                objective
+            });
+            this.renderAdvancedBluePrint(blueprint);
             button.classList.remove('loading');
-        }, 800);
+        }, 1200);
     }
 
-    generateBluePrint(ninjaLevel, objective) {
-        const levelRange = { min: ninjaLevel - 7, max: ninjaLevel + 7 };
+    async generateAdvancedBluePrint(params) {
+        const { playerClass, ninjaLevel, currentKins, kinsPerHour, objective } = params;
         
-        // Get monsters within ±7 levels
-        let suitableMonsters = this.monsters.filter(monster => 
-            monster.level >= levelRange.min && monster.level <= levelRange.max
-        );
-
-        // Apply objective-specific filtering
-        if (objective === 'kins') {
-            // For kins: prefer regular monsters, but include cursed for level 107+
-            if (ninjaLevel >= 107) {
-                // High level players can farm kins from cursed land too
-                // No type filtering needed, both regular and cursed are good
-            } else {
-                // Lower level players stick to regular monsters
-                suitableMonsters = suitableMonsters.filter(m => m.type === 'regular');
-            }
-            if (ninjaLevel >= 40) {
-                suitableMonsters = suitableMonsters.filter(m => m.level <= ninjaLevel - 2);
-            }
-        } else if (objective === 'level') {
-            // For leveling: prefer cursed monsters for better exp
-            const cursedMonsters = suitableMonsters.filter(m => m.type === 'cursed');
-            if (cursedMonsters.length > 0) {
-                suitableMonsters = cursedMonsters;
-            }
-        }
-
-        // Sort by efficiency
-        suitableMonsters.sort((a, b) => {
-            const aScore = this.calculateEfficiencyScore(a, ninjaLevel, objective);
-            const bScore = this.calculateEfficiencyScore(b, ninjaLevel, objective);
-            return bScore - aScore;
-        });
-
-        // Group by maps for better organization
-        const mapGroups = this.groupMonstersByMaps(suitableMonsters.slice(0, 10));
+        // Generate monsters analysis
+        const monstersAnalysis = this.generateMonstersAnalysis(ninjaLevel, objective);
+        
+        // Generate skills analysis
+        const skillsAnalysis = await this.generateSkillsAnalysis(playerClass, ninjaLevel);
+        
+        // Generate equipment analysis
+        const equipmentAnalysis = this.generateEquipmentAnalysis(playerClass, ninjaLevel);
+        
+        // Generate estimator analysis
+        const estimatorAnalysis = this.generateEstimatorAnalysis(ninjaLevel, currentKins, kinsPerHour, objective);
+        
+        // Generate pro tips
+        const proTips = this.generateProTips(ninjaLevel, objective, playerClass);
         
         return {
-            objective,
-            ninjaLevel,
-            mapGroups,
-            totalMonsters: suitableMonsters.length
+            params,
+            monstersAnalysis,
+            skillsAnalysis,
+            equipmentAnalysis,
+            estimatorAnalysis,
+            proTips
         };
     }
 
-    calculateEfficiencyScore(monster, ninjaLevel, objective) {
-        const levelDiff = Math.abs(monster.level - ninjaLevel);
-        let score = 100 - (levelDiff * 5); // Base score decreases with level difference
+    generateMonstersAnalysis(ninjaLevel, objective) {
+        let levelRange, suitableMonsters;
         
         if (objective === 'kins') {
-            // For kins: prefer regular monsters, but cursed is good for 107+ players
-            if (ninjaLevel >= 107) {
-                // Both regular and cursed are good for high-level kins farming
-                if (monster.type === 'regular') score += 15;
-                if (monster.type === 'cursed') score += 18;
+            // Kins: ±7 levels, but prioritize LOWEST possible (level-7)
+            levelRange = { min: ninjaLevel - 7, max: ninjaLevel + 7 };
+            suitableMonsters = this.monsters.filter(monster => 
+                monster.level >= levelRange.min && monster.level <= levelRange.max
+            );
+            
+            if (ninjaLevel >= 108) {
+                // Level 108+ must use cursed monsters for kins
+                suitableMonsters = suitableMonsters.filter(m => m.type === 'cursed');
+                // For 108+, prioritize level-7 cursed monsters
+                const targetLevel = ninjaLevel - 7;
+                const bestLevelMonsters = suitableMonsters.filter(m => m.level === targetLevel);
+                if (bestLevelMonsters.length > 0) {
+                    suitableMonsters = bestLevelMonsters;
+                }
             } else {
-                // Lower levels prefer regular monsters only
-                if (monster.type === 'regular') score += 20;
+                // Below 108: use regular monsters only
+                suitableMonsters = suitableMonsters.filter(m => m.type === 'regular');
+                // Prioritize exactly level-7 monsters for best kins
+                const targetLevel = ninjaLevel - 7;
+                const bestLevelMonsters = suitableMonsters.filter(m => m.level === targetLevel);
+                if (bestLevelMonsters.length > 0) {
+                    suitableMonsters = bestLevelMonsters;
+                } else {
+                    // If no level-7 monsters, get closest to level-7
+                    suitableMonsters.sort((a, b) => Math.abs(a.level - targetLevel) - Math.abs(b.level - targetLevel));
+                    suitableMonsters = suitableMonsters.slice(0, 5);
+                }
             }
-            if (monster.level <= ninjaLevel) score += 10;
-        } else if (objective === 'level') {
-            // For leveling: prefer cursed monsters, similar or higher levels
-            if (monster.type === 'cursed') score += 30;
-            if (monster.level >= ninjaLevel) score += 15;
+            
+            // Sort by lowest level first, then by lowest HP
+            suitableMonsters.sort((a, b) => a.level - b.level || a.hp - b.hp);
+        } else {
+            // Level: ±10 levels, prefer HIGHEST possible (level+10)
+            levelRange = { min: ninjaLevel - 10, max: ninjaLevel + 10 };
+            suitableMonsters = this.monsters.filter(monster => 
+                monster.level >= levelRange.min && monster.level <= levelRange.max
+            );
+            
+            // Prioritize cursed monsters for better exp
+            const cursedMonsters = suitableMonsters.filter(m => m.type === 'cursed');
+            if (cursedMonsters.length > 0) {
+                // Prioritize exactly level+10 cursed monsters
+                const targetLevel = ninjaLevel + 10;
+                const bestLevelMonsters = cursedMonsters.filter(m => m.level === targetLevel);
+                if (bestLevelMonsters.length > 0) {
+                    suitableMonsters = bestLevelMonsters;
+                } else {
+                    suitableMonsters = cursedMonsters;
+                }
+            }
+            
+            // Sort by highest level first (more exp)
+            suitableMonsters.sort((a, b) => b.level - a.level);
         }
         
-        return Math.max(0, score);
+        const mapGroups = this.groupMonstersByMaps(suitableMonsters.slice(0, 8)).slice(0, 1);
+        
+        return {
+            objective,
+            levelRange,
+            mapGroups,
+            totalMonsters: suitableMonsters.length,
+            recommendedType: objective === 'kins' ? (ninjaLevel >= 108 ? 'cursed' : 'regular') : 'cursed',
+            targetLevel: objective === 'kins' ? ninjaLevel - 7 : ninjaLevel + 10
+        };
     }
+
+    async generateSkillsAnalysis(playerClass, ninjaLevel) {
+        if (!this.skillsets || this.skillsets.length === 0) {
+            await this.loadSkillsets();
+        }
+        
+        const classSkills = this.skillsets.filter(skill => skill.class === playerClass);
+        const availableSkills = classSkills.filter(skill => skill.level <= ninjaLevel);
+        const nextSkills = classSkills.filter(skill => skill.level > ninjaLevel && skill.level <= ninjaLevel + 20);
+        
+        // Get the highest available skill
+        const currentSkill = availableSkills.length > 0 ? 
+            availableSkills.reduce((max, skill) => skill.level > max.level ? skill : max) : null;
+        
+        return {
+            playerClass,
+            currentSkill,
+            availableSkills: availableSkills.slice(-3), // Last 3 available skills
+            nextSkills: nextSkills.slice(0, 3), // Next 3 skills to unlock
+            recommendLevel90: ninjaLevel >= 90
+        };
+    }
+
+    generateEquipmentAnalysis(playerClass, ninjaLevel) {
+        const suitableEquipments = this.equipments.filter(equipment => {
+            // Filter by level (within reasonable range)
+            if (equipment.level > ninjaLevel + 20) return false;
+            
+            // Filter by class for weapons
+            if (equipment.category === 'sword' && equipment.weapon_type) {
+                return equipment.weapon_type === playerClass;
+            }
+            
+            return true;
+        });
+        
+        // Group by category
+        const categories = {};
+        suitableEquipments.forEach(equipment => {
+            const category = equipment.category === 'sword' ? equipment.weapon_type : equipment.category;
+            if (!categories[category]) categories[category] = [];
+            categories[category].push(equipment);
+        });
+        
+        // Get best items from each category
+        const recommendations = {};
+        Object.keys(categories).forEach(category => {
+            const items = categories[category];
+            // Sort by level (descending) and take top 2
+            items.sort((a, b) => b.level - a.level);
+            recommendations[category] = items.slice(0, 2);
+        });
+        
+        return {
+            playerClass,
+            recommendations,
+            totalEquipments: suitableEquipments.length
+        };
+    }
+
+    generateEstimatorAnalysis(ninjaLevel, currentKins, kinsPerHour, objective) {
+        const analysis = {};
+        
+        if (objective === 'kins' && kinsPerHour > 0) {
+            // Kins estimation
+            const kinsPerDay = kinsPerHour * 24;
+            const kinsPerWeek = kinsPerDay * 7;
+            const kinsPerMonth = kinsPerDay * 30;
+            
+            analysis.kins = {
+                current: currentKins,
+                perHour: kinsPerHour,
+                perDay: kinsPerDay,
+                perWeek: kinsPerWeek,
+                perMonth: kinsPerMonth,
+                projections: {
+                    '1_week': currentKins + kinsPerWeek,
+                    '1_month': currentKins + kinsPerMonth,
+                    '3_months': currentKins + (kinsPerMonth * 3)
+                }
+            };
+        }
+        
+        if (objective === 'level' && this.levelRequirements) {
+            // Level estimation (simplified)
+            const nextLevel = ninjaLevel + 1;
+            if (nextLevel <= 130 && this.levelRequirements[nextLevel.toString()]) {
+                const expNeeded = this.levelRequirements[nextLevel.toString()];
+                // Assume 1% per hour as base rate
+                const hoursToNextLevel = 100; // 100 hours for 100%
+                
+                analysis.level = {
+                    current: ninjaLevel,
+                    next: nextLevel,
+                    expNeeded: expNeeded,
+                    estimatedHours: hoursToNextLevel,
+                    estimatedDays: Math.ceil(hoursToNextLevel / 24)
+                };
+            }
+        }
+        
+        return analysis;
+    }
+
+    generateProTips(ninjaLevel, objective, playerClass) {
+        const tips = [];
+        
+        // Level-based tips
+        if (ninjaLevel >= 90) {
+            tips.push({
+                title: 'Use Level 90 Skills',
+                content: 'At level 90+, always use your level 90 skill (Kage Bunshin no Jutsu) for better grind rate and efficiency.',
+                type: 'skill'
+            });
+        }
+        
+        // Kins farming tips
+        if (objective === 'kins') {
+            if (ninjaLevel >= 108) {
+                tips.push({
+                    title: 'Kich Yên Technique (Level 108+)',
+                    content: 'Team up with 4+ accounts to reduce monster HP by 30%. This technique is essential for high-level kins farming in cursed lands.',
+                    type: 'kich-yen',
+                    isKichYen: true
+                });
+            }
+            
+            if (ninjaLevel <= 107) {
+                tips.push({
+                    title: 'Regular Monsters for Kins',
+                    content: 'Focus on regular monsters 7 levels below your current level for maximum kins efficiency and easier kills.',
+                    type: 'strategy'
+                });
+            }
+        }
+        
+        // Potion recommendations
+        if (ninjaLevel >= 60) {
+            const mpPotPercent = Math.min(40, Math.floor((ninjaLevel - 50) / 10) * 10 + 10);
+            tips.push({
+                title: 'MP Potion Usage',
+                content: `Use ${mpPotPercent}% MP potions for sustained grinding. Recommended pot levels: 10, 30, 50, 70, 90.`,
+                type: 'potion'
+            });
+        }
+        
+        if (ninjaLevel >= 90) {
+            const hpPotPercent = Math.min(40, Math.floor((ninjaLevel - 80) / 10) * 10 + 10);
+            tips.push({
+                title: 'HP Potion Usage',
+                content: `Use ${hpPotPercent}% HP potions for safety. Increment by 10% every 10 levels for optimal efficiency.`,
+                type: 'potion'
+            });
+        }
+        
+        // Class-specific tips
+        const classSchools = {
+            'sword': 'hirosaki', 'shuriken': 'hirosaki',
+            'kunai': 'ookaza', 'bow': 'ookaza',
+            'blade': 'haruna', 'fan': 'haruna'
+        };
+        
+        if (classSchools[playerClass]) {
+            tips.push({
+                title: `${playerClass.toUpperCase()} Class Strategy`,
+                content: `As a ${playerClass} user from ${classSchools[playerClass]} school, focus on your class-specific equipment and skills for maximum effectiveness.`,
+                type: 'class'
+            });
+        }
+        
+        return tips;
+    }
+
+
 
     groupMonstersByMaps(monsters) {
         const mapGroups = new Map();
@@ -715,33 +988,68 @@ class Ninjadex {
             .slice(0, 5);
     }
 
-    renderBluePrint(blueprint) {
+    renderAdvancedBluePrint(blueprint) {
+        // Render monsters analysis
+        this.renderMonstersAnalysis(blueprint.monstersAnalysis);
+        
+        // Render skills analysis
+        this.renderSkillsAnalysis(blueprint.skillsAnalysis);
+        
+        // Render equipment analysis
+        this.renderEquipmentAnalysis(blueprint.equipmentAnalysis);
+        
+        // Render estimator analysis
+        this.renderEstimatorAnalysis(blueprint.estimatorAnalysis);
+        
+        // Render pro tips
+        this.renderProTips(blueprint.proTips);
+        
+        document.getElementById('planResults').style.display = 'block';
+    }
+
+    renderMonstersAnalysis(analysis) {
         const container = document.getElementById('recommendedMonsters');
         container.innerHTML = '';
 
-        if (blueprint.mapGroups.length === 0) {
+        if (analysis.mapGroups.length === 0) {
             container.innerHTML = '<p style="color: var(--text-secondary);">No suitable monsters found for your level and objective.</p>';
-            document.getElementById('planResults').style.display = 'block';
             return;
         }
 
         // Add objective summary
         const summary = document.createElement('div');
         summary.className = 'blueprint-summary';
+        const targetText = analysis.objective === 'kins' ? 
+            `Target Level: ${analysis.targetLevel} (your level -7 for easiest kills)` : 
+            `Target Level: ${analysis.targetLevel} (your level +10 for maximum EXP)`;
         summary.innerHTML = `
             <div class="summary-text">
-                <strong>Objective:</strong> ${blueprint.objective === 'kins' ? 'Farm Kins (Regular Maps Recommended)' : 'Boost Level (Cursed Land Recommended)'}<br>
-                <strong>Level Range:</strong> ${blueprint.ninjaLevel - 7} - ${blueprint.ninjaLevel + 7} (±7 from your level)
+                <strong>Objective:</strong> ${analysis.objective === 'kins' ? 'Farm Kins (Lowest HP Priority)' : 'Boost Level (Highest EXP Priority)'}<br>
+                <strong>${targetText}</strong><br>
+                <strong>Recommended Type:</strong> ${analysis.recommendedType.toUpperCase()} monsters
             </div>
         `;
         container.appendChild(summary);
 
-        // Render map groups
-        blueprint.mapGroups.forEach(mapGroup => {
+        if (analysis.objective === 'kins') {
+            const kichYenNote = document.createElement('div');
+            kichYenNote.className = 'tip-card';
+            kichYenNote.style.marginBottom = '1rem';
+            kichYenNote.innerHTML = `
+                <div class="tip-title">Kins Farming Strategy</div>
+                <div class="tip-content">For level 99: Target level 92 monsters (99-7=92) for maximum kins with lowest HP. Regular monsters give best kins rates.</div>
+            `;
+            container.appendChild(kichYenNote);
+        }
+
+        // Render map groups with images
+        analysis.mapGroups.forEach(mapGroup => {
             const mapCard = document.createElement('div');
             mapCard.className = 'blueprint-map';
+            const imageUrl = this.getMapImageUrl(mapGroup.mapName);
             
             mapCard.innerHTML = `
+                <div class="map-image" style="background-image: url('${imageUrl}');" data-image-url="${imageUrl}" data-map-name="${mapGroup.mapName}"></div>
                 <div class="blueprint-map-header">
                     <span class="blueprint-map-name">${mapGroup.mapName}</span>
                     <span class="blueprint-map-type ${mapGroup.mapType}">${mapGroup.mapType.toUpperCase()}</span>
@@ -758,8 +1066,166 @@ class Ninjadex {
             
             container.appendChild(mapCard);
         });
+    }
 
-        document.getElementById('planResults').style.display = 'block';
+    renderSkillsAnalysis(analysis) {
+        const container = document.getElementById('recommendedSkills');
+        container.innerHTML = '';
+
+        if (!analysis.currentSkill) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">No skills available for your level.</p>';
+            return;
+        }
+
+        // Current skill
+        const currentSkillCard = this.createSkillAnalysisCard(analysis.currentSkill, 'Current Best Skill', 'Your highest available skill');
+        container.appendChild(currentSkillCard);
+
+        // Next skills to unlock
+        if (analysis.nextSkills.length > 0) {
+            const nextSkillsTitle = document.createElement('h4');
+            nextSkillsTitle.textContent = 'Next Skills to Unlock';
+            nextSkillsTitle.style.color = 'var(--text-primary)';
+            nextSkillsTitle.style.marginTop = '1.5rem';
+            nextSkillsTitle.style.marginBottom = '1rem';
+            container.appendChild(nextSkillsTitle);
+
+            analysis.nextSkills.forEach(skill => {
+                const skillCard = this.createSkillAnalysisCard(skill, `Level ${skill.level}`, 'Upcoming skill');
+                container.appendChild(skillCard);
+            });
+        }
+
+        // Level 90 recommendation
+        if (analysis.recommendLevel90) {
+            const level90Tip = document.createElement('div');
+            level90Tip.className = 'tip-card';
+            level90Tip.innerHTML = `
+                <div class="tip-title">Level 90+ Recommendation</div>
+                <div class="tip-content">Use your level 90 skill (Kage Bunshin no Jutsu) for optimal grinding efficiency.</div>
+            `;
+            container.appendChild(level90Tip);
+        }
+    }
+
+    createSkillAnalysisCard(skill, title, subtitle) {
+        const card = document.createElement('div');
+        card.className = 'skill-card';
+        const imageUrl = this.getSkillImageUrl(skill.name);
+
+        card.innerHTML = `
+            <div class="skill-image" style="background-image: url('${imageUrl}');" data-image-url="${imageUrl}" data-skill-name="${skill.name}"></div>
+            <div class="skill-header">
+                <div class="skill-name">${skill.name}</div>
+                <div class="skill-level">Level ${skill.level}</div>
+            </div>
+            <div class="skill-class-info">
+                <span class="skill-class ${skill.class}">${skill.class.toUpperCase()}</span>
+                <span class="skill-school ${skill.school}">${skill.school.toUpperCase()}</span>
+            </div>
+            <div class="skill-description">${skill.description}</div>
+            <div style="margin-top: 0.5rem; padding: 0.5rem; background: var(--tertiary-bg); border-radius: 4px;">
+                <div style="font-weight: bold; color: var(--accent-color);">${title}</div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">${subtitle}</div>
+            </div>
+        `;
+
+        return card;
+    }
+
+    renderEquipmentAnalysis(analysis) {
+        const container = document.getElementById('recommendedEquipment');
+        container.innerHTML = '';
+
+        if (Object.keys(analysis.recommendations).length === 0) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">No suitable equipment found for your class and level.</p>';
+            return;
+        }
+
+        Object.keys(analysis.recommendations).forEach(category => {
+            const items = analysis.recommendations[category];
+            if (items.length === 0) return;
+
+            const categoryTitle = document.createElement('h4');
+            categoryTitle.textContent = this.getCategoryDisplayName(category);
+            categoryTitle.style.color = 'var(--text-primary)';
+            categoryTitle.style.marginBottom = '1rem';
+            if (category !== Object.keys(analysis.recommendations)[0]) {
+                categoryTitle.style.marginTop = '1.5rem';
+            }
+            container.appendChild(categoryTitle);
+
+            items.forEach(equipment => {
+                const equipmentCard = this.createEquipmentCard(equipment);
+                container.appendChild(equipmentCard);
+            });
+        });
+    }
+
+    renderEstimatorAnalysis(analysis) {
+        const container = document.getElementById('estimatorResults');
+        container.innerHTML = '';
+
+        if (analysis.kins) {
+            const kinsSection = document.createElement('div');
+            kinsSection.className = 'estimator-section';
+            kinsSection.innerHTML = `
+                <div class="estimator-title">Kins Projection</div>
+                <div class="estimator-value">${this.formatKins(analysis.kins.current)} current kins</div>
+                <div class="estimator-breakdown">
+                    Per hour: ${this.formatKins(analysis.kins.perHour)}<br>
+                    Per day: ${this.formatKins(analysis.kins.perDay)}<br>
+                    Per week: ${this.formatKins(analysis.kins.perWeek)}<br>
+                    Per month: ${this.formatKins(analysis.kins.perMonth)}
+                </div>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <strong>Projections:</strong><br>
+                    1 week: ${this.formatKins(analysis.kins.projections['1_week'])}<br>
+                    1 month: ${this.formatKins(analysis.kins.projections['1_month'])}<br>
+                    3 months: ${this.formatKins(analysis.kins.projections['3_months'])}
+                </div>
+            `;
+            container.appendChild(kinsSection);
+        }
+
+        if (analysis.level) {
+            const levelSection = document.createElement('div');
+            levelSection.className = 'estimator-section';
+            levelSection.innerHTML = `
+                <div class="estimator-title">Level Progression</div>
+                <div class="estimator-value">Level ${analysis.level.current} → ${analysis.level.next}</div>
+                <div class="estimator-breakdown">
+                    EXP needed: ${this.formatKins(analysis.level.expNeeded)}<br>
+                    Estimated time: ${analysis.level.estimatedHours} hours<br>
+                    Estimated days: ${analysis.level.estimatedDays} days
+                </div>
+            `;
+            container.appendChild(levelSection);
+        }
+
+        if (!analysis.kins && !analysis.level) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">Complete all input fields to see detailed analysis.</p>';
+        }
+    }
+
+    renderProTips(tips) {
+        const container = document.getElementById('proTips');
+        container.innerHTML = '';
+
+        if (tips.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">No specific tips available for your current setup.</p>';
+            return;
+        }
+
+        tips.forEach(tip => {
+            const tipCard = document.createElement('div');
+            tipCard.className = tip.isKichYen ? 'tip-card kich-yen-card' : 'tip-card';
+            tipCard.innerHTML = `
+                <div class="tip-title">${tip.title}</div>
+                <div class="tip-content">${tip.content}</div>
+            `;
+            container.appendChild(tipCard);
+        });
     }
 
     processMaps() {
