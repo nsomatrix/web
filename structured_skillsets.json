@@ -26,72 +26,86 @@
         {
           "name": "Enchokuto",
           "level": 10,
-          "description": "Basic blade skill to slash a target."
+          "description": "Basic blade skill to slash a target.",
+          "classification": "active"
         },
         {
           "name": "Konoitoame",
           "level": 15,
-          "description": "Mind Ninjutsu to increase Power , HP and Movement Speed."
+          "description": "Mind Ninjutsu to increase Power , HP and Movement Speed.",
+          "classification": "passive"
         },
         {
           "name": "Maroyakato",
           "level": 20,
-          "description": "Slash a given target two times."
+          "description": "Slash a given target two times.",
+          "classification": "active"
         },
         {
           "name": "Magumandari",
           "level": 25,
-          "description": "Enemies are unable to counter-attack for a specified time."
+          "description": "Enemies are unable to counter-attack for a specified time.",
+          "classification": "active"
         },
         {
           "name": "Chousouto",
           "level": 30,
-          "description": "Combine Wind and Blade to produce a powerful blade that can damage up to 3 targets."
+          "description": "Combine Wind and Blade to produce a powerful blade that can damage up to 3 targets.",
+          "classification": "active"
         },
         {
           "name": "Aisubaagu",
           "level": 35,
-          "description": "Use special Wind skill to approach and immediately slash enemies."
+          "description": "Use special Wind skill to approach and immediately slash enemies.",
+          "classification": "active"
         },
         {
           "name": "Hayateto",
           "level": 40,
-          "description": "Storm and Lightning slashes to crash down on the enemy."
+          "description": "Storm and Lightning slashes to crash down on the enemy.",
+          "classification": "active"
         },
         {
           "name": "Zenpanteki",
           "level": 45,
-          "description": "Increase Anti Ice and also fast recovery when frozen."
+          "description": "Increase Anti Ice and also fast recovery when frozen.",
+          "classification": "passive"
         },
         {
           "name": "Raikouto",
           "level": 50,
-          "description": "Lightning slash to damage up to 4 nearby targets."
+          "description": "Lightning slash to damage up to 4 nearby targets.",
+          "classification": "active"
         },
         {
           "name": "Ikennotto",
           "level": 60,
-          "description": "Use Electricity to freeze your opponent and increase your own HP."
+          "description": "Use Electricity to freeze your opponent and increase your own HP.",
+          "classification": "passive"
         },
         {
           "name": "Baasutosutoomu",
           "level": 70,
-          "description": "Use the power of wind to destroy your enemy , including the chance to stun your enemy."
+          "description": "Use the power of wind to destroy your enemy , including the chance to stun your enemy.",
+          "classification": "active"
         },
         {
           "name": "Kaminari",
           "level": 80,
-          "description": "Release lightning to use thunder hitting enemy."
+          "description": "Release lightning to use thunder hitting enemy.",
+          "classification": "active"
         },
         {
           "name": "Kage Bunshin no Jutsu",
           "level": 90,
-          "description": "This technique creates copies of the user."
+          "description": "This technique creates copies of the user.",
+          "classification": "support"
         },
         {
           "name": "Raijin",
           "level": 100,
-          "description": "Wind - Lightning Release."
+          "description": "Wind - Lightning Release.",
+          "classification": "active"
         }
       ]
     },
@@ -101,72 +115,86 @@
         {
           "name": "Uzusa",
           "level": 10,
-          "description": "Basic bow skill to damage a given target with arrows."
+          "description": "Basic bow skill to damage a given target with arrows.",
+          "classification": "active"
         },
         {
           "name": "Washihitomi",
           "level": 15,
-          "description": "Shinobi eyes skill to increase power and accuracy."
+          "description": "Shinobi eyes skill to increase power and accuracy.",
+          "classification": "passive"
         },
         {
           "name": "Kinkinsa",
           "level": 20,
-          "description": "Shoot Ice Arrows to damage a target."
+          "description": "Shoot Ice Arrows to damage a target.",
+          "classification": "active"
         },
         {
           "name": "Sogekihei",
           "level": 25,
-          "description": "Secret skill that will use MP but decreases an enemy strength."
+          "description": "Secret skill that will use MP but decreases an enemy strength.",
+          "classification": "active"
         },
         {
           "name": "Nikinkinsa",
           "level": 30,
-          "description": "Shoot two arrows at once to damage up to 3 enemies."
+          "description": "Shoot two arrows at once to damage up to 3 enemies.",
+          "classification": "active"
         },
         {
           "name": "Joutenhitomi",
           "level": 35,
-          "description": "Use secret technique to dramatically improve attack power but also hurts yourself in the process."
+          "description": "Use secret technique to dramatically improve attack power but also hurts yourself in the process.",
+          "classification": "active"
         },
         {
           "name": "Kogosa",
           "level": 40,
-          "description": "Create a frozen arrow to shoot at enemies for serious damage."
+          "description": "Create a frozen arrow to shoot at enemies for serious damage.",
+          "classification": "active"
         },
         {
           "name": "Kyshouma",
           "level": 45,
-          "description": "Increase Anti Fire and also fast recover when you get burned."
+          "description": "Increase Anti Fire and also fast recover when you get burned.",
+          "classification": "passive"
         },
         {
           "name": "Chousoukinkinsa",
           "level": 50,
-          "description": "Shoot three ice arrows to damage up to 4 nearby targets."
+          "description": "Shoot three ice arrows to damage up to 4 nearby targets.",
+          "classification": "active"
         },
         {
           "name": "Totaaigo",
           "level": 60,
-          "description": "Use ice to surround and protect your body for a limited time."
+          "description": "Use ice to surround and protect your body for a limited time.",
+          "classification": "passive"
         },
         {
           "name": "Furoozunkyuusen",
           "level": 70,
-          "description": "Shoot long range ice arrows from far away to attack the enemy , with the chance to freeze your enemy."
+          "description": "Shoot long range ice arrows from far away to attack the enemy , with the chance to freeze your enemy.",
+          "classification": "active"
         },
         {
           "name": "Aisu Meiku",
           "level": 80,
-          "description": "Shot Ice Arrows to hit the enemy."
+          "description": "Shot Ice Arrows to hit the enemy.",
+          "classification": "active"
         },
         {
           "name": "Kage Bunshin no Jutsu",
           "level": 90,
-          "description": "This technique creates copies of the user."
+          "description": "This technique creates copies of the user.",
+          "classification": "support"
         },
         {
           "name": "Kogoraseru",
           "level": 100,
-          "description": "Ice Release."
+          "description": "Ice Release.",
+          "classification": "active"
         }
       ]
     },
@@ -176,72 +204,86 @@
         {
           "name": "Otama",
           "level": 10,
-          "description": "Entry-level Shuriken throwing skill to damage a given target."
+          "description": "Entry-level Shuriken throwing skill to damage a given target.",
+          "classification": "active"
         },
         {
           "name": "Itotama",
           "level": 15,
-          "description": "Spirit Eyes skill to improve attack and counter attack ability."
+          "description": "Spirit Eyes skill to improve attack and counter attack ability.",
+          "classification": "passive"
         },
         {
           "name": "Kasoushuriken",
           "level": 20,
-          "description": "Throw 2 Shurikens continuously at a given target."
+          "description": "Throw 2 Shurikens continuously at a given target.",
+          "classification": "active"
         },
         {
           "name": "Taiyoutama",
           "level": 25,
-          "description": "Summon fire to burn all targets you want to attack."
+          "description": "Summon fire to burn all targets you want to attack.",
+          "classification": "active"
         },
         {
           "name": "Bikoushuriken",
           "level": 30,
-          "description": "Magic fire will burn all enemies and protect against any thrown shurikens."
+          "description": "Magic fire will burn all enemies and protect against any thrown shurikens.",
+          "classification": "active"
         },
         {
           "name": "Hoshitama",
           "level": 35,
-          "description": "Become invisible and restore HP/MP for a specified time."
+          "description": "Become invisible and restore HP/MP for a specified time.",
+          "classification": "active"
         },
         {
           "name": "Hinotama",
           "level": 40,
-          "description": "Quick throw 2 shurikens toward enemy fire , causing huge damage."
+          "description": "Quick throw 2 shurikens toward enemy fire , causing huge damage.",
+          "classification": "active"
         },
         {
           "name": "Hijoukai",
           "level": 45,
-          "description": "Increase Anti Wind and also fast recover when stunned."
+          "description": "Increase Anti Wind and also fast recover when stunned.",
+          "classification": "passive"
         },
         {
           "name": "Choukou Shuriken",
           "level": 50,
-          "description": "Magic fire burns big shurikens and up to 4 enemies at the same time."
+          "description": "Magic fire burns big shurikens and up to 4 enemies at the same time.",
+          "classification": "active"
         },
         {
           "name": "Totogai",
           "level": 60,
-          "description": "Use Fire for great chance at critical damage."
+          "description": "Use Fire for great chance at critical damage.",
+          "classification": "passive"
         },
         {
           "name": "Baaningufukiya",
           "level": 70,
-          "description": "Thrown Illusion Shuriken with hellish fire toward enemy."
+          "description": "Thrown Illusion Shuriken with hellish fire toward enemy.",
+          "classification": "active"
         },
         {
           "name": "Hibashiri",
           "level": 80,
-          "description": "Throw fire shuriken to destroy the enemy."
+          "description": "Throw fire shuriken to destroy the enemy.",
+          "classification": "active"
         },
         {
           "name": "Kage Bunshin no Jutsu",
           "level": 90,
-          "description": "This technique creates copies of the user."
+          "description": "This technique creates copies of the user.",
+          "classification": "support"
         },
         {
           "name": "Tsumabeni",
           "level": 100,
-          "description": "Fire Release"
+          "description": "Fire Release",
+          "classification": "active"
         }
       ]
     },
@@ -251,72 +293,86 @@
         {
           "name": "Yokobatan",
           "level": 10,
-          "description": "Basic Kunai skill to damage a given target."
+          "description": "Basic Kunai skill to damage a given target.",
+          "classification": "active"
         },
         {
           "name": "Akaiame",
           "level": 15,
-          "description": "Mind Ninjutsu improves precision attack and movement speed."
+          "description": "Mind Ninjutsu improves precision attack and movement speed.",
+          "classification": "passive"
         },
         {
           "name": "Mizuibatan",
           "level": 20,
-          "description": "Continuous damage caused by repeated slashing of target."
+          "description": "Continuous damage caused by repeated slashing of target.",
+          "classification": "active"
         },
         {
           "name": "Aoiame",
           "level": 25,
-          "description": "Create a protective log to absorb all damage."
+          "description": "Create a protective log to absorb all damage.",
+          "classification": "active"
         },
         {
           "name": "Uzubatan",
           "level": 30,
-          "description": "Create a massive air blade to damage up to 3 targets."
+          "description": "Create a massive air blade to damage up to 3 targets.",
+          "classification": "active"
         },
         {
           "name": "Hibikou",
           "level": 35,
-          "description": "Freeze enemy for a specified time."
+          "description": "Freeze enemy for a specified time.",
+          "classification": "active"
         },
         {
           "name": "Kogoeru",
           "level": 40,
-          "description": "Damage target by creating two moving ice circles."
+          "description": "Damage target by creating two moving ice circles.",
+          "classification": "active"
         },
         {
           "name": "Jotente",
           "level": 45,
-          "description": "Create Anti Fire that will also fast recover when you get burned."
+          "description": "Create Anti Fire that will also fast recover when you get burned.",
+          "classification": "passive"
         },
         {
           "name": "Choukoukogo",
           "level": 50,
-          "description": "Create a ball of ice roll over and damage up to 4 enemy."
+          "description": "Create a ball of ice roll over and damage up to 4 enemy.",
+          "classification": "active"
         },
         {
           "name": "Kitsukemaguma",
           "level": 60,
-          "description": "Chance to auto freeze any enemy trying to attack you."
+          "description": "Chance to auto freeze any enemy trying to attack you.",
+          "classification": "passive"
         },
         {
           "name": "Furiizukatto",
           "level": 70,
-          "description": "Produces powerful rings of ice that cause tremendous damage , including the chance to freeze your enemy."
+          "description": "Produces powerful rings of ice that cause tremendous damage , including the chance to freeze your enemy.",
+          "classification": "active"
         },
         {
           "name": "Saihyoken",
           "level": 80,
-          "description": "Summon ice stone to hit the enemy."
+          "description": "Summon ice stone to hit the enemy.",
+          "classification": "active"
         },
         {
           "name": "Kage Bunshin no Jutsu",
           "level": 90,
-          "description": "This technique creates copies of the user."
+          "description": "This technique creates copies of the user.",
+          "classification": "support"
         },
         {
           "name": "Shabondama",
           "level": 100,
-          "description": "Ice Release"
+          "description": "Ice Release",
+          "classification": "active"
         }
       ]
     },
@@ -326,72 +382,86 @@
         {
           "name": "Hiyoko",
           "level": 10,
-          "description": "Basic Sword skill to damage target."
+          "description": "Basic Sword skill to damage target.",
+          "classification": "active"
         },
         {
           "name": "Amagedon",
           "level": 15,
-          "description": "Shinobi mind power improves both offensive and defensive."
+          "description": "Shinobi mind power improves both offensive and defensive.",
+          "classification": "passive"
         },
         {
           "name": "Jizokuzan",
           "level": 20,
-          "description": "3 continuous strikes to damage a given target."
+          "description": "3 continuous strikes to damage a given target.",
+          "classification": "active"
         },
         {
           "name": "Kakyuu",
           "level": 25,
-          "description": "Burn monsters by fire and turn them into food."
+          "description": "Burn monsters by fire and turn them into food.",
+          "classification": "active"
         },
         {
           "name": "X Zangeki",
           "level": 30,
-          "description": "Damage up to 3 targets with quick slashing technique."
+          "description": "Damage up to 3 targets with quick slashing technique.",
+          "classification": "active"
         },
         {
           "name": "Raikou",
           "level": 35,
-          "description": "Turn invisible and hit enemy with fatal first strike."
+          "description": "Turn invisible and hit enemy with fatal first strike.",
+          "classification": "active"
         },
         {
           "name": "Hihebun",
           "level": 40,
-          "description": "Rain of swords that causes massive damage to target."
+          "description": "Rain of swords that causes massive damage to target.",
+          "classification": "active"
         },
         {
           "name": "Shuurai",
           "level": 45,
-          "description": "Increase Anti Super skill and fast recover when stunned."
+          "description": "Increase Anti Super skill and fast recover when stunned.",
+          "classification": "passive"
         },
         {
           "name": "Choukouhirenzo",
           "level": 50,
-          "description": "Power 3 fire damage within a certain range (max 4 targets)."
+          "description": "Power 3 fire damage within a certain range (max 4 targets).",
+          "classification": "active"
         },
         {
           "name": "Pawaraikou",
           "level": 60,
-          "description": "Fire base skill that creates great damage in the first hit."
+          "description": "Fire base skill that creates great damage in the first hit.",
+          "classification": "passive"
         },
         {
           "name": "Maajizangeki",
           "level": 70,
-          "description": "Transform three Fire Swords into an Illusion Sword to explosively destroy your enemy."
+          "description": "Transform three Fire Swords into an Illusion Sword to explosively destroy your enemy.",
+          "classification": "active"
         },
         {
           "name": "Ikkakujuu",
           "level": 80,
-          "description": "Release the fire with Qilin form to burn the enemy."
+          "description": "Release the fire with Qilin form to burn the enemy.",
+          "classification": "active"
         },
         {
           "name": "Kage Bunshin no Jutsu",
           "level": 90,
-          "description": "This technique creates copies of the user."
+          "description": "This technique creates copies of the user.",
+          "classification": "support"
         },
         {
           "name": "Enko Bakusatsu",
           "level": 100,
-          "description": "Fire Release."
+          "description": "Fire Release.",
+          "classification": "active"
         }
       ]
     },
@@ -401,72 +471,86 @@
         {
           "name": "Ouchia",
           "level": 10,
-          "description": "Basic Fan skill to produce a heavy wind at targets."
+          "description": "Basic Fan skill to produce a heavy wind at targets.",
+          "classification": "active"
         },
         {
           "name": "Suishou",
           "level": 15,
-          "description": "Fast Recover HP for you and your party."
+          "description": "Fast Recover HP for you and your party.",
+          "classification": "passive"
         },
         {
           "name": "Oouchia",
           "level": 20,
-          "description": "Shinobi mind skill to increase MP , HP and experience in battle."
+          "description": "Shinobi mind skill to increase MP , HP and experience in battle.",
+          "classification": "active"
         },
         {
           "name": "Kusenmono",
           "level": 25,
-          "description": "Help a target recover from exhaustion while increasing dodge ability."
+          "description": "Help a target recover from exhaustion while increasing dodge ability.",
+          "classification": "active"
         },
         {
           "name": "Bakkuuchiha",
           "level": 30,
-          "description": "Throw rotating fan for immediate damage for up to 3 nearby targets."
+          "description": "Throw rotating fan for immediate damage for up to 3 nearby targets.",
+          "classification": "active"
         },
         {
           "name": "Hayatemi",
           "level": 35,
-          "description": "Increase attack and defense of you and your party for a period of time."
+          "description": "Increase attack and defense of you and your party for a period of time.",
+          "classification": "active"
         },
         {
           "name": "Bousouhayate",
           "level": 40,
-          "description": "Reduce all the effects on you and your party for a certain period of time."
+          "description": "Reduce all the effects on you and your party for a certain period of time.",
+          "classification": "active"
         },
         {
           "name": "Toruneedo",
           "level": 45,
-          "description": "Increase dodge ability and Anti Ice."
+          "description": "Increase dodge ability and Anti Ice.",
+          "classification": "passive"
         },
         {
           "name": "Tatsumaki",
           "level": 50,
-          "description": "Make Tornadoes and thunder to critically damage up to four targets."
+          "description": "Make Tornadoes and thunder to critically damage up to four targets.",
+          "classification": "active"
         },
         {
           "name": "Ooenjo",
           "level": 60,
-          "description": "Summon wind to provide effective support."
+          "description": "Summon wind to provide effective support.",
+          "classification": "passive"
         },
         {
           "name": "Kougekitenrai",
           "level": 70,
-          "description": "Create a powerful explosion to destroy your enemy , including the chance to stun your enemy."
+          "description": "Create a powerful explosion to destroy your enemy , including the chance to stun your enemy.",
+          "classification": "active"
         },
         {
           "name": "Kokaze",
           "level": 80,
-          "description": "Summon lightning tornado to destroy the enemy."
+          "description": "Summon lightning tornado to destroy the enemy.",
+          "classification": "active"
         },
         {
           "name": "Kage Bunshin no Jutsu",
           "level": 90,
-          "description": "This technique creates copies of the user."
+          "description": "This technique creates copies of the user.",
+          "classification": "support"
         },
         {
           "name": "Kamikaze",
           "level": 100,
-          "description": "Wind - Lightning Release."
+          "description": "Wind - Lightning Release.",
+          "classification": "active"
         }
       ]
     }
