@@ -666,9 +666,10 @@
 .skill-image {
     width: 100%;
     height: 120px;
-    background-size: cover;
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: #1a1a1a;
     cursor: pointer;
     transition: transform 0.2s;
 }
