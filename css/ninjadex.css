@@ -296,42 +296,21 @@
     }
 }
 
-.blueprint-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
+.blueprint-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.blueprint-section {
-    background: var(--tertiary-bg);
+.blueprint-compact > div {
+    background: var(--secondary-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
+    border-radius: 4px;
+    padding: 1rem;
 }
 
-.blueprint-section h4 {
-    color: var(--accent-color);
-    margin: 0 0 1rem 0;
-    font-size: 1.2rem;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.5rem;
-}
-
-@media (min-width: 1200px) {
-    .blueprint-grid {
-        grid-template-columns: 2fr 1fr 1fr;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-    .blueprint-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-    
-    .blueprint-section:first-child {
-        grid-column: 1 / -1;
-    }
+.blueprint-compact > div:empty {
+    display: none;
 }
 
 .analysis-tabs {
@@ -1234,18 +1213,15 @@
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .analysis-tabs {
-        flex-direction: column;
-        gap: 0;
-    }
-    
-    .analysis-tab-btn {
-        border-bottom: 1px solid var(--border-color);
-        border-radius: 0;
-        text-align: left;
-    }
-    
     .input-row {
         grid-template-columns: 1fr;
+    }
+    
+    .blueprint-compact {
+        gap: 0.75rem;
+    }
+    
+    .blueprint-compact > div {
+        padding: 0.75rem;
     }
 }
