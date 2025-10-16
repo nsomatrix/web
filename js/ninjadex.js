@@ -799,18 +799,22 @@ class Ninjadex {
         }
         
         const classSkills = this.skillsets.filter(skill => skill.class === playerClass);
-        const availableSkills = classSkills.filter(skill => skill.level <= ninjaLevel);
-        const nextSkills = classSkills.filter(skill => skill.level > ninjaLevel && skill.level <= ninjaLevel + 20);
+        const availableAutoSkills = classSkills.filter(skill => skill.level <= ninjaLevel && skill.classification === 'auto');
+        const nextAutoSkills = classSkills.filter(skill => 
+            skill.level > ninjaLevel && 
+            skill.classification === 'auto' && 
+            skill.level <= ninjaLevel + 30
+        ).sort((a, b) => a.level - b.level);
         
-        // Get the highest available skill
-        const currentSkill = availableSkills.length > 0 ? 
-            availableSkills.reduce((max, skill) => skill.level > max.level ? skill : max) : null;
+        // Get the highest available auto skill
+        const currentSkill = availableAutoSkills.length > 0 ? 
+            availableAutoSkills.reduce((max, skill) => skill.level > max.level ? skill : max) : null;
         
         return {
             playerClass,
             currentSkill,
-            availableSkills: availableSkills.slice(-3), // Last 3 available skills
-            nextSkills: nextSkills.slice(0, 3), // Next 3 skills to unlock
+            availableSkills: availableAutoSkills.slice(-3), // Last 3 available auto skills
+            nextSkills: nextAutoSkills.slice(0, 3), // Next 3 auto skills to unlock
             recommendLevel90: ninjaLevel >= 90
         };
     }
@@ -1078,20 +1082,20 @@ class Ninjadex {
         }
 
         // Current skill
-        const currentSkillCard = this.createSkillAnalysisCard(analysis.currentSkill, 'Current Best Skill', 'Your highest available skill');
+        const currentSkillCard = this.createSkillAnalysisCard(analysis.currentSkill, 'Current Best Auto Skill', 'Your highest available auto skill');
         container.appendChild(currentSkillCard);
 
-        // Next skills to unlock
+        // Next auto skills to unlock
         if (analysis.nextSkills.length > 0) {
             const nextSkillsTitle = document.createElement('h4');
-            nextSkillsTitle.textContent = 'Next Skills to Unlock';
+            nextSkillsTitle.textContent = 'Next Auto Skills to Unlock';
             nextSkillsTitle.style.color = 'var(--text-primary)';
             nextSkillsTitle.style.marginTop = '1.5rem';
             nextSkillsTitle.style.marginBottom = '1rem';
             container.appendChild(nextSkillsTitle);
 
             analysis.nextSkills.forEach(skill => {
-                const skillCard = this.createSkillAnalysisCard(skill, `Level ${skill.level}`, 'Upcoming skill');
+                const skillCard = this.createSkillAnalysisCard(skill, `Level ${skill.level}`, 'Auto skill');
                 container.appendChild(skillCard);
             });
         }
