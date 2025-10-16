@@ -980,14 +980,6 @@ class Ninjadex {
             'blade': 'haruna', 'fan': 'haruna'
         };
         
-        if (classSchools[playerClass]) {
-            tips.push({
-                title: `${playerClass.toUpperCase()} Class Strategy`,
-                content: `As a ${playerClass} user from ${classSchools[playerClass]} school, focus on your class-specific equipment and skills for maximum effectiveness.`,
-                type: 'class'
-            });
-        }
-        
         return tips;
     }
 
@@ -1106,17 +1098,6 @@ class Ninjadex {
         // Current skill
         const currentSkillCard = this.createSkillAnalysisCard(analysis.currentSkill, 'Current Best Auto Skill', 'Your highest available auto skill');
         container.appendChild(currentSkillCard);
-
-        // Level 90 recommendation
-        if (analysis.recommendLevel90) {
-            const level90Tip = document.createElement('div');
-            level90Tip.className = 'tip-card';
-            level90Tip.innerHTML = `
-                <div class="tip-title">Level 90+ Recommendation</div>
-                <div class="tip-content">Use your level 90 skill (Kage Bunshin no Jutsu) for optimal grinding efficiency.</div>
-            `;
-            container.appendChild(level90Tip);
-        }
     }
 
     createSkillAnalysisCard(skill, title, subtitle) {
