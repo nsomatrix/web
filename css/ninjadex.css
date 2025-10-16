@@ -666,12 +666,33 @@
 .skill-image {
     width: 100%;
     height: 120px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.skill-image::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background-image: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(15px) brightness(0.6);
+    z-index: 1;
+}
+
+.skill-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: inherit;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    transition: transform 0.2s;
+    z-index: 2;
 }
 
 .skill-image:hover {
