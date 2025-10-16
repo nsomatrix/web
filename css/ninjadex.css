@@ -1225,3 +1225,140 @@
         padding: 0.75rem;
     }
 }
+
+/* Compact Equipment Cards */
+.compact-equipment-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    background: var(--card-bg);
+    transition: background-color 0.2s ease;
+}
+
+.compact-header:hover {
+    background: var(--hover-bg);
+}
+
+.equipment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.equipment-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.equipment-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.expand-icon {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.compact-equipment-card.expanded .expand-icon {
+    transform: rotate(180deg);
+}
+
+.equipment-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    border-top: 1px solid var(--border-color);
+}
+
+.compact-equipment-card.expanded .equipment-details {
+    max-height: 500px;
+    padding: 0.75rem;
+}
+
+.equipment-image-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.equipment-image {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.equipment-info-expanded {
+    flex: 1;
+}
+
+.equipment-category {
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.attribute {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.weapon-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.upgrades-section {
+    margin-top: 0.5rem;
+}
+
+.upgrades-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.upgrade-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.upgrade-level {
+    background: var(--accent-color);
+    color: white;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-weight: 600;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.upgrade-desc {
+    color: var(--text-secondary);
+}

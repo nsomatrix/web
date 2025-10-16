@@ -820,9 +820,24 @@ class Ninjadex {
     }
 
     generateEquipmentAnalysis(playerClass, ninjaLevel) {
+        // Define class-attribute mapping
+        const classAttributes = {
+            'blade': 'Wind',
+            'fan': 'Wind',
+            'shuriken': 'Fire',
+            'sword': 'Fire',
+            'bow': 'Water',
+            'kunai': 'Water'
+        };
+        
+        const requiredAttribute = classAttributes[playerClass];
+        
         const suitableEquipments = this.equipments.filter(equipment => {
             // Filter by level (within reasonable range)
             if (equipment.level > ninjaLevel + 20) return false;
+            
+            // Filter by attribute for the class
+            if (equipment.attribute && equipment.attribute !== requiredAttribute) return false;
             
             // Filter by class for weapons
             if (equipment.category === 'sword' && equipment.weapon_type) {
@@ -844,9 +859,16 @@ class Ninjadex {
         const recommendations = {};
         Object.keys(categories).forEach(category => {
             const items = categories[category];
-            // Sort by level (descending) and take top 2
-            items.sort((a, b) => b.level - a.level);
-            recommendations[category] = items.slice(0, 2);
+            // Sort by closest to current level, then by highest level
+            items.sort((a, b) => {
+                const aDiff = Math.abs(a.level - ninjaLevel);
+                const bDiff = Math.abs(b.level - ninjaLevel);
+                if (aDiff === bDiff) {
+                    return b.level - a.level; // If same distance, prefer higher level
+                }
+                return aDiff - bDiff; // Prefer closer to current level
+            });
+            recommendations[category] = items.slice(0, 1); // Take only the best one
         });
         
         return {
@@ -1160,10 +1182,55 @@ class Ninjadex {
             container.appendChild(categoryTitle);
 
             items.forEach(equipment => {
-                const equipmentCard = this.createEquipmentCard(equipment);
+                const equipmentCard = this.createCompactEquipmentCard(equipment);
                 container.appendChild(equipmentCard);
             });
         });
+    }
+
+    createCompactEquipmentCard(equipment) {
+        const card = document.createElement('div');
+        card.className = 'compact-equipment-card';
+        const imageUrl = this.getEquipmentImageUrl(equipment.name);
+        
+        const upgradesHtml = equipment.upgrades.map(upgrade => 
+            `<div class="upgrade-item">
+                <span class="upgrade-level">+${upgrade.upgrade_level}</span>
+                <span class="upgrade-desc">${upgrade.description}: ${upgrade.value}</span>
+            </div>`
+        ).join('');
+
+        const weaponStats = equipment.type === 'weapon' ? 
+            `<div class="weapon-stats">
+                <div>External: ${equipment.external_strike || 'N/A'}</div>
+                <div>Internal: ${equipment.internal_strike || 'N/A'}</div>
+            </div>` : '';
+
+        card.innerHTML = `
+            <div class="compact-header" onclick="this.parentElement.classList.toggle('expanded')">
+                <div class="equipment-info">
+                    <span class="equipment-name">${equipment.name}</span>
+                    <span class="equipment-meta">Lv.${equipment.level} ${equipment.type.toUpperCase()}</span>
+                </div>
+                <div class="expand-icon">▼</div>
+            </div>
+            <div class="equipment-details">
+                <div class="equipment-image-section">
+                    <div class="equipment-image" style="background-image: url('${imageUrl}');"></div>
+                    <div class="equipment-info-expanded">
+                        <div class="equipment-category">${equipment.category.toUpperCase()}</div>
+                        ${equipment.attribute ? `<div class="attribute">Attribute: ${equipment.attribute}</div>` : ''}
+                        ${weaponStats}
+                    </div>
+                </div>
+                <div class="upgrades-section">
+                    <div class="upgrades-label">Upgrades:</div>
+                    ${upgradesHtml}
+                </div>
+            </div>
+        `;
+
+        return card;
     }
 
     renderEstimatorAnalysis(analysis) {
