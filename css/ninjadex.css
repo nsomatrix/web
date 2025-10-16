@@ -1322,6 +1322,18 @@
     margin-bottom: 0.5rem;
 }
 
+.attribute.fire {
+    color: orange;
+}
+
+.attribute.water {
+    color: #4dabf7;
+}
+
+.attribute.wind {
+    color: gray;
+}
+
 .weapon-stats {
     display: flex;
     gap: 1rem;

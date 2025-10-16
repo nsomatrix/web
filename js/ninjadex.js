@@ -1107,21 +1107,6 @@ class Ninjadex {
         const currentSkillCard = this.createSkillAnalysisCard(analysis.currentSkill, 'Current Best Auto Skill', 'Your highest available auto skill');
         container.appendChild(currentSkillCard);
 
-        // Next auto skills to unlock
-        if (analysis.nextSkills.length > 0) {
-            const nextSkillsTitle = document.createElement('h4');
-            nextSkillsTitle.textContent = 'Next Auto Skills to Unlock';
-            nextSkillsTitle.style.color = 'var(--text-primary)';
-            nextSkillsTitle.style.marginTop = '1.5rem';
-            nextSkillsTitle.style.marginBottom = '1rem';
-            container.appendChild(nextSkillsTitle);
-
-            analysis.nextSkills.forEach(skill => {
-                const skillCard = this.createSkillAnalysisCard(skill, `Level ${skill.level}`, 'Auto skill');
-                container.appendChild(skillCard);
-            });
-        }
-
         // Level 90 recommendation
         if (analysis.recommendLevel90) {
             const level90Tip = document.createElement('div');
@@ -1195,7 +1180,7 @@ class Ninjadex {
         
         const upgradesHtml = equipment.upgrades.map(upgrade => 
             `<div class="upgrade-item">
-                <span class="upgrade-level">+${upgrade.upgrade_level}</span>
+                <span class="upgrade-level" data-level="${upgrade.upgrade_level}">+${upgrade.upgrade_level}</span>
                 <span class="upgrade-desc">${upgrade.description}: ${upgrade.value}</span>
             </div>`
         ).join('');
@@ -1205,6 +1190,8 @@ class Ninjadex {
                 <div>External: ${equipment.external_strike || 'N/A'}</div>
                 <div>Internal: ${equipment.internal_strike || 'N/A'}</div>
             </div>` : '';
+
+        const attributeClass = equipment.attribute ? equipment.attribute.toLowerCase() : '';
 
         card.innerHTML = `
             <div class="compact-header" onclick="this.parentElement.classList.toggle('expanded')">
@@ -1219,7 +1206,7 @@ class Ninjadex {
                     <div class="equipment-image" style="background-image: url('${imageUrl}');"></div>
                     <div class="equipment-info-expanded">
                         <div class="equipment-category">${equipment.category.toUpperCase()}</div>
-                        ${equipment.attribute ? `<div class="attribute">Attribute: ${equipment.attribute}</div>` : ''}
+                        ${equipment.attribute ? `<div class="attribute ${attributeClass}">Attribute: ${equipment.attribute}</div>` : ''}
                         ${weaponStats}
                     </div>
                 </div>
