@@ -195,6 +195,13 @@ class Ninjadex {
                 const imageUrl = this.getMapImageUrl(locationName);
                 this.showFullscreenImage(imageUrl, locationName);
             }
+            
+            // Handle skill image clicks
+            if (e.target.classList.contains('skill-image')) {
+                const imageUrl = e.target.dataset.imageUrl;
+                const skillName = e.target.dataset.skillName;
+                this.showFullscreenImage(imageUrl, skillName);
+            }
         });
     }
 
@@ -369,8 +376,10 @@ class Ninjadex {
     createSkillCard(skill) {
         const card = document.createElement('div');
         card.className = 'skill-card';
+        const imageUrl = this.getSkillImageUrl(skill.name);
 
         card.innerHTML = `
+            <div class="skill-image" style="background-image: url('${imageUrl}');" data-image-url="${imageUrl}" data-skill-name="${skill.name}"></div>
             <div class="skill-header">
                 <div class="skill-name">${skill.name}</div>
                 <div class="skill-level">Level ${skill.level}</div>
@@ -866,6 +875,23 @@ class Ninjadex {
         const filename = mapName.replace(/ /g, '-').toLowerCase()
             .replace(/-(i|ii|iii|iv|v)$/i, (match, roman) => `-${roman.toUpperCase()}`) + '.png';
         return `https://archive.org/download/nsomtx-maps/${filename}`;
+    }
+
+    getSkillImageUrl(skillName) {
+        let filename = skillName.toLowerCase()
+            .replace(/\s+/g, '')  // Remove all spaces
+            .replace(/\./g, '')   // Remove dots
+            .replace(/'/g, '')    // Remove apostrophes
+            .replace(/-/g, '');   // Remove hyphens from skill name
+        
+        // Handle special cases that have hyphens in filenames
+        if (skillName === 'Aisu Meiku') filename = 'aisu-meiku';
+        if (skillName === 'Enko Bakusatsu') filename = 'enko-bakusatsu';
+        if (skillName === 'Choukou Shuriken') filename = 'choukou-shuriken';
+        if (skillName === 'X Zangeki') filename = 'x-zangeki';
+        if (skillName === 'Kage Bunshin no Jutsu') filename = 'kage-bunshin-no-jutsu';
+        
+        return `https://archive.org/download/nsomtx-skills/${filename}.png`;
     }
 
     showLoading(text = 'Loading') {
