@@ -4,6 +4,9 @@ import { AuthManager } from './modules/auth.js';
 import { FileManager } from './modules/files.js';
 import { NotesManager } from './modules/notes.js';
 import { PasswordManager } from './modules/passwords.js';
+import { FriendsManager } from './modules/friends.js';
+import { MessagingManager } from './modules/messaging.js';
+import { SocialManager } from './modules/social.js';
 import { showMessageBox, openModal, closeModal } from './modules/ui.js';
 import { encryptData, decryptData } from './modules/crypto.js';
 
@@ -52,14 +55,8 @@ function setupAuthStateListener() {
 // Global variables
 let allAvatars = [];
 let currentAvatarIndex = 0;
-let authManager, fileManager, notesManager, passwordManager;
-let currentChatFriend = null;
-let messageListener = null;
-let messageCache = new Map();
-let isTyping = false;
-let typingTimeout = null;
-let typingListener = null;
-let friendToRemove = null;
+let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager;
+
 
 // Desktop Dashboard Enhancement
 class DesktopDashboard {
@@ -94,6 +91,14 @@ function initializeManagers() {
     fileManager = new FileManager(authManager);
     notesManager = new NotesManager(authManager, db);
     passwordManager = new PasswordManager(authManager, db);
+    friendsManager = new FriendsManager(authManager, db);
+    messagingManager = new MessagingManager(authManager, db);
+    socialManager = new SocialManager(authManager, db);
+    
+    // Make managers globally available
+    window.friendsManager = friendsManager;
+    window.messagingManager = messagingManager;
+    window.socialManager = socialManager;
 }
 
 // Avatar functions
@@ -493,7 +498,7 @@ function setupFeatureButtons() {
     if (friendsBtn) {
         friendsBtn.onclick = () => {
             openModal(document.getElementById('friendsModal'));
-            loadFriendsList();
+            friendsManager.loadFriendsList();
         };
     }
 
@@ -666,13 +671,13 @@ function setupDeleteHandlers() {
     // Unfriend confirmation handlers
     const confirmUnfriendBtn = document.getElementById('confirmUnfriendBtn');
     if (confirmUnfriendBtn) {
-        confirmUnfriendBtn.onclick = confirmRemoveFriend;
+        confirmUnfriendBtn.onclick = () => friendsManager.confirmRemoveFriend();
     }
     
     const cancelUnfriendBtn = document.getElementById('cancelUnfriendBtn');
     if (cancelUnfriendBtn) {
         cancelUnfriendBtn.onclick = () => {
-            friendToRemove = null;
+            friendsManager.friendToRemove = null;
             closeModal(document.getElementById('unfriendConfirmModal'));
         };
     }
@@ -697,14 +702,14 @@ function setupSearchAndMessaging() {
     
     if (searchIcon) {
         searchIcon.onclick = () => {
-            performUserSearch();
+            socialManager.performUserSearch();
         };
     }
 
     if (userSearch) {
         userSearch.onkeydown = (e) => {
             if (e.key === 'Enter') {
-                performUserSearch();
+                socialManager.performUserSearch();
             }
         };
     }
@@ -714,50 +719,25 @@ function setupSearchAndMessaging() {
     if (sendMessageBtn) {
         sendMessageBtn.onclick = (e) => {
             e.preventDefault();
-            sendNewMessage();
+            messagingManager.sendMessage();
         };
     }
 
     const messageInput = document.getElementById('messageInput');
     if (messageInput) {
-        // Enhanced input handling
         messageInput.onkeydown = (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendNewMessage();
+                messagingManager.sendMessage();
             }
         };
         
-        // Auto-resize textarea and typing indicator
         messageInput.oninput = () => {
             messageInput.style.height = 'auto';
             messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
-            
-            // Typing indicator
-            if (currentChatFriend && messageInput.value.trim()) {
-                if (!isTyping) {
-                    isTyping = true;
-                    const expireAt = new Date(Date.now() + 10000); // 10 seconds TTL
-                    db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).set({
-                        isTyping: true,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        expireAt: expireAt
-                    }).catch(console.error);
-                }
-                
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    isTyping = false;
-                    db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
-                }, 1500);
-            } else if (isTyping) {
-                isTyping = false;
-                clearTimeout(typingTimeout);
-                db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
-            }
+            messagingManager.handleTyping(messageInput);
         };
         
-        // Focus management and stop typing on blur
         messageInput.onfocus = () => {
             setTimeout(() => {
                 const messagesList = document.getElementById('messagesList');
@@ -766,11 +746,7 @@ function setupSearchAndMessaging() {
         };
         
         messageInput.onblur = () => {
-            if (isTyping && currentChatFriend) {
-                isTyping = false;
-                clearTimeout(typingTimeout);
-                db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
-            }
+            messagingManager.stopTyping();
         };
     }
 }
@@ -909,153 +885,13 @@ async function displaySearchResults(results) {
     openModal(document.getElementById('searchResultsModal'));
 }
 
-// Global functions for friend management
-window.addFriend = async function(friendId, friendUsername) {
-    try {
-        const currentUserDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
-        const currentUserData = currentUserDoc.data();
-        
-        const requestData = {
-            fromUserId: authManager.currentUser.uid,
-            fromUsername: currentUserData.usernameTag || currentUserData.username,
-            status: 'pending',
-            sentAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        await db.collection('players').doc(friendId)
-            .collection('friendRequests').doc(authManager.currentUser.uid).set(requestData);
-        
-        showMessageBox('Friend request sent!', 'success', 2000);
-        closeModal(document.getElementById('searchResultsModal'));
-    } catch (error) {
-        console.error('Add friend error:', error);
-        showMessageBox('Failed to send friend request', 'error', 3000);
-    }
-}
-
-window.acceptFriendRequest = async function(fromUserId, fromUsername) {
-    try {
-        const batch = db.batch();
-        const currentUserData = await db.collection('players').doc(authManager.currentUser.uid).get();
-        
-        // Clean up any existing friend documents first
-        const existingFriends = await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').where('friendId', '==', fromUserId).get();
-        existingFriends.forEach(doc => batch.delete(doc.ref));
-        
-        const existingReverseFriends = await db.collection('players').doc(fromUserId)
-            .collection('friends').where('friendId', '==', authManager.currentUser.uid).get();
-        existingReverseFriends.forEach(doc => batch.delete(doc.ref));
-        
-        // Create new friend relationships using friendId as document ID
-        const friendRef1 = db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').doc(fromUserId);
-        batch.set(friendRef1, {
-            friendId: fromUserId,
-            username: fromUsername,
-            status: 'accepted',
-            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        const friendRef2 = db.collection('players').doc(fromUserId)
-            .collection('friends').doc(authManager.currentUser.uid);
-        batch.set(friendRef2, {
-            friendId: authManager.currentUser.uid,
-            username: currentUserData.data().usernameTag,
-            status: 'accepted',
-            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // Mark friend request as accepted
-        const requestRef = db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friendRequests').doc(fromUserId);
-        batch.update(requestRef, { status: 'accepted' });
-
-        // Send notification
-        const notificationRef = db.collection('players').doc(fromUserId)
-            .collection('notifications').doc();
-        batch.set(notificationRef, {
-            type: 'friend_accepted',
-            fromUserId: authManager.currentUser.uid,
-            fromUsername: currentUserData.data().usernameTag,
-            message: `@${currentUserData.data().usernameTag} accepted your friend request`,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            read: false
-        });
-
-        await batch.commit();
-        showMessageBox('Friend request accepted!', 'success', 2000);
-        loadNotifications();
-    } catch (error) {
-        console.error('Accept friend request error:', error);
-        showMessageBox('Failed to accept friend request', 'error', 3000);
-    }
-}
-
-window.rejectFriendRequest = async function(fromUserId) {
-    try {
-        await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friendRequests').doc(fromUserId).update({
-                status: 'rejected'
-            });
-
-        showMessageBox('Friend request rejected', 'info', 2000);
-        loadNotifications();
-    } catch (error) {
-        console.error('Reject friend request error:', error);
-        showMessageBox('Failed to reject friend request', 'error', 3000);
-    }
-}
-
-window.markAsRead = async function(notificationId) {
-    try {
-        await db.collection('players').doc(authManager.currentUser.uid)
-            .collection('notifications').doc(notificationId).update({
-                read: true
-            });
-        loadNotifications();
-    } catch (error) {
-        console.error('Mark as read error:', error);
-    }
-}
-
-window.removeFriend = function(friendId) {
-    friendToRemove = friendId;
-    openModal(document.getElementById('unfriendConfirmModal'));
-}
-
-window.confirmRemoveFriend = async function() {
-    if (!friendToRemove) return;
-    
-    try {
-        const batch = db.batch();
-        
-        // Delete using document ID (friendId)
-        const friendRef1 = db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').doc(friendToRemove);
-        batch.delete(friendRef1);
-        
-        const friendRef2 = db.collection('players').doc(friendToRemove)
-            .collection('friends').doc(authManager.currentUser.uid);
-        batch.delete(friendRef2);
-        
-        await batch.commit();
-        showMessageBox('Friend removed', 'info', 2000);
-        loadFriendsList();
-        closeModal(document.getElementById('unfriendConfirmModal'));
-    } catch (error) {
-        console.error('Remove friend error:', error);
-        showMessageBox('Failed to remove friend', 'error', 3000);
-    } finally {
-        friendToRemove = null;
-    }
-}
-
-window.sendMessage = function(friendId) {
-    currentChatFriend = friendId;
-    openModal(document.getElementById('messagesModal'));
-    loadMessages(friendId);
-}
+// Global functions for backward compatibility
+window.addFriend = (friendId, friendUsername) => socialManager.addFriend(friendId, friendUsername);
+window.acceptFriendRequest = (fromUserId, fromUsername) => socialManager.acceptFriendRequest(fromUserId, fromUsername);
+window.rejectFriendRequest = (fromUserId) => socialManager.rejectFriendRequest(fromUserId);
+window.markAsRead = (notificationId) => socialManager.markAsRead(notificationId);
+window.removeFriend = (friendId) => friendsManager.removeFriend(friendId);
+window.sendMessage = (friendId) => messagingManager.openChat(friendId);
 
 // Modern messaging system
 async function loadMessages(friendId) {
@@ -1677,7 +1513,7 @@ function setupNotificationHandlers() {
                 e.preventDefault();
                 e.stopPropagation();
                 openModal(document.getElementById('notificationsModal'));
-                loadNotifications();
+                socialManager.loadNotifications();
                 updateNotificationBadge(0);
             });
         }
@@ -1686,7 +1522,6 @@ function setupNotificationHandlers() {
             messageIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                // Hide message input when opening recent chats
                 const messageInputContainer = document.querySelector('.message-input-container');
                 if (messageInputContainer) messageInputContainer.style.display = 'none';
                 openModal(document.getElementById('messagesModal'));
