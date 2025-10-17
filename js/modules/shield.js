@@ -148,46 +148,61 @@ export class ShieldManager {
         await batch.commit();
     }
 
-    // Login History
-    async recordLogin() {
+    // Industry Standard Login History
+    async recordLogin(success = true, failureReason = null) {
+        if (!this.authManager.currentUser && success) return;
+        
+        try {
+            const ip = await this.getClientIP();
+            const location = await this.getLocation();
+            const fingerprint = this.generateBrowserFingerprint();
+            
+            const loginData = {
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                ip: ip,
+                location: location,
+                userAgent: navigator.userAgent,
+                browser: this.getBrowserInfo(),
+                device: this.getDeviceInfo(),
+                fingerprint: fingerprint,
+                success: success,
+                failureReason: failureReason,
+                sessionId: success ? this.currentSessionId : null
+            };
+
+            if (success && this.authManager.currentUser) {
+                await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                    .collection('loginHistory').add(loginData);
+            } else {
+                // For failed logins, store in global collection for security monitoring
+                await this.db.collection('failedLogins').add({
+                    ...loginData,
+                    attemptedEmail: failureReason?.email || 'unknown'
+                });
+            }
+            
+            // Cleanup old entries (keep last 50)
+            await this.cleanupLoginHistory();
+        } catch (error) {
+            console.log('Login recording failed:', error.message);
+        }
+    }
+
+    async cleanupLoginHistory() {
         if (!this.authManager.currentUser) return;
         
         try {
-            const now = new Date();
-            const today = now.toDateString();
-            const ip = await this.getClientIP();
-            
-            // Check for existing login today from same IP
-            const existingLogin = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+            const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('loginHistory')
-                .where('date', '==', today)
-                .where('ip', '==', ip)
-                .limit(1)
+                .orderBy('timestamp', 'desc')
+                .offset(50)
                 .get();
             
-            if (!existingLogin.empty) {
-                // Update existing login time
-                const loginDoc = existingLogin.docs[0];
-                await loginDoc.ref.update({
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                return;
-            }
-
-            const loginData = {
-                date: today,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                ip: ip,
-                userAgent: navigator.userAgent,
-                success: true,
-                location: await this.getLocation()
-            };
-
-            await this.db.collection('players').doc(this.authManager.currentUser.uid)
-                .collection('loginHistory').add(loginData);
+            const batch = this.db.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            if (!snapshot.empty) await batch.commit();
         } catch (error) {
-            console.log('Login recording failed (rules not deployed yet):', error.message);
+            console.log('Login history cleanup failed:', error.message);
         }
     }
 
@@ -197,7 +212,8 @@ export class ShieldManager {
         try {
             const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('loginHistory')
-                .limit(10)
+                .orderBy('timestamp', 'desc')
+                .limit(20)
                 .get();
             
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
