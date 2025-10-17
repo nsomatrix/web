@@ -193,6 +193,11 @@ class Ninjadex {
         document.getElementById('generatePlan').addEventListener('click', () => {
             this.generateTrainingPlan();
         });
+
+        // Dynamic level update for blueprint
+        document.getElementById('ninjaLevel').addEventListener('input', () => {
+            this.updateBlueprintDynamically();
+        });
         
         // Setup blueprint custom selects after DOM is ready
         setTimeout(() => {
@@ -725,7 +730,8 @@ class Ninjadex {
         let levelRange, suitableMonsters;
         
         if (objective === 'kins') {
-            // Kins: ±7 levels, but prioritize LOWEST possible (level-7)
+            // Dynamic Kins: Auto-detect ±7 levels from current level
+            const targetLevel = ninjaLevel - 7;
             levelRange = { min: ninjaLevel - 7, max: ninjaLevel + 7 };
             suitableMonsters = this.monsters.filter(monster => 
                 monster.level >= levelRange.min && monster.level <= levelRange.max
@@ -734,8 +740,7 @@ class Ninjadex {
             if (ninjaLevel >= 108) {
                 // Level 108+ must use cursed monsters for kins
                 suitableMonsters = suitableMonsters.filter(m => m.type === 'cursed');
-                // For 108+, prioritize level-7 cursed monsters
-                const targetLevel = ninjaLevel - 7;
+                // Prioritize exactly targetLevel cursed monsters
                 const bestLevelMonsters = suitableMonsters.filter(m => m.level === targetLevel);
                 if (bestLevelMonsters.length > 0) {
                     suitableMonsters = bestLevelMonsters;
@@ -743,13 +748,12 @@ class Ninjadex {
             } else {
                 // Below 108: use regular monsters only
                 suitableMonsters = suitableMonsters.filter(m => m.type === 'regular');
-                // Prioritize exactly level-7 monsters for best kins
-                const targetLevel = ninjaLevel - 7;
+                // Prioritize exactly targetLevel monsters for best kins
                 const bestLevelMonsters = suitableMonsters.filter(m => m.level === targetLevel);
                 if (bestLevelMonsters.length > 0) {
                     suitableMonsters = bestLevelMonsters;
                 } else {
-                    // If no level-7 monsters, get closest to level-7
+                    // If no targetLevel monsters, get closest to targetLevel
                     suitableMonsters.sort((a, b) => Math.abs(a.level - targetLevel) - Math.abs(b.level - targetLevel));
                     suitableMonsters = suitableMonsters.slice(0, 5);
                 }
@@ -1044,7 +1048,8 @@ class Ninjadex {
             <div class="summary-text">
                 <strong>Objective:</strong> ${analysis.objective === 'kins' ? 'Farm Kins (Lowest HP Priority)' : 'Boost Level (Highest EXP Priority)'}<br>
                 <strong>${targetText}</strong><br>
-                <strong>Recommended Type:</strong> ${analysis.recommendedType.toUpperCase()} monsters
+                <strong>Recommended Type:</strong> ${analysis.recommendedType.toUpperCase()} monsters<br>
+                <strong>Dynamic Level Detection:</strong> Auto-adjusts ±7 levels from your current level
             </div>
         `;
         container.appendChild(summary);
@@ -1053,9 +1058,10 @@ class Ninjadex {
             const kichYenNote = document.createElement('div');
             kichYenNote.className = 'tip-card';
             kichYenNote.style.marginBottom = '1rem';
+            const targetLevel = ninjaLevel - 7;
             kichYenNote.innerHTML = `
                 <div class="tip-title">Kins Farming Strategy</div>
-                <div class="tip-content">For level 99: Target level 92 monsters (99-7=92) for maximum kins with lowest HP. Regular monsters give best kins rates.</div>
+                <div class="tip-content">Dynamic level detection: Automatically targets monsters 7 levels below your current level (${targetLevel}) for maximum kins with lowest HP. Regular monsters give best kins rates.</div>
             `;
             container.appendChild(kichYenNote);
         }
@@ -1458,6 +1464,40 @@ class Ninjadex {
             'weapons': 'Weapons'
         };
         return categoryNames[category] || category;
+    }
+
+    updateBlueprintDynamically() {
+        const ninjaLevel = parseInt(document.getElementById('ninjaLevel').value);
+        if (ninjaLevel && ninjaLevel >= 1 && ninjaLevel <= 130) {
+            // Auto-regenerate blueprint with new level
+            const currentObjective = document.querySelector('.objective-btn.active')?.dataset.objective || 'kins';
+            this.updateDynamicInfo(ninjaLevel, currentObjective);
+        }
+    }
+
+    updateDynamicInfo(ninjaLevel, objective) {
+        const targetLevel = objective === 'kins' ? ninjaLevel - 7 : ninjaLevel + 10;
+        const recommendedType = objective === 'kins' ? (ninjaLevel >= 108 ? 'cursed' : 'regular') : 'cursed';
+        
+        // Update any existing blueprint summary
+        const summaryElement = document.querySelector('.blueprint-summary .summary-text');
+        if (summaryElement) {
+            const targetText = objective === 'kins' ? 
+                `Target Level: ${targetLevel} (your level -7 for easiest kills)` : 
+                `Target Level: ${targetLevel} (your level +10 for maximum EXP)`;
+            summaryElement.innerHTML = `
+                <strong>Objective:</strong> ${objective === 'kins' ? 'Farm Kins (Lowest HP Priority)' : 'Boost Level (Highest EXP Priority)'}<br>
+                <strong>${targetText}</strong><br>
+                <strong>Recommended Type:</strong> ${recommendedType.toUpperCase()} monsters<br>
+                <strong>Dynamic Level Detection:</strong> Auto-adjusts ±7 levels from your current level
+            `;
+        }
+
+        // Update strategy note
+        const strategyNote = document.querySelector('.kins-strategy .tip-content');
+        if (strategyNote && objective === 'kins') {
+            strategyNote.textContent = `Dynamic level detection: Automatically targets monsters 7 levels below your current level (${targetLevel}) for maximum kins with lowest HP. Regular monsters give best kins rates.`;
+        }
     }
 }
 
