@@ -3,10 +3,11 @@
   max-width: 900px;
   width: 95vw;
   max-height: 90vh;
-  background: #0f0f0f;
-  border: 1px solid #2a2a2a;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 0, 0, 0.3);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   color: #ffffff;
   overflow: hidden;
   position: relative;
@@ -16,9 +17,10 @@
 }
 
 .shield-header {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   padding: 24px 32px;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid rgba(255, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -87,7 +89,7 @@
 .shield-sections {
   flex: 1;
   overflow-y: auto;
-  background: #0f0f0f;
+  background: transparent;
   min-height: 0;
 }
 
@@ -105,7 +107,7 @@
   align-items: center;
   gap: 16px;
   padding: 20px 32px;
-  background: #0f0f0f;
+  background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
@@ -114,7 +116,7 @@
 }
 
 .section-header:hover {
-  background: #1a1a1a;
+  background: rgba(255, 255, 255, 0.05);
   border-left-color: #00d4ff;
 }
 
@@ -157,7 +159,7 @@
 
 .section-content {
   padding: 0 32px 24px;
-  background: #0f0f0f;
+  background: transparent;
   overflow: visible;
   transition: all 0.3s ease;
   position: relative;
@@ -172,8 +174,9 @@
 }
 
 .session-item, .history-item, .event-item {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.2);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 12px;
@@ -190,7 +193,7 @@
 }
 
 .session-item:hover, .history-item:hover, .event-item:hover {
-  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  background: rgba(255, 255, 255, 0.08);
   border-color: #00d4ff;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -198,11 +201,11 @@
 
 .session-current {
   border-left: 4px solid #00ff88;
-  background: linear-gradient(135deg, #0a2a1a 0%, #1a3a2a 100%);
+  background: rgba(0, 255, 136, 0.1);
 }
 
 .session-current:hover {
-  background: linear-gradient(135deg, #1a3a2a 0%, #2a4a3a 100%);
+  background: rgba(0, 255, 136, 0.15);
 }
 
 .auth-method {
@@ -210,8 +213,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.2);
   border-radius: 12px;
   margin-bottom: 12px;
   transition: all 0.2s ease;
@@ -221,7 +225,7 @@
 }
 
 .auth-method:hover {
-  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  background: rgba(255, 255, 255, 0.08);
   border-color: #00d4ff;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -259,8 +263,9 @@
 }
 
 .backup-code {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.2);
   border-radius: 8px;
   padding: 16px 12px;
   text-align: center;
@@ -272,7 +277,7 @@
 }
 
 .backup-code:hover {
-  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  background: rgba(255, 255, 255, 0.08);
   border-color: #00d4ff;
   transform: translateY(-2px);
 }
