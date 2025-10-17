@@ -6,7 +6,13 @@ export class ShieldManager {
     }
 
     generateSessionId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        // Use persistent session ID based on browser fingerprint
+        let sessionId = localStorage.getItem('ninjabase_session_id');
+        if (!sessionId) {
+            sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+            localStorage.setItem('ninjabase_session_id', sessionId);
+        }
+        return sessionId;
     }
 
     // Session Management
@@ -14,6 +20,9 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
+            // Clean up old sessions first
+            await this.cleanupOldSessions();
+            
             // Check if session already exists
             const existingSession = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions').doc(this.currentSessionId).get();
@@ -40,6 +49,24 @@ export class ShieldManager {
                 .collection('sessions').doc(this.currentSessionId).set(sessionData);
         } catch (error) {
             console.log('Session creation failed (rules not deployed yet):', error.message);
+        }
+    }
+
+    async cleanupOldSessions() {
+        if (!this.authManager.currentUser) return;
+        
+        try {
+            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            const oldSessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions')
+                .where('lastActivity', '<', sevenDaysAgo)
+                .get();
+            
+            const batch = this.db.batch();
+            oldSessions.docs.forEach(doc => batch.delete(doc.ref));
+            if (!oldSessions.empty) await batch.commit();
+        } catch (error) {
+            console.log('Session cleanup failed:', error.message);
         }
     }
 
@@ -731,11 +758,39 @@ export class ShieldManager {
     }
 
     async revokeAllSessions() {
-        if (confirm('This will log you out of all other devices. Continue?')) {
-            await this.revokeAllSessions();
-            window.showMessageBox('All other sessions revoked', 'success', 2000);
-            this.loadSessionsData();
-        }
+        this.showConfirmModal(
+            'Sign Out All Other Sessions',
+            'This will sign you out of all other devices and browsers. Your current session will remain active.',
+            'Sign Out All',
+            'Cancel',
+            async () => {
+                await this.revokeAllSessions();
+                window.showMessageBox('All other sessions signed out', 'success', 2000);
+                this.loadSessionsData();
+            }
+        );
+    }
+
+    showConfirmModal(title, message, confirmText, cancelText, onConfirm) {
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `
+            <div style="background:#1a1a1a;color:white;padding:24px;border-radius:12px;max-width:400px;width:90%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);border:1px solid #333;">
+                <h3 style="margin:0 0 16px 0;font-size:18px;font-weight:600;color:white;">${title}</h3>
+                <p style="margin:0 0 24px 0;color:#ccc;line-height:1.5;">${message}</p>
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#2d2d2d;color:#ccc;border:1px solid #555;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${cancelText}</button>
+                    <button id="confirmBtn" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${confirmText}</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        modal.querySelector('#confirmBtn').onclick = () => {
+            modal.remove();
+            onConfirm();
+        };
     }
 
     async regenerateRecoveryKey() {
