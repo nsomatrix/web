@@ -14,6 +14,19 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
+            // Check if session already exists
+            const existingSession = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions').doc(this.currentSessionId).get();
+            
+            if (existingSession.exists) {
+                // Update existing session
+                await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                    .collection('sessions').doc(this.currentSessionId).update({
+                        lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                return;
+            }
+
             const sessionData = {
                 sessionId: this.currentSessionId,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -33,10 +46,17 @@ export class ShieldManager {
     async getSessions() {
         if (!this.authManager.currentUser) return [];
         
-        const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
-            .collection('sessions').where('isActive', '==', true).get();
-        
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        try {
+            const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions')
+                .where('isActive', '==', true)
+                .get();
+            
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.log('Failed to get sessions:', error.message);
+            return [];
+        }
     }
 
     async revokeSession(sessionId) {
@@ -66,9 +86,32 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
+            const now = new Date();
+            const today = now.toDateString();
+            const ip = await this.getClientIP();
+            
+            // Check for existing login today from same IP
+            const existingLogin = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('loginHistory')
+                .where('date', '==', today)
+                .where('ip', '==', ip)
+                .limit(1)
+                .get();
+            
+            if (!existingLogin.empty) {
+                // Update existing login time
+                const loginDoc = existingLogin.docs[0];
+                await loginDoc.ref.update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                return;
+            }
+
             const loginData = {
+                date: today,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                ip: await this.getClientIP(),
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                ip: ip,
                 userAgent: navigator.userAgent,
                 success: true,
                 location: await this.getLocation()
@@ -84,10 +127,17 @@ export class ShieldManager {
     async getLoginHistory() {
         if (!this.authManager.currentUser) return [];
         
-        const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
-            .collection('loginHistory').orderBy('timestamp', 'desc').limit(10).get();
-        
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        try {
+            const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('loginHistory')
+                .limit(10)
+                .get();
+            
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.log('Failed to get login history:', error.message);
+            return [];
+        }
     }
 
     // Security Score Calculation
