@@ -471,16 +471,22 @@ export class ShieldManager {
                 return;
             }
             
-            if (this.verifyTOTP(secret, code)) {
-                await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
-                    authenticatorEnabled: true,
-                    totpSecret: secret
-                });
-                await this.logSecurityEvent('authenticator_enabled');
-                modal.remove();
-                resolve();
-            } else {
-                alert('Invalid code. Please check your authenticator app and try again.');
+            try {
+                const isValid = await this.verifyTOTP(secret, code);
+                if (isValid) {
+                    await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
+                        authenticatorEnabled: true,
+                        totpSecret: secret
+                    });
+                    await this.logSecurityEvent('authenticator_enabled');
+                    modal.remove();
+                    resolve();
+                } else {
+                    alert('Invalid code. Please check your authenticator app and try again.');
+                }
+            } catch (error) {
+                console.error('TOTP verification error:', error);
+                alert('Verification failed. Please try again.');
             }
         };
         
@@ -492,41 +498,58 @@ export class ShieldManager {
 
     // Industry-standard TOTP using Web Crypto API
     async verifyTOTP(secret, token) {
+        console.log('TOTP Verification - Input token:', token);
+        console.log('TOTP Verification - Secret length:', secret.length);
+        
         const timeWindow = Math.floor(Date.now() / 1000 / 30);
+        console.log('TOTP Verification - Time window:', timeWindow);
+        
         for (let i = -1; i <= 1; i++) {
             const expectedToken = await this.generateTOTP(secret, timeWindow + i);
+            console.log(`TOTP Verification - Expected token for window ${timeWindow + i}:`, expectedToken);
             if (expectedToken === token) {
+                console.log('TOTP Verification - SUCCESS');
                 return true;
             }
         }
+        console.log('TOTP Verification - FAILED');
         return false;
     }
 
     async generateTOTP(secret, timeWindow) {
-        // Use Web Crypto API for industry-standard implementation
-        const key = this.base32ToBytes(secret);
-        const time = new ArrayBuffer(8);
-        const timeView = new DataView(time);
-        timeView.setUint32(4, timeWindow, false);
-        
-        const cryptoKey = await crypto.subtle.importKey(
-            'raw',
-            key,
-            { name: 'HMAC', hash: 'SHA-1' },
-            false,
-            ['sign']
-        );
-        
-        const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
-        const hmac = new Uint8Array(signature);
-        
-        const offset = hmac[hmac.length - 1] & 0xf;
-        const code = ((hmac[offset] & 0x7f) << 24) |
-                    ((hmac[offset + 1] & 0xff) << 16) |
-                    ((hmac[offset + 2] & 0xff) << 8) |
-                    (hmac[offset + 3] & 0xff);
-        
-        return (code % 1000000).toString().padStart(6, '0');
+        try {
+            // Use Web Crypto API for industry-standard implementation
+            const key = this.base32ToBytes(secret);
+            console.log('TOTP Generate - Key bytes length:', key.length);
+            
+            const time = new ArrayBuffer(8);
+            const timeView = new DataView(time);
+            timeView.setUint32(4, timeWindow, false);
+            
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw',
+                key,
+                { name: 'HMAC', hash: 'SHA-1' },
+                false,
+                ['sign']
+            );
+            
+            const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
+            const hmac = new Uint8Array(signature);
+            
+            const offset = hmac[hmac.length - 1] & 0xf;
+            const code = ((hmac[offset] & 0x7f) << 24) |
+                        ((hmac[offset + 1] & 0xff) << 16) |
+                        ((hmac[offset + 2] & 0xff) << 8) |
+                        (hmac[offset + 3] & 0xff);
+            
+            const result = (code % 1000000).toString().padStart(6, '0');
+            console.log('TOTP Generate - Generated code:', result);
+            return result;
+        } catch (error) {
+            console.error('TOTP Generate error:', error);
+            throw error;
+        }
     }
 
     base32ToBytes(base32) {
@@ -626,11 +649,17 @@ export class ShieldManager {
                     return;
                 }
                 
-                if (this.verifyTOTP(data.totpSecret, code)) {
-                    modal.remove();
-                    resolve(true);
-                } else {
-                    alert('Invalid code. Please try again.');
+                try {
+                    const isValid = await this.verifyTOTP(data.totpSecret, code);
+                    if (isValid) {
+                        modal.remove();
+                        resolve(true);
+                    } else {
+                        alert('Invalid code. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('TOTP verification error:', error);
+                    alert('Verification failed. Please try again.');
                 }
             };
         } else {
