@@ -59,6 +59,7 @@ let messageCache = new Map();
 let isTyping = false;
 let typingTimeout = null;
 let typingListener = null;
+let friendToRemove = null;
 
 // Desktop Dashboard Enhancement
 class DesktopDashboard {
@@ -655,6 +656,20 @@ function setupDeleteHandlers() {
         }
     };
 
+    // Unfriend confirmation handlers
+    const confirmUnfriendBtn = document.getElementById('confirmUnfriendBtn');
+    if (confirmUnfriendBtn) {
+        confirmUnfriendBtn.onclick = confirmRemoveFriend;
+    }
+    
+    const cancelUnfriendBtn = document.getElementById('cancelUnfriendBtn');
+    if (cancelUnfriendBtn) {
+        cancelUnfriendBtn.onclick = () => {
+            friendToRemove = null;
+            closeModal(document.getElementById('unfriendConfirmModal'));
+        };
+    }
+
     // Cancel buttons
     ['cancelDeleteNoteBtn', 'cancelDeletePmEntryBtn', 'cancelDeleteAccountBtn'].forEach(btnId => {
         const btn = document.getElementById(btnId);
@@ -997,25 +1012,35 @@ window.markAsRead = async function(notificationId) {
     }
 }
 
-window.removeFriend = async function(friendId) {
+window.removeFriend = function(friendId) {
+    friendToRemove = friendId;
+    openModal(document.getElementById('unfriendConfirmModal'));
+}
+
+window.confirmRemoveFriend = async function() {
+    if (!friendToRemove) return;
+    
     try {
         const batch = db.batch();
         
         // Delete using document ID (friendId)
         const friendRef1 = db.collection('players').doc(authManager.currentUser.uid)
-            .collection('friends').doc(friendId);
+            .collection('friends').doc(friendToRemove);
         batch.delete(friendRef1);
         
-        const friendRef2 = db.collection('players').doc(friendId)
+        const friendRef2 = db.collection('players').doc(friendToRemove)
             .collection('friends').doc(authManager.currentUser.uid);
         batch.delete(friendRef2);
         
         await batch.commit();
         showMessageBox('Friend removed', 'info', 2000);
         loadFriendsList();
+        closeModal(document.getElementById('unfriendConfirmModal'));
     } catch (error) {
         console.error('Remove friend error:', error);
         showMessageBox('Failed to remove friend', 'error', 3000);
+    } finally {
+        friendToRemove = null;
     }
 }
 
