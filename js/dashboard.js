@@ -1527,13 +1527,17 @@ async function loadFriendsList() {
             item.innerHTML = `
                 <div class="friend-info">
                     <img src="avatars/${sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
-                    <span>@${sanitizeInput(friend.username)}</span>
-                    <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
-                    ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : ''}
+                    <div class="friend-details">
+                        <div class="friend-name">@${sanitizeInput(friend.username)}</div>
+                        <div class="friend-status">
+                            <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
+                            ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : '<span class="online-text">Online</span>'}
+                        </div>
+                    </div>
                 </div>
                 <div class="friend-actions">
-                    <button class="message-btn" style="background:#007bff;color:white;border:1px solid #007bff;padding:5px 10px;border-radius:3px;" onclick="sendMessage('${sanitizeInput(friend.friendId)}')">Message</button>
-                    <button class="unfriend-btn" style="background:#dc3545;color:white;border:1px solid #dc3545;padding:5px 10px;border-radius:3px;" onclick="removeFriend('${sanitizeInput(friend.friendId)}')">Unfriend</button>
+                    <button class="btn btn-sm" style="background:#007bff;" onclick="sendMessage('${sanitizeInput(friend.friendId)}')">Message</button>
+                    <button class="btn btn-sm btn-danger" onclick="removeFriend('${sanitizeInput(friend.friendId)}')">Remove</button>
                 </div>
             `;
             friendsList.appendChild(item);
@@ -1574,12 +1578,16 @@ async function loadRecentChats() {
             chatItem.innerHTML = `
                 <div class="friend-info">
                     <img src="avatars/${sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
-                    <span>@${sanitizeInput(friend.username)}</span>
-                    <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
-                    ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : ''}
+                    <div class="friend-details">
+                        <div class="friend-name">@${sanitizeInput(friend.username)}</div>
+                        <div class="friend-status">
+                            <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
+                            ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : '<span class="online-text">Online</span>'}
+                        </div>
+                    </div>
                 </div>
                 <div class="friend-actions">
-                    <span style="color: var(--accent-red);">Chat</span>
+                    <i class="fas fa-comment" style="color: var(--primary);"></i>
                 </div>
             `;
             messagesList.appendChild(chatItem);

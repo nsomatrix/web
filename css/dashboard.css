@@ -735,6 +735,7 @@ body {
   background: var(--bg-secondary);
   border-radius: var(--radius);
   transition: all 0.2s;
+  min-height: 70px;
 }
 
 .friend-item:hover, .search-item:hover, .notification-item:hover {
@@ -746,6 +747,35 @@ body {
   align-items: center;
   gap: 0.75rem;
   flex: 1;
+  min-width: 0;
+}
+
+.friend-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.friend-name {
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.online-text {
+  color: var(--success);
+  font-weight: 500;
 }
 
 .friend-avatar, .search-avatar {
@@ -753,11 +783,13 @@ body {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .friend-actions, .search-actions, .notification-actions {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .online-status {
