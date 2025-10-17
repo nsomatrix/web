@@ -35,31 +35,55 @@
     `;
     document.body.appendChild(loader);
     
-    // Global functions
-    window.showLoading = function() {
-        document.getElementById('loading-overlay').style.display = 'flex';
+    let loadingTimeout;
+    let activeRequests = 0;
+    
+    // Smart loader functions
+    window.showLoading = function(force = false) {
+        if (force) {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            return;
+        }
+        
+        clearTimeout(loadingTimeout);
+        loadingTimeout = setTimeout(() => {
+            if (activeRequests > 0) {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            }
+        }, 200); // Only show if request takes longer than 200ms
     };
     
     window.hideLoading = function() {
+        clearTimeout(loadingTimeout);
         document.getElementById('loading-overlay').style.display = 'none';
     };
     
-    // Intercept fetch
+    // Intercept fetch with smart loading
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
+        activeRequests++;
         window.showLoading();
         return originalFetch.apply(this, args).finally(() => {
-            setTimeout(() => window.hideLoading(), 300);
+            activeRequests--;
+            if (activeRequests === 0) {
+                setTimeout(() => window.hideLoading(), 100);
+            }
         });
     };
     
-    // Intercept XMLHttpRequest
+    // Intercept XMLHttpRequest with smart loading
     const originalXHRSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function(...args) {
+        activeRequests++;
         window.showLoading();
         this.addEventListener('loadend', () => {
-            setTimeout(() => window.hideLoading(), 300);
+            activeRequests--;
+            if (activeRequests === 0) {
+                setTimeout(() => window.hideLoading(), 100);
+            }
         });
         return originalXHRSend.apply(this, args);
     };
+    // Manual control for long operations
+    window.showLoadingForce = () => window.showLoading(true);
 })();
