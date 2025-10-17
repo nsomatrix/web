@@ -394,18 +394,25 @@ export class ShieldManager {
                     name: this.authManager.currentUser.email,
                     displayName: this.authManager.currentUser.displayName || this.authManager.currentUser.email
                 },
-                pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                pubKeyCredParams: [
+                    { alg: -7, type: "public-key" },  // ES256
+                    { alg: -257, type: "public-key" } // RS256
+                ],
                 authenticatorSelection: {
                     authenticatorAttachment: "platform",
-                    userVerification: "required"
+                    userVerification: "required",
+                    requireResidentKey: false
                 },
+                attestation: "direct",
                 timeout: 60000
             }
         });
 
+        // Store credential properly for verification
         await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
             fingerprintEnabled: true,
-            fingerprintCredentialId: Array.from(new Uint8Array(credential.rawId))
+            fingerprintCredentialId: Array.from(new Uint8Array(credential.rawId)),
+            fingerprintPublicKey: Array.from(new Uint8Array(credential.response.getPublicKey()))
         });
 
         await this.logSecurityEvent('fingerprint_enabled');
@@ -483,23 +490,36 @@ export class ShieldManager {
         };
     }
 
-    verifyTOTP(secret, token) {
+    // Industry-standard TOTP using Web Crypto API
+    async verifyTOTP(secret, token) {
         const timeWindow = Math.floor(Date.now() / 1000 / 30);
-        for (let i = -2; i <= 2; i++) {
-            if (this.generateTOTP(secret, timeWindow + i) === token) {
+        for (let i = -1; i <= 1; i++) {
+            const expectedToken = await this.generateTOTP(secret, timeWindow + i);
+            if (expectedToken === token) {
                 return true;
             }
         }
         return false;
     }
 
-    generateTOTP(secret, timeWindow) {
+    async generateTOTP(secret, timeWindow) {
+        // Use Web Crypto API for industry-standard implementation
         const key = this.base32ToBytes(secret);
         const time = new ArrayBuffer(8);
         const timeView = new DataView(time);
         timeView.setUint32(4, timeWindow, false);
         
-        const hmac = this.hmacSha1(key, new Uint8Array(time));
+        const cryptoKey = await crypto.subtle.importKey(
+            'raw',
+            key,
+            { name: 'HMAC', hash: 'SHA-1' },
+            false,
+            ['sign']
+        );
+        
+        const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
+        const hmac = new Uint8Array(signature);
+        
         const offset = hmac[hmac.length - 1] & 0xf;
         const code = ((hmac[offset] & 0x7f) << 24) |
                     ((hmac[offset + 1] & 0xff) << 16) |
@@ -510,88 +530,20 @@ export class ShieldManager {
     }
 
     base32ToBytes(base32) {
+        // RFC 4648 compliant base32 decoding
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         let bits = '';
-        for (let char of base32) {
+        for (let char of base32.toUpperCase()) {
+            if (alphabet.indexOf(char) === -1) continue;
             bits += alphabet.indexOf(char).toString(2).padStart(5, '0');
         }
         const bytes = [];
         for (let i = 0; i < bits.length; i += 8) {
-            bytes.push(parseInt(bits.substr(i, 8), 2));
+            if (bits.substr(i, 8).length === 8) {
+                bytes.push(parseInt(bits.substr(i, 8), 2));
+            }
         }
         return new Uint8Array(bytes);
-    }
-
-    hmacSha1(key, data) {
-        // Simplified HMAC-SHA1 for TOTP
-        const blockSize = 64;
-        if (key.length > blockSize) {
-            key = this.sha1(key);
-        }
-        const keyPadded = new Uint8Array(blockSize);
-        keyPadded.set(key);
-        
-        const oKeyPad = keyPadded.map(b => b ^ 0x5c);
-        const iKeyPad = keyPadded.map(b => b ^ 0x36);
-        
-        const inner = new Uint8Array(blockSize + data.length);
-        inner.set(iKeyPad);
-        inner.set(data, blockSize);
-        
-        const innerHash = this.sha1(inner);
-        const outer = new Uint8Array(blockSize + innerHash.length);
-        outer.set(oKeyPad);
-        outer.set(innerHash, blockSize);
-        
-        return this.sha1(outer);
-    }
-
-    sha1(data) {
-        // Basic SHA1 implementation
-        const h = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
-        const msg = new Uint8Array(data.length + 9 + (64 - ((data.length + 9) % 64)) % 64);
-        msg.set(data);
-        msg[data.length] = 0x80;
-        new DataView(msg.buffer).setUint32(msg.length - 4, data.length * 8, false);
-        
-        for (let i = 0; i < msg.length; i += 64) {
-            const w = new Uint32Array(80);
-            for (let j = 0; j < 16; j++) {
-                w[j] = new DataView(msg.buffer).getUint32(i + j * 4, false);
-            }
-            for (let j = 16; j < 80; j++) {
-                w[j] = this.rotateLeft(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1);
-            }
-            
-            let [a, b, c, d, e] = h;
-            for (let j = 0; j < 80; j++) {
-                const f = j < 20 ? (b & c) | (~b & d) :
-                         j < 40 ? b ^ c ^ d :
-                         j < 60 ? (b & c) | (b & d) | (c & d) :
-                         b ^ c ^ d;
-                const k = j < 20 ? 0x5A827999 :
-                         j < 40 ? 0x6ED9EBA1 :
-                         j < 60 ? 0x8F1BBCDC :
-                         0xCA62C1D6;
-                const temp = (this.rotateLeft(a, 5) + f + e + k + w[j]) >>> 0;
-                e = d; d = c; c = this.rotateLeft(b, 30); b = a; a = temp;
-            }
-            h[0] = (h[0] + a) >>> 0;
-            h[1] = (h[1] + b) >>> 0;
-            h[2] = (h[2] + c) >>> 0;
-            h[3] = (h[3] + d) >>> 0;
-            h[4] = (h[4] + e) >>> 0;
-        }
-        
-        const result = new Uint8Array(20);
-        for (let i = 0; i < 5; i++) {
-            new DataView(result.buffer).setUint32(i * 4, h[i], false);
-        }
-        return result;
-    }
-
-    rotateLeft(n, s) {
-        return (n << s) | (n >>> (32 - s));
     }
 
     // Check if biometric authentication is enabled (either method)
