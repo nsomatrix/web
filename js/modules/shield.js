@@ -757,7 +757,7 @@ export class ShieldManager {
         this.loadSessionsData();
     }
 
-    async revokeAllSessions() {
+    async revokeAllSessionsUI() {
         this.showConfirmModal(
             'Sign Out All Other Sessions',
             'This will sign you out of all other devices and browsers. Your current session will remain active.',
