@@ -8,10 +8,10 @@ export class ShieldManager {
     generateSessionId() {
         // Generate browser fingerprint for consistent session identification
         const fingerprint = this.generateBrowserFingerprint();
-        let sessionId = sessionStorage.getItem('ninjabase_session_id');
+        let sessionId = sessionStorage.getItem('nsomatrix_session_id');
         if (!sessionId) {
             sessionId = fingerprint + '_' + Date.now().toString(36);
-            sessionStorage.setItem('ninjabase_session_id', sessionId);
+            sessionStorage.setItem('nsomatrix_session_id', sessionId);
         }
         return sessionId;
     }
@@ -64,7 +64,7 @@ export class ShieldManager {
                 // Update existing session
                 const existingSession = existingSessions.docs[0];
                 this.currentSessionId = existingSession.id;
-                sessionStorage.setItem('ninjabase_session_id', this.currentSessionId);
+                sessionStorage.setItem('nsomatrix_session_id', this.currentSessionId);
                 
                 await existingSession.ref.update({
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
@@ -426,7 +426,7 @@ export class ShieldManager {
             publicKey: {
                 challenge: challenge,
                 rp: { 
-                    name: "NinjaBase",
+                    name: "NSO Matrix",
                     id: window.location.hostname
                 },
                 user: {
@@ -478,7 +478,7 @@ export class ShieldManager {
     }
 
     generateQRCodeURL(secret) {
-        const issuer = 'NinjaBase';
+        const issuer = 'NSO Matrix';
         const accountName = this.authManager.currentUser.email;
         const otpauth = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
         return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauth)}`;
@@ -996,7 +996,7 @@ export class ShieldManager {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `ninjabase-data-${new Date().toISOString().split('T')[0]}.json`;
+                    a.download = `nsomatrix-data-${new Date().toISOString().split('T')[0]}.json`;
                     a.click();
                     URL.revokeObjectURL(url);
                     window.showMessageBox('Data exported successfully', 'success', 2000);
