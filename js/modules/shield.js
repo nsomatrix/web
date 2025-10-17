@@ -288,16 +288,21 @@ export class ShieldManager {
         await this.logSecurityEvent('account_unlocked');
     }
 
-    // Biometric Authentication
+    // Real Biometric Authentication
     async setupFingerprint() {
-        if (!window.PublicKeyCredential) {
-            throw new Error('WebAuthn not supported');
+        if (!window.PublicKeyCredential || !navigator.credentials) {
+            throw new Error('WebAuthn not supported on this device');
         }
 
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        
         const credential = await navigator.credentials.create({
             publicKey: {
-                challenge: new Uint8Array(32),
-                rp: { name: "NinjaBase" },
+                challenge: challenge,
+                rp: { 
+                    name: "NinjaBase",
+                    id: window.location.hostname
+                },
                 user: {
                     id: new TextEncoder().encode(this.authManager.currentUser.uid),
                     name: this.authManager.currentUser.email,
@@ -307,7 +312,8 @@ export class ShieldManager {
                 authenticatorSelection: {
                     authenticatorAttachment: "platform",
                     userVerification: "required"
-                }
+                },
+                timeout: 60000
             }
         });
 
@@ -317,38 +323,183 @@ export class ShieldManager {
         });
 
         await this.logSecurityEvent('fingerprint_enabled');
-        return true;
     }
 
+    // Real TOTP Authenticator
     async setupAuthenticator() {
-        if (!window.PublicKeyCredential) {
-            throw new Error('WebAuthn not supported');
+        const secret = this.generateTOTPSecret();
+        const qrCodeUrl = this.generateQRCodeURL(secret);
+        
+        return new Promise((resolve, reject) => {
+            this.showAuthenticatorModal(qrCodeUrl, secret, resolve, reject);
+        });
+    }
+
+    generateTOTPSecret() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let secret = '';
+        for (let i = 0; i < 32; i++) {
+            secret += chars.charAt(Math.floor(Math.random() * chars.length));
         }
+        return secret;
+    }
 
-        const credential = await navigator.credentials.create({
-            publicKey: {
-                challenge: new Uint8Array(32),
-                rp: { name: "NinjaBase" },
-                user: {
-                    id: new TextEncoder().encode(this.authManager.currentUser.uid),
-                    name: this.authManager.currentUser.email,
-                    displayName: this.authManager.currentUser.displayName || this.authManager.currentUser.email
-                },
-                pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-                authenticatorSelection: {
-                    authenticatorAttachment: "cross-platform",
-                    userVerification: "preferred"
-                }
+    generateQRCodeURL(secret) {
+        const issuer = 'NinjaBase';
+        const accountName = this.authManager.currentUser.email;
+        const otpauth = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
+        return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauth)}`;
+    }
+
+    showAuthenticatorModal(qrCodeUrl, secret, resolve, reject) {
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `
+            <div style="background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:400px;text-align:center;border:1px solid #333;">
+                <h3 style="color:#e74c3c;margin-bottom:20px;">📱 Setup Authenticator App</h3>
+                <p>1. Install Google Authenticator or Authy</p>
+                <p>2. Scan this QR code:</p>
+                <img src="${qrCodeUrl}" style="margin:20px 0;border:1px solid #333;" />
+                <p style="font-size:12px;color:#888;margin-bottom:20px;">Or enter manually: <br><code style="background:#2d2d2d;padding:5px;word-break:break-all;">${secret}</code></p>
+                <input type="text" id="totpVerifyCode" placeholder="Enter 6-digit code" style="background:#2d2d2d;color:white;border:1px solid #555;padding:10px;margin:10px 0;width:150px;text-align:center;" maxlength="6" />
+                <div>
+                    <button id="verifyTOTPBtn" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin:5px;">Verify & Enable</button>
+                    <button id="cancelTOTPBtn" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin:5px;">Cancel</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('verifyTOTPBtn').onclick = async () => {
+            const code = document.getElementById('totpVerifyCode').value;
+            if (this.verifyTOTP(secret, code)) {
+                await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
+                    authenticatorEnabled: true,
+                    totpSecret: secret
+                });
+                await this.logSecurityEvent('authenticator_enabled');
+                modal.remove();
+                resolve();
+            } else {
+                alert('Invalid code. Please try again.');
             }
-        });
+        };
+        
+        document.getElementById('cancelTOTPBtn').onclick = () => {
+            modal.remove();
+            reject(new Error('Setup cancelled'));
+        };
+    }
 
-        await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
-            authenticatorEnabled: true,
-            authenticatorCredentialId: Array.from(new Uint8Array(credential.rawId))
-        });
+    verifyTOTP(secret, token) {
+        const window = Math.floor(Date.now() / 1000 / 30);
+        for (let i = -1; i <= 1; i++) {
+            if (this.generateTOTP(secret, window + i) === token) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-        await this.logSecurityEvent('authenticator_enabled');
-        return true;
+    generateTOTP(secret, timeWindow) {
+        // Simple TOTP implementation
+        const key = this.base32ToBytes(secret);
+        const time = new ArrayBuffer(8);
+        const timeView = new DataView(time);
+        timeView.setUint32(4, timeWindow, false);
+        
+        return this.hmacSha1(key, new Uint8Array(time))
+            .slice(-4)
+            .reduce((acc, byte, i) => acc + (byte << (8 * (3 - i))), 0)
+            .toString()
+            .slice(-6)
+            .padStart(6, '0');
+    }
+
+    base32ToBytes(base32) {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let bits = '';
+        for (let char of base32) {
+            bits += alphabet.indexOf(char).toString(2).padStart(5, '0');
+        }
+        const bytes = [];
+        for (let i = 0; i < bits.length; i += 8) {
+            bytes.push(parseInt(bits.substr(i, 8), 2));
+        }
+        return new Uint8Array(bytes);
+    }
+
+    hmacSha1(key, data) {
+        // Simplified HMAC-SHA1 for TOTP
+        const blockSize = 64;
+        if (key.length > blockSize) {
+            key = this.sha1(key);
+        }
+        const keyPadded = new Uint8Array(blockSize);
+        keyPadded.set(key);
+        
+        const oKeyPad = keyPadded.map(b => b ^ 0x5c);
+        const iKeyPad = keyPadded.map(b => b ^ 0x36);
+        
+        const inner = new Uint8Array(blockSize + data.length);
+        inner.set(iKeyPad);
+        inner.set(data, blockSize);
+        
+        const innerHash = this.sha1(inner);
+        const outer = new Uint8Array(blockSize + innerHash.length);
+        outer.set(oKeyPad);
+        outer.set(innerHash, blockSize);
+        
+        return this.sha1(outer);
+    }
+
+    sha1(data) {
+        // Basic SHA1 implementation
+        const h = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
+        const msg = new Uint8Array(data.length + 9 + (64 - ((data.length + 9) % 64)) % 64);
+        msg.set(data);
+        msg[data.length] = 0x80;
+        new DataView(msg.buffer).setUint32(msg.length - 4, data.length * 8, false);
+        
+        for (let i = 0; i < msg.length; i += 64) {
+            const w = new Uint32Array(80);
+            for (let j = 0; j < 16; j++) {
+                w[j] = new DataView(msg.buffer).getUint32(i + j * 4, false);
+            }
+            for (let j = 16; j < 80; j++) {
+                w[j] = this.rotateLeft(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1);
+            }
+            
+            let [a, b, c, d, e] = h;
+            for (let j = 0; j < 80; j++) {
+                const f = j < 20 ? (b & c) | (~b & d) :
+                         j < 40 ? b ^ c ^ d :
+                         j < 60 ? (b & c) | (b & d) | (c & d) :
+                         b ^ c ^ d;
+                const k = j < 20 ? 0x5A827999 :
+                         j < 40 ? 0x6ED9EBA1 :
+                         j < 60 ? 0x8F1BBCDC :
+                         0xCA62C1D6;
+                const temp = (this.rotateLeft(a, 5) + f + e + k + w[j]) >>> 0;
+                e = d; d = c; c = this.rotateLeft(b, 30); b = a; a = temp;
+            }
+            h[0] = (h[0] + a) >>> 0;
+            h[1] = (h[1] + b) >>> 0;
+            h[2] = (h[2] + c) >>> 0;
+            h[3] = (h[3] + d) >>> 0;
+            h[4] = (h[4] + e) >>> 0;
+        }
+        
+        const result = new Uint8Array(20);
+        for (let i = 0; i < 5; i++) {
+            new DataView(result.buffer).setUint32(i * 4, h[i], false);
+        }
+        return result;
+    }
+
+    rotateLeft(n, s) {
+        return (n << s) | (n >>> (32 - s));
     }
 
     // Utility functions
@@ -418,8 +569,8 @@ export class ShieldManager {
         });
 
         // Setup biometric buttons
-        document.getElementById('setupFingerprint')?.addEventListener('click', () => this.setupFingerprint());
-        document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticator());
+        document.getElementById('setupFingerprint')?.addEventListener('click', () => this.setupFingerprintUI());
+        document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticatorUI());
     }
 
     switchTab(tabName) {
@@ -651,22 +802,30 @@ export class ShieldManager {
     }
 
     async loadBiometricStatus() {
-        const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
-        const data = playerDoc.data();
-        
-        const fingerprintStatus = document.getElementById('fingerprintStatus');
-        const authenticatorStatus = document.getElementById('authenticatorStatus');
-        
-        fingerprintStatus.innerHTML = data.fingerprintEnabled ? 
-            '<span style="color: var(--success);">✅ Enabled</span>' : 
-            '<span style="color: var(--text-muted);">❌ Disabled</span>';
+        try {
+            const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
+            const data = playerDoc.data() || {};
             
-        authenticatorStatus.innerHTML = data.authenticatorEnabled ? 
-            '<span style="color: var(--success);">✅ Enabled</span>' : 
-            '<span style="color: var(--text-muted);">❌ Disabled</span>';
+            const fingerprintStatus = document.getElementById('fingerprintStatus');
+            const authenticatorStatus = document.getElementById('authenticatorStatus');
+            
+            if (fingerprintStatus) {
+                fingerprintStatus.innerHTML = (data.fingerprintEnabled && data.fingerprintCredentialId) ? 
+                    '<span style="color: var(--success);">✅ Enabled</span>' : 
+                    '<span style="color: var(--text-muted);">❌ Disabled</span>';
+            }
+                
+            if (authenticatorStatus) {
+                authenticatorStatus.innerHTML = (data.authenticatorEnabled && data.totpSecret) ? 
+                    '<span style="color: var(--success);">✅ Enabled</span>' : 
+                    '<span style="color: var(--text-muted);">❌ Disabled</span>';
+            }
+        } catch (error) {
+            console.log('Failed to load biometric status:', error.message);
+        }
     }
 
-    async setupFingerprint() {
+    async setupFingerprintUI() {
         try {
             await this.setupFingerprint();
             window.showMessageBox('Fingerprint authentication enabled', 'success', 2000);
@@ -676,10 +835,10 @@ export class ShieldManager {
         }
     }
 
-    async setupAuthenticator() {
+    async setupAuthenticatorUI() {
         try {
             await this.setupAuthenticator();
-            window.showMessageBox('Hardware authenticator enabled', 'success', 2000);
+            window.showMessageBox('Authenticator app enabled', 'success', 2000);
             this.loadBiometricStatus();
         } catch (error) {
             window.showMessageBox('Failed to setup authenticator: ' + error.message, 'error', 3000);
