@@ -642,6 +642,19 @@ export class ShieldManager {
         document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticatorUI());
     }
 
+    toggleSection(sectionId) {
+        const content = document.getElementById(`${sectionId}-content`);
+        const toggle = document.getElementById(`${sectionId}-toggle`);
+        
+        if (content.classList.contains('collapsed')) {
+            content.classList.remove('collapsed');
+            toggle.classList.remove('rotated');
+        } else {
+            content.classList.add('collapsed');
+            toggle.classList.add('rotated');
+        }
+    }
+
 
 
     async loadSecurityScore() {
@@ -793,30 +806,42 @@ export class ShieldManager {
         };
     }
 
-    async regenerateRecoveryKey() {
+    async regenerateRecoveryKeyUI() {
         if (!this.authManager.currentEncryptionKey) {
             window.showMessageBox('Please unlock your master password first', 'error', 3000);
             return;
         }
 
-        if (confirm('This will invalidate your current recovery key. Continue?')) {
-            try {
-                const newKey = await this.regenerateRecoveryKey();
-                this.showRecoveryKey(newKey);
-                window.showMessageBox('Recovery key regenerated successfully', 'success', 2000);
-            } catch (error) {
-                window.showMessageBox('Failed to regenerate recovery key', 'error', 3000);
+        this.showConfirmModal(
+            'Generate New Recovery Key',
+            'This will invalidate your current recovery key. Make sure you have it saved securely before continuing.',
+            'Generate New Key',
+            'Cancel',
+            async () => {
+                try {
+                    const newKey = await this.regenerateRecoveryKey();
+                    this.showRecoveryKey(newKey);
+                    window.showMessageBox('Recovery key regenerated successfully', 'success', 2000);
+                } catch (error) {
+                    window.showMessageBox('Failed to regenerate recovery key', 'error', 3000);
+                }
             }
-        }
+        );
     }
 
-    async generateBackupCodes() {
-        if (confirm('This will replace any existing backup codes. Continue?')) {
-            const codes = await this.generateBackupCodes();
-            this.displayBackupCodes(codes);
-            await this.logSecurityEvent('backup_codes_generated');
-            window.showMessageBox('Backup codes generated successfully', 'success', 2000);
-        }
+    async generateBackupCodesUI() {
+        this.showConfirmModal(
+            'Generate Backup Codes',
+            'This will replace any existing backup codes. Save the new codes in a secure location.',
+            'Generate Codes',
+            'Cancel',
+            async () => {
+                const codes = await this.generateBackupCodes();
+                this.displayBackupCodes(codes);
+                await this.logSecurityEvent('backup_codes_generated');
+                window.showMessageBox('Backup codes generated successfully', 'success', 2000);
+            }
+        );
     }
 
     displayBackupCodes(codes) {
@@ -844,37 +869,49 @@ export class ShieldManager {
         document.body.appendChild(modal);
     }
 
-    async exportData() {
-        if (confirm('This will export all your data. Continue?')) {
-            try {
-                const data = await this.exportUserData();
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `ninjabase-data-${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                window.showMessageBox('Data exported successfully', 'success', 2000);
-            } catch (error) {
-                window.showMessageBox('Failed to export data', 'error', 3000);
+    async exportDataUI() {
+        this.showConfirmModal(
+            'Download Your Data',
+            'This will create a JSON file containing all your account data including notes, passwords, and security information.',
+            'Download Data',
+            'Cancel',
+            async () => {
+                try {
+                    const data = await this.exportUserData();
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `ninjabase-data-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    window.showMessageBox('Data exported successfully', 'success', 2000);
+                } catch (error) {
+                    window.showMessageBox('Failed to export data', 'error', 3000);
+                }
             }
-        }
+        );
     }
 
-    async lockdownAccount() {
-        if (confirm('This will lock your account and log you out of all devices. You can unlock it by logging in again. Continue?')) {
-            try {
-                await this.lockdownAccount();
-                window.showMessageBox('Account locked successfully', 'success', 2000);
-                setTimeout(() => {
-                    firebase.auth().signOut();
-                    window.location.href = 'login.html';
-                }, 2000);
-            } catch (error) {
-                window.showMessageBox('Failed to lock account', 'error', 3000);
+    async lockdownAccountUI() {
+        this.showConfirmModal(
+            'Deactivate Account',
+            'This will temporarily deactivate your account and sign you out of all devices. You can reactivate by logging in again.',
+            'Deactivate Account',
+            'Cancel',
+            async () => {
+                try {
+                    await this.lockdownAccount();
+                    window.showMessageBox('Account deactivated successfully', 'success', 2000);
+                    setTimeout(() => {
+                        firebase.auth().signOut();
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } catch (error) {
+                    window.showMessageBox('Failed to deactivate account', 'error', 3000);
+                }
             }
-        }
+        );
     }
 
     async loadBiometricStatus() {

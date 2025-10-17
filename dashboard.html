@@ -374,12 +374,15 @@
                 </div>
                 
                 <div class="shield-section">
-                    <div class="section-header">
+                    <div class="section-header" onclick="shieldManager.toggleSection('recent-activity')">
                         <i class="fas fa-history"></i>
                         <h4>Recent Activity</h4>
-                        <span class="count-badge" id="loginCount">--</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="count-badge" id="loginCount">--</span>
+                            <i class="fas fa-chevron-down section-toggle" id="recent-activity-toggle"></i>
+                        </div>
                     </div>
-                    <div class="section-content">
+                    <div class="section-content" id="recent-activity-content">
                         <div id="loginHistoryList"></div>
                     </div>
                 </div>
@@ -414,8 +417,8 @@
                     </div>
                     <div class="section-content">
                         <div class="key-actions">
-                            <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKey()">Generate New Recovery Key</button>
-                            <button class="btn btn-secondary" onclick="shieldManager.generateBackupCodes()">Generate Backup Codes</button>
+                            <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKeyUI()">Generate New Recovery Key</button>
+                            <button class="btn btn-secondary" onclick="shieldManager.generateBackupCodesUI()">Generate Backup Codes</button>
                         </div>
                         <div id="backupCodesList"></div>
                     </div>
@@ -428,18 +431,19 @@
                     </div>
                     <div class="section-content">
                         <div class="privacy-actions">
-                            <button class="btn btn-info" onclick="shieldManager.exportData()">Download Your Data</button>
-                            <button class="btn btn-danger" onclick="shieldManager.lockdownAccount()">Deactivate Account</button>
+                            <button class="btn btn-info" onclick="shieldManager.exportDataUI()">Download Your Data</button>
+                            <button class="btn btn-danger" onclick="shieldManager.lockdownAccountUI()">Deactivate Account</button>
                         </div>
                     </div>
                 </div>
                 
                 <div class="shield-section">
-                    <div class="section-header">
+                    <div class="section-header" onclick="shieldManager.toggleSection('security-events')">
                         <i class="fas fa-shield-alt"></i>
                         <h4>Security Events</h4>
+                        <i class="fas fa-chevron-down section-toggle" id="security-events-toggle"></i>
                     </div>
-                    <div class="section-content">
+                    <div class="section-content" id="security-events-content">
                         <div id="securityEventsList"></div>
                     </div>
                 </div>
