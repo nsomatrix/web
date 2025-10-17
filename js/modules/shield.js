@@ -554,47 +554,18 @@ export class ShieldManager {
         await this.loadSecurityScore();
         await this.loadSessionsData();
         await this.loadHistoryData();
+        await this.loadSecurityEvents();
+        await this.loadBiometricStatus();
         this.setupShieldTabs();
     }
 
     setupShieldTabs() {
-        // Main tabs
-        document.querySelectorAll('.shield-tab').forEach(tab => {
-            tab.onclick = () => this.switchTab(tab.dataset.tab);
-        });
-
-        // Sub tabs
-        document.querySelectorAll('.shield-tab-sub').forEach(tab => {
-            tab.onclick = () => this.switchSubTab(tab.dataset.subtab);
-        });
-
         // Setup biometric buttons
         document.getElementById('setupFingerprint')?.addEventListener('click', () => this.setupFingerprintUI());
         document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticatorUI());
     }
 
-    switchTab(tabName) {
-        document.querySelectorAll('.shield-tab').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.shield-content').forEach(content => content.classList.remove('active'));
-        
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-        document.getElementById(`shield-${tabName}`).classList.add('active');
 
-        // Load data for specific tabs
-        if (tabName === 'sessions') this.loadSessionsData();
-        if (tabName === 'history') this.loadHistoryData();
-        if (tabName === 'privacy') this.loadBiometricStatus();
-    }
-
-    switchSubTab(subtabName) {
-        document.querySelectorAll('.shield-tab-sub').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.shield-subcontent').forEach(content => content.classList.remove('active'));
-        
-        document.querySelector(`[data-subtab="${subtabName}"]`).classList.add('active');
-        document.getElementById(`${subtabName === 'logins' ? 'loginHistoryList' : 'securityEventsList'}`).classList.add('active');
-
-        if (subtabName === 'events') this.loadSecurityEvents();
-    }
 
     async loadSecurityScore() {
         const score = await this.calculateSecurityScore();
