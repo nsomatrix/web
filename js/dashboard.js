@@ -237,6 +237,14 @@ async function setupDashboard(user) {
         if (shieldManager) {
             await shieldManager.createSession();
             await shieldManager.recordLogin();
+            
+            // Check if biometric verification is required
+            const biometricVerified = await shieldManager.verifyBiometricAuth();
+            if (!biometricVerified) {
+                // User cancelled biometric verification, sign them out
+                auth.signOut();
+                return;
+            }
         }
 
         // Update last login

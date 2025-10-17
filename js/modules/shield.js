@@ -365,8 +365,17 @@ export class ShieldManager {
         await this.logSecurityEvent('account_unlocked');
     }
 
+    // Device Detection
+    isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
     // Real Biometric Authentication
     async setupFingerprint() {
+        if (!this.isMobileDevice()) {
+            throw new Error('Fingerprint authentication can only be set up on mobile devices');
+        }
+
         if (!window.PublicKeyCredential || !navigator.credentials) {
             throw new Error('WebAuthn not supported on this device');
         }
@@ -449,7 +458,12 @@ export class ShieldManager {
         document.body.appendChild(modal);
         
         document.getElementById('verifyTOTPBtn').onclick = async () => {
-            const code = document.getElementById('totpVerifyCode').value;
+            const code = document.getElementById('totpVerifyCode').value.trim();
+            if (code.length !== 6) {
+                alert('Please enter a 6-digit code');
+                return;
+            }
+            
             if (this.verifyTOTP(secret, code)) {
                 await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
                     authenticatorEnabled: true,
@@ -459,7 +473,7 @@ export class ShieldManager {
                 modal.remove();
                 resolve();
             } else {
-                alert('Invalid code. Please try again.');
+                alert('Invalid code. Please check your authenticator app and try again.');
             }
         };
         
@@ -470,9 +484,9 @@ export class ShieldManager {
     }
 
     verifyTOTP(secret, token) {
-        const window = Math.floor(Date.now() / 1000 / 30);
-        for (let i = -1; i <= 1; i++) {
-            if (this.generateTOTP(secret, window + i) === token) {
+        const timeWindow = Math.floor(Date.now() / 1000 / 30);
+        for (let i = -2; i <= 2; i++) {
+            if (this.generateTOTP(secret, timeWindow + i) === token) {
                 return true;
             }
         }
@@ -480,18 +494,19 @@ export class ShieldManager {
     }
 
     generateTOTP(secret, timeWindow) {
-        // Simple TOTP implementation
         const key = this.base32ToBytes(secret);
         const time = new ArrayBuffer(8);
         const timeView = new DataView(time);
         timeView.setUint32(4, timeWindow, false);
         
-        return this.hmacSha1(key, new Uint8Array(time))
-            .slice(-4)
-            .reduce((acc, byte, i) => acc + (byte << (8 * (3 - i))), 0)
-            .toString()
-            .slice(-6)
-            .padStart(6, '0');
+        const hmac = this.hmacSha1(key, new Uint8Array(time));
+        const offset = hmac[hmac.length - 1] & 0xf;
+        const code = ((hmac[offset] & 0x7f) << 24) |
+                    ((hmac[offset + 1] & 0xff) << 16) |
+                    ((hmac[offset + 2] & 0xff) << 8) |
+                    (hmac[offset + 3] & 0xff);
+        
+        return (code % 1000000).toString().padStart(6, '0');
     }
 
     base32ToBytes(base32) {
@@ -577,6 +592,99 @@ export class ShieldManager {
 
     rotateLeft(n, s) {
         return (n << s) | (n >>> (32 - s));
+    }
+
+    // Check if biometric authentication is enabled (either method)
+    async requiresBiometricAuth() {
+        if (!this.authManager.currentUser) return false;
+        
+        try {
+            const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
+            const data = playerDoc.data() || {};
+            
+            return data.fingerprintEnabled || data.authenticatorEnabled;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // Verify biometric authentication before dashboard access
+    async verifyBiometricAuth() {
+        const requiresAuth = await this.requiresBiometricAuth();
+        if (!requiresAuth) return true;
+        
+        return new Promise((resolve) => {
+            this.showBiometricVerificationModal(resolve);
+        });
+    }
+
+    async showBiometricVerificationModal(resolve) {
+        const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
+        const data = playerDoc.data() || {};
+        
+        const hasFingerprintEnabled = data.fingerprintEnabled;
+        const hasAuthenticatorEnabled = data.authenticatorEnabled;
+        const isMobile = this.isMobileDevice();
+        
+        // Prefer fingerprint on mobile if available
+        if (hasFingerprintEnabled && isMobile) {
+            try {
+                const credential = await navigator.credentials.get({
+                    publicKey: {
+                        challenge: crypto.getRandomValues(new Uint8Array(32)),
+                        timeout: 60000,
+                        userVerification: "required"
+                    }
+                });
+                resolve(true);
+                return;
+            } catch (error) {
+                // Fingerprint failed, fall back to authenticator if available
+                if (!hasAuthenticatorEnabled) {
+                    alert('Fingerprint verification failed and no authenticator backup available');
+                    resolve(false);
+                    return;
+                }
+            }
+        }
+        
+        // Show authenticator verification
+        if (hasAuthenticatorEnabled) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10001;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#1a1a1a;color:white;padding:40px;border-radius:16px;max-width:400px;text-align:center;border:1px solid #333;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+                    <h3 style="color:#00d4ff;margin-bottom:20px;font-size:24px;">🔐 Authentication Required</h3>
+                    <p style="margin-bottom:30px;color:#ccc;line-height:1.5;">Enter your authenticator code to access the dashboard.</p>
+                    
+                    <div style="margin-bottom:20px;">
+                        <input type="text" id="totpVerifyInput" placeholder="Enter 6-digit code" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;margin:10px 0;width:150px;text-align:center;border-radius:8px;" maxlength="6" />
+                        <br>
+                        <button id="totpVerifyBtn" style="background:linear-gradient(135deg,#00ff88,#00cc6a);color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;font-weight:600;">✓ Verify Code</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('totpVerifyBtn').onclick = async () => {
+                const code = document.getElementById('totpVerifyInput').value.trim();
+                if (code.length !== 6) {
+                    alert('Please enter a 6-digit code');
+                    return;
+                }
+                
+                if (this.verifyTOTP(data.totpSecret, code)) {
+                    modal.remove();
+                    resolve(true);
+                } else {
+                    alert('Invalid code. Please try again.');
+                }
+            };
+        } else {
+            // No authentication methods available
+            resolve(true);
+        }
     }
 
     // Utility functions
@@ -939,6 +1047,11 @@ export class ShieldManager {
     }
 
     async setupFingerprintUI() {
+        if (!this.isMobileDevice()) {
+            window.showMessageBox('Fingerprint authentication can only be set up on mobile devices. Please use your phone to enable this feature.', 'error', 4000);
+            return;
+        }
+        
         try {
             await this.setupFingerprint();
             window.showMessageBox('Fingerprint authentication enabled', 'success', 2000);
