@@ -467,7 +467,7 @@ export class ShieldManager {
         document.getElementById('verifyTOTPBtn').onclick = async () => {
             const code = document.getElementById('totpVerifyCode').value.trim();
             if (code.length !== 6) {
-                alert('Please enter a 6-digit code');
+                this.showInlineAlert('Please enter a 6-digit code', 'error');
                 return;
             }
             
@@ -482,11 +482,11 @@ export class ShieldManager {
                     modal.remove();
                     resolve();
                 } else {
-                    alert('Invalid code. Please check your authenticator app and try again.');
+                    this.showInlineAlert('Invalid code. Please check your authenticator app and try again.', 'error');
                 }
             } catch (error) {
                 console.error('TOTP verification error:', error);
-                alert('Verification failed. Please try again.');
+                this.showInlineAlert('Verification failed. Please try again.', 'error');
             }
         };
         
@@ -496,60 +496,41 @@ export class ShieldManager {
         };
     }
 
-    // Industry-standard TOTP using Web Crypto API
     async verifyTOTP(secret, token) {
-        console.log('TOTP Verification - Input token:', token);
-        console.log('TOTP Verification - Secret length:', secret.length);
-        
         const timeWindow = Math.floor(Date.now() / 1000 / 30);
-        console.log('TOTP Verification - Time window:', timeWindow);
-        
         for (let i = -1; i <= 1; i++) {
             const expectedToken = await this.generateTOTP(secret, timeWindow + i);
-            console.log(`TOTP Verification - Expected token for window ${timeWindow + i}:`, expectedToken);
             if (expectedToken === token) {
-                console.log('TOTP Verification - SUCCESS');
                 return true;
             }
         }
-        console.log('TOTP Verification - FAILED');
         return false;
     }
 
     async generateTOTP(secret, timeWindow) {
-        try {
-            // Use Web Crypto API for industry-standard implementation
-            const key = this.base32ToBytes(secret);
-            console.log('TOTP Generate - Key bytes length:', key.length);
-            
-            const time = new ArrayBuffer(8);
-            const timeView = new DataView(time);
-            timeView.setUint32(4, timeWindow, false);
-            
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                key,
-                { name: 'HMAC', hash: 'SHA-1' },
-                false,
-                ['sign']
-            );
-            
-            const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
-            const hmac = new Uint8Array(signature);
-            
-            const offset = hmac[hmac.length - 1] & 0xf;
-            const code = ((hmac[offset] & 0x7f) << 24) |
-                        ((hmac[offset + 1] & 0xff) << 16) |
-                        ((hmac[offset + 2] & 0xff) << 8) |
-                        (hmac[offset + 3] & 0xff);
-            
-            const result = (code % 1000000).toString().padStart(6, '0');
-            console.log('TOTP Generate - Generated code:', result);
-            return result;
-        } catch (error) {
-            console.error('TOTP Generate error:', error);
-            throw error;
-        }
+        const key = this.base32ToBytes(secret);
+        const time = new ArrayBuffer(8);
+        const timeView = new DataView(time);
+        timeView.setUint32(4, timeWindow, false);
+        
+        const cryptoKey = await crypto.subtle.importKey(
+            'raw',
+            key,
+            { name: 'HMAC', hash: 'SHA-1' },
+            false,
+            ['sign']
+        );
+        
+        const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
+        const hmac = new Uint8Array(signature);
+        
+        const offset = hmac[hmac.length - 1] & 0xf;
+        const code = ((hmac[offset] & 0x7f) << 24) |
+                    ((hmac[offset + 1] & 0xff) << 16) |
+                    ((hmac[offset + 2] & 0xff) << 8) |
+                    (hmac[offset + 3] & 0xff);
+        
+        return (code % 1000000).toString().padStart(6, '0');
     }
 
     base32ToBytes(base32) {
@@ -616,7 +597,7 @@ export class ShieldManager {
             } catch (error) {
                 // Fingerprint failed, fall back to authenticator if available
                 if (!hasAuthenticatorEnabled) {
-                    alert('Fingerprint verification failed and no authenticator backup available');
+                    this.showInlineAlert('Fingerprint verification failed and no authenticator backup available', 'error');
                     resolve(false);
                     return;
                 }
@@ -645,7 +626,7 @@ export class ShieldManager {
             document.getElementById('totpVerifyBtn').onclick = async () => {
                 const code = document.getElementById('totpVerifyInput').value.trim();
                 if (code.length !== 6) {
-                    alert('Please enter a 6-digit code');
+                    this.showInlineAlert('Please enter a 6-digit code', 'error');
                     return;
                 }
                 
@@ -655,11 +636,11 @@ export class ShieldManager {
                         modal.remove();
                         resolve(true);
                     } else {
-                        alert('Invalid code. Please try again.');
+                        this.showInlineAlert('Invalid code. Please try again.', 'error');
                     }
                 } catch (error) {
                     console.error('TOTP verification error:', error);
-                    alert('Verification failed. Please try again.');
+                    this.showInlineAlert('Verification failed. Please try again.', 'error');
                 }
             };
         } else {
@@ -729,6 +710,8 @@ export class ShieldManager {
         // Setup biometric buttons
         document.getElementById('setupFingerprint')?.addEventListener('click', () => this.setupFingerprintUI());
         document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticatorUI());
+        document.getElementById('disableFingerprint')?.addEventListener('click', () => this.disableFingerprintUI());
+        document.getElementById('disableAuthenticator')?.addEventListener('click', () => this.disableAuthenticatorUI());
     }
 
     toggleSection(sectionId) {
@@ -1010,17 +993,34 @@ export class ShieldManager {
             
             const fingerprintStatus = document.getElementById('fingerprintStatus');
             const authenticatorStatus = document.getElementById('authenticatorStatus');
+            const setupFingerprintBtn = document.getElementById('setupFingerprint');
+            const disableFingerprintBtn = document.getElementById('disableFingerprint');
+            const setupAuthenticatorBtn = document.getElementById('setupAuthenticator');
+            const disableAuthenticatorBtn = document.getElementById('disableAuthenticator');
+            
+            const fingerprintEnabled = data.fingerprintEnabled && data.fingerprintCredentialId;
+            const authenticatorEnabled = data.authenticatorEnabled && data.totpSecret;
             
             if (fingerprintStatus) {
-                fingerprintStatus.innerHTML = (data.fingerprintEnabled && data.fingerprintCredentialId) ? 
+                fingerprintStatus.innerHTML = fingerprintEnabled ? 
                     '<span style="color: var(--success);">✅ Enabled</span>' : 
                     '<span style="color: var(--text-muted);">❌ Disabled</span>';
             }
+            
+            if (setupFingerprintBtn && disableFingerprintBtn) {
+                setupFingerprintBtn.style.display = fingerprintEnabled ? 'none' : 'inline-block';
+                disableFingerprintBtn.style.display = fingerprintEnabled ? 'inline-block' : 'none';
+            }
                 
             if (authenticatorStatus) {
-                authenticatorStatus.innerHTML = (data.authenticatorEnabled && data.totpSecret) ? 
+                authenticatorStatus.innerHTML = authenticatorEnabled ? 
                     '<span style="color: var(--success);">✅ Enabled</span>' : 
                     '<span style="color: var(--text-muted);">❌ Disabled</span>';
+            }
+            
+            if (setupAuthenticatorBtn && disableAuthenticatorBtn) {
+                setupAuthenticatorBtn.style.display = authenticatorEnabled ? 'none' : 'inline-block';
+                disableAuthenticatorBtn.style.display = authenticatorEnabled ? 'inline-block' : 'none';
             }
         } catch (error) {
             console.log('Failed to load biometric status:', error.message);
@@ -1029,26 +1029,82 @@ export class ShieldManager {
 
     async setupFingerprintUI() {
         if (!this.isMobileDevice()) {
-            window.showMessageBox('Fingerprint authentication can only be set up on mobile devices. Please use your phone to enable this feature.', 'error', 4000);
+            this.showInlineAlert('Fingerprint authentication can only be set up on mobile devices. Please use your phone to enable this feature.');
             return;
         }
         
         try {
             await this.setupFingerprint();
-            window.showMessageBox('Fingerprint authentication enabled', 'success', 2000);
+            this.showInlineAlert('Fingerprint authentication enabled');
             this.loadBiometricStatus();
         } catch (error) {
-            window.showMessageBox('Failed to setup fingerprint: ' + error.message, 'error', 3000);
+            this.showInlineAlert('Failed to setup fingerprint: ' + error.message);
         }
     }
 
     async setupAuthenticatorUI() {
         try {
             await this.setupAuthenticator();
-            window.showMessageBox('Authenticator app enabled', 'success', 2000);
+            this.showInlineAlert('Authenticator app enabled');
             this.loadBiometricStatus();
         } catch (error) {
-            window.showMessageBox('Failed to setup authenticator: ' + error.message, 'error', 3000);
+            this.showInlineAlert('Failed to setup authenticator: ' + error.message);
         }
+    }
+
+    async disableFingerprintUI() {
+        const verified = await this.verifyBiometricAuth();
+        if (!verified) {
+            this.showInlineAlert('Authentication required to disable fingerprint');
+            return;
+        }
+        
+        if (await this.showInlineConfirm('Are you sure you want to disable fingerprint authentication?')) {
+            await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
+                fingerprintEnabled: firebase.firestore.FieldValue.delete(),
+                fingerprintCredentialId: firebase.firestore.FieldValue.delete(),
+                fingerprintPublicKey: firebase.firestore.FieldValue.delete()
+            });
+            await this.logSecurityEvent('fingerprint_disabled');
+            this.showInlineAlert('Fingerprint authentication disabled');
+            this.loadBiometricStatus();
+        }
+    }
+
+    async disableAuthenticatorUI() {
+        const verified = await this.verifyBiometricAuth();
+        if (!verified) {
+            this.showInlineAlert('Authentication required to disable authenticator');
+            return;
+        }
+        
+        if (await this.showInlineConfirm('Are you sure you want to disable authenticator app?')) {
+            await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
+                authenticatorEnabled: firebase.firestore.FieldValue.delete(),
+                totpSecret: firebase.firestore.FieldValue.delete()
+            });
+            await this.logSecurityEvent('authenticator_disabled');
+            this.showInlineAlert('Authenticator app disabled');
+            this.loadBiometricStatus();
+        }
+    }
+
+    showInlineAlert(message, type = 'info') {
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
+        const colors = { success: '#00ff88', error: '#ff4444', info: '#00d4ff' };
+        modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:${colors[type]};font-size:48px;margin-bottom:20px;">${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><button onclick="this.parentElement.parentElement.remove()" style="background:${colors[type]};color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;">OK</button></div>`;
+        document.body.appendChild(modal);
+        setTimeout(() => modal.remove(), 5000);
+    }
+
+    showInlineConfirm(message) {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:#ffaa00;font-size:48px;margin-bottom:20px;">⚠</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><div><button onclick="this.parentElement.parentElement.parentElement.remove();window.tempResolve(true)" style="background:#ff4444;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Yes</button><button onclick="this.parentElement.parentElement.parentElement.remove();window.tempResolve(false)" style="background:#666;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Cancel</button></div></div>`;
+            document.body.appendChild(modal);
+            window.tempResolve = resolve;
+        });
     }
 }
