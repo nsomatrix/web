@@ -1,0 +1,19 @@
+FIRESTORE TTL SETUP:
+
+1. Go to Firebase Console → Firestore → Indexes
+2. Click "Create Index" 
+3. Set:
+   - Collection ID: typing
+   - Field: expireAt
+   - Order: Ascending
+   - TTL: Enable (set expiration field to "expireAt")
+
+This will auto-delete typing documents after 10 seconds, preventing database bloat.
+
+Alternative: The code already deletes documents when:
+- User stops typing (1.5s timeout)
+- User sends message
+- User switches chats
+- User closes tab
+
+So minimal cleanup needed!

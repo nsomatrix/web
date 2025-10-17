@@ -57,6 +57,8 @@ let currentChatFriend = null;
 let messageListener = null;
 let messageCache = new Map();
 let isTyping = false;
+let typingTimeout = null;
+let typingListener = null;
 
 // Desktop Dashboard Enhancement
 class DesktopDashboard {
@@ -704,18 +706,49 @@ function setupSearchAndMessaging() {
             }
         };
         
-        // Auto-resize textarea
+        // Auto-resize textarea and typing indicator
         messageInput.oninput = () => {
             messageInput.style.height = 'auto';
             messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+            
+            // Typing indicator
+            if (currentChatFriend && messageInput.value.trim()) {
+                if (!isTyping) {
+                    isTyping = true;
+                    const expireAt = new Date(Date.now() + 10000); // 10 seconds TTL
+                    db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).set({
+                        isTyping: true,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        expireAt: expireAt
+                    }).catch(console.error);
+                }
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    isTyping = false;
+                    db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
+                }, 1500);
+            } else if (isTyping) {
+                isTyping = false;
+                clearTimeout(typingTimeout);
+                db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
+            }
         };
         
-        // Focus management
+        // Focus management and stop typing on blur
         messageInput.onfocus = () => {
             setTimeout(() => {
                 const messagesList = document.getElementById('messagesList');
                 messagesList.scrollTop = messagesList.scrollHeight;
             }, 300);
+        };
+        
+        messageInput.onblur = () => {
+            if (isTyping && currentChatFriend) {
+                isTyping = false;
+                clearTimeout(typingTimeout);
+                db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
+            }
         };
     }
 }
@@ -1005,10 +1038,14 @@ async function loadMessages(friendId) {
         const messageInputContainer = document.querySelector('.message-input-container');
         if (messageInputContainer) messageInputContainer.style.display = 'block';
         
-        // Clean up previous listener
+        // Clean up previous listeners
         if (messageListener) {
             messageListener();
             messageListener = null;
+        }
+        if (typingListener) {
+            typingListener();
+            typingListener = null;
         }
         
         console.log('Setting up message listener for:', friendId);
@@ -1045,6 +1082,24 @@ async function loadMessages(friendId) {
                 markMessagesAsRead(snapshot, friendId);
             }, error => {
                 console.error('❌ Message listener error:', error);
+            });
+        
+        // Listen for typing indicators
+        typingListener = db.collection('typing').doc(`${friendId}_${authManager.currentUser.uid}`)
+            .onSnapshot(doc => {
+                const typingDiv = document.getElementById('typing-indicator');
+                if (doc.exists && doc.data().isTyping) {
+                    if (!typingDiv) {
+                        const indicator = document.createElement('div');
+                        indicator.id = 'typing-indicator';
+                        indicator.style.cssText = 'padding:8px 16px;color:#888;font-style:italic;font-size:14px;animation:pulse 1.5s infinite;';
+                        indicator.innerHTML = '💬 Typing...';
+                        document.getElementById('messagesList').appendChild(indicator);
+                        document.getElementById('messagesList').scrollTop = document.getElementById('messagesList').scrollHeight;
+                    }
+                } else {
+                    if (typingDiv) typingDiv.remove();
+                }
             });
         
     } catch (error) {
@@ -1376,10 +1431,16 @@ async function sendNewMessage() {
         replyText: messageInput.dataset.replyText
     } : {};
     
-    // Clear input and reply preview
+    // Clear input and reply preview, stop typing
     messageInput.value = '';
     messageInput.disabled = true;
     if (isReply) cancelReply();
+    
+    if (isTyping) {
+        isTyping = false;
+        clearTimeout(typingTimeout);
+        db.collection('typing').doc(`${authManager.currentUser.uid}_${currentChatFriend}`).delete().catch(console.error);
+    }
     
     try {
         const messageData = {

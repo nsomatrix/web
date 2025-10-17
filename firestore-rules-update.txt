@@ -1,0 +1,11 @@
+Add this rule to your Firestore rules after the presence rule:
+
+    match /typing/{typingId} {
+      allow read, write: if request.auth != null && 
+        (typingId.matches('.*_' + request.auth.uid + '$') || 
+         typingId.matches('^' + request.auth.uid + '_.*'));
+    }
+
+This allows users to:
+- Write their own typing status (userId_friendId)
+- Read typing status meant for them (friendId_userId)
