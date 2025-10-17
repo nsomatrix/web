@@ -496,6 +496,13 @@ function setupFeatureButtons() {
             loadFriendsList();
         };
     }
+
+    const securityBtn = document.getElementById('securityBtn');
+    if (securityBtn) {
+        securityBtn.onclick = () => {
+            showMessageBox('Shield settings coming soon! 🛑', 'info', 3000);
+        };
+    }
 }
 
 function setupModalHandlers() {
