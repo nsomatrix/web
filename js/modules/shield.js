@@ -6,13 +6,40 @@ export class ShieldManager {
     }
 
     generateSessionId() {
-        // Use persistent session ID based on browser fingerprint
-        let sessionId = localStorage.getItem('ninjabase_session_id');
+        // Generate browser fingerprint for consistent session identification
+        const fingerprint = this.generateBrowserFingerprint();
+        let sessionId = sessionStorage.getItem('ninjabase_session_id');
         if (!sessionId) {
-            sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-            localStorage.setItem('ninjabase_session_id', sessionId);
+            sessionId = fingerprint + '_' + Date.now().toString(36);
+            sessionStorage.setItem('ninjabase_session_id', sessionId);
         }
         return sessionId;
+    }
+
+    generateBrowserFingerprint() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('Browser fingerprint', 2, 2);
+        
+        const fingerprint = [
+            navigator.userAgent,
+            navigator.language,
+            screen.width + 'x' + screen.height,
+            new Date().getTimezoneOffset(),
+            navigator.platform,
+            canvas.toDataURL()
+        ].join('|');
+        
+        // Create hash of fingerprint
+        let hash = 0;
+        for (let i = 0; i < fingerprint.length; i++) {
+            const char = fingerprint.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Math.abs(hash).toString(36);
     }
 
     // Session Management
@@ -20,35 +47,48 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
-            // Clean up old sessions first
             await this.cleanupOldSessions();
             
-            // Check if session already exists
-            const existingSession = await this.db.collection('players').doc(this.authManager.currentUser.uid)
-                .collection('sessions').doc(this.currentSessionId).get();
+            const fingerprint = this.generateBrowserFingerprint();
+            const ip = await this.getClientIP();
             
-            if (existingSession.exists) {
+            // Check for existing session with same fingerprint and IP
+            const existingSessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions')
+                .where('fingerprint', '==', fingerprint)
+                .where('ip', '==', ip)
+                .where('isActive', '==', true)
+                .get();
+            
+            if (!existingSessions.empty) {
                 // Update existing session
-                await this.db.collection('players').doc(this.authManager.currentUser.uid)
-                    .collection('sessions').doc(this.currentSessionId).update({
-                        lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                const existingSession = existingSessions.docs[0];
+                this.currentSessionId = existingSession.id;
+                sessionStorage.setItem('ninjabase_session_id', this.currentSessionId);
+                
+                await existingSession.ref.update({
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 return;
             }
 
+            // Create new session
             const sessionData = {
                 sessionId: this.currentSessionId,
+                fingerprint: fingerprint,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
                 userAgent: navigator.userAgent,
-                ip: await this.getClientIP(),
+                browser: this.getBrowserInfo(),
+                device: this.getDeviceInfo(),
+                ip: ip,
                 isActive: true
             };
 
             await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions').doc(this.currentSessionId).set(sessionData);
         } catch (error) {
-            console.log('Session creation failed (rules not deployed yet):', error.message);
+            console.log('Session creation failed:', error.message);
         }
     }
 
