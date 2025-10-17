@@ -52,17 +52,19 @@ service cloud.firestore {
          typingId.matches('^' + request.auth.uid + '_.*'));
     }
 
-    // Security collections for Shield module
+    // Security features
     match /players/{userId}/sessions/{sessionId} {
       allow read, write: if request.auth.uid == userId;
     }
 
     match /players/{userId}/loginHistory/{historyId} {
-      allow read, write: if request.auth.uid == userId;
+      allow read: if request.auth.uid == userId;
+      allow create: if request.auth.uid == userId;
     }
 
     match /players/{userId}/securityEvents/{eventId} {
-      allow read, write: if request.auth.uid == userId;
+      allow read: if request.auth.uid == userId;
+      allow create: if request.auth.uid == userId;
     }
 
     match /players/{userId}/backupCodes/{codeId} {

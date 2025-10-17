@@ -346,6 +346,113 @@
         </div>
     </div>
 
+    <div id="shieldModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <span class="close-button" data-modal="shieldModal">&times;</span>
+            <h3 style="color: #e74c3c; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-shield-alt"></i> Shield Control Center
+            </h3>
+            
+            <div class="shield-tabs">
+                <button class="shield-tab active" data-tab="overview">🛡️ Overview</button>
+                <button class="shield-tab" data-tab="sessions">🔐 Sessions</button>
+                <button class="shield-tab" data-tab="history">📊 History</button>
+                <button class="shield-tab" data-tab="keys">🔑 Keys</button>
+                <button class="shield-tab" data-tab="privacy">⚙️ Privacy</button>
+            </div>
+            
+            <div id="shield-overview" class="shield-content active">
+                <div class="security-score-card">
+                    <h4>Security Score</h4>
+                    <div class="score-display">
+                        <div class="score-circle" id="securityScoreCircle">
+                            <span id="securityScoreText">--</span>
+                        </div>
+                        <div class="score-details" id="securityScoreDetails"></div>
+                    </div>
+                </div>
+                
+                <div class="shield-grid">
+                    <div class="shield-card" onclick="shieldManager.switchTab('sessions')">
+                        <i class="fas fa-desktop"></i>
+                        <h5>Active Sessions</h5>
+                        <span id="sessionCount">--</span>
+                    </div>
+                    <div class="shield-card" onclick="shieldManager.switchTab('history')">
+                        <i class="fas fa-history"></i>
+                        <h5>Login History</h5>
+                        <span id="loginCount">--</span>
+                    </div>
+                    <div class="shield-card" onclick="shieldManager.switchTab('keys')">
+                        <i class="fas fa-key"></i>
+                        <h5>Recovery Keys</h5>
+                        <span>Secure</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="shield-sessions" class="shield-content">
+                <div class="shield-header">
+                    <h4>Session Management</h4>
+                    <button class="btn btn-danger btn-sm" onclick="shieldManager.revokeAllSessions()">Revoke All</button>
+                </div>
+                <div id="sessionsList"></div>
+            </div>
+            
+            <div id="shield-history" class="shield-content">
+                <h4>Login History & Security Events</h4>
+                <div class="shield-tabs-sub">
+                    <button class="shield-tab-sub active" data-subtab="logins">Logins</button>
+                    <button class="shield-tab-sub" data-subtab="events">Security Events</button>
+                </div>
+                <div id="loginHistoryList" class="shield-subcontent active"></div>
+                <div id="securityEventsList" class="shield-subcontent"></div>
+            </div>
+            
+            <div id="shield-keys" class="shield-content">
+                <h4>Key Management</h4>
+                <div class="key-section">
+                    <h5>Recovery Key</h5>
+                    <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKey()">Regenerate Recovery Key</button>
+                    <p class="text-muted">Generate a new recovery key. Save it securely!</p>
+                </div>
+                <div class="key-section">
+                    <h5>Backup Codes</h5>
+                    <button class="btn btn-secondary" onclick="shieldManager.generateBackupCodes()">Generate Backup Codes</button>
+                    <div id="backupCodesList"></div>
+                </div>
+            </div>
+            
+            <div id="shield-privacy" class="shield-content">
+                <h4>Privacy Controls</h4>
+                <div class="biometric-section">
+                    <h5>Fingerprint Authentication</h5>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span>Status: <span id="fingerprintStatus">❌ Disabled</span></span>
+                        <button class="btn btn-primary btn-sm" id="setupFingerprint">Setup Fingerprint</button>
+                    </div>
+                </div>
+                <div class="biometric-section">
+                    <h5>Hardware Authenticator</h5>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span>Status: <span id="authenticatorStatus">❌ Disabled</span></span>
+                        <button class="btn btn-primary btn-sm" id="setupAuthenticator">Setup Authenticator</button>
+                    </div>
+                </div>
+                <div class="privacy-section">
+                    <h5>Data Export</h5>
+                    <button class="btn btn-info" onclick="shieldManager.exportData()">Download My Data</button>
+                    <p class="text-muted">Export all your data in JSON format</p>
+                </div>
+                <div class="privacy-section">
+                    <h5>Account Lockdown</h5>
+                    <button class="btn btn-danger" onclick="shieldManager.lockdownAccount()">Lock Account</button>
+                    <p class="text-muted">Temporarily disable account and revoke all sessions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="customMessageBox" class="custom-message-box" style="display:none;">
         <p id="messageBoxText"></p>
     </div>

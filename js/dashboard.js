@@ -7,6 +7,7 @@ import { PasswordManager } from './modules/passwords.js';
 import { FriendsManager } from './modules/friends.js';
 import { MessagingManager } from './modules/messaging.js';
 import { SocialManager } from './modules/social.js';
+import { ShieldManager } from './modules/shield.js';
 import { showMessageBox, openModal, closeModal } from './modules/ui.js';
 import { encryptData, decryptData } from './modules/crypto.js';
 
@@ -55,7 +56,7 @@ function setupAuthStateListener() {
 // Global variables
 let allAvatars = [];
 let currentAvatarIndex = 0;
-let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager;
+let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager, shieldManager;
 
 
 // Desktop Dashboard Enhancement
@@ -94,11 +95,13 @@ function initializeManagers() {
     friendsManager = new FriendsManager(authManager, db);
     messagingManager = new MessagingManager(authManager, db);
     socialManager = new SocialManager(authManager, db);
+    shieldManager = new ShieldManager(authManager, db);
     
     // Make managers globally available
     window.friendsManager = friendsManager;
     window.messagingManager = messagingManager;
     window.socialManager = socialManager;
+    window.shieldManager = shieldManager;
 }
 
 // Avatar functions
@@ -229,6 +232,12 @@ async function setupDashboard(user) {
         setupNotificationHandlers();
         setupOnlinePresence();
         setupNotificationCounters();
+        
+        // Initialize Shield features
+        if (shieldManager) {
+            await shieldManager.createSession();
+            await shieldManager.recordLogin();
+        }
 
         // Update last login
         const lastLoginDisplay = document.getElementById('lastLoginDisplay');
@@ -504,8 +513,9 @@ function setupFeatureButtons() {
 
     const securityBtn = document.getElementById('securityBtn');
     if (securityBtn) {
-        securityBtn.onclick = () => {
-            showMessageBox('Shield settings coming soon! 🛑', 'info', 3000);
+        securityBtn.onclick = async () => {
+            openModal(document.getElementById('shieldModal'));
+            await shieldManager.loadShieldData();
         };
     }
 }

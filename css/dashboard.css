@@ -992,4 +992,216 @@ body {
   .modal-content {
     padding: 1rem;
   }
+  
+  .shield-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .shield-tab {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .score-display {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .shield-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Shield Modal Styles */
+.shield-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.shield-tab {
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.shield-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.shield-content {
+  display: none;
+}
+
+.shield-content.active {
+  display: block;
+}
+
+.security-score-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.score-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  position: relative;
+}
+
+.score-circle.excellent { background: linear-gradient(135deg, #10b981, #059669); }
+.score-circle.good { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.score-circle.poor { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+.shield-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.shield-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+}
+
+.shield-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.shield-card i {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.shield-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.session-item, .history-item, .event-item {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-current {
+  border-left: 4px solid var(--success);
+}
+
+.shield-tabs-sub {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.shield-tab-sub {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shield-tab-sub.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.shield-subcontent {
+  display: none;
+}
+
+.shield-subcontent.active {
+  display: block;
+}
+
+.key-section, .privacy-section {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.backup-codes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.backup-code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  text-align: center;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.breach-result {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.breach-safe {
+  border-left: 4px solid var(--success);
+}
+
+.breach-found {
+  border-left: 4px solid var(--danger);
+}
+
+.biometric-section {
+  padding: 1rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: rgba(45, 45, 45, 0.3);
+}
+
+.biometric-section h5 {
+  margin-bottom: 0.5rem;
+  color: #e74c3c;
 }
