@@ -831,7 +831,9 @@ export class ShieldManager {
             'account_unlocked': 'Account Unlocked',
             'backup_codes_generated': 'Backup Codes Generated',
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
-            'authenticator_enabled': 'Hardware Authenticator Enabled'
+            'fingerprint_disabled': 'Fingerprint Authentication Disabled',
+            'authenticator_enabled': 'App Authenticator Enabled',
+            'authenticator_disabled': 'App Authenticator Disabled'
         };
         return types[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
