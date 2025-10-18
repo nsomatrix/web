@@ -82,8 +82,10 @@ function setupAuthStateListener() {
 }
 
 // Session validation - check if current session still exists
+let sessionValidationPaused = false;
+
 async function validateSession() {
-    if (!authManager.currentUser || !shieldManager.currentSessionId) return true;
+    if (sessionValidationPaused || !authManager.currentUser || !shieldManager.currentSessionId) return true;
     
     try {
         const sessionDoc = await db.collection('players').doc(authManager.currentUser.uid)
@@ -137,7 +139,8 @@ async function check2FARequired(user) {
     try {
         const doc = await db.collection('players').doc(user.uid).get();
         const data = doc.data() || {};
-        return data.authenticatorEnabled === true && data.totpSecret;
+        // Check if either authenticator OR email 2FA is enabled
+        return (data.authenticatorEnabled === true && data.totpSecret) || data.emailTwoFactorEnabled === true;
     } catch (error) {
         console.error('Error checking 2FA status:', error);
         return false;
@@ -145,30 +148,51 @@ async function check2FARequired(user) {
 }
 
 async function verify2FA(user) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
+        // Pause session validation during 2FA
+        sessionValidationPaused = true;
+        
+        // Check what 2FA methods are enabled
+        const doc = await db.collection('players').doc(user.uid).get();
+        const data = doc.data() || {};
+        const hasAuthenticator = data.authenticatorEnabled === true && data.totpSecret;
+        const hasEmailTwoFactor = data.emailTwoFactorEnabled === true;
+        
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10002;display:flex;align-items:center;justify-content:center;';
+        
+        let methodButtons = '';
+        if (hasAuthenticator) {
+            methodButtons += `
+                <button id="useAuthenticatorBtn" style="background:#007bff;color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
+                    📱 Use Authenticator App
+                </button>`;
+        }
+        if (hasEmailTwoFactor) {
+            methodButtons += `
+                <button id="useEmailCodeBtn" style="background:#ffc107;color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
+                    ✉️ Send Email Code
+                </button>`;
+        }
+        
+        // If only one method is enabled, show it directly
+        const showMethodSelection = hasAuthenticator && hasEmailTwoFactor;
         
         modal.innerHTML = `
             <div style="background:#1a1a1a;color:white;padding:40px;border-radius:16px;max-width:400px;text-align:center;border:1px solid #333;">
                 <h3 style="color:#00d4ff;margin-bottom:30px;">🔐 Two-Factor Authentication Required</h3>
                 
-                <div id="authMethodSelection">
+                <div id="authMethodSelection" style="display:${showMethodSelection ? 'block' : 'none'};">
                     <p style="color:#ccc;margin-bottom:30px;">Choose your verification method:</p>
-                    <button id="useAuthenticatorBtn" style="background:#007bff;color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
-                        📱 Use Authenticator App
-                    </button>
-                    <button id="useEmailCodeBtn" style="background:#ffc107;color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
-                        ✉️ Send Email Code
-                    </button>
+                    ${methodButtons}
                 </div>
                 
-                <div id="authCodeSection" style="display:none;">
-                    <p id="codePrompt" style="color:#ccc;margin-bottom:20px;">Enter your 6-digit code:</p>
+                <div id="authCodeSection" style="display:${showMethodSelection ? 'none' : 'block'};">
+                    <p id="codePrompt" style="color:#ccc;margin-bottom:20px;">${hasAuthenticator && !hasEmailTwoFactor ? 'Enter your authenticator app code:' : 'Enter the code sent to your email:'}</p>
                     <input type="tel" id="authCodeInput" placeholder="000000" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;width:150px;text-align:center;border-radius:8px;font-size:18px;letter-spacing:2px;" maxlength="6" inputmode="numeric" pattern="[0-9]*" />
                     <br><br>
                     <button id="verifyCodeBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;-webkit-tap-highlight-color:transparent;">Verify Code</button>
-                    <button id="backBtn" style="background:#6c757d;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;-webkit-tap-highlight-color:transparent;">Back</button>
+                    ${showMethodSelection ? '<button id="backBtn" style="background:#6c757d;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;-webkit-tap-highlight-color:transparent;">Back</button>' : ''}
                 </div>
                 
                 <button id="signOutBtn" style="background:#dc3545;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin-top:20px;">Sign Out</button>
@@ -187,41 +211,61 @@ async function verify2FA(user) {
         
         let currentMethod = null;
         
-        // Authenticator app method
-        document.getElementById('useAuthenticatorBtn').onclick = () => {
+        // If only one method enabled, set it automatically
+        if (hasAuthenticator && !hasEmailTwoFactor) {
             currentMethod = 'authenticator';
-            methodSelection.style.display = 'none';
-            codeSection.style.display = 'block';
-            codePrompt.textContent = 'Enter your authenticator app code:';
-            codeInput.focus();
-        };
-        
-        // Email code method
-        document.getElementById('useEmailCodeBtn').onclick = async () => {
+        } else if (!hasAuthenticator && hasEmailTwoFactor) {
             currentMethod = 'email';
-            methodSelection.style.display = 'none';
-            codeSection.style.display = 'block';
-            codePrompt.textContent = 'Sending email code...';
-            
+            // Auto-send email code
             try {
                 await sendEmailCode(user.email);
                 codePrompt.textContent = 'Enter the code sent to your email:';
-                codeInput.focus();
             } catch (error) {
-                codePrompt.textContent = 'Failed to send email. Try authenticator app.';
-                setTimeout(() => {
-                    backBtn.click();
-                }, 2000);
+                codePrompt.textContent = 'Failed to send email code. Please try again.';
             }
-        };
+        }
         
-        // Back button
-        backBtn.onclick = () => {
-            methodSelection.style.display = 'block';
-            codeSection.style.display = 'none';
-            codeInput.value = '';
-            currentMethod = null;
-        };
+        // Authenticator app method
+        if (hasAuthenticator) {
+            document.getElementById('useAuthenticatorBtn')?.addEventListener('click', () => {
+                currentMethod = 'authenticator';
+                methodSelection.style.display = 'none';
+                codeSection.style.display = 'block';
+                codePrompt.textContent = 'Enter your authenticator app code:';
+                codeInput.focus();
+            });
+        }
+        
+        // Email code method
+        if (hasEmailTwoFactor) {
+            document.getElementById('useEmailCodeBtn')?.addEventListener('click', async () => {
+                currentMethod = 'email';
+                methodSelection.style.display = 'none';
+                codeSection.style.display = 'block';
+                codePrompt.textContent = 'Sending email code...';
+                
+                try {
+                    await sendEmailCode(user.email);
+                    codePrompt.textContent = 'Enter the code sent to your email:';
+                    codeInput.focus();
+                } catch (error) {
+                    codePrompt.textContent = 'Failed to send email. Try again.';
+                    setTimeout(() => {
+                        backBtn?.click();
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Back button (only if multiple methods)
+        if (backBtn) {
+            backBtn.onclick = () => {
+                methodSelection.style.display = 'block';
+                codeSection.style.display = 'none';
+                codeInput.value = '';
+                currentMethod = null;
+            };
+        }
         
         // Verify code
         const verify = async () => {
@@ -242,11 +286,6 @@ async function verify2FA(user) {
                 
                 if (currentMethod === 'authenticator') {
                     console.log('Verifying with authenticator');
-                    const doc = await db.collection('players').doc(user.uid).get();
-                    const data = doc.data();
-                    console.log('Got user data, has totpSecret:', !!data.totpSecret);
-                    
-                    // Use the global TOTP verification instead of import
                     isValid = await verifyTOTPCode(data.totpSecret, code);
                     console.log('TOTP verification result:', isValid);
                 } else if (currentMethod === 'email') {
@@ -259,6 +298,7 @@ async function verify2FA(user) {
                 
                 if (isValid) {
                     console.log('Verification successful, resolving');
+                    sessionValidationPaused = false; // Resume session validation
                     modal.remove();
                     resolve(true);
                 } else {
@@ -305,9 +345,36 @@ async function verify2FA(user) {
         });
         
         signOutBtn.onclick = () => {
+            sessionValidationPaused = false; // Resume session validation
             modal.remove();
             resolve(false);
         };
+        
+        // Close on escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', handleEscape);
+                sessionValidationPaused = false; // Resume session validation
+                modal.remove();
+                resolve(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        
+        // Close on background click
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                document.removeEventListener('keydown', handleEscape);
+                sessionValidationPaused = false; // Resume session validation
+                modal.remove();
+                resolve(false);
+            }
+        };
+        
+        // Focus input if code section is visible
+        if (codeSection.style.display !== 'none') {
+            codeInput.focus();
+        }
     });
 }
 
@@ -944,7 +1011,10 @@ function setupModalHandlers() {
         };
         
         button.addEventListener('click', handleClose);
-        button.addEventListener('touchend', handleClose);
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handleClose(e);
+        });
     });
     
     // Close modals when clicking outside

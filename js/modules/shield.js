@@ -286,8 +286,8 @@ export class ShieldManager {
         // Email verification (5 points)
         if (this.authManager.currentUser.emailVerified) score += 5;
 
-        // Two-factor authentication (10 points)
-        if (data.authenticatorEnabled) score += 10;
+        // Two-factor authentication (10 points) - either authenticator OR email 2FA
+        if (data.authenticatorEnabled || data.emailTwoFactorEnabled) score += 10;
 
         // Account age (5 points)
         const accountAge = (Date.now() - this.authManager.currentUser.metadata.creationTime) / (1000 * 60 * 60 * 24);
@@ -434,7 +434,9 @@ export class ShieldManager {
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
             'fingerprint_disabled': 'Fingerprint Authentication Disabled',
             'authenticator_enabled': 'App Authenticator Enabled',
-            'authenticator_disabled': 'App Authenticator Disabled'
+            'authenticator_disabled': 'App Authenticator Disabled',
+            'email_2fa_enabled': 'Email Two-Factor Authentication Enabled',
+            'email_2fa_disabled': 'Email Two-Factor Authentication Disabled'
         };
         return types[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
@@ -611,6 +613,34 @@ export class ShieldManager {
         // Setup authenticator buttons
         document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticatorUI());
         document.getElementById('disableAuthenticator')?.addEventListener('click', () => this.disableAuthenticatorUI());
+        
+        // Setup email 2FA buttons
+        document.getElementById('enableEmailTwoFactor')?.addEventListener('click', () => this.enableEmailTwoFactorUI());
+        document.getElementById('disableEmailTwoFactor')?.addEventListener('click', () => this.disableEmailTwoFactorUI());
+    }
+
+    async enableEmailTwoFactorUI() {
+        if (await this.showInlineConfirm('Enable email-based two-factor authentication? You will receive codes via email.')) {
+            await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
+                emailTwoFactorEnabled: true
+            });
+            await this.logSecurityEvent('email_2fa_enabled');
+            this.showInlineAlert('Email two-factor authentication enabled');
+            await this.loadBiometricStatus();
+            await this.loadSecurityScore();
+        }
+    }
+
+    async disableEmailTwoFactorUI() {
+        if (await this.showInlineConfirm('Are you sure you want to disable email two-factor authentication?')) {
+            await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
+                emailTwoFactorEnabled: firebase.firestore.FieldValue.delete()
+            });
+            await this.logSecurityEvent('email_2fa_disabled');
+            this.showInlineAlert('Email two-factor authentication disabled');
+            await this.loadBiometricStatus();
+            await this.loadSecurityScore();
+        }
     }
 
     toggleSection(sectionId) {
@@ -731,7 +761,9 @@ export class ShieldManager {
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
             'fingerprint_disabled': 'Fingerprint Authentication Disabled',
             'authenticator_enabled': 'App Authenticator Enabled',
-            'authenticator_disabled': 'App Authenticator Disabled'
+            'authenticator_disabled': 'App Authenticator Disabled',
+            'email_2fa_enabled': 'Email Two-Factor Authentication Enabled',
+            'email_2fa_disabled': 'Email Two-Factor Authentication Disabled'
         };
         return types[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
@@ -872,7 +904,12 @@ export class ShieldManager {
             const setupAuthenticatorBtn = document.getElementById('setupAuthenticator');
             const disableAuthenticatorBtn = document.getElementById('disableAuthenticator');
             
+            const emailTwoFactorStatus = document.getElementById('emailTwoFactorStatus');
+            const enableEmailTwoFactorBtn = document.getElementById('enableEmailTwoFactor');
+            const disableEmailTwoFactorBtn = document.getElementById('disableEmailTwoFactor');
+            
             const authenticatorEnabled = data.authenticatorEnabled === true && data.totpSecret;
+            const emailTwoFactorEnabled = data.emailTwoFactorEnabled === true;
                 
             if (authenticatorStatus) {
                 authenticatorStatus.innerHTML = authenticatorEnabled ? 
@@ -880,9 +917,20 @@ export class ShieldManager {
                     '<span style="color: var(--text-muted);">❌ Disabled</span>';
             }
             
+            if (emailTwoFactorStatus) {
+                emailTwoFactorStatus.innerHTML = emailTwoFactorEnabled ? 
+                    '<span style="color: var(--success);">✅ Enabled</span>' : 
+                    '<span style="color: var(--text-muted);">❌ Disabled</span>';
+            }
+            
             if (setupAuthenticatorBtn && disableAuthenticatorBtn) {
                 setupAuthenticatorBtn.style.display = authenticatorEnabled ? 'none' : 'inline-block';
                 disableAuthenticatorBtn.style.display = authenticatorEnabled ? 'inline-block' : 'none';
+            }
+            
+            if (enableEmailTwoFactorBtn && disableEmailTwoFactorBtn) {
+                enableEmailTwoFactorBtn.style.display = emailTwoFactorEnabled ? 'none' : 'inline-block';
+                disableEmailTwoFactorBtn.style.display = emailTwoFactorEnabled ? 'inline-block' : 'none';
             }
         } catch (error) {
             console.error('Failed to load biometric status:', error);
@@ -923,18 +971,75 @@ export class ShieldManager {
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
         const colors = { success: '#00ff88', error: '#ff4444', info: '#00d4ff' };
-        modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:${colors[type]};font-size:48px;margin-bottom:20px;">${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><button onclick="this.parentElement.parentElement.remove()" style="background:${colors[type]};color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;">OK</button></div>`;
+        modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:${colors[type]};font-size:48px;margin-bottom:20px;">${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><button class="ok-btn" style="background:${colors[type]};color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;">OK</button></div>`;
         document.body.appendChild(modal);
-        setTimeout(() => modal.remove(), 5000);
+        
+        const cleanup = () => {
+            modal.remove();
+        };
+        
+        const okBtn = modal.querySelector('.ok-btn');
+        okBtn.onclick = cleanup;
+        
+        // Close on background click
+        modal.onclick = (e) => {
+            if (e.target === modal) cleanup();
+        };
+        
+        // Close on escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', handleEscape);
+                cleanup();
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        
+        // Auto-close after 5 seconds
+        setTimeout(cleanup, 5000);
     }
 
     showInlineConfirm(message) {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:#ffaa00;font-size:48px;margin-bottom:20px;">⚠</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><div><button onclick="this.parentElement.parentElement.parentElement.remove();window.tempResolve(true)" style="background:#ff4444;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Yes</button><button onclick="this.parentElement.parentElement.parentElement.remove();window.tempResolve(false)" style="background:#666;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Cancel</button></div></div>`;
+            modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:#ffaa00;font-size:48px;margin-bottom:20px;">⚠</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><div><button class="confirm-btn" style="background:#ff4444;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Yes</button><button class="cancel-btn" style="background:#666;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Cancel</button></div></div>`;
             document.body.appendChild(modal);
-            window.tempResolve = resolve;
+            
+            const confirmBtn = modal.querySelector('.confirm-btn');
+            const cancelBtn = modal.querySelector('.cancel-btn');
+            
+            const cleanup = () => {
+                modal.remove();
+            };
+            
+            confirmBtn.onclick = () => {
+                cleanup();
+                resolve(true);
+            };
+            
+            cancelBtn.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+            
+            // Close on background click
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    cleanup();
+                    resolve(false);
+                }
+            };
+            
+            // Close on escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    document.removeEventListener('keydown', handleEscape);
+                    cleanup();
+                    resolve(false);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
         });
     }
 }
