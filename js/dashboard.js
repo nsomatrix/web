@@ -112,22 +112,78 @@ async function verify2FA(user) {
         modal.innerHTML = `
             <div style="background:#1a1a1a;color:white;padding:40px;border-radius:16px;max-width:400px;text-align:center;border:1px solid #333;">
                 <h3 style="color:#00d4ff;margin-bottom:30px;">🔐 Two-Factor Authentication Required</h3>
-                <p style="color:#ccc;margin-bottom:30px;">Enter your 6-digit authenticator code:</p>
-                <input type="text" id="authCodeInput" placeholder="000000" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;width:150px;text-align:center;border-radius:8px;font-size:18px;letter-spacing:2px;" maxlength="6" />
-                <br><br>
-                <button id="verifyCodeBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Verify Code</button>
-                <button id="signOutBtn" style="background:#dc3545;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Sign Out</button>
+                
+                <div id="authMethodSelection">
+                    <p style="color:#ccc;margin-bottom:30px;">Choose your verification method:</p>
+                    <button id="useAuthenticatorBtn" style="background:#007bff;color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
+                        📱 Use Authenticator App
+                    </button>
+                    <button id="useEmailCodeBtn" style="background:#ffc107;color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
+                        ✉️ Send Email Code
+                    </button>
+                </div>
+                
+                <div id="authCodeSection" style="display:none;">
+                    <p id="codePrompt" style="color:#ccc;margin-bottom:20px;">Enter your 6-digit code:</p>
+                    <input type="text" id="authCodeInput" placeholder="000000" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;width:150px;text-align:center;border-radius:8px;font-size:18px;letter-spacing:2px;" maxlength="6" />
+                    <br><br>
+                    <button id="verifyCodeBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Verify Code</button>
+                    <button id="backBtn" style="background:#6c757d;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Back</button>
+                </div>
+                
+                <button id="signOutBtn" style="background:#dc3545;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin-top:20px;">Sign Out</button>
             </div>
         `;
         
         document.body.appendChild(modal);
         
+        const methodSelection = document.getElementById('authMethodSelection');
+        const codeSection = document.getElementById('authCodeSection');
+        const codePrompt = document.getElementById('codePrompt');
         const codeInput = document.getElementById('authCodeInput');
         const verifyBtn = document.getElementById('verifyCodeBtn');
+        const backBtn = document.getElementById('backBtn');
         const signOutBtn = document.getElementById('signOutBtn');
         
-        codeInput.focus();
+        let currentMethod = null;
         
+        // Authenticator app method
+        document.getElementById('useAuthenticatorBtn').onclick = () => {
+            currentMethod = 'authenticator';
+            methodSelection.style.display = 'none';
+            codeSection.style.display = 'block';
+            codePrompt.textContent = 'Enter your authenticator app code:';
+            codeInput.focus();
+        };
+        
+        // Email code method
+        document.getElementById('useEmailCodeBtn').onclick = async () => {
+            currentMethod = 'email';
+            methodSelection.style.display = 'none';
+            codeSection.style.display = 'block';
+            codePrompt.textContent = 'Sending email code...';
+            
+            try {
+                await sendEmailCode(user.email);
+                codePrompt.textContent = 'Enter the code sent to your email:';
+                codeInput.focus();
+            } catch (error) {
+                codePrompt.textContent = 'Failed to send email. Try authenticator app.';
+                setTimeout(() => {
+                    backBtn.click();
+                }, 2000);
+            }
+        };
+        
+        // Back button
+        backBtn.onclick = () => {
+            methodSelection.style.display = 'block';
+            codeSection.style.display = 'none';
+            codeInput.value = '';
+            currentMethod = null;
+        };
+        
+        // Verify code
         const verify = async () => {
             const code = codeInput.value.trim();
             if (!/^\d{6}$/.test(code)) {
@@ -139,12 +195,16 @@ async function verify2FA(user) {
             verifyBtn.textContent = 'Verifying...';
             
             try {
-                const doc = await db.collection('players').doc(user.uid).get();
-                const data = doc.data();
+                let isValid = false;
                 
-                // Import TOTP verification
-                const { TOTPManager } = await import('./modules/totp.js');
-                const isValid = await TOTPManager.verifyTOTP(data.totpSecret, code);
+                if (currentMethod === 'authenticator') {
+                    const doc = await db.collection('players').doc(user.uid).get();
+                    const data = doc.data();
+                    const { TOTPManager } = await import('./modules/totp.js');
+                    isValid = await TOTPManager.verifyTOTP(data.totpSecret, code);
+                } else if (currentMethod === 'email') {
+                    isValid = await verifyEmailCode(user.uid, code);
+                }
                 
                 if (isValid) {
                     modal.remove();
@@ -174,6 +234,46 @@ async function verify2FA(user) {
             resolve(false);
         };
     });
+}
+
+async function sendEmailCode(email) {
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+    
+    await db.collection('emailVerifications').doc(auth.currentUser.uid).set({
+        code: verificationCode,
+        expiry: expiry,
+        used: false,
+        email: email
+    });
+    
+    // Send email via EmailJS proxy
+    const response = await fetch('https://emailjs-proxy.nsomtx.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: email, code: verificationCode })
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to send email');
+    }
+}
+
+async function verifyEmailCode(uid, code) {
+    try {
+        const doc = await db.collection('emailVerifications').doc(uid).get();
+        if (!doc.exists) return false;
+        
+        const data = doc.data();
+        if (data.used || Date.now() > data.expiry) return false;
+        if (data.code !== code) return false;
+        
+        // Mark as used
+        await doc.ref.update({ used: true });
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 // Avatar functions

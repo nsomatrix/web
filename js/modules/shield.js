@@ -55,27 +55,36 @@ export class ShieldManager {
             const fingerprint = this.generateBrowserFingerprint();
             const ip = await this.getClientIP();
             
-            // Check for existing session with same fingerprint and IP
+            // Check for existing session with same fingerprint OR same IP
             const existingSessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions')
-                .where('fingerprint', '==', fingerprint)
-                .where('ip', '==', ip)
                 .where('isActive', '==', true)
                 .get();
             
-            if (!existingSessions.empty) {
+            // Find matching session by fingerprint or IP
+            let matchingSession = null;
+            existingSessions.forEach(doc => {
+                const data = doc.data();
+                if (data.fingerprint === fingerprint || data.ip === ip) {
+                    matchingSession = doc;
+                }
+            });
+            
+            if (matchingSession) {
                 // Update existing session
-                const existingSession = existingSessions.docs[0];
-                this.currentSessionId = existingSession.id;
+                this.currentSessionId = matchingSession.id;
                 sessionStorage.setItem('nsomatrix_session_id', this.currentSessionId);
                 
-                await existingSession.ref.update({
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                await matchingSession.ref.update({
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+                    userAgent: navigator.userAgent,
+                    browser: getBrowserInfo(),
+                    device: getDeviceInfo()
                 });
                 return;
             }
 
-            // Create new session
+            // Create new session only if no match found
             const sessionData = {
                 sessionId: this.currentSessionId,
                 fingerprint: fingerprint,
@@ -540,6 +549,7 @@ export class ShieldManager {
 
     // UI Management Methods
     async loadShieldData() {
+        await this.cleanupDuplicateSessions();
         await this.loadSecurityScore();
         await this.loadSessionsData();
         await this.loadHistoryData();
@@ -729,18 +739,36 @@ export class ShieldManager {
         );
     }
 
-    async cleanupAllSessionsUI() {
-        showConfirmModal(
-            'Clean Up Old Sessions',
-            'This will remove all inactive sessions older than 24 hours.',
-            'Clean Up',
-            'Cancel',
-            async () => {
-                await this.cleanupOldSessions();
-                window.showMessageBox('Old sessions cleaned up', 'success', 2000);
-                this.loadSessionsData();
+    async cleanupDuplicateSessions() {
+        if (!this.authManager.currentUser) return;
+        
+        try {
+            const sessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions').where('isActive', '==', true).get();
+            
+            const seenFingerprints = new Set();
+            const seenIPs = new Set();
+            const batch = this.db.batch();
+            
+            sessions.docs.forEach(doc => {
+                const data = doc.data();
+                const isDuplicate = seenFingerprints.has(data.fingerprint) || seenIPs.has(data.ip);
+                
+                if (isDuplicate && doc.id !== this.currentSessionId) {
+                    // Delete duplicate session
+                    batch.delete(doc.ref);
+                } else {
+                    seenFingerprints.add(data.fingerprint);
+                    seenIPs.add(data.ip);
+                }
+            });
+            
+            if (!batch._delegate._mutations.length === 0) {
+                await batch.commit();
             }
-        );
+        } catch (error) {
+            console.log('Duplicate cleanup failed:', error.message);
+        }
     }
 
 
