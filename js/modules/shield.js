@@ -433,7 +433,11 @@ export class ShieldManager {
         }
 
         if (!window.PublicKeyCredential || !navigator.credentials) {
-            throw new Error('WebAuthn not supported on this device');
+            throw new Error('WebAuthn not supported on this browser');
+        }
+        
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            throw new Error('WebAuthn requires HTTPS connection');
         }
 
         const challenge = crypto.getRandomValues(new Uint8Array(32));
@@ -1119,6 +1123,11 @@ export class ShieldManager {
     async setupFingerprintUI() {
         if (!this.isMobileDevice()) {
             this.showInlineAlert('Fingerprint authentication can only be set up on mobile devices. Please use your phone to enable this feature.');
+            return;
+        }
+        
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            this.showInlineAlert('Fingerprint authentication requires HTTPS connection. Please access the site via HTTPS.');
             return;
         }
         
