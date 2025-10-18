@@ -617,7 +617,7 @@ export class ShieldManager {
             
             item.innerHTML = `
                 <div>
-                    <strong>${getBrowserInfo()} on ${getDeviceInfo()}</strong>
+                    <strong>${session.browser || 'Unknown'} on ${session.device || 'Unknown'}</strong>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">
                         ${session.ip} • ${formatTimestamp(session.lastActivity)}
                         ${isCurrentSession ? ' • Current Session' : ''}
