@@ -1,8 +1,8 @@
-/* Shield Modal - Modern Clean Design - Fixed Layout */
+/* Shield Modal - Industry Standard Responsive Design */
 .shield-modal {
   max-width: 900px;
   width: 95vw;
-  max-height: 90vh;
+  max-height: calc(100vh - 120px); /* Account for navbar (60px) + footer (40px) + padding (20px) */
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 0, 0, 0.3);
@@ -10,10 +10,14 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   color: #ffffff;
   overflow: hidden;
-  position: relative;
-  z-index: 1000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1100; /* Higher than navbar (1050) */
   display: flex;
   flex-direction: column;
+  margin: 0;
 }
 
 .shield-header {
@@ -91,6 +95,25 @@
   overflow-y: auto;
   background: transparent;
   min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 0, 0, 0.3) transparent;
+}
+
+.shield-sections::-webkit-scrollbar {
+  width: 6px;
+}
+
+.shield-sections::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shield-sections::-webkit-scrollbar-thumb {
+  background: rgba(255, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.shield-sections::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 0, 0, 0.5);
 }
 
 .shield-section {
@@ -295,6 +318,11 @@
   letter-spacing: 0.5px;
   position: relative;
   z-index: 3;
+  min-height: 44px; /* Minimum touch target size */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .shield-modal .btn-primary {
@@ -365,13 +393,14 @@
 @media (max-width: 768px) {
   .shield-modal {
     width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(100vh - 100px); /* Account for navbar + footer */
+    max-height: calc(100vh - 100px);
     border-radius: 0;
     position: fixed;
-    top: 0;
+    top: 60px; /* Below navbar */
     left: 0;
-    z-index: 10000;
+    transform: none;
+    z-index: 1100;
   }
   
   .shield-header {
@@ -460,6 +489,11 @@
 
 /* Small Mobile */
 @media (max-width: 480px) {
+  .shield-modal {
+    height: calc(100vh - 100px);
+    max-height: calc(100vh - 100px);
+  }
+  
   .shield-header {
     padding: 16px;
     flex-direction: column;
@@ -486,6 +520,53 @@
   
   .backup-codes-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .shield-modal {
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+  }
+  
+  .shield-header {
+    padding: 12px 20px;
+  }
+  
+  .security-score {
+    padding: 8px 12px;
+  }
+  
+  .score-circle {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
+  }
+}
+
+/* Very Small Screens */
+@media (max-width: 320px) {
+  .shield-modal {
+    width: 100vw;
+    height: calc(100vh - 100px);
+    border-radius: 0;
+  }
+  
+  .shield-header {
+    padding: 12px;
+  }
+  
+  .shield-header h3 {
+    font-size: 14px;
+  }
+  
+  .section-header {
+    padding: 12px;
+  }
+  
+  .section-content {
+    padding: 0 12px 12px;
   }
 }
 
@@ -525,4 +606,28 @@
   position: static;
   transform: none;
   margin: 0;
+}
+
+/* Ensure modal backdrop is properly positioned */
+.modal {
+  backdrop-filter: blur(4px);
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Ensure proper stacking context */
+.retro-navbar {
+  z-index: 1050;
+}
+
+.matrix-footer {
+  z-index: 1049;
+}
+
+.shield-modal,
+.modal {
+  z-index: 1100;
 }

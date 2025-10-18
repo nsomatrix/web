@@ -760,6 +760,35 @@ export class ShieldManager {
         await this.loadSecurityEvents();
         await this.loadBiometricStatus();
         this.setupShieldTabs();
+        this.setupModalHandlers();
+    }
+    
+    setupModalHandlers() {
+        // Add body scroll lock when shield modal opens
+        const shieldModal = document.getElementById('shieldModal');
+        if (shieldModal) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const isVisible = shieldModal.style.display !== 'none';
+                        if (isVisible) {
+                            document.body.classList.add('modal-open');
+                        } else {
+                            document.body.classList.remove('modal-open');
+                        }
+                    }
+                });
+            });
+            observer.observe(shieldModal, { attributes: true });
+        }
+        
+        // Handle close button
+        const closeButton = document.querySelector('[data-modal="shieldModal"]');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                document.body.classList.remove('modal-open');
+            });
+        }
     }
 
     setupShieldTabs() {
@@ -922,16 +951,18 @@ export class ShieldManager {
                 <h3 style="margin:0 0 16px 0;font-size:18px;font-weight:600;color:white;">${title}</h3>
                 <p style="margin:0 0 24px 0;color:#ccc;line-height:1.5;">${message}</p>
                 <div style="display:flex;gap:12px;justify-content:flex-end;">
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#2d2d2d;color:#ccc;border:1px solid #555;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${cancelText}</button>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove();document.body.classList.remove('modal-open');" style="background:#2d2d2d;color:#ccc;border:1px solid #555;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${cancelText}</button>
                     <button id="confirmBtn" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${confirmText}</button>
                 </div>
             </div>
         `;
         
         document.body.appendChild(modal);
+        document.body.classList.add('modal-open');
         
         modal.querySelector('#confirmBtn').onclick = () => {
             modal.remove();
+            document.body.classList.remove('modal-open');
             onConfirm();
         };
     }
