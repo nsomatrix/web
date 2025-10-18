@@ -147,18 +147,25 @@ export class ShieldManager {
     }
 
     async revokeAllSessions() {
-        const sessions = await this.getSessions();
-        const batch = this.db.batch();
+        if (!this.authManager.currentUser) return;
         
-        sessions.forEach(session => {
-            if (session.id !== this.currentSessionId) {
-                const ref = this.db.collection('players').doc(this.authManager.currentUser.uid)
-                    .collection('sessions').doc(session.id);
-                batch.update(ref, { isActive: false });
-            }
-        });
-        
-        await batch.commit();
+        try {
+            const sessions = await this.getSessions();
+            const batch = this.db.batch();
+            
+            sessions.forEach(session => {
+                if (session.id !== this.currentSessionId) {
+                    const ref = this.db.collection('players').doc(this.authManager.currentUser.uid)
+                        .collection('sessions').doc(session.id);
+                    batch.delete(ref); // Delete instead of marking inactive
+                }
+            });
+            
+            await batch.commit();
+        } catch (error) {
+            console.error('Error revoking all sessions:', error);
+            throw error;
+        }
     }
 
     // Industry Standard Login History
@@ -533,6 +540,36 @@ export class ShieldManager {
         await this.loadBiometricStatus();
         this.setupShieldTabs();
         this.setupModalHandlers();
+        this.setupRealtimeListeners();
+    }
+
+    setupRealtimeListeners() {
+        if (!this.authManager.currentUser) return;
+        
+        // Real-time session updates
+        this.sessionListener = this.db.collection('players').doc(this.authManager.currentUser.uid)
+            .collection('sessions').where('isActive', '==', true)
+            .onSnapshot(() => {
+                this.loadSessionsData();
+            });
+        
+        // Real-time user data updates (for authenticator status)
+        this.userListener = this.db.collection('players').doc(this.authManager.currentUser.uid)
+            .onSnapshot(() => {
+                this.loadBiometricStatus();
+                this.loadSecurityScore();
+            });
+    }
+
+    cleanup() {
+        if (this.sessionListener) {
+            this.sessionListener();
+            this.sessionListener = null;
+        }
+        if (this.userListener) {
+            this.userListener();
+            this.userListener = null;
+        }
     }
     
     setupModalHandlers() {
@@ -693,9 +730,15 @@ export class ShieldManager {
     }
 
     async revokeSessionUI(sessionId) {
-        await this.revokeSession(sessionId);
-        window.showMessageBox('Session revoked successfully', 'success', 2000);
-        await this.loadSessionsData();
+        try {
+            // Actually delete the session document
+            await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions').doc(sessionId).delete();
+            window.showMessageBox('Session revoked successfully', 'success', 2000);
+        } catch (error) {
+            console.error('Error revoking session:', error);
+            window.showMessageBox('Failed to revoke session', 'error', 3000);
+        }
     }
 
     async revokeAllSessionsUI() {

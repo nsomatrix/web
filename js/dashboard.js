@@ -81,6 +81,32 @@ function setupAuthStateListener() {
     });
 }
 
+// Session validation - check if current session still exists
+async function validateSession() {
+    if (!authManager.currentUser || !shieldManager.currentSessionId) return true;
+    
+    try {
+        const sessionDoc = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('sessions').doc(shieldManager.currentSessionId).get();
+        
+        if (!sessionDoc.exists) {
+            showMessageBox('Session revoked from another device. Signing out...', 'warning', 3000);
+            setTimeout(() => {
+                auth.signOut();
+                window.location.href = 'login.html';
+            }, 3000);
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Session validation error:', error);
+        return true; // Don't sign out on error
+    }
+}
+
+// Check session every 30 seconds
+setInterval(validateSession, 30000);
+
 // Initialize managers
 function initializeManagers() {
     authManager = new AuthManager(auth, db);
