@@ -695,7 +695,7 @@ export class ShieldManager {
     async revokeSessionUI(sessionId) {
         await this.revokeSession(sessionId);
         window.showMessageBox('Session revoked successfully', 'success', 2000);
-        this.loadSessionsData();
+        await this.loadSessionsData();
     }
 
     async revokeAllSessionsUI() {
@@ -708,7 +708,7 @@ export class ShieldManager {
                 await this.revokeAllSessions();
                 await this.cleanupOldSessions(); // Also cleanup old sessions
                 window.showMessageBox('All other sessions signed out', 'success', 2000);
-                this.loadSessionsData();
+                await this.loadSessionsData();
             }
         );
     }
@@ -845,7 +845,8 @@ export class ShieldManager {
         try {
             await this.setupAuthenticator();
             this.showInlineAlert('Authenticator app enabled');
-            this.loadBiometricStatus();
+            await this.loadBiometricStatus();
+            await this.loadSecurityScore();
         } catch (error) {
             this.showInlineAlert('Failed to setup authenticator: ' + error.message);
         }
@@ -863,7 +864,8 @@ export class ShieldManager {
             });
             await this.logSecurityEvent('authenticator_disabled');
             this.showInlineAlert('Authenticator app disabled');
-            this.loadBiometricStatus();
+            await this.loadBiometricStatus();
+            await this.loadSecurityScore();
         }
     }
 
