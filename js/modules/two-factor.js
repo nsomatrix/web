@@ -8,7 +8,7 @@ export class TwoFactorAuth {
         try {
             const doc = await this.db.collection('players').doc(user.uid).get();
             const data = doc.data() || {};
-            return data.fingerprintEnabled || data.authenticatorEnabled;
+            return data.authenticatorEnabled;
         } catch (error) {
             return false;
         }
@@ -30,22 +30,12 @@ export class TwoFactorAuth {
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10002;display:flex;align-items:center;justify-content:center;';
         
-        let methods = [];
-        if (data.fingerprintEnabled && this.isMobile()) methods.push('fingerprint');
-        if (data.authenticatorEnabled) methods.push('authenticator');
-        
         modal.innerHTML = `
             <div style="background:#1a1a1a;color:white;padding:40px;border-radius:16px;max-width:400px;text-align:center;border:1px solid #333;">
                 <h3 style="color:#00d4ff;margin-bottom:30px;">🔐 Two-Factor Authentication</h3>
                 <p style="color:#ccc;margin-bottom:30px;">Choose your verification method:</p>
                 
-                ${methods.includes('fingerprint') ? `
-                    <button id="useFingerprintBtn" style="background:linear-gradient(135deg,#00ff88,#00cc6a);color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
-                        👆 Use Fingerprint
-                    </button>
-                ` : ''}
-                
-                ${methods.includes('authenticator') ? `
+                ${data.authenticatorEnabled ? `
                     <button id="useAuthenticatorBtn" style="background:linear-gradient(135deg,#007bff,#0056b3);color:white;border:none;padding:15px 30px;border-radius:8px;cursor:pointer;margin:10px;width:100%;font-weight:600;">
                         📱 Use Authenticator App
                     </button>
@@ -65,27 +55,8 @@ export class TwoFactorAuth {
         
         document.body.appendChild(modal);
         
-        // Fingerprint verification
-        if (methods.includes('fingerprint')) {
-            document.getElementById('useFingerprintBtn').onclick = async () => {
-                try {
-                    await navigator.credentials.get({
-                        publicKey: {
-                            challenge: crypto.getRandomValues(new Uint8Array(32)),
-                            timeout: 60000,
-                            userVerification: "required"
-                        }
-                    });
-                    modal.remove();
-                    resolve(true);
-                } catch (error) {
-                    this.showError('Fingerprint verification failed');
-                }
-            };
-        }
-        
         // Authenticator verification
-        if (methods.includes('authenticator')) {
+        if (data.authenticatorEnabled) {
             document.getElementById('useAuthenticatorBtn').onclick = () => {
                 document.getElementById('authCodeSection').style.display = 'block';
                 document.getElementById('verifyCodeBtn').onclick = async () => {
@@ -169,9 +140,7 @@ export class TwoFactorAuth {
         return new Uint8Array(bytes);
     }
 
-    isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
+
 
     showError(message) {
         window.showMessageBox(message, 'error', 3000);

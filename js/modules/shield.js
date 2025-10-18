@@ -252,8 +252,8 @@ export class ShieldManager {
         // Email verification (5 points)
         if (this.authManager.currentUser.emailVerified) score += 5;
 
-        // Biometric authentication (10 points)
-        if (data.fingerprintEnabled || data.authenticatorEnabled) score += 10;
+        // Two-factor authentication (10 points)
+        if (data.authenticatorEnabled) score += 10;
 
         // Account age (5 points)
         const accountAge = (Date.now() - this.authManager.currentUser.metadata.creationTime) / (1000 * 60 * 60 * 24);
@@ -426,57 +426,7 @@ export class ShieldManager {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
-    // Real Biometric Authentication
-    async setupFingerprint() {
-        if (!this.isMobileDevice()) {
-            throw new Error('Fingerprint authentication can only be set up on mobile devices');
-        }
 
-        if (!window.PublicKeyCredential || !navigator.credentials) {
-            throw new Error('WebAuthn not supported on this browser');
-        }
-        
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-            throw new Error('WebAuthn requires HTTPS connection');
-        }
-
-        const challenge = crypto.getRandomValues(new Uint8Array(32));
-        
-        const credential = await navigator.credentials.create({
-            publicKey: {
-                challenge: challenge,
-                rp: { 
-                    name: "NSO Matrix",
-                    id: window.location.hostname
-                },
-                user: {
-                    id: new TextEncoder().encode(this.authManager.currentUser.uid),
-                    name: this.authManager.currentUser.email,
-                    displayName: this.authManager.currentUser.displayName || this.authManager.currentUser.email
-                },
-                pubKeyCredParams: [
-                    { alg: -7, type: "public-key" },  // ES256
-                    { alg: -257, type: "public-key" } // RS256
-                ],
-                authenticatorSelection: {
-                    authenticatorAttachment: "platform",
-                    userVerification: "required",
-                    requireResidentKey: false
-                },
-                attestation: "direct",
-                timeout: 60000
-            }
-        });
-
-        // Store credential properly for verification
-        await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
-            fingerprintEnabled: true,
-            fingerprintCredentialId: Array.from(new Uint8Array(credential.rawId)),
-            fingerprintPublicKey: Array.from(new Uint8Array(credential.response.getPublicKey()))
-        });
-
-        await this.logSecurityEvent('fingerprint_enabled');
-    }
 
     // Real TOTP Authenticator
     async setupAuthenticator() {
@@ -647,10 +597,8 @@ export class ShieldManager {
     }
 
     setupShieldTabs() {
-        // Setup biometric buttons
-        document.getElementById('setupFingerprint')?.addEventListener('click', () => this.setupFingerprintUI());
+        // Setup authenticator buttons
         document.getElementById('setupAuthenticator')?.addEventListener('click', () => this.setupAuthenticatorUI());
-        document.getElementById('disableFingerprint')?.addEventListener('click', () => this.disableFingerprintUI());
         document.getElementById('disableAuthenticator')?.addEventListener('click', () => this.disableAuthenticatorUI());
     }
 
@@ -935,26 +883,11 @@ export class ShieldManager {
             const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
             const data = playerDoc.data() || {};
             
-            const fingerprintStatus = document.getElementById('fingerprintStatus');
             const authenticatorStatus = document.getElementById('authenticatorStatus');
-            const setupFingerprintBtn = document.getElementById('setupFingerprint');
-            const disableFingerprintBtn = document.getElementById('disableFingerprint');
             const setupAuthenticatorBtn = document.getElementById('setupAuthenticator');
             const disableAuthenticatorBtn = document.getElementById('disableAuthenticator');
             
-            const fingerprintEnabled = data.fingerprintEnabled && data.fingerprintCredentialId;
             const authenticatorEnabled = data.authenticatorEnabled && data.totpSecret;
-            
-            if (fingerprintStatus) {
-                fingerprintStatus.innerHTML = fingerprintEnabled ? 
-                    '<span style="color: var(--success);">✅ Enabled</span>' : 
-                    '<span style="color: var(--text-muted);">❌ Disabled</span>';
-            }
-            
-            if (setupFingerprintBtn && disableFingerprintBtn) {
-                setupFingerprintBtn.style.display = fingerprintEnabled ? 'none' : 'inline-block';
-                disableFingerprintBtn.style.display = fingerprintEnabled ? 'inline-block' : 'none';
-            }
                 
             if (authenticatorStatus) {
                 authenticatorStatus.innerHTML = authenticatorEnabled ? 
@@ -971,25 +904,7 @@ export class ShieldManager {
         }
     }
 
-    async setupFingerprintUI() {
-        if (!this.isMobileDevice()) {
-            this.showInlineAlert('Fingerprint authentication can only be set up on mobile devices. Please use your phone to enable this feature.');
-            return;
-        }
-        
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-            this.showInlineAlert('Fingerprint authentication requires HTTPS connection. Please access the site via HTTPS.');
-            return;
-        }
-        
-        try {
-            await this.setupFingerprint();
-            this.showInlineAlert('Fingerprint authentication enabled');
-            this.loadBiometricStatus();
-        } catch (error) {
-            this.showInlineAlert('Failed to setup fingerprint: ' + error.message);
-        }
-    }
+
 
     async setupAuthenticatorUI() {
         try {
@@ -1042,32 +957,9 @@ export class ShieldManager {
         return new Uint8Array(bytes);
     }
 
-    async disableFingerprintUI() {
-        const verified = await this.verifyBiometricAuth();
-        if (!verified) {
-            this.showInlineAlert('Authentication required to disable fingerprint');
-            return;
-        }
-        
-        if (await this.showInlineConfirm('Are you sure you want to disable fingerprint authentication?')) {
-            await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
-                fingerprintEnabled: firebase.firestore.FieldValue.delete(),
-                fingerprintCredentialId: firebase.firestore.FieldValue.delete(),
-                fingerprintPublicKey: firebase.firestore.FieldValue.delete()
-            });
-            await this.logSecurityEvent('fingerprint_disabled');
-            this.showInlineAlert('Fingerprint authentication disabled');
-            this.loadBiometricStatus();
-        }
-    }
+
 
     async disableAuthenticatorUI() {
-        const verified = await this.verifyBiometricAuth();
-        if (!verified) {
-            this.showInlineAlert('Authentication required to disable authenticator');
-            return;
-        }
-        
         if (await this.showInlineConfirm('Are you sure you want to disable authenticator app?')) {
             await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
                 authenticatorEnabled: firebase.firestore.FieldValue.delete(),
