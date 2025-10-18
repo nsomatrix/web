@@ -8,7 +8,7 @@ import { FriendsManager } from './modules/friends.js';
 import { MessagingManager } from './modules/messaging.js';
 import { SocialManager } from './modules/social.js';
 import { ShieldManager } from './modules/shield.js';
-import { TwoFactorAuth } from './modules/two-factor.js';
+
 import { showMessageBox, openModal, closeModal } from './modules/ui.js';
 import { encryptData, decryptData } from './modules/crypto.js';
 
@@ -57,7 +57,7 @@ function setupAuthStateListener() {
 // Global variables
 let allAvatars = [];
 let currentAvatarIndex = 0;
-let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager, shieldManager, twoFactorAuth;
+let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager, shieldManager;
 
 
 // Desktop Dashboard Enhancement
@@ -97,7 +97,7 @@ function initializeManagers() {
     messagingManager = new MessagingManager(authManager, db);
     socialManager = new SocialManager(authManager, db);
     shieldManager = new ShieldManager(authManager, db);
-    twoFactorAuth = new TwoFactorAuth(auth, db);
+
     
     // Make managers globally available
     window.friendsManager = friendsManager;
@@ -235,14 +235,7 @@ async function setupDashboard(user) {
         setupOnlinePresence();
         setupNotificationCounters();
         
-        // Two-factor authentication check
-        if (twoFactorAuth) {
-            const twoFactorVerified = await twoFactorAuth.verifyTwoFactor(user);
-            if (!twoFactorVerified) {
-                auth.signOut();
-                return;
-            }
-        }
+
         
         // Initialize Shield features
         if (shieldManager) {

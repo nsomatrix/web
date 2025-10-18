@@ -1,13 +1,15 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import { TwoFactorAuth } from './modules/two-factor.js';
 
 // Wait for Firebase to be ready
-let auth, db;
+let auth, db, twoFactorAuth;
 
 function initializeFirebase() {
     if (window.firebaseReady && window.firebaseAuth && window.firebaseDb) {
         auth = window.firebaseAuth;
         db = window.firebaseDb;
+        twoFactorAuth = new TwoFactorAuth(auth, db);
         return true;
     }
     return false;
@@ -345,6 +347,17 @@ async function handleLogin() {
             }
         }
 
+        // Check 2FA
+        const requires2FA = await twoFactorAuth.requiresTwoFactor(user);
+        if (requires2FA) {
+            const verified = await twoFactorAuth.verifyTwoFactor(user);
+            if (!verified) {
+                await auth.signOut();
+                showMessageBox('Two-factor authentication failed', 'error');
+                return;
+            }
+        }
+        
         localStorage.setItem('userLoggedIn', 'true');
         showMessageBox('Login successful! Redirecting', 'success');
         
