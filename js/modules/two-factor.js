@@ -109,19 +109,19 @@ export class TwoFactorAuth {
                 email: email
             });
             
-            // Send email via Resend
-            const response = await fetch('https://resend-proxy.nsomtx.workers.dev', {
+            // Send email via EmailJS proxy
+            const response = await fetch('https://emailjs-proxy.nsomtx.workers.dev', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ to: email, code: verificationCode })
             });
             
-            if (response.ok) {
-                if (window.showMessageBox) {
-                    window.showMessageBox('Verification code sent to your email', 'success', 3000);
-                }
-            } else {
+            if (!response.ok) {
                 throw new Error('Failed to send email');
+            }
+            
+            if (window.showMessageBox) {
+                window.showMessageBox('Verification code sent to your email', 'success', 3000);
             }
         } catch (error) {
             console.error('Send magic link error:', error);
