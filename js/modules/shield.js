@@ -384,29 +384,7 @@ export class ShieldManager {
         return userData;
     }
 
-    // Account Lockdown
-    async lockdownAccount() {
-        if (!this.authManager.currentUser) return;
-        
-        await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
-            accountLocked: true,
-            lockedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
 
-        await this.revokeAllSessions();
-        await this.logSecurityEvent('account_locked');
-    }
-
-    async unlockAccount() {
-        if (!this.authManager.currentUser) return;
-        
-        await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
-            accountLocked: false,
-            unlockedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        await this.logSecurityEvent('account_unlocked');
-    }
 
     // Device Detection
     isMobileDevice() {
@@ -439,8 +417,6 @@ export class ShieldManager {
         const types = {
             'recovery_key_regenerated': 'Recovery Key Regenerated',
             'data_exported': 'Data Exported',
-            'account_locked': 'Account Locked',
-            'account_unlocked': 'Account Unlocked',
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
             'fingerprint_disabled': 'Fingerprint Authentication Disabled',
             'authenticator_enabled': 'App Authenticator Enabled',
@@ -708,8 +684,6 @@ export class ShieldManager {
         const types = {
             'recovery_key_regenerated': 'Recovery Key Regenerated',
             'data_exported': 'Data Exported',
-            'account_locked': 'Account Locked',
-            'account_unlocked': 'Account Unlocked',
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
             'fingerprint_disabled': 'Fingerprint Authentication Disabled',
             'authenticator_enabled': 'App Authenticator Enabled',
@@ -837,26 +811,7 @@ export class ShieldManager {
         );
     }
 
-    async lockdownAccountUI() {
-        showConfirmModal(
-            'Deactivate Account',
-            'This will temporarily deactivate your account and sign you out of all devices. You can reactivate by logging in again.',
-            'Deactivate Account',
-            'Cancel',
-            async () => {
-                try {
-                    await this.lockdownAccount();
-                    window.showMessageBox('Account deactivated successfully', 'success', 2000);
-                    setTimeout(() => {
-                        firebase.auth().signOut();
-                        window.location.href = 'login.html';
-                    }, 2000);
-                } catch (error) {
-                    window.showMessageBox('Failed to deactivate account', 'error', 3000);
-                }
-            }
-        );
-    }
+
 
     async loadBiometricStatus() {
         try {
