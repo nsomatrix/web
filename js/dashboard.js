@@ -66,6 +66,14 @@ function setupAuthStateListener() {
             document.getElementById('setup-section').style.display = 'none';
             document.getElementById('main-dashboard').style.display = 'none';
             authManager?.clearSession();
+            
+            // Clear 2FA session data on sign out
+            Object.keys(sessionStorage).forEach(key => {
+                if (key.startsWith('2fa_verified_')) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+            
             if (window.location.pathname !== '/login.html') {
                 window.location.href = "login.html";
             }
@@ -483,14 +491,28 @@ async function setupDashboard(user) {
     // Check if 2FA is required and verify it first
     const requires2FA = await check2FARequired(user);
     if (requires2FA) {
-        const verified = await verify2FA(user);
-        if (!verified) {
-            showMessageBox('2FA verification failed. Signing out.', 'error', 3000);
-            setTimeout(() => {
-                auth.signOut();
-                window.location.href = 'login.html';
-            }, 3000);
-            return;
+        // Check if 2FA was already verified in this session
+        const sessionVerified = sessionStorage.getItem('2fa_verified_' + user.uid);
+        const sessionTime = sessionStorage.getItem('2fa_verified_time_' + user.uid);
+        const currentTime = Date.now();
+        
+        // If verified within last 30 minutes, skip 2FA
+        if (sessionVerified && sessionTime && (currentTime - parseInt(sessionTime)) < 30 * 60 * 1000) {
+            console.log('2FA already verified in this session');
+        } else {
+            const verified = await verify2FA(user);
+            if (!verified) {
+                showMessageBox('2FA verification failed. Signing out.', 'error', 3000);
+                setTimeout(() => {
+                    auth.signOut();
+                    window.location.href = 'login.html';
+                }, 3000);
+                return;
+            } else {
+                // Store 2FA verification in session
+                sessionStorage.setItem('2fa_verified_' + user.uid, 'true');
+                sessionStorage.setItem('2fa_verified_time_' + user.uid, currentTime.toString());
+            }
         }
     }
     
