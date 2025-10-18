@@ -125,10 +125,10 @@ async function verify2FA(user) {
                 
                 <div id="authCodeSection" style="display:none;">
                     <p id="codePrompt" style="color:#ccc;margin-bottom:20px;">Enter your 6-digit code:</p>
-                    <input type="text" id="authCodeInput" placeholder="000000" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;width:150px;text-align:center;border-radius:8px;font-size:18px;letter-spacing:2px;" maxlength="6" />
+                    <input type="tel" id="authCodeInput" placeholder="000000" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;width:150px;text-align:center;border-radius:8px;font-size:18px;letter-spacing:2px;" maxlength="6" inputmode="numeric" pattern="[0-9]*" />
                     <br><br>
-                    <button id="verifyCodeBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Verify Code</button>
-                    <button id="backBtn" style="background:#6c757d;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Back</button>
+                    <button id="verifyCodeBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;-webkit-tap-highlight-color:transparent;">Verify Code</button>
+                    <button id="backBtn" style="background:#6c757d;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;-webkit-tap-highlight-color:transparent;">Back</button>
                 </div>
                 
                 <button id="signOutBtn" style="background:#dc3545;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin-top:20px;">Sign Out</button>
@@ -186,7 +186,10 @@ async function verify2FA(user) {
         // Verify code
         const verify = async () => {
             const code = codeInput.value.trim();
+            console.log('Verifying code:', code, 'Method:', currentMethod);
+            
             if (!/^\d{6}$/.test(code)) {
+                console.log('Invalid code format');
                 showMessageBox('Please enter a valid 6-digit code', 'error', 3000);
                 return;
             }
@@ -198,42 +201,172 @@ async function verify2FA(user) {
                 let isValid = false;
                 
                 if (currentMethod === 'authenticator') {
+                    console.log('Verifying with authenticator');
                     const doc = await db.collection('players').doc(user.uid).get();
                     const data = doc.data();
-                    const { TOTPManager } = await import('./modules/totp.js');
-                    isValid = await TOTPManager.verifyTOTP(data.totpSecret, code);
+                    console.log('Got user data, has totpSecret:', !!data.totpSecret);
+                    
+                    // Use the global TOTP verification instead of import
+                    isValid = await verifyTOTPCode(data.totpSecret, code);
+                    console.log('TOTP verification result:', isValid);
                 } else if (currentMethod === 'email') {
+                    console.log('Verifying with email');
                     isValid = await verifyEmailCode(user.uid, code);
+                    console.log('Email verification result:', isValid);
                 }
                 
+                console.log('Final verification result:', isValid);
+                
                 if (isValid) {
+                    console.log('Verification successful, resolving');
                     modal.remove();
                     resolve(true);
                 } else {
+                    console.log('Verification failed');
                     showMessageBox('Invalid code. Please try again.', 'error', 3000);
-                    verifyBtn.disabled = false;
-                    verifyBtn.textContent = 'Verify Code';
-                    codeInput.value = '';
-                    codeInput.focus();
+                    setTimeout(() => {
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'Verify Code';
+                        codeInput.select();
+                    }, 100);
                 }
             } catch (error) {
                 console.error('2FA verification error:', error);
-                showMessageBox('Verification failed. Please try again.', 'error', 3000);
-                verifyBtn.disabled = false;
-                verifyBtn.textContent = 'Verify Code';
+                showMessageBox('Verification failed: ' + error.message, 'error', 3000);
+                setTimeout(() => {
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify Code';
+                }, 100);
             }
         };
         
-        verifyBtn.onclick = verify;
-        codeInput.onkeydown = (e) => {
-            if (e.key === 'Enter') verify();
-        };
+        // Use touchend for mobile compatibility
+        verifyBtn.addEventListener('click', verify);
+        verifyBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            verify();
+        });
+        
+        codeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verify();
+            }
+        });
+        
+        // Mobile-specific input handling
+        codeInput.addEventListener('input', (e) => {
+            // Only allow numbers
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            // Auto-verify when 6 digits entered on mobile
+            if (e.target.value.length === 6 && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                setTimeout(() => verify(), 500);
+            }
+        });
         
         signOutBtn.onclick = () => {
             modal.remove();
             resolve(false);
         };
     });
+}
+
+async function verifyTOTPCode(secret, token) {
+    try {
+        if (!secret || !token || token.length !== 6) {
+            return false;
+        }
+        
+        const currentTime = Math.floor(Date.now() / 1000 / 30);
+        
+        // Check current time and ±3 windows for mobile compatibility
+        for (let drift = -3; drift <= 3; drift++) {
+            const timeWindow = currentTime + drift;
+            const expectedToken = await generateTOTP(secret, timeWindow);
+            
+            if (expectedToken === token) {
+                return true;
+            }
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('TOTP verification error:', error);
+        return false;
+    }
+}
+
+async function generateTOTP(secret, timeWindow) {
+    try {
+        const key = base32ToBytes(secret);
+        if (!key || key.length === 0) {
+            throw new Error('Invalid secret key');
+        }
+        
+        // Create time buffer
+        const timeBytes = new Uint8Array(8);
+        const timeView = new DataView(timeBytes.buffer);
+        timeView.setUint32(4, timeWindow, false);
+        
+        // Use CryptoJS for mobile compatibility
+        const keyWordArray = CryptoJS.lib.WordArray.create(key);
+        const timeWordArray = CryptoJS.lib.WordArray.create(timeBytes);
+        
+        const hmac = CryptoJS.HmacSHA1(timeWordArray, keyWordArray);
+        const hmacBytes = new Uint8Array(hmac.sigBytes);
+        
+        // Convert WordArray to Uint8Array
+        for (let i = 0; i < hmac.sigBytes; i++) {
+            hmacBytes[i] = (hmac.words[Math.floor(i / 4)] >>> (24 - (i % 4) * 8)) & 0xff;
+        }
+        
+        const offset = hmacBytes[hmacBytes.length - 1] & 0xf;
+        const code = ((hmacBytes[offset] & 0x7f) << 24) | 
+                    ((hmacBytes[offset + 1] & 0xff) << 16) | 
+                    ((hmacBytes[offset + 2] & 0xff) << 8) | 
+                    (hmacBytes[offset + 3] & 0xff);
+        
+        const result = (code % 1000000).toString().padStart(6, '0');
+        return result;
+    } catch (error) {
+        console.error('TOTP generation error:', error);
+        throw error;
+    }
+}
+
+function base32ToBytes(base32) {
+    try {
+        if (!base32 || typeof base32 !== 'string') {
+            throw new Error('Invalid base32 input');
+        }
+        
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        const cleanBase32 = base32.toUpperCase().replace(/[^A-Z2-7]/g, '');
+        
+        if (cleanBase32.length === 0) {
+            throw new Error('Empty base32 string after cleaning');
+        }
+        
+        let bits = '';
+        for (let char of cleanBase32) {
+            const index = alphabet.indexOf(char);
+            if (index === -1) continue;
+            bits += index.toString(2).padStart(5, '0');
+        }
+        
+        const bytes = [];
+        for (let i = 0; i < bits.length; i += 8) {
+            const byte = bits.substring(i, i + 8);
+            if (byte.length === 8) {
+                bytes.push(parseInt(byte, 2));
+            }
+        }
+        
+        return new Uint8Array(bytes);
+    } catch (error) {
+        console.error('Base32 decode error:', error);
+        throw error;
+    }
 }
 
 async function sendEmailCode(email) {
