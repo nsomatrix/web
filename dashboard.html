@@ -393,6 +393,7 @@
                         <h4>Two-Factor Authentication</h4>
                     </div>
                     <div class="section-content">
+                        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">⚠️ Once enabled, these methods will be required for dashboard access after login.</p>
                         <div class="auth-method">
                             <div class="method-info">
                                 <span class="method-name">Biometric Authentication</span>
@@ -411,6 +412,15 @@
                             <div>
                                 <button class="btn btn-primary btn-sm" id="setupAuthenticator">Set Up</button>
                                 <button class="btn btn-danger btn-sm" id="disableAuthenticator" style="display:none;">Disable</button>
+                            </div>
+                        </div>
+                        <div class="auth-method">
+                            <div class="method-info">
+                                <span class="method-name">Magic Email Link</span>
+                                <span class="method-status">✅ Always Available</span>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">Fallback method</span>
                             </div>
                         </div>
                     </div>
@@ -488,6 +498,7 @@
     <script src="js/essentials.js"></script>
     <script src="js/fileChooser.js"></script>
     <script src="js/setup.js"></script>
+    <script src="js/magic-link-handler.js"></script>
     <script src="components/loader.js"></script>
     <script type="module" src="js/dashboard.js"></script>
     
