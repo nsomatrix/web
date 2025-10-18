@@ -12,6 +12,8 @@ export class ShieldManager {
         // Generate browser fingerprint for consistent session identification
         const fingerprint = this.generateBrowserFingerprint();
         let sessionId = sessionStorage.getItem('nsomatrix_session_id');
+        
+        // If no session ID or it was cleared, generate a new one
         if (!sessionId) {
             sessionId = fingerprint + '_' + Date.now().toString(36);
             sessionStorage.setItem('nsomatrix_session_id', sessionId);
@@ -50,6 +52,11 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
+            // Regenerate session ID if it was cleared
+            if (!this.currentSessionId) {
+                this.currentSessionId = this.generateSessionId();
+            }
+            
             await this.cleanupOldSessions();
             
             const fingerprint = this.generateBrowserFingerprint();

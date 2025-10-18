@@ -90,6 +90,17 @@ async function validateSession() {
             .collection('sessions').doc(shieldManager.currentSessionId).get();
         
         if (!sessionDoc.exists) {
+            console.log('Session was revoked, clearing session ID and allowing re-creation');
+            // Clear the revoked session ID so a new one can be created
+            shieldManager.currentSessionId = null;
+            sessionStorage.removeItem('nsomatrix_session_id');
+            
+            // Try to create a new session
+            if (shieldManager) {
+                await shieldManager.createSession();
+                return true; // Allow continued use with new session
+            }
+            
             showMessageBox('Session revoked from another device. Signing out...', 'warning', 3000);
             setTimeout(() => {
                 auth.signOut();
