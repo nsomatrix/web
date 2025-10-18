@@ -403,6 +403,17 @@
     z-index: 1100;
   }
   
+  .shield-modal .close-button {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    top: 16px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 50%;
+  }
+  
   .shield-header {
     padding: 20px;
     flex-direction: row;

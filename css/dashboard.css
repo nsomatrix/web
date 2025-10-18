@@ -709,12 +709,15 @@ body {
   font-size: 1.5rem;
   cursor: pointer;
   color: var(--text-muted);
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
+  pointer-events: auto;
+  z-index: 9999;
+  touch-action: manipulation;
 }
 
 .close-button:hover {
