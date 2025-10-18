@@ -1,3 +1,5 @@
+import { sanitizeInput } from './utils.js';
+
 export class FriendsManager {
     constructor(authManager, db) {
         this.authManager = authManager;
@@ -34,18 +36,18 @@ export class FriendsManager {
                 item.className = 'friend-item';
                 item.innerHTML = `
                     <div class="friend-info">
-                        <img src="avatars/${this.sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
+                        <img src="avatars/${sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
                         <div class="friend-details">
-                            <div class="friend-name">@${this.sanitizeInput(friend.username)}</div>
+                            <div class="friend-name">@${sanitizeInput(friend.username)}</div>
                             <div class="friend-status">
                                 <span class="online-status ${onlineStatus.isOnline ? 'status-online' : 'status-offline'}"></span>
-                                ${!onlineStatus.isOnline ? `<span class="last-seen">${this.sanitizeInput(onlineStatus.lastSeen)}</span>` : '<span class="online-text">Online</span>'}
+                                ${!onlineStatus.isOnline ? `<span class="last-seen">${sanitizeInput(onlineStatus.lastSeen)}</span>` : '<span class="online-text">Online</span>'}
                             </div>
                         </div>
                     </div>
                     <div class="friend-actions">
-                        <button class="btn btn-sm" style="background:#007bff;" onclick="window.friendsManager.sendMessage('${this.sanitizeInput(friend.friendId)}')">Message</button>
-                        <button class="btn btn-sm btn-danger" onclick="window.friendsManager.removeFriend('${this.sanitizeInput(friend.friendId)}')">Remove</button>
+                        <button class="btn btn-sm" style="background:#007bff;" onclick="window.friendsManager.sendMessage('${sanitizeInput(friend.friendId)}')">Message</button>
+                        <button class="btn btn-sm btn-danger" onclick="window.friendsManager.removeFriend('${sanitizeInput(friend.friendId)}')">Remove</button>
                     </div>
                 `;
                 friendsList.appendChild(item);
@@ -128,18 +130,5 @@ export class FriendsManager {
         if (window.messagingManager) {
             window.messagingManager.openChat(friendId);
         }
-    }
-
-    sanitizeInput(input) {
-        if (!input) return '';
-        return input.replace(/[<>"'&]/g, function(match) {
-            return {
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#x27;',
-                '&': '&amp;'
-            }[match];
-        });
     }
 }

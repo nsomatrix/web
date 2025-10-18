@@ -1,4 +1,4 @@
-// Unified Dashboard JavaScript
+// Unified Dashboard JavaScript - Optimized
 import { getFirebaseConfig } from './modules/config.js';
 import { AuthManager } from './modules/auth.js';
 import { FileManager } from './modules/files.js';
@@ -8,15 +8,14 @@ import { FriendsManager } from './modules/friends.js';
 import { MessagingManager } from './modules/messaging.js';
 import { SocialManager } from './modules/social.js';
 import { ShieldManager } from './modules/shield.js';
-
 import { showMessageBox, openModal, closeModal } from './modules/ui.js';
 import { encryptData, decryptData } from './modules/crypto.js';
 
-// Import closeModal for global use
+// Global modal functions
 window.closeModal = closeModal;
 window.openModal = openModal;
 
-// Initialize Firebase with config from worker
+// Initialize Firebase
 let auth, db;
 getFirebaseConfig().then(firebaseConfig => {
     if (!firebase.apps.length) {
@@ -25,12 +24,33 @@ getFirebaseConfig().then(firebaseConfig => {
     auth = firebase.auth();
     db = firebase.firestore();
     
-    // Initialize managers after Firebase is ready
     initializeManagers();
-    
-    // Set up auth state listener after Firebase is initialized
     setupAuthStateListener();
 });
+
+// Global variables
+let allAvatars = [];
+let currentAvatarIndex = 0;
+let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager, shieldManager;
+
+// Desktop Dashboard Enhancement
+class DesktopDashboard {
+    constructor() {
+        this.setupResponsive();
+    }
+
+    setupResponsive() {
+        window.addEventListener('resize', () => this.handleResize());
+        this.handleResize();
+    }
+
+    handleResize() {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (sidebar) {
+            sidebar.style.display = window.innerWidth <= 768 ? 'none' : 'flex';
+        }
+    }
+}
 
 function setupAuthStateListener() {
     auth.onAuthStateChanged(async (user) => {
@@ -51,40 +71,6 @@ function setupAuthStateListener() {
             }
         }
     });
-}
-
-
-// Global variables
-let allAvatars = [];
-let currentAvatarIndex = 0;
-let authManager, fileManager, notesManager, passwordManager, friendsManager, messagingManager, socialManager, shieldManager;
-
-
-// Desktop Dashboard Enhancement
-class DesktopDashboard {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.setupResponsive();
-    }
-
-    setupResponsive() {
-        window.addEventListener('resize', () => {
-            this.handleResize();
-        });
-        this.handleResize();
-    }
-
-    handleResize() {
-        const sidebar = document.querySelector('.dashboard-sidebar');
-        if (window.innerWidth <= 768) {
-            if (sidebar) sidebar.style.display = 'none';
-        } else {
-            if (sidebar) sidebar.style.display = 'flex';
-        }
-    }
 }
 
 // Initialize managers

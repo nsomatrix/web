@@ -1,3 +1,5 @@
+import { sanitizeInput } from './utils.js';
+
 export class SocialManager {
     constructor(authManager, db) {
         this.authManager = authManager;
@@ -63,15 +65,15 @@ export class SocialManager {
                 if (existingFriend.exists && existingFriend.data().status === 'accepted') {
                     actionButton = '<span style="color: var(--accent-red);">Already Friends</span>';
                 } else if (pendingRequest.exists && pendingRequest.data().status === 'pending') {
-                    actionButton = `<button class="accept-btn" onclick="window.socialManager.acceptFriendRequest('${this.sanitizeInput(user.id)}', '${this.sanitizeInput(user.usernameTag)}')">Accept Request</button>`;
+                    actionButton = `<button class="accept-btn" onclick="window.socialManager.acceptFriendRequest('${sanitizeInput(user.id)}', '${sanitizeInput(user.usernameTag)}')">Accept Request</button>`;
                 } else {
-                    actionButton = `<button class="add-friend-btn btn btn-danger" onclick="window.socialManager.addFriend('${this.sanitizeInput(user.id)}', '${this.sanitizeInput(user.usernameTag)}')">Add Friend</button>`;
+                    actionButton = `<button class="add-friend-btn btn btn-danger" onclick="window.socialManager.addFriend('${sanitizeInput(user.id)}', '${sanitizeInput(user.usernameTag)}')">Add Friend</button>`;
                 }
                 
                 item.innerHTML = `
                     <div class="search-info">
-                        <img src="avatars/${this.sanitizeInput(user.avatar)}" alt="Avatar" class="search-avatar">
-                        <span>@${this.sanitizeInput(user.usernameTag)}</span>
+                        <img src="avatars/${sanitizeInput(user.avatar)}" alt="Avatar" class="search-avatar">
+                        <span>@${sanitizeInput(user.usernameTag)}</span>
                     </div>
                     <div class="search-actions">
                         ${actionButton}
@@ -184,12 +186,12 @@ export class SocialManager {
                 item.className = 'notification-item';
                 item.innerHTML = `
                     <div class="notification-info">
-                        <img src="avatars/${this.sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
-                        <span>@${this.sanitizeInput(request.fromUsername)} sent you a friend request</span>
+                        <img src="avatars/${sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
+                        <span>@${sanitizeInput(request.fromUsername)} sent you a friend request</span>
                     </div>
                     <div class="notification-actions">
-                        <button class="accept-btn btn btn-success" onclick="window.socialManager.acceptFriendRequest('${this.sanitizeInput(request.fromUserId)}', '${this.sanitizeInput(request.fromUsername)}')">Accept</button>
-                        <button class="reject-btn btn btn-danger" onclick="window.socialManager.rejectFriendRequest('${this.sanitizeInput(request.fromUserId)}')">Reject</button>
+                        <button class="accept-btn btn btn-success" onclick="window.socialManager.acceptFriendRequest('${sanitizeInput(request.fromUserId)}', '${sanitizeInput(request.fromUsername)}')">Accept</button>
+                        <button class="reject-btn btn btn-danger" onclick="window.socialManager.rejectFriendRequest('${sanitizeInput(request.fromUserId)}')">Reject</button>
                     </div>
                 `;
                 notificationsList.appendChild(item);
@@ -205,11 +207,11 @@ export class SocialManager {
                 item.className = 'notification-item';
                 item.innerHTML = `
                     <div class="notification-info">
-                        <img src="avatars/${this.sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
-                        <span>${this.sanitizeInput(notification.message)}</span>
+                        <img src="avatars/${sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
+                        <span>${sanitizeInput(notification.message)}</span>
                     </div>
                     <div class="notification-actions">
-                        <button class="reject-btn btn btn-danger" onclick="window.socialManager.markAsRead('${this.sanitizeInput(doc.id)}')">Mark as Read</button>
+                        <button class="reject-btn btn btn-danger" onclick="window.socialManager.markAsRead('${sanitizeInput(doc.id)}')">Mark as Read</button>
                     </div>
                 `;
                 notificationsList.appendChild(item);
@@ -250,16 +252,5 @@ export class SocialManager {
         }
     }
 
-    sanitizeInput(input) {
-        if (!input) return '';
-        return input.replace(/[<>"'&]/g, function(match) {
-            return {
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#x27;',
-                '&': '&amp;'
-            }[match];
-        });
-    }
+
 }

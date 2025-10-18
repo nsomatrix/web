@@ -1,3 +1,6 @@
+import { formatTimestamp, getBrowserInfo, getDeviceInfo, showConfirmModal } from './utils.js';
+import { TOTPManager } from './totp.js';
+
 export class ShieldManager {
     constructor(authManager, db) {
         this.authManager = authManager;
@@ -433,32 +436,53 @@ export class ShieldManager {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
+    // Utility functions still needed locally
+    async getClientIP() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch {
+            return 'Unknown';
+        }
+    }
+
+    async getLocation() {
+        try {
+            const ip = await this.getClientIP();
+            const response = await fetch(`https://ipapi.co/${ip}/json/`);
+            const data = await response.json();
+            return `${data.city}, ${data.country_name}`;
+        } catch {
+            return 'Unknown';
+        }
+    }
+
+    formatEventType(type) {
+        const types = {
+            'recovery_key_regenerated': 'Recovery Key Regenerated',
+            'data_exported': 'Data Exported',
+            'account_locked': 'Account Locked',
+            'account_unlocked': 'Account Unlocked',
+            'backup_codes_generated': 'Backup Codes Generated',
+            'fingerprint_enabled': 'Fingerprint Authentication Enabled',
+            'fingerprint_disabled': 'Fingerprint Authentication Disabled',
+            'authenticator_enabled': 'App Authenticator Enabled',
+            'authenticator_disabled': 'App Authenticator Disabled'
+        };
+        return types[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
 
 
     // Real TOTP Authenticator
     async setupAuthenticator() {
-        const secret = this.generateTOTPSecret();
-        const qrCodeUrl = this.generateQRCodeURL(secret);
+        const secret = TOTPManager.generateSecret();
+        const qrCodeUrl = TOTPManager.generateQRCodeURL(secret, 'NSO Matrix', this.authManager.currentUser.email);
         
         return new Promise((resolve, reject) => {
             this.showAuthenticatorModal(qrCodeUrl, secret, resolve, reject);
         });
-    }
-
-    generateTOTPSecret() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        let secret = '';
-        for (let i = 0; i < 32; i++) {
-            secret += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return secret;
-    }
-
-    generateQRCodeURL(secret) {
-        const issuer = 'NSO Matrix';
-        const accountName = this.authManager.currentUser.email;
-        const otpauth = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
-        return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauth)}`;
     }
 
     showAuthenticatorModal(qrCodeUrl, secret, resolve, reject) {
@@ -510,7 +534,7 @@ export class ShieldManager {
             verifyBtn.textContent = 'Verifying...';
             
             try {
-                const isValid = await this.verifyTOTP(secret, code);
+                const isValid = await TOTPManager.verifyTOTP(secret, code);
                 if (isValid) {
                     await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
                         authenticatorEnabled: true,
@@ -543,52 +567,9 @@ export class ShieldManager {
 
 
 
-    // Utility functions
-    async getClientIP() {
-        try {
-            const response = await fetch('https://api.ipify.org?format=json');
-            const data = await response.json();
-            return data.ip;
-        } catch {
-            return 'Unknown';
-        }
-    }
 
-    async getLocation() {
-        try {
-            const ip = await this.getClientIP();
-            const response = await fetch(`https://ipapi.co/${ip}/json/`);
-            const data = await response.json();
-            return `${data.city}, ${data.country_name}`;
-        } catch {
-            return 'Unknown';
-        }
-    }
 
-    formatTimestamp(timestamp) {
-        if (!timestamp) return 'Unknown';
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleString();
-    }
 
-    getBrowserInfo() {
-        const ua = navigator.userAgent;
-        let browser = 'Unknown';
-        
-        if (ua.includes('Chrome')) browser = 'Chrome';
-        else if (ua.includes('Firefox')) browser = 'Firefox';
-        else if (ua.includes('Safari')) browser = 'Safari';
-        else if (ua.includes('Edge')) browser = 'Edge';
-        
-        return browser;
-    }
-
-    getDeviceInfo() {
-        const ua = navigator.userAgent;
-        if (/Mobile|Android|iPhone|iPad/.test(ua)) return 'Mobile';
-        if (/Tablet|iPad/.test(ua)) return 'Tablet';
-        return 'Desktop';
-    }
 
     // UI Management Methods
     async loadShieldData() {
@@ -667,27 +648,41 @@ export class ShieldManager {
     }
 
     async loadSessionsData() {
+        console.log('Loading sessions data...');
         const sessions = await this.getSessions();
+        console.log('Sessions found:', sessions.length);
+        
         const sessionsList = document.getElementById('sessionsList');
         const sessionCount = document.getElementById('sessionCount');
+        
+        if (!sessionsList) {
+            console.error('sessionsList element not found');
+            return;
+        }
+        
+        if (!sessionCount) {
+            console.error('sessionCount element not found');
+            return;
+        }
         
         sessionCount.textContent = sessions.length;
         sessionsList.innerHTML = '';
 
         sessions.forEach(session => {
+            console.log('Processing session:', session.id);
             const isCurrentSession = session.id === this.currentSessionId;
             const item = document.createElement('div');
             item.className = `session-item ${isCurrentSession ? 'session-current' : ''}`;
             
             item.innerHTML = `
                 <div>
-                    <strong>${this.getBrowserInfo()} on ${this.getDeviceInfo()}</strong>
+                    <strong>${getBrowserInfo()} on ${getDeviceInfo()}</strong>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">
-                        ${session.ip} • ${this.formatTimestamp(session.lastActivity)}
+                        ${session.ip} • ${formatTimestamp(session.lastActivity)}
                         ${isCurrentSession ? ' • Current Session' : ''}
                     </div>
                 </div>
-                ${!isCurrentSession ? `<button class="btn btn-danger btn-sm" onclick="shieldManager.revokeSession('${session.id}')">Revoke</button>` : '<span style="color: var(--success);">Active</span>'}
+                ${!isCurrentSession ? `<button class="btn btn-danger btn-sm" onclick="shieldManager.revokeSessionUI('${session.id}')">Revoke</button>` : '<span style="color: var(--success);">Active</span>'}
             `;
             
             sessionsList.appendChild(item);
@@ -710,7 +705,7 @@ export class ShieldManager {
                 <div>
                     <strong>${login.location || 'Unknown Location'}</strong>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">
-                        ${login.ip} • ${this.formatTimestamp(login.timestamp)}
+                        ${login.ip} • ${formatTimestamp(login.timestamp)}
                     </div>
                 </div>
                 <span style="color: var(--success);">✓ Success</span>
@@ -734,7 +729,7 @@ export class ShieldManager {
                 <div>
                     <strong>${this.formatEventType(event.type)}</strong>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">
-                        ${this.formatTimestamp(event.timestamp)}
+                        ${formatTimestamp(event.timestamp)}
                     </div>
                 </div>
                 <span style="color: var(--info);">ℹ️</span>
@@ -759,14 +754,14 @@ export class ShieldManager {
         return types[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
 
-    async revokeSession(sessionId) {
+    async revokeSessionUI(sessionId) {
         await this.revokeSession(sessionId);
         window.showMessageBox('Session revoked successfully', 'success', 2000);
         this.loadSessionsData();
     }
 
     async revokeAllSessionsUI() {
-        this.showConfirmModal(
+        showConfirmModal(
             'Sign Out All Other Sessions',
             'This will sign you out of all other devices and browsers. Your current session will remain active.',
             'Sign Out All',
@@ -779,29 +774,7 @@ export class ShieldManager {
         );
     }
 
-    showConfirmModal(title, message, confirmText, cancelText, onConfirm) {
-        const modal = document.createElement('div');
-        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;';
-        modal.innerHTML = `
-            <div style="background:#1a1a1a;color:white;padding:24px;border-radius:12px;max-width:400px;width:90%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);border:1px solid #333;">
-                <h3 style="margin:0 0 16px 0;font-size:18px;font-weight:600;color:white;">${title}</h3>
-                <p style="margin:0 0 24px 0;color:#ccc;line-height:1.5;">${message}</p>
-                <div style="display:flex;gap:12px;justify-content:flex-end;">
-                    <button onclick="this.parentElement.parentElement.parentElement.remove();document.body.classList.remove('modal-open');" style="background:#2d2d2d;color:#ccc;border:1px solid #555;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${cancelText}</button>
-                    <button id="confirmBtn" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:500;">${confirmText}</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        document.body.classList.add('modal-open');
-        
-        modal.querySelector('#confirmBtn').onclick = () => {
-            modal.remove();
-            document.body.classList.remove('modal-open');
-            onConfirm();
-        };
-    }
+
 
     async regenerateRecoveryKeyUI() {
         if (!this.authManager.currentEncryptionKey) {
@@ -809,7 +782,7 @@ export class ShieldManager {
             return;
         }
 
-        this.showConfirmModal(
+        showConfirmModal(
             'Generate New Recovery Key',
             'This will invalidate your current recovery key. Make sure you have it saved securely before continuing.',
             'Generate New Key',
@@ -827,7 +800,7 @@ export class ShieldManager {
     }
 
     async generateBackupCodesUI() {
-        this.showConfirmModal(
+        showConfirmModal(
             'Generate Backup Codes',
             'This will replace any existing backup codes. Save the new codes in a secure location.',
             'Generate Codes',
@@ -867,7 +840,7 @@ export class ShieldManager {
     }
 
     async exportDataUI() {
-        this.showConfirmModal(
+        showConfirmModal(
             'Download Your Data',
             'This will create a JSON file containing all your account data including notes, passwords, and security information.',
             'Download Data',
@@ -891,7 +864,7 @@ export class ShieldManager {
     }
 
     async lockdownAccountUI() {
-        this.showConfirmModal(
+        showConfirmModal(
             'Deactivate Account',
             'This will temporarily deactivate your account and sign you out of all devices. You can reactivate by logging in again.',
             'Deactivate Account',
@@ -913,14 +886,23 @@ export class ShieldManager {
 
     async loadBiometricStatus() {
         try {
+            console.log('Loading biometric status...');
             const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
             const data = playerDoc.data() || {};
+            console.log('Player data:', data);
             
             const authenticatorStatus = document.getElementById('authenticatorStatus');
             const setupAuthenticatorBtn = document.getElementById('setupAuthenticator');
             const disableAuthenticatorBtn = document.getElementById('disableAuthenticator');
             
+            console.log('Elements found:', {
+                authenticatorStatus: !!authenticatorStatus,
+                setupAuthenticatorBtn: !!setupAuthenticatorBtn,
+                disableAuthenticatorBtn: !!disableAuthenticatorBtn
+            });
+            
             const authenticatorEnabled = data.authenticatorEnabled && data.totpSecret;
+            console.log('Authenticator enabled:', authenticatorEnabled);
                 
             if (authenticatorStatus) {
                 authenticatorStatus.innerHTML = authenticatorEnabled ? 
@@ -933,7 +915,7 @@ export class ShieldManager {
                 disableAuthenticatorBtn.style.display = authenticatorEnabled ? 'inline-block' : 'none';
             }
         } catch (error) {
-            console.log('Failed to load biometric status:', error.message);
+            console.error('Failed to load biometric status:', error);
         }
     }
 
@@ -949,97 +931,7 @@ export class ShieldManager {
         }
     }
 
-    async verifyTOTP(secret, token) {
-        try {
-            if (!secret || !token || token.length !== 6) {
-                return false;
-            }
-            
-            const timeWindow = Math.floor(Date.now() / 1000 / 30);
-            
-            // Check current time window and adjacent windows for clock drift
-            for (let i = -2; i <= 2; i++) {
-                const expectedToken = await this.generateTOTP(secret, timeWindow + i);
-                if (expectedToken === token) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (error) {
-            console.error('TOTP verification error:', error);
-            return false;
-        }
-    }
 
-    async generateTOTP(secret, timeWindow) {
-        try {
-            const key = this.base32ToBytes(secret);
-            if (!key || key.length === 0) {
-                throw new Error('Invalid secret key');
-            }
-            
-            const time = new ArrayBuffer(8);
-            const timeView = new DataView(time);
-            timeView.setUint32(4, timeWindow, false);
-            
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw', 
-                key, 
-                { name: 'HMAC', hash: 'SHA-1' }, 
-                false, 
-                ['sign']
-            );
-            
-            const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
-            const hmac = new Uint8Array(signature);
-            
-            const offset = hmac[hmac.length - 1] & 0xf;
-            const code = ((hmac[offset] & 0x7f) << 24) | 
-                        ((hmac[offset + 1] & 0xff) << 16) | 
-                        ((hmac[offset + 2] & 0xff) << 8) | 
-                        (hmac[offset + 3] & 0xff);
-            
-            return (code % 1000000).toString().padStart(6, '0');
-        } catch (error) {
-            console.error('TOTP generation error:', error);
-            throw error;
-        }
-    }
-
-    base32ToBytes(base32) {
-        try {
-            if (!base32 || typeof base32 !== 'string') {
-                throw new Error('Invalid base32 input');
-            }
-            
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-            const cleanBase32 = base32.toUpperCase().replace(/[^A-Z2-7]/g, '');
-            
-            if (cleanBase32.length === 0) {
-                throw new Error('Empty base32 string after cleaning');
-            }
-            
-            let bits = '';
-            for (let char of cleanBase32) {
-                const index = alphabet.indexOf(char);
-                if (index === -1) continue;
-                bits += index.toString(2).padStart(5, '0');
-            }
-            
-            const bytes = [];
-            for (let i = 0; i < bits.length; i += 8) {
-                const byte = bits.substring(i, i + 8);
-                if (byte.length === 8) {
-                    bytes.push(parseInt(byte, 2));
-                }
-            }
-            
-            return new Uint8Array(bytes);
-        } catch (error) {
-            console.error('Base32 decode error:', error);
-            throw error;
-        }
-    }
 
 
 

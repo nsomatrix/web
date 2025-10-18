@@ -1,3 +1,5 @@
+import { sanitizeInput } from './utils.js';
+
 export class MessagingManager {
     constructor(authManager, db) {
         this.authManager = authManager;
@@ -21,7 +23,7 @@ export class MessagingManager {
             
             const friendDoc = await this.db.collection('players').doc(friendId).get();
             const friendData = friendDoc.data();
-            document.getElementById('messageModalTitle').textContent = `Chat with @${this.sanitizeInput(friendData.usernameTag)}`;
+            document.getElementById('messageModalTitle').textContent = `Chat with @${sanitizeInput(friendData.usernameTag)}`;
             
             const messageInputContainer = document.querySelector('.message-input-container');
             if (messageInputContainer) messageInputContainer.style.display = 'block';
@@ -146,11 +148,11 @@ export class MessagingManager {
                         font-size: 12px;
                         opacity: 0.8;
                     ">
-                        <div style="font-style: italic;">↩️ ${this.sanitizeInput(message.replyText || 'Message')}</div>
+                        <div style="font-style: italic;">↩️ ${sanitizeInput(message.replyText || 'Message')}</div>
                     </div>` : 
                     ''
                 }
-                <div style="font-size: 14px; line-height: 1.4;">${this.sanitizeInput(message.text)}</div>
+                <div style="font-size: 14px; line-height: 1.4;">${sanitizeInput(message.text)}</div>
                     <div style="
                         font-size: 11px;
                         opacity: 0.7;
@@ -186,7 +188,7 @@ export class MessagingManager {
                                 z-index: 1000;
                                 min-width: 120px;
                             ">
-                                <div onclick="window.messagingManager.replyToMessage('${message.id}', '${this.sanitizeInput(message.text)}')" style="
+                                <div onclick="window.messagingManager.replyToMessage('${message.id}', '${sanitizeInput(message.text)}')" style="
                                     padding: 12px 16px;
                                     cursor: pointer;
                                     color: white;
@@ -397,16 +399,5 @@ export class MessagingManager {
         }
     }
 
-    sanitizeInput(input) {
-        if (!input) return '';
-        return input.replace(/[<>"'&]/g, function(match) {
-            return {
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#x27;',
-                '&': '&amp;'
-            }[match];
-        });
-    }
+
 }
