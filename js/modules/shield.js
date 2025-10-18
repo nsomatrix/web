@@ -82,8 +82,8 @@ export class ShieldManager {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
                 userAgent: navigator.userAgent,
-                browser: this.getBrowserInfo(),
-                device: this.getDeviceInfo(),
+                browser: getBrowserInfo(),
+                device: getDeviceInfo(),
                 ip: ip,
                 isActive: true
             };
@@ -99,10 +99,11 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
-            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            // Clean up sessions older than 24 hours
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
             const oldSessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions')
-                .where('lastActivity', '<', sevenDaysAgo)
+                .where('lastActivity', '<', oneDayAgo)
                 .get();
             
             const batch = this.db.batch();
@@ -165,8 +166,8 @@ export class ShieldManager {
                 ip: ip,
                 location: location,
                 userAgent: navigator.userAgent,
-                browser: this.getBrowserInfo(),
-                device: this.getDeviceInfo(),
+                browser: getBrowserInfo(),
+                device: getDeviceInfo(),
                 fingerprint: fingerprint,
                 success: success,
                 failureReason: failureReason,
@@ -272,40 +273,7 @@ export class ShieldManager {
         return Math.min(score, 100);
     }
 
-    // Backup Codes
-    async generateBackupCodes() {
-        if (!this.authManager.currentUser) return [];
-        
-        const codes = [];
-        for (let i = 0; i < 10; i++) {
-            codes.push(this.generateBackupCode());
-        }
 
-        const batch = this.db.batch();
-        
-        // Clear existing codes
-        const existingCodes = await this.db.collection('players').doc(this.authManager.currentUser.uid)
-            .collection('backupCodes').get();
-        existingCodes.forEach(doc => batch.delete(doc.ref));
-
-        // Add new codes
-        codes.forEach(code => {
-            const ref = this.db.collection('players').doc(this.authManager.currentUser.uid)
-                .collection('backupCodes').doc();
-            batch.set(ref, {
-                code: code,
-                used: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        });
-
-        await batch.commit();
-        return codes;
-    }
-
-    generateBackupCode() {
-        return Math.random().toString(36).substr(2, 8).toUpperCase();
-    }
 
     // Recovery Key Management
     async regenerateRecoveryKey() {
@@ -464,7 +432,6 @@ export class ShieldManager {
             'data_exported': 'Data Exported',
             'account_locked': 'Account Locked',
             'account_unlocked': 'Account Unlocked',
-            'backup_codes_generated': 'Backup Codes Generated',
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
             'fingerprint_disabled': 'Fingerprint Authentication Disabled',
             'authenticator_enabled': 'App Authenticator Enabled',
@@ -648,28 +615,16 @@ export class ShieldManager {
     }
 
     async loadSessionsData() {
-        console.log('Loading sessions data...');
         const sessions = await this.getSessions();
-        console.log('Sessions found:', sessions.length);
-        
         const sessionsList = document.getElementById('sessionsList');
         const sessionCount = document.getElementById('sessionCount');
         
-        if (!sessionsList) {
-            console.error('sessionsList element not found');
-            return;
-        }
-        
-        if (!sessionCount) {
-            console.error('sessionCount element not found');
-            return;
-        }
+        if (!sessionsList || !sessionCount) return;
         
         sessionCount.textContent = sessions.length;
         sessionsList.innerHTML = '';
 
         sessions.forEach(session => {
-            console.log('Processing session:', session.id);
             const isCurrentSession = session.id === this.currentSessionId;
             const item = document.createElement('div');
             item.className = `session-item ${isCurrentSession ? 'session-current' : ''}`;
@@ -745,7 +700,6 @@ export class ShieldManager {
             'data_exported': 'Data Exported',
             'account_locked': 'Account Locked',
             'account_unlocked': 'Account Unlocked',
-            'backup_codes_generated': 'Backup Codes Generated',
             'fingerprint_enabled': 'Fingerprint Authentication Enabled',
             'fingerprint_disabled': 'Fingerprint Authentication Disabled',
             'authenticator_enabled': 'App Authenticator Enabled',
@@ -768,7 +722,22 @@ export class ShieldManager {
             'Cancel',
             async () => {
                 await this.revokeAllSessions();
+                await this.cleanupOldSessions(); // Also cleanup old sessions
                 window.showMessageBox('All other sessions signed out', 'success', 2000);
+                this.loadSessionsData();
+            }
+        );
+    }
+
+    async cleanupAllSessionsUI() {
+        showConfirmModal(
+            'Clean Up Old Sessions',
+            'This will remove all inactive sessions older than 24 hours.',
+            'Clean Up',
+            'Cancel',
+            async () => {
+                await this.cleanupOldSessions();
+                window.showMessageBox('Old sessions cleaned up', 'success', 2000);
                 this.loadSessionsData();
             }
         );
@@ -799,30 +768,7 @@ export class ShieldManager {
         );
     }
 
-    async generateBackupCodesUI() {
-        showConfirmModal(
-            'Generate Backup Codes',
-            'This will replace any existing backup codes. Save the new codes in a secure location.',
-            'Generate Codes',
-            'Cancel',
-            async () => {
-                const codes = await this.generateBackupCodes();
-                this.displayBackupCodes(codes);
-                await this.logSecurityEvent('backup_codes_generated');
-                window.showMessageBox('Backup codes generated successfully', 'success', 2000);
-            }
-        );
-    }
 
-    displayBackupCodes(codes) {
-        const codesList = document.getElementById('backupCodesList');
-        codesList.innerHTML = `
-            <div class="backup-codes-grid">
-                ${codes.map(code => `<div class="backup-code">${code}</div>`).join('')}
-            </div>
-            <p style="color: var(--warning); margin-top: 1rem;">⚠️ Save these codes securely. Each can only be used once.</p>
-        `;
-    }
 
     showRecoveryKey(recoveryKey) {
         const modal = document.createElement('div');
@@ -886,23 +832,14 @@ export class ShieldManager {
 
     async loadBiometricStatus() {
         try {
-            console.log('Loading biometric status...');
             const playerDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
             const data = playerDoc.data() || {};
-            console.log('Player data:', data);
             
             const authenticatorStatus = document.getElementById('authenticatorStatus');
             const setupAuthenticatorBtn = document.getElementById('setupAuthenticator');
             const disableAuthenticatorBtn = document.getElementById('disableAuthenticator');
             
-            console.log('Elements found:', {
-                authenticatorStatus: !!authenticatorStatus,
-                setupAuthenticatorBtn: !!setupAuthenticatorBtn,
-                disableAuthenticatorBtn: !!disableAuthenticatorBtn
-            });
-            
-            const authenticatorEnabled = data.authenticatorEnabled && data.totpSecret;
-            console.log('Authenticator enabled:', authenticatorEnabled);
+            const authenticatorEnabled = data.authenticatorEnabled === true && data.totpSecret;
                 
             if (authenticatorStatus) {
                 authenticatorStatus.innerHTML = authenticatorEnabled ? 

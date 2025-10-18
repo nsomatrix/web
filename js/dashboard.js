@@ -92,6 +92,90 @@ function initializeManagers() {
     window.shieldManager = shieldManager;
 }
 
+// 2FA enforcement functions
+async function check2FARequired(user) {
+    try {
+        const doc = await db.collection('players').doc(user.uid).get();
+        const data = doc.data() || {};
+        return data.authenticatorEnabled === true && data.totpSecret;
+    } catch (error) {
+        console.error('Error checking 2FA status:', error);
+        return false;
+    }
+}
+
+async function verify2FA(user) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10002;display:flex;align-items:center;justify-content:center;';
+        
+        modal.innerHTML = `
+            <div style="background:#1a1a1a;color:white;padding:40px;border-radius:16px;max-width:400px;text-align:center;border:1px solid #333;">
+                <h3 style="color:#00d4ff;margin-bottom:30px;">🔐 Two-Factor Authentication Required</h3>
+                <p style="color:#ccc;margin-bottom:30px;">Enter your 6-digit authenticator code:</p>
+                <input type="text" id="authCodeInput" placeholder="000000" style="background:#2d2d2d;color:white;border:1px solid #555;padding:12px;width:150px;text-align:center;border-radius:8px;font-size:18px;letter-spacing:2px;" maxlength="6" />
+                <br><br>
+                <button id="verifyCodeBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Verify Code</button>
+                <button id="signOutBtn" style="background:#dc3545;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Sign Out</button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const codeInput = document.getElementById('authCodeInput');
+        const verifyBtn = document.getElementById('verifyCodeBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        
+        codeInput.focus();
+        
+        const verify = async () => {
+            const code = codeInput.value.trim();
+            if (!/^\d{6}$/.test(code)) {
+                showMessageBox('Please enter a valid 6-digit code', 'error', 3000);
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifying...';
+            
+            try {
+                const doc = await db.collection('players').doc(user.uid).get();
+                const data = doc.data();
+                
+                // Import TOTP verification
+                const { TOTPManager } = await import('./modules/totp.js');
+                const isValid = await TOTPManager.verifyTOTP(data.totpSecret, code);
+                
+                if (isValid) {
+                    modal.remove();
+                    resolve(true);
+                } else {
+                    showMessageBox('Invalid code. Please try again.', 'error', 3000);
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify Code';
+                    codeInput.value = '';
+                    codeInput.focus();
+                }
+            } catch (error) {
+                console.error('2FA verification error:', error);
+                showMessageBox('Verification failed. Please try again.', 'error', 3000);
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify Code';
+            }
+        };
+        
+        verifyBtn.onclick = verify;
+        codeInput.onkeydown = (e) => {
+            if (e.key === 'Enter') verify();
+        };
+        
+        signOutBtn.onclick = () => {
+            modal.remove();
+            resolve(false);
+        };
+    });
+}
+
 // Avatar functions
 async function loadAvatars() {
     try {
@@ -162,6 +246,21 @@ async function saveProfile(user) {
 // Dashboard setup
 async function setupDashboard(user) {
     authManager.currentUser = user;
+    
+    // Check if 2FA is required and verify it first
+    const requires2FA = await check2FARequired(user);
+    if (requires2FA) {
+        const verified = await verify2FA(user);
+        if (!verified) {
+            showMessageBox('2FA verification failed. Signing out.', 'error', 3000);
+            setTimeout(() => {
+                auth.signOut();
+                window.location.href = 'login.html';
+            }, 3000);
+            return;
+        }
+    }
+    
     const playerDocRef = db.collection('players').doc(user.uid);
 
     try {
