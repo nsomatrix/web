@@ -192,15 +192,22 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
-            const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+            // Get all login history entries
+            const allSnapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('loginHistory')
                 .orderBy('timestamp', 'desc')
-                .offset(50)
                 .get();
             
-            const batch = this.db.batch();
-            snapshot.docs.forEach(doc => batch.delete(doc.ref));
-            if (!snapshot.empty) await batch.commit();
+            // If we have more than 50 entries, delete the oldest ones
+            if (allSnapshot.size > 50) {
+                const batch = this.db.batch();
+                const docsToDelete = allSnapshot.docs.slice(50); // Keep first 50, delete the rest
+                
+                docsToDelete.forEach(doc => batch.delete(doc.ref));
+                if (docsToDelete.length > 0) {
+                    await batch.commit();
+                }
+            }
         } catch (error) {
             console.log('Login history cleanup failed:', error.message);
         }
@@ -462,9 +469,11 @@ export class ShieldManager {
                 <h3 style="color:#e74c3c;margin-bottom:20px;">📱 Setup Authenticator App</h3>
                 <p>1. Install Google Authenticator or Authy</p>
                 <p>2. Scan this QR code:</p>
-                <img src="${qrCodeUrl}" style="margin:20px 0;border:1px solid #333;" />
+                <img src="${qrCodeUrl}" style="margin:20px 0;border:1px solid #333;" onerror="this.style.display='none';document.getElementById('qrError').style.display='block';" />
+                <div id="qrError" style="display:none;color:#ff6b6b;margin:20px 0;">QR code failed to load. Use manual entry below.</div>
                 <p style="font-size:12px;color:#888;margin-bottom:20px;">Or enter manually: <br><code style="background:#2d2d2d;padding:5px;word-break:break-all;">${secret}</code></p>
-                <input type="text" id="totpVerifyCode" placeholder="Enter 6-digit code" style="background:#2d2d2d;color:white;border:1px solid #555;padding:10px;margin:10px 0;width:150px;text-align:center;" maxlength="6" />
+                <input type="text" id="totpVerifyCode" placeholder="Enter 6-digit code" style="background:#2d2d2d;color:white;border:1px solid #555;padding:10px;margin:10px 0;width:150px;text-align:center;" maxlength="6" pattern="[0-9]{6}" />
+                <div id="verificationError" style="color:#ff6b6b;margin:10px 0;display:none;"></div>
                 <div>
                     <button id="verifyTOTPBtn" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin:5px;">Verify & Enable</button>
                     <button id="cancelTOTPBtn" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin:5px;">Cancel</button>
@@ -474,12 +483,31 @@ export class ShieldManager {
         
         document.body.appendChild(modal);
         
-        document.getElementById('verifyTOTPBtn').onclick = async () => {
-            const code = document.getElementById('totpVerifyCode').value.trim();
-            if (code.length !== 6) {
-                this.showInlineAlert('Please enter a 6-digit code', 'error');
+        const verifyBtn = document.getElementById('verifyTOTPBtn');
+        const codeInput = document.getElementById('totpVerifyCode');
+        const errorDiv = document.getElementById('verificationError');
+        
+        // Allow Enter key to verify
+        codeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                verifyBtn.click();
+            }
+        });
+        
+        verifyBtn.onclick = async () => {
+            const code = codeInput.value.trim();
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            
+            if (!/^\d{6}$/.test(code)) {
+                errorDiv.textContent = 'Please enter a valid 6-digit code';
+                errorDiv.style.display = 'block';
                 return;
             }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifying...';
             
             try {
                 const isValid = await this.verifyTOTP(secret, code);
@@ -492,11 +520,16 @@ export class ShieldManager {
                     modal.remove();
                     resolve();
                 } else {
-                    this.showInlineAlert('Invalid code. Please check your authenticator app and try again.', 'error');
+                    errorDiv.textContent = 'Invalid code. Please check your authenticator app and try again.';
+                    errorDiv.style.display = 'block';
                 }
             } catch (error) {
                 console.error('TOTP verification error:', error);
-                this.showInlineAlert('Verification failed. Please try again.', 'error');
+                errorDiv.textContent = 'Verification failed. Please try again.';
+                errorDiv.style.display = 'block';
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify & Enable';
             }
         };
         
@@ -917,44 +950,95 @@ export class ShieldManager {
     }
 
     async verifyTOTP(secret, token) {
-        const timeWindow = Math.floor(Date.now() / 1000 / 30);
-        for (let i = -1; i <= 1; i++) {
-            const expectedToken = await this.generateTOTP(secret, timeWindow + i);
-            if (expectedToken === token) return true;
+        try {
+            if (!secret || !token || token.length !== 6) {
+                return false;
+            }
+            
+            const timeWindow = Math.floor(Date.now() / 1000 / 30);
+            
+            // Check current time window and adjacent windows for clock drift
+            for (let i = -2; i <= 2; i++) {
+                const expectedToken = await this.generateTOTP(secret, timeWindow + i);
+                if (expectedToken === token) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (error) {
+            console.error('TOTP verification error:', error);
+            return false;
         }
-        return false;
     }
 
     async generateTOTP(secret, timeWindow) {
-        const key = this.base32ToBytes(secret);
-        const time = new ArrayBuffer(8);
-        const timeView = new DataView(time);
-        timeView.setUint32(4, timeWindow, false);
-        
-        const cryptoKey = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
-        const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
-        const hmac = new Uint8Array(signature);
-        
-        const offset = hmac[hmac.length - 1] & 0xf;
-        const code = ((hmac[offset] & 0x7f) << 24) | ((hmac[offset + 1] & 0xff) << 16) | ((hmac[offset + 2] & 0xff) << 8) | (hmac[offset + 3] & 0xff);
-        
-        return (code % 1000000).toString().padStart(6, '0');
+        try {
+            const key = this.base32ToBytes(secret);
+            if (!key || key.length === 0) {
+                throw new Error('Invalid secret key');
+            }
+            
+            const time = new ArrayBuffer(8);
+            const timeView = new DataView(time);
+            timeView.setUint32(4, timeWindow, false);
+            
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw', 
+                key, 
+                { name: 'HMAC', hash: 'SHA-1' }, 
+                false, 
+                ['sign']
+            );
+            
+            const signature = await crypto.subtle.sign('HMAC', cryptoKey, time);
+            const hmac = new Uint8Array(signature);
+            
+            const offset = hmac[hmac.length - 1] & 0xf;
+            const code = ((hmac[offset] & 0x7f) << 24) | 
+                        ((hmac[offset + 1] & 0xff) << 16) | 
+                        ((hmac[offset + 2] & 0xff) << 8) | 
+                        (hmac[offset + 3] & 0xff);
+            
+            return (code % 1000000).toString().padStart(6, '0');
+        } catch (error) {
+            console.error('TOTP generation error:', error);
+            throw error;
+        }
     }
 
     base32ToBytes(base32) {
-        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        let bits = '';
-        for (let char of base32.toUpperCase()) {
-            if (alphabet.indexOf(char) === -1) continue;
-            bits += alphabet.indexOf(char).toString(2).padStart(5, '0');
-        }
-        const bytes = [];
-        for (let i = 0; i < bits.length; i += 8) {
-            if (bits.substr(i, 8).length === 8) {
-                bytes.push(parseInt(bits.substr(i, 8), 2));
+        try {
+            if (!base32 || typeof base32 !== 'string') {
+                throw new Error('Invalid base32 input');
             }
+            
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            const cleanBase32 = base32.toUpperCase().replace(/[^A-Z2-7]/g, '');
+            
+            if (cleanBase32.length === 0) {
+                throw new Error('Empty base32 string after cleaning');
+            }
+            
+            let bits = '';
+            for (let char of cleanBase32) {
+                const index = alphabet.indexOf(char);
+                if (index === -1) continue;
+                bits += index.toString(2).padStart(5, '0');
+            }
+            
+            const bytes = [];
+            for (let i = 0; i < bits.length; i += 8) {
+                const byte = bits.substring(i, i + 8);
+                if (byte.length === 8) {
+                    bytes.push(parseInt(byte, 2));
+                }
+            }
+            
+            return new Uint8Array(bytes);
+        } catch (error) {
+            console.error('Base32 decode error:', error);
+            throw error;
         }
-        return new Uint8Array(bytes);
     }
 
 

@@ -52,22 +52,23 @@ service cloud.firestore {
          typingId.matches('^' + request.auth.uid + '_.*'));
     }
 
-    // Security features
     match /players/{userId}/sessions/{sessionId} {
       allow read, write: if request.auth.uid == userId;
     }
 
     match /players/{userId}/loginHistory/{historyId} {
-      allow read: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
+      allow read, write: if request.auth.uid == userId;
     }
 
     match /players/{userId}/securityEvents/{eventId} {
-      allow read: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
+      allow read, write: if request.auth.uid == userId;
     }
 
     match /players/{userId}/backupCodes/{codeId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    match /emailVerifications/{userId} {
       allow read, write: if request.auth.uid == userId;
     }
   }
