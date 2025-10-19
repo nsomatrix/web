@@ -300,7 +300,10 @@
         <div class="modal-content" style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
             <div style="padding: 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; background: #2d2d2d;">
                 <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc;">&times;</span>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="createGroupBtn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">+ Group</button>
+                    <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc;">&times;</span>
+                </div>
             </div>
             <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
             <div class="message-input-container" style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">
@@ -344,6 +347,16 @@
             <p>Are you sure you want to remove this friend? This action cannot be undone.</p>
             <button id="confirmUnfriendBtn" class="btn btn-danger">Yes, Remove Friend</button>
             <button id="cancelUnfriendBtn" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+
+    <div id="createGroupModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" data-modal="createGroupModal">&times;</span>
+            <h3>Create Group Chat</h3>
+            <input type="text" id="groupNameInput" class="form-control" placeholder="Group name" maxlength="50" />
+            <div id="friendsSelection" style="max-height: 300px; overflow-y: auto; margin: 1rem 0;"></div>
+            <button id="createGroupChatBtn" class="btn btn-success">Create Group</button>
         </div>
     </div>
 

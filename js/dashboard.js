@@ -14,6 +14,7 @@ import { encryptData, decryptData } from './modules/crypto.js';
 // Global modal functions
 window.closeModal = closeModal;
 window.openModal = openModal;
+window.showMessageBox = showMessageBox;
 
 // Initialize Firebase
 let auth, db;
@@ -1286,6 +1287,7 @@ window.rejectFriendRequest = (fromUserId) => socialManager.rejectFriendRequest(f
 window.markAsRead = (notificationId) => socialManager.markAsRead(notificationId);
 window.removeFriend = (friendId) => friendsManager.removeFriend(friendId);
 window.sendMessage = (friendId) => messagingManager.openChat(friendId);
+window.openGroupChat = (groupId) => messagingManager.openGroupChat(groupId);
 
 
 
@@ -1305,13 +1307,38 @@ async function loadRecentChats() {
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '';
         
+        // Load group chats
+        const groupChatsSnapshot = await db.collection('groupChats')
+            .where('members', 'array-contains', authManager.currentUser.uid).get();
+        
+        for (const doc of groupChatsSnapshot.docs) {
+            const group = doc.data();
+            const chatItem = document.createElement('div');
+            chatItem.className = 'friend-item';
+            chatItem.style.cursor = 'pointer';
+            chatItem.onclick = () => messagingManager.openGroupChat(doc.id);
+            chatItem.innerHTML = `
+                <div class="friend-info">
+                    <div style="width: 40px; height: 40px; background: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="friend-details">
+                        <div class="friend-name">${group.name}</div>
+                        <div class="friend-status">
+                            <span style="color: #888; font-size: 12px;">${group.members.length} members</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="friend-actions">
+                    <i class="fas fa-comments" style="color: var(--primary);"></i>
+                </div>
+            `;
+            messagesList.appendChild(chatItem);
+        }
+        
+        // Load friend chats
         const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friends').where('status', '==', 'accepted').get();
-        
-        if (friendsSnapshot.empty) {
-            messagesList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No friends to chat with</p>';
-            return;
-        }
         
         for (const doc of friendsSnapshot.docs) {
             const friend = doc.data();
@@ -1340,8 +1367,44 @@ async function loadRecentChats() {
             `;
             messagesList.appendChild(chatItem);
         }
+        
+        if (groupChatsSnapshot.empty && friendsSnapshot.empty) {
+            messagesList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No chats available</p>';
+        }
     } catch (error) {
         console.error('Load recent chats error:', error);
+    }
+}
+
+async function loadFriendsForGroup() {
+    try {
+        const friendsSelection = document.getElementById('friendsSelection');
+        friendsSelection.innerHTML = '';
+        
+        const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
+            .collection('friends').where('status', '==', 'accepted').get();
+        
+        if (friendsSnapshot.empty) {
+            friendsSelection.innerHTML = '<p style="text-align: center; color: #888;">No friends available</p>';
+            return;
+        }
+        
+        for (const doc of friendsSnapshot.docs) {
+            const friend = doc.data();
+            const friendProfile = await db.collection('players').doc(friend.friendId).get();
+            const friendData = friendProfile.data();
+            
+            const friendItem = document.createElement('div');
+            friendItem.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid #333; border-radius: 4px; margin-bottom: 8px;';
+            friendItem.innerHTML = `
+                <input type="checkbox" value="${friend.friendId}" style="margin: 0;">
+                <img src="avatars/${friendData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                <span style="color: white;">@${friend.username}</span>
+            `;
+            friendsSelection.appendChild(friendItem);
+        }
+    } catch (error) {
+        console.error('Load friends for group error:', error);
     }
 }
 
