@@ -58,6 +58,13 @@ function setupAuthStateListener() {
             if (authManager) {
                 authManager.currentUser = user;
             }
+            
+            // Don't setup dashboard if recovery key is being shown
+            if (sessionStorage.getItem('showingRecoveryKey')) {
+                console.log('Recovery key modal is open, delaying dashboard setup');
+                return;
+            }
+            
             setTimeout(() => {
                 setupDashboard(user);
             }, 2000);
@@ -92,6 +99,16 @@ async function validateSession() {
             .collection('sessions').doc(shieldManager.currentSessionId).get();
         
         if (!sessionDoc.exists) {
+            // Check if this is a new account (no sessions created yet)
+            const allSessions = await db.collection('players').doc(authManager.currentUser.uid)
+                .collection('sessions').get();
+            
+            if (allSessions.empty) {
+                // New account, no sessions exist yet - this is normal
+                console.log('New account detected, no sessions exist yet');
+                return true;
+            }
+            
             console.log('Session was revoked, signing out');
             // Clear the revoked session ID
             shieldManager.currentSessionId = null;

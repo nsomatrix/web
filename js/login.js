@@ -467,6 +467,9 @@ async function handleSignup() {
         sessionStorage.setItem('currentEncryptionKeyHex', masterPasswordHash);
         localStorage.setItem('userLoggedIn', 'true');
         
+        // Prevent automatic redirect during recovery key display
+        sessionStorage.setItem('showingRecoveryKey', 'true');
+        
         showMessageBox('Account created successfully!', 'success');
         showRecoveryKey(recoveryKey);
 
@@ -608,6 +611,8 @@ function showRecoveryKey(recoveryKey) {
     
     document.getElementById('recoveryKeySaved').onclick = () => {
         document.body.removeChild(modal);
+        // Clear the flag to allow normal auth flow
+        sessionStorage.removeItem('showingRecoveryKey');
         showMessageBox('Redirecting to dashboard...', 'success');
         setTimeout(() => {
             window.location.href = "dashboard.html";
