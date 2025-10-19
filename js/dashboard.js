@@ -1193,14 +1193,16 @@ function setupSearchAndMessaging() {
     if (sendMessageBtn) {
         sendMessageBtn.onclick = (e) => {
             e.preventDefault();
-            messagingManager.sendMessage();
+            if (!document.getElementById('messageInput').disabled) {
+                messagingManager.sendMessage();
+            }
         };
     }
 
     const messageInput = document.getElementById('messageInput');
     if (messageInput) {
         messageInput.onkeydown = (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !messageInput.disabled) {
                 e.preventDefault();
                 messagingManager.sendMessage();
             }
@@ -1842,4 +1844,33 @@ $(document).ready(function() {
     setupEventListeners();
     loadAvatars();
     new DesktopDashboard();
+    
+    // Group chat handlers
+    $(document).on('click', '#createGroupBtn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openModal(document.getElementById('createGroupModal'));
+        loadFriendsForGroup();
+    });
+    
+    $(document).on('click', '#createGroupChatBtn', async function() {
+        const groupName = document.getElementById('groupNameInput').value.trim();
+        const selectedFriends = Array.from(document.querySelectorAll('#friendsSelection input:checked')).map(cb => cb.value);
+        
+        if (!groupName || selectedFriends.length === 0) {
+            showMessageBox('Please enter group name and select friends', 'error', 3000);
+            return;
+        }
+        
+        try {
+            const groupId = await messagingManager.createGroupChat(groupName, selectedFriends);
+            closeModal(document.getElementById('createGroupModal'));
+            messagingManager.openGroupChat(groupId);
+            showMessageBox('Group chat created!', 'success', 2000);
+            document.getElementById('groupNameInput').value = '';
+        } catch (error) {
+            console.error('Create group error:', error);
+            showMessageBox('Failed to create group', 'error', 3000);
+        }
+    });
 });
