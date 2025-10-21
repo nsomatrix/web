@@ -11,12 +11,14 @@ export class MessagingManager {
         this.isTyping = false;
         this.typingTimeout = null;
         this.lastMessageCount = 0;
+        this.currentMessages = [];
     }
 
     async openChat(friendId) {
         this.currentChatFriend = friendId;
         this.currentGroupChat = null;
         this.lastMessageCount = 0;
+        document.getElementById('messagesList').innerHTML = '';
         window.openModal(document.getElementById('messagesModal'));
         this.loadMessages(friendId);
     }
@@ -25,6 +27,7 @@ export class MessagingManager {
         this.currentGroupChat = groupId;
         this.currentChatFriend = null;
         this.lastMessageCount = 0;
+        document.getElementById('messagesList').innerHTML = '';
         window.openModal(document.getElementById('messagesModal'));
         this.loadGroupMessages(groupId);
     }
@@ -62,6 +65,7 @@ export class MessagingManager {
                         return a.createdAt.toMillis() - b.createdAt.toMillis();
                     });
                     
+                    this.currentMessages = messages;
                     this.renderMessages(messages);
                     this.markMessagesAsRead(snapshot, friendId);
                 });
@@ -134,11 +138,11 @@ export class MessagingManager {
                         return a.createdAt.toMillis() - b.createdAt.toMillis();
                     });
                     
+                    this.currentMessages = messages;
                     this.renderGroupMessages(messages, groupData.members);
                     this.markMessagesAsRead(snapshot);
                 });
             
-            // Listen for typing indicators in group chat
             this.typingListener = this.db.collection('typing')
                 .where(firebase.firestore.FieldPath.documentId(), '>=', `${groupId}_`)
                 .where(firebase.firestore.FieldPath.documentId(), '<', `${groupId}_\uf8ff`)
@@ -196,15 +200,19 @@ export class MessagingManager {
             this.typingListener();
             this.typingListener = null;
         }
+        this.currentMessages = [];
+        this.memberDataCache = null;
     }
 
     renderMessages(messages) {
         const messagesList = document.getElementById('messagesList');
         
-        if (this.lastMessageCount === messages.length) return;
-        this.lastMessageCount = messages.length;
+        const existingMessages = Array.from(messagesList.children).filter(el => el.id !== 'typing-indicator');
+        const newMessages = messages.slice(existingMessages.length);
         
-        messagesList.innerHTML = '';
+        if (newMessages.length === 0) return;
+        
+        const wasAtBottom = messagesList.scrollHeight - messagesList.scrollTop <= messagesList.clientHeight + 50;
         
         if (messages.length === 0) {
             messagesList.innerHTML = `
@@ -216,138 +224,146 @@ export class MessagingManager {
             return;
         }
         
-        messages.forEach((message) => {
-            const isSent = message.senderId === this.authManager.currentUser.uid;
+        newMessages.forEach((message) => {
+            this.renderSingleMessage(message, messagesList);
+        });
+        
+        if (wasAtBottom) {
+            requestAnimationFrame(() => {
+                messagesList.scrollTop = messagesList.scrollHeight;
+            });
+        }
+    }
+
+    renderSingleMessage(message, container) {
+        const isSent = message.senderId === this.authManager.currentUser.uid;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+        messageDiv.style.cssText = `
+            display: flex;
+            margin: 8px 16px;
+            ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
+        `;
+        
+        let timestamp = 'Now';
+        if (message.createdAt) {
+            const date = message.createdAt.toDate();
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
             
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
-            messageDiv.style.cssText = `
-                display: flex;
-                margin: 8px 16px;
-                ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
-            `;
-            
-            let timestamp = 'Sending...';
-            if (message.createdAt) {
-                const date = message.createdAt.toDate();
-                const today = new Date();
-                const isToday = date.toDateString() === today.toDateString();
-                
-                if (isToday) {
-                    timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                } else {
-                    timestamp = date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
-                               date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
+            if (isToday) {
+                timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                timestamp = date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
+                           date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
+        }
             
-            messageDiv.innerHTML = `
-                <div style="
-                    max-width: 70%;
-                    background: ${isSent ? '#e74c3c' : '#3d3d3d'};
-                    color: white;
-                    padding: 12px 16px;
-                    border-radius: 18px;
-                    ${isSent ? 'border-bottom-right-radius: 4px;' : 'border-bottom-left-radius: 4px;'}
-                    word-wrap: break-word;
-                    position: relative;
-                    border: 1px solid ${isSent ? '#c0392b' : '#555'};
+        messageDiv.innerHTML = `
+            <div style="
+                max-width: 70%;
+                background: ${isSent ? '#e74c3c' : '#3d3d3d'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 18px;
+                ${isSent ? 'border-bottom-right-radius: 4px;' : 'border-bottom-left-radius: 4px;'}
+                word-wrap: break-word;
+                position: relative;
+                border: 1px solid ${isSent ? '#c0392b' : '#555'};
+            ">
+                ${message.replyTo ? 
+                `<div style="
+                    background: rgba(255,255,255,0.1);
+                    border-left: 3px solid #e74c3c;
+                    padding: 6px 10px;
+                    margin-bottom: 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    opacity: 0.8;
                 ">
-                    ${message.replyTo ? 
-                    `<div style="
-                        background: rgba(255,255,255,0.1);
-                        border-left: 3px solid #e74c3c;
-                        padding: 6px 10px;
-                        margin-bottom: 8px;
-                        border-radius: 4px;
-                        font-size: 12px;
-                        opacity: 0.8;
-                    ">
-                        <div style="font-style: italic;">↩️ ${sanitizeInput(message.replyText || 'Message')}</div>
-                    </div>` : 
-                    ''
-                }
-                <div style="font-size: 14px; line-height: 1.4;">${sanitizeInput(message.text)}</div>
-                    <div style="
-                        font-size: 11px;
-                        opacity: 0.7;
-                        margin-top: 4px;
-                        text-align: right;
-                        color: #ccc;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    ">
-                        <span>${timestamp}</span>
-                        <div style="position: relative;">
-                            <span class="message-menu-btn" onclick="window.messagingManager.toggleMessageMenu('${message.id}')" style="
+                    <div style="font-style: italic;">↩️ ${sanitizeInput(message.replyText || 'Message')}</div>
+                </div>` : 
+                ''
+            }
+            <div style="font-size: 14px; line-height: 1.4;">${sanitizeInput(message.text)}</div>
+                <div style="
+                    font-size: 11px;
+                    opacity: 0.7;
+                    margin-top: 4px;
+                    text-align: right;
+                    color: #ccc;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <span>${timestamp}</span>
+                    <div style="position: relative;">
+                        <span class="message-menu-btn" onclick="window.messagingManager.toggleMessageMenu('${message.id}')" style="
+                            cursor: pointer;
+                            padding: 4px 8px;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            opacity: 0.7;
+                            transition: opacity 0.2s;
+                            -webkit-tap-highlight-color: transparent;
+                            user-select: none;
+                            touch-action: manipulation;
+                        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">⋯</span>
+                        <div id="menu-${message.id}" class="message-menu" style="
+                            display: none;
+                            position: absolute;
+                            right: 0;
+                            bottom: 30px;
+                            background: #2d2d2d;
+                            border: 1px solid #555;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                            z-index: 1000;
+                            min-width: 120px;
+                        ">
+                            <div onclick="window.messagingManager.replyToMessage('${message.id}', '${sanitizeInput(message.text)}')" style="
+                                padding: 12px 16px;
                                 cursor: pointer;
-                                padding: 4px 8px;
-                                border-radius: 8px;
-                                font-size: 16px;
-                                opacity: 0.7;
-                                transition: opacity 0.2s;
+                                color: white;
+                                ${isSent ? 'border-bottom: 1px solid #555;' : ''}
+                                font-size: 14px;
                                 -webkit-tap-highlight-color: transparent;
-                                user-select: none;
                                 touch-action: manipulation;
-                            " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">⋯</span>
-                            <div id="menu-${message.id}" class="message-menu" style="
-                                display: none;
-                                position: absolute;
-                                right: 0;
-                                bottom: 30px;
-                                background: #2d2d2d;
-                                border: 1px solid #555;
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                                z-index: 1000;
-                                min-width: 120px;
-                            ">
-                                <div onclick="window.messagingManager.replyToMessage('${message.id}', '${sanitizeInput(message.text)}')" style="
+                            " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
+                                ↩️ Reply
+                            </div>
+                            ${isSent ? 
+                                `<div onclick="window.messagingManager.unsendMessage('${message.id}')" style="
                                     padding: 12px 16px;
                                     cursor: pointer;
-                                    color: white;
-                                    ${isSent ? 'border-bottom: 1px solid #555;' : ''}
+                                    color: #e74c3c;
                                     font-size: 14px;
                                     -webkit-tap-highlight-color: transparent;
                                     touch-action: manipulation;
                                 " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
-                                    ↩️ Reply
-                                </div>
-                                ${isSent ? 
-                                    `<div onclick="window.messagingManager.unsendMessage('${message.id}')" style="
-                                        padding: 12px 16px;
-                                        cursor: pointer;
-                                        color: #e74c3c;
-                                        font-size: 14px;
-                                        -webkit-tap-highlight-color: transparent;
-                                        touch-action: manipulation;
-                                    " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
-                                        🗑️ Unsend
-                                    </div>` : 
-                                    ''
-                                }
-                            </div>
+                                    🗑️ Unsend
+                                </div>` : 
+                                ''
+                            }
                         </div>
                     </div>
                 </div>
-            `;
-            
-            messagesList.appendChild(messageDiv);
-        });
+            </div>
+        `;
         
-        requestAnimationFrame(() => {
-            messagesList.scrollTop = messagesList.scrollHeight;
-        });
+        container.appendChild(messageDiv);
     }
 
     async renderGroupMessages(messages, members) {
         const messagesList = document.getElementById('messagesList');
         
-        if (this.lastMessageCount === messages.length) return;
-        this.lastMessageCount = messages.length;
+        const existingMessages = Array.from(messagesList.children).filter(el => el.id !== 'typing-indicator');
+        const newMessages = messages.slice(existingMessages.length);
         
-        messagesList.innerHTML = '';
+        if (newMessages.length === 0) return;
+        
+        const wasAtBottom = messagesList.scrollHeight - messagesList.scrollTop <= messagesList.clientHeight + 50;
         
         if (messages.length === 0) {
             messagesList.innerHTML = `
@@ -359,170 +375,178 @@ export class MessagingManager {
             return;
         }
         
-        const memberData = {};
-        for (const memberId of members) {
-            try {
-                const [memberDoc, presenceDoc] = await Promise.all([
-                    this.db.collection('players').doc(memberId).get(),
-                    this.db.collection('presence').doc(memberId).get()
-                ]);
-                
-                if (memberDoc.exists) {
-                    const userData = memberDoc.data();
-                    const presenceData = presenceDoc.exists ? presenceDoc.data() : {};
+        if (!this.memberDataCache) {
+            this.memberDataCache = {};
+            for (const memberId of members) {
+                try {
+                    const [memberDoc, presenceDoc] = await Promise.all([
+                        this.db.collection('players').doc(memberId).get(),
+                        this.db.collection('presence').doc(memberId).get()
+                    ]);
                     
-                    memberData[memberId] = {
-                        usernameTag: userData.usernameTag || 'Unknown',
-                        avatar: userData.avatar || 'default.gif',
-                        isOnline: presenceData.isOnline || false
-                    };
-                } else {
-                    memberData[memberId] = {
+                    if (memberDoc.exists) {
+                        const userData = memberDoc.data();
+                        const presenceData = presenceDoc.exists ? presenceDoc.data() : {};
+                        
+                        this.memberDataCache[memberId] = {
+                            usernameTag: userData.usernameTag || 'Unknown',
+                            avatar: userData.avatar || 'default.gif',
+                            isOnline: presenceData.isOnline || false
+                        };
+                    } else {
+                        this.memberDataCache[memberId] = {
+                            usernameTag: 'Unknown',
+                            avatar: 'default.gif',
+                            isOnline: false
+                        };
+                    }
+                } catch (error) {
+                    this.memberDataCache[memberId] = {
                         usernameTag: 'Unknown',
                         avatar: 'default.gif',
                         isOnline: false
                     };
                 }
-            } catch (error) {
-                memberData[memberId] = {
-                    usernameTag: 'Unknown',
-                    avatar: 'default.gif',
-                    isOnline: false
-                };
             }
         }
         
-        messages.forEach((message) => {
-            const isSent = message.senderId === this.authManager.currentUser.uid;
-            const senderData = memberData[message.senderId] || { usernameTag: 'Unknown', avatar: 'default.gif', isOnline: false };
+        newMessages.forEach((message) => {
+            this.renderSingleGroupMessage(message, messagesList, this.memberDataCache);
+        });
+        
+        if (wasAtBottom) {
+            requestAnimationFrame(() => {
+                messagesList.scrollTop = messagesList.scrollHeight;
+            });
+        }
+    }
+
+    renderSingleGroupMessage(message, container, memberData) {
+        const isSent = message.senderId === this.authManager.currentUser.uid;
+        const senderData = memberData[message.senderId] || { usernameTag: 'Unknown', avatar: 'default.gif', isOnline: false };
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+        messageDiv.style.cssText = `
+            display: flex;
+            margin: 8px 16px;
+            gap: 8px;
+            ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
+        `;
+        
+        let timestamp = 'Now';
+        if (message.createdAt) {
+            const date = message.createdAt.toDate();
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
             
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
-            messageDiv.style.cssText = `
-                display: flex;
-                margin: 8px 16px;
-                gap: 8px;
-                ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
-            `;
-            
-            let timestamp = 'Sending...';
-            if (message.createdAt) {
-                const date = message.createdAt.toDate();
-                const today = new Date();
-                const isToday = date.toDateString() === today.toDateString();
-                
-                if (isToday) {
-                    timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                } else {
-                    timestamp = date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
-                               date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
+            if (isToday) {
+                timestamp = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                timestamp = date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
+                           date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
-            
-            messageDiv.innerHTML = `
-                ${!isSent ? `
-                    <div style="flex-shrink: 0;">
-                        <img src="avatars/${senderData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
-                    </div>
-                ` : ''}
-                <div style="
-                    max-width: 70%;
-                    background: ${isSent ? '#e74c3c' : '#3d3d3d'};
-                    color: white;
-                    padding: 12px 16px;
-                    border-radius: 18px;
-                    ${isSent ? 'border-bottom-right-radius: 4px;' : 'border-bottom-left-radius: 4px;'}
-                    word-wrap: break-word;
-                    position: relative;
-                    border: 1px solid ${isSent ? '#c0392b' : '#555'};
+        }
+        
+        messageDiv.innerHTML = `
+            ${!isSent ? `
+                <div style="flex-shrink: 0;">
+                    <img src="avatars/${senderData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                </div>
+            ` : ''}
+            <div style="
+                max-width: 70%;
+                background: ${isSent ? '#e74c3c' : '#3d3d3d'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 18px;
+                ${isSent ? 'border-bottom-right-radius: 4px;' : 'border-bottom-left-radius: 4px;'}
+                word-wrap: break-word;
+                position: relative;
+                border: 1px solid ${isSent ? '#c0392b' : '#555'};
+            ">
+                ${!isSent ? `<div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">@${sanitizeInput(senderData.usernameTag)} <span style="width: 6px; height: 6px; border-radius: 50%; background: ${senderData.isOnline ? '#28a745' : '#6c757d'};"></span></div>` : ''}
+                ${message.replyTo ? 
+                `<div style="
+                    background: rgba(255,255,255,0.1);
+                    border-left: 3px solid #e74c3c;
+                    padding: 6px 10px;
+                    margin-bottom: 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    opacity: 0.8;
                 ">
-                    ${!isSent ? `<div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">@${sanitizeInput(senderData.usernameTag)} <span style="width: 6px; height: 6px; border-radius: 50%; background: ${senderData.isOnline ? '#28a745' : '#6c757d'};"></span></div>` : ''}
-                    ${message.replyTo ? 
-                    `<div style="
-                        background: rgba(255,255,255,0.1);
-                        border-left: 3px solid #e74c3c;
-                        padding: 6px 10px;
-                        margin-bottom: 8px;
-                        border-radius: 4px;
-                        font-size: 12px;
-                        opacity: 0.8;
-                    ">
-                        <div style="font-style: italic;">↩️ ${sanitizeInput(message.replyText || 'Message')}</div>
-                    </div>` : 
-                    ''
-                }
-                <div style="font-size: 14px; line-height: 1.4;">${sanitizeInput(message.text)}</div>
-                    <div style="
-                        font-size: 11px;
-                        opacity: 0.7;
-                        margin-top: 4px;
-                        text-align: right;
-                        color: #ccc;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    ">
-                        <span>${timestamp}</span>
-                        <div style="position: relative;">
-                            <span class="message-menu-btn" onclick="window.messagingManager.toggleMessageMenu('${message.id}')" style="
+                    <div style="font-style: italic;">↩️ ${sanitizeInput(message.replyText || 'Message')}</div>
+                </div>` : 
+                ''
+            }
+            <div style="font-size: 14px; line-height: 1.4;">${sanitizeInput(message.text)}</div>
+                <div style="
+                    font-size: 11px;
+                    opacity: 0.7;
+                    margin-top: 4px;
+                    text-align: right;
+                    color: #ccc;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <span>${timestamp}</span>
+                    <div style="position: relative;">
+                        <span class="message-menu-btn" onclick="window.messagingManager.toggleMessageMenu('${message.id}')" style="
+                            cursor: pointer;
+                            padding: 4px 8px;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            opacity: 0.7;
+                            transition: opacity 0.2s;
+                            -webkit-tap-highlight-color: transparent;
+                            user-select: none;
+                            touch-action: manipulation;
+                        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">⋯</span>
+                        <div id="menu-${message.id}" class="message-menu" style="
+                            display: none;
+                            position: absolute;
+                            right: 0;
+                            bottom: 30px;
+                            background: #2d2d2d;
+                            border: 1px solid #555;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                            z-index: 1000;
+                            min-width: 120px;
+                        ">
+                            <div onclick="window.messagingManager.replyToMessage('${message.id}', '${sanitizeInput(message.text)}')" style="
+                                padding: 12px 16px;
                                 cursor: pointer;
-                                padding: 4px 8px;
-                                border-radius: 8px;
-                                font-size: 16px;
-                                opacity: 0.7;
-                                transition: opacity 0.2s;
+                                color: white;
+                                ${isSent ? 'border-bottom: 1px solid #555;' : ''}
+                                font-size: 14px;
                                 -webkit-tap-highlight-color: transparent;
-                                user-select: none;
                                 touch-action: manipulation;
-                            " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">⋯</span>
-                            <div id="menu-${message.id}" class="message-menu" style="
-                                display: none;
-                                position: absolute;
-                                right: 0;
-                                bottom: 30px;
-                                background: #2d2d2d;
-                                border: 1px solid #555;
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                                z-index: 1000;
-                                min-width: 120px;
-                            ">
-                                <div onclick="window.messagingManager.replyToMessage('${message.id}', '${sanitizeInput(message.text)}')" style="
+                            " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
+                                ↩️ Reply
+                            </div>
+                            ${isSent ? 
+                                `<div onclick="window.messagingManager.unsendMessage('${message.id}')" style="
                                     padding: 12px 16px;
                                     cursor: pointer;
-                                    color: white;
-                                    ${isSent ? 'border-bottom: 1px solid #555;' : ''}
+                                    color: #e74c3c;
                                     font-size: 14px;
                                     -webkit-tap-highlight-color: transparent;
                                     touch-action: manipulation;
                                 " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
-                                    ↩️ Reply
-                                </div>
-                                ${isSent ? 
-                                    `<div onclick="window.messagingManager.unsendMessage('${message.id}')" style="
-                                        padding: 12px 16px;
-                                        cursor: pointer;
-                                        color: #e74c3c;
-                                        font-size: 14px;
-                                        -webkit-tap-highlight-color: transparent;
-                                        touch-action: manipulation;
-                                    " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
-                                        🗑️ Unsend
-                                    </div>` : 
-                                    ''
-                                }
-                            </div>
+                                    🗑️ Unsend
+                                </div>` : 
+                                ''
+                            }
                         </div>
                     </div>
                 </div>
-            `;
-            
-            messagesList.appendChild(messageDiv);
-        });
+            </div>
+        `;
         
-        requestAnimationFrame(() => {
-            messagesList.scrollTop = messagesList.scrollHeight;
-        });
+        container.appendChild(messageDiv);
     }
 
     markMessagesAsRead(snapshot, friendId) {
@@ -563,7 +587,6 @@ export class MessagingManager {
         } : {};
         
         messageInput.value = '';
-        messageInput.disabled = true;
         if (isReply) this.cancelReply();
         
         if (this.isTyping) {
@@ -606,12 +629,11 @@ export class MessagingManager {
             
         } catch (error) {
             console.error('Send message error:', error);
-            window.showMessageBox('Failed to send message', 'error', 2000);
             messageInput.value = messageText;
-        } finally {
-            messageInput.disabled = false;
-            messageInput.focus();
+            window.showMessageBox('Failed to send message', 'error', 2000);
         }
+        
+        messageInput.focus();
     }
 
     handleTyping(messageInput) {
