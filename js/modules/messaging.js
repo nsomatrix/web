@@ -112,6 +112,7 @@ export class MessagingManager {
             }
             
             const groupData = groupDoc.data();
+            this.isGroupCreator = groupData.createdBy === this.authManager.currentUser.uid;
             document.getElementById('messageModalTitle').textContent = `${groupData.name} (${groupData.members.length})`;
             
             const messageInputContainer = document.querySelector('.message-input-container');
@@ -546,6 +547,26 @@ export class MessagingManager {
             </div>
         `;
         
+        // Add delete group option for group creators
+        if (this.isGroupCreator) {
+            const menuDiv = messageDiv.querySelector(`#menu-${message.id}`);
+            if (menuDiv) {
+                menuDiv.innerHTML += `
+                    <div onclick="window.messagingManager.deleteGroup()" style="
+                        padding: 12px 16px;
+                        cursor: pointer;
+                        color: #e74c3c;
+                        font-size: 14px;
+                        border-top: 1px solid #555;
+                        -webkit-tap-highlight-color: transparent;
+                        touch-action: manipulation;
+                    " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
+                        🗑️ Delete Group
+                    </div>
+                `;
+            }
+        }
+        
         container.appendChild(messageDiv);
     }
 
@@ -754,6 +775,39 @@ export class MessagingManager {
             console.error('Error deleting message:', error);
             window.showMessageBox('Failed to delete message', 'error', 2000);
         }
+    }
+
+    async deleteGroup() {
+        if (!this.currentGroupChat || !this.isGroupCreator) return;
+        
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `
+            <div style="background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:400px;text-align:center;border:1px solid #333;">
+                <h3 style="color:#e74c3c;margin-bottom:20px;">⚠️ Delete Group</h3>
+                <p style="margin-bottom:20px;color:#ccc;">Delete this group? This cannot be undone.</p>
+                <div style="display:flex;gap:10px;justify-content:center;">
+                    <button id="confirmDelete" style="background:#e74c3c;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Delete</button>
+                    <button id="cancelDelete" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmDelete').onclick = async () => {
+            try {
+                await this.db.collection('groupChats').doc(this.currentGroupChat).delete();
+                document.getElementById('messagesModal').style.display = 'none';
+                window.showMessageBox('Group deleted', 'success', 2000);
+            } catch (error) {
+                console.error('Delete group error:', error);
+                window.showMessageBox('Failed to delete group', 'error', 2000);
+            }
+            modal.remove();
+        };
+        
+        document.getElementById('cancelDelete').onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
 
     async createGroupChat(name, memberIds) {
