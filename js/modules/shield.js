@@ -506,9 +506,11 @@ export class ShieldManager {
                 if (isValid) {
                     await this.db.collection('players').doc(this.authManager.currentUser.uid).update({
                         authenticatorEnabled: true,
-                        totpSecret: secret
+                        totpSecret: secret,
+                        emailTwoFactorEnabled: true  // Auto-enable email 2FA as fallback
                     });
                     await this.logSecurityEvent('authenticator_enabled');
+                    await this.logSecurityEvent('email_2fa_enabled', { reason: 'auto_fallback' });
                     modal.remove();
                     resolve();
                 } else {
@@ -942,7 +944,7 @@ export class ShieldManager {
     async setupAuthenticatorUI() {
         try {
             await this.setupAuthenticator();
-            this.showInlineAlert('Authenticator app enabled');
+            this.showInlineAlert('Authenticator app enabled with email fallback');
             await this.loadBiometricStatus();
             await this.loadSecurityScore();
         } catch (error) {
