@@ -126,6 +126,40 @@ export class MessagingManager {
                     this.renderGroupMessages(messages, groupData.members);
                     this.markMessagesAsRead(snapshot);
                 });
+            
+            // Listen for typing indicators in group chat
+            this.typingListener = this.db.collection('typing')
+                .where(firebase.firestore.FieldPath.documentId(), '>=', `${groupId}_`)
+                .where(firebase.firestore.FieldPath.documentId(), '<', `${groupId}_\uf8ff`)
+                .onSnapshot(snapshot => {
+                    const typingUsers = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.isTyping && data.userId !== this.authManager.currentUser.uid) {
+                            typingUsers.push(data.userId);
+                        }
+                    });
+                    
+                    const typingDiv = document.getElementById('typing-indicator');
+                    if (typingUsers.length > 0) {
+                        if (!typingDiv) {
+                            const indicator = document.createElement('div');
+                            indicator.id = 'typing-indicator';
+                            indicator.style.cssText = 'padding:8px 16px;color:#888;font-style:italic;font-size:14px;animation:pulse 1.5s infinite;';
+                            
+                            if (typingUsers.length === 1) {
+                                indicator.innerHTML = '💬 Someone is typing...';
+                            } else {
+                                indicator.innerHTML = `💬 ${typingUsers.length} people are typing...`;
+                            }
+                            
+                            document.getElementById('messagesList').appendChild(indicator);
+                            document.getElementById('messagesList').scrollTop = document.getElementById('messagesList').scrollHeight;
+                        }
+                    } else {
+                        if (typingDiv) typingDiv.remove();
+                    }
+                });
                 
         } catch (error) {
             console.error('Load group messages error:', error);
@@ -487,9 +521,10 @@ export class MessagingManager {
         if (this.isTyping) {
             this.isTyping = false;
             clearTimeout(this.typingTimeout);
-            if (this.currentChatFriend) {
-                this.db.collection('typing').doc(`${this.authManager.currentUser.uid}_${this.currentChatFriend}`).delete().catch(console.error);
-            }
+            const docId = this.currentChatFriend ? 
+                `${this.authManager.currentUser.uid}_${this.currentChatFriend}` :
+                `${this.currentGroupChat}_${this.authManager.currentUser.uid}`;
+            this.db.collection('typing').doc(docId).delete().catch(console.error);
         }
         
         try {
@@ -532,34 +567,50 @@ export class MessagingManager {
     }
 
     handleTyping(messageInput) {
-        if (this.currentChatFriend && messageInput.value.trim()) {
+        const chatId = this.currentChatFriend || this.currentGroupChat;
+        if (chatId && messageInput.value.trim()) {
             if (!this.isTyping) {
                 this.isTyping = true;
                 const expireAt = new Date(Date.now() + 10000);
-                this.db.collection('typing').doc(`${this.authManager.currentUser.uid}_${this.currentChatFriend}`).set({
+                const docId = this.currentChatFriend ? 
+                    `${this.authManager.currentUser.uid}_${this.currentChatFriend}` :
+                    `${this.currentGroupChat}_${this.authManager.currentUser.uid}`;
+                
+                this.db.collection('typing').doc(docId).set({
                     isTyping: true,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    expireAt: expireAt
+                    expireAt: expireAt,
+                    userId: this.authManager.currentUser.uid,
+                    chatType: this.currentChatFriend ? 'direct' : 'group'
                 }).catch(console.error);
             }
             
             clearTimeout(this.typingTimeout);
             this.typingTimeout = setTimeout(() => {
                 this.isTyping = false;
-                this.db.collection('typing').doc(`${this.authManager.currentUser.uid}_${this.currentChatFriend}`).delete().catch(console.error);
+                const docId = this.currentChatFriend ? 
+                    `${this.authManager.currentUser.uid}_${this.currentChatFriend}` :
+                    `${this.currentGroupChat}_${this.authManager.currentUser.uid}`;
+                this.db.collection('typing').doc(docId).delete().catch(console.error);
             }, 1500);
         } else if (this.isTyping) {
             this.isTyping = false;
             clearTimeout(this.typingTimeout);
-            this.db.collection('typing').doc(`${this.authManager.currentUser.uid}_${this.currentChatFriend}`).delete().catch(console.error);
+            const docId = this.currentChatFriend ? 
+                `${this.authManager.currentUser.uid}_${this.currentChatFriend}` :
+                `${this.currentGroupChat}_${this.authManager.currentUser.uid}`;
+            this.db.collection('typing').doc(docId).delete().catch(console.error);
         }
     }
 
     stopTyping() {
-        if (this.isTyping && this.currentChatFriend) {
+        if (this.isTyping) {
             this.isTyping = false;
             clearTimeout(this.typingTimeout);
-            this.db.collection('typing').doc(`${this.authManager.currentUser.uid}_${this.currentChatFriend}`).delete().catch(console.error);
+            const docId = this.currentChatFriend ? 
+                `${this.authManager.currentUser.uid}_${this.currentChatFriend}` :
+                `${this.currentGroupChat}_${this.authManager.currentUser.uid}`;
+            this.db.collection('typing').doc(docId).delete().catch(console.error);
         }
     }
 
