@@ -398,6 +398,47 @@ export class ShieldManager {
         return userData;
     }
 
+    async exportSelectedUserData(selections) {
+        if (!this.authManager.currentUser) return null;
+        
+        const userData = {
+            exportedAt: new Date().toISOString(),
+            selections: selections
+        };
+
+        if (selections.profile) {
+            const profileDoc = await this.db.collection('players').doc(this.authManager.currentUser.uid).get();
+            userData.profile = profileDoc.data();
+        }
+
+        if (selections.notes && this.authManager.currentEncryptionKey) {
+            const notesSnapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('notes').get();
+            userData.notes = notesSnapshot.docs.map(doc => doc.data());
+        }
+
+        if (selections.passwords && this.authManager.currentEncryptionKey) {
+            const passwordsSnapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('passwords').get();
+            userData.passwords = passwordsSnapshot.docs.map(doc => doc.data());
+        }
+
+        if (selections.friends) {
+            const friendsSnapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('friends').get();
+            userData.friends = friendsSnapshot.docs.map(doc => doc.data());
+        }
+
+        if (selections.security) {
+            userData.loginHistory = await this.getLoginHistory();
+            userData.securityEvents = await this.getSecurityEvents();
+            userData.sessions = await this.getSessions();
+        }
+
+        await this.logSecurityEvent('data_exported', { selections });
+        return userData;
+    }
+
 
 
     // Device Detection
@@ -872,27 +913,73 @@ export class ShieldManager {
     }
 
     async exportDataUI() {
-        showConfirmModal(
-            'Download Your Data',
-            'This will create a JSON file containing all your account data including notes, passwords, and security information.',
-            'Download Data',
-            'Cancel',
-            async () => {
-                try {
-                    const data = await this.exportUserData();
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `nsomatrix-data-${new Date().toISOString().split('T')[0]}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    window.showMessageBox('Data exported successfully', 'success', 2000);
-                } catch (error) {
-                    window.showMessageBox('Failed to export data', 'error', 3000);
-                }
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `
+            <div style="background:#1a1a1a;color:white;padding:30px;border-radius:10px;max-width:500px;border:1px solid #333;">
+                <h3 style="color:#00d4ff;margin-bottom:20px;">📥 Export Your Data</h3>
+                <p style="margin-bottom:20px;color:#ccc;">Select what data to include in your export:</p>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:flex;align-items:center;margin-bottom:10px;cursor:pointer;">
+                        <input type="checkbox" id="exportProfile" checked style="margin-right:10px;">
+                        <span>Profile Information</span>
+                    </label>
+                    <label style="display:flex;align-items:center;margin-bottom:10px;cursor:pointer;">
+                        <input type="checkbox" id="exportNotes" checked style="margin-right:10px;">
+                        <span>Notes</span>
+                    </label>
+                    <label style="display:flex;align-items:center;margin-bottom:10px;cursor:pointer;">
+                        <input type="checkbox" id="exportPasswords" style="margin-right:10px;">
+                        <span>Passwords</span>
+                    </label>
+                    <label style="display:flex;align-items:center;margin-bottom:10px;cursor:pointer;">
+                        <input type="checkbox" id="exportFriends" checked style="margin-right:10px;">
+                        <span>Friends List</span>
+                    </label>
+                    <label style="display:flex;align-items:center;margin-bottom:10px;cursor:pointer;">
+                        <input type="checkbox" id="exportSecurity" style="margin-right:10px;">
+                        <span>Security Data</span>
+                    </label>
+                </div>
+                
+                <div style="display:flex;gap:10px;justify-content:center;">
+                    <button id="exportSelectedBtn" style="background:#28a745;color:white;border:none;padding:12px 24px;border-radius:5px;cursor:pointer;">Export Selected</button>
+                    <button id="cancelExportBtn" style="background:#6c757d;color:white;border:none;padding:12px 24px;border-radius:5px;cursor:pointer;">Cancel</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('exportSelectedBtn').onclick = async () => {
+            const selections = {
+                profile: document.getElementById('exportProfile').checked,
+                notes: document.getElementById('exportNotes').checked,
+                passwords: document.getElementById('exportPasswords').checked,
+                friends: document.getElementById('exportFriends').checked,
+                security: document.getElementById('exportSecurity').checked
+            };
+            
+            modal.remove();
+            
+            try {
+                const data = await this.exportSelectedUserData(selections);
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `nsomatrix-data-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                window.showMessageBox('Selected data exported successfully', 'success', 2000);
+            } catch (error) {
+                window.showMessageBox('Failed to export data', 'error', 3000);
             }
-        );
+        };
+        
+        document.getElementById('cancelExportBtn').onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
 
 
