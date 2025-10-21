@@ -21,7 +21,7 @@ export class AuthManager {
             this.sessionExpiryTimer = setTimeout(async () => {
                 console.warn("Session expired due to inactivity. Clearing encryption key.");
                 this.currentEncryptionKey = null;
-                sessionStorage.removeItem('currentEncryptionKeyHex');
+                this.secureRemoveKey('currentEncryptionKeyHex');
                 
                 // Check if account needs recovery key
                 const needsRecovery = await this.checkPasswordResetStatus();
@@ -93,7 +93,7 @@ export class AuthManager {
             }
 
             this.currentEncryptionKey = derivedKeyForVerification;
-            sessionStorage.setItem('currentEncryptionKeyHex', this.currentEncryptionKey.toString(CryptoJS.enc.Hex));
+            this.secureStoreKey('currentEncryptionKeyHex', this.currentEncryptionKey.toString(CryptoJS.enc.Hex));
             this.failedUnlockAttempts = 0;
             showMessageBox("Dashboard unlocked successfully", "success", 4000);
             return true;
@@ -107,7 +107,7 @@ export class AuthManager {
     }
 
     async restoreEncryptionKey() {
-        const storedKeyHex = sessionStorage.getItem('currentEncryptionKeyHex');
+        const storedKeyHex = this.secureGetKey('currentEncryptionKeyHex');
         if (storedKeyHex) {
             try {
                 this.currentEncryptionKey = CryptoJS.enc.Hex.parse(storedKeyHex);
@@ -119,7 +119,7 @@ export class AuthManager {
                     const data = playerDoc.data();
                     if (data && data.masterPasswordHash && storedKeyHex !== data.masterPasswordHash) {
                         // Key doesn't match - password was likely reset
-                        sessionStorage.removeItem('currentEncryptionKeyHex');
+                        this.secureRemoveKey('currentEncryptionKeyHex');
                         this.currentEncryptionKey = null;
                         return false;
                     }
@@ -129,7 +129,7 @@ export class AuthManager {
                 return true;
             } catch (e) {
                 console.error("Failed to restore encryption key from localStorage:", e);
-                sessionStorage.removeItem('currentEncryptionKeyHex');
+                this.secureRemoveKey('currentEncryptionKeyHex');
                 this.currentEncryptionKey = null;
                 return false;
             }
@@ -139,8 +139,32 @@ export class AuthManager {
 
     clearSession() {
         this.currentEncryptionKey = null;
-        sessionStorage.removeItem('currentEncryptionKeyHex');
+        this.secureRemoveKey('currentEncryptionKeyHex');
         clearTimeout(this.sessionExpiryTimer);
+    }
+
+    // Secure storage methods
+    secureStoreKey(key, value) {
+        const sessionKey = CryptoJS.SHA256(navigator.userAgent + window.location.origin).toString();
+        const encrypted = CryptoJS.AES.encrypt(value, sessionKey).toString();
+        sessionStorage.setItem(key, encrypted);
+    }
+
+    secureGetKey(key) {
+        const encrypted = sessionStorage.getItem(key);
+        if (!encrypted) return null;
+        try {
+            const sessionKey = CryptoJS.SHA256(navigator.userAgent + window.location.origin).toString();
+            const decrypted = CryptoJS.AES.decrypt(encrypted, sessionKey);
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        } catch (e) {
+            sessionStorage.removeItem(key);
+            return null;
+        }
+    }
+
+    secureRemoveKey(key) {
+        sessionStorage.removeItem(key);
     }
 
     // Check if account needs recovery key due to password reset

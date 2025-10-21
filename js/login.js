@@ -1,6 +1,7 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 import { TwoFactorAuth } from './modules/two-factor.js';
+import { TURNSTILE_CONFIG } from './modules/config.js';
 
 // Wait for Firebase to be ready
 let auth, db, twoFactorAuth;
@@ -95,7 +96,7 @@ function renderTurnstile() {
     try {
         container.innerHTML = '';
         turnstileWidgetId = window.turnstile.render(container, {
-            sitekey: '0x4AAAAAAB6AxJBsBeZyr7Mv',
+            sitekey: TURNSTILE_CONFIG.SITE_KEY,
             callback: window.onTurnstileSuccess,
             'error-callback': window.onTurnstileError,
             'expired-callback': window.onTurnstileExpired,
@@ -294,12 +295,8 @@ async function handleLogin() {
             renderTurnstile();
         }
         
-        if (!turnstileInitialized && window.location.hostname === 'localhost') {
-            turnstileToken = 'dev-bypass-token';
-        } else {
-            showMessageBox('Please complete the security verification', 'error');
-            return;
-        }
+        showMessageBox('Please complete the security verification', 'error');
+        return;
     }
 
     if (!email.includes('@')) {
@@ -342,7 +339,9 @@ async function handleLogin() {
                     });
                 } else {
                     // Use the derived key as encryption key (this is the actual encryption key)
-                    sessionStorage.setItem('currentEncryptionKeyHex', derivedKeyHex);
+                    const sessionKey = CryptoJS.SHA256(navigator.userAgent + window.location.origin).toString();
+                    const encrypted = CryptoJS.AES.encrypt(derivedKeyHex, sessionKey).toString();
+                    sessionStorage.setItem('currentEncryptionKeyHex', encrypted);
                 }
             }
         }
@@ -464,7 +463,9 @@ async function handleSignup() {
             encryptedMasterKey: encryptedMasterKey
         });
 
-        sessionStorage.setItem('currentEncryptionKeyHex', masterPasswordHash);
+        const sessionKey = CryptoJS.SHA256(navigator.userAgent + window.location.origin).toString();
+        const encrypted = CryptoJS.AES.encrypt(masterPasswordHash, sessionKey).toString();
+        sessionStorage.setItem('currentEncryptionKeyHex', encrypted);
         localStorage.setItem('userLoggedIn', 'true');
         
         // Prevent automatic redirect during recovery key display

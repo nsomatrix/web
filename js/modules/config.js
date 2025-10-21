@@ -19,3 +19,7 @@ export const CRYPTO_CONFIG = {
     SESSION_TIMEOUT: 30 * 60 * 1000  // 30 minutes instead of 5
 };
 
+export const TURNSTILE_CONFIG = {
+    SITE_KEY: '0x4AAAAAAB6AxJBsBeZyr7Mv'
+};
+

@@ -609,12 +609,24 @@ async function setupDashboard(user) {
     const requires2FA = await check2FARequired(user);
     if (requires2FA) {
         // Check if 2FA was already verified in this session
-        const sessionVerified = sessionStorage.getItem('2fa_verified_' + user.uid);
-        const sessionTime = sessionStorage.getItem('2fa_verified_time_' + user.uid);
+        const sessionData = sessionStorage.getItem('2fa_verified_' + user.uid);
         const currentTime = Date.now();
         
-        // If verified within last 30 minutes, skip 2FA
-        if (sessionVerified && sessionTime && (currentTime - parseInt(sessionTime)) < 30 * 60 * 1000) {
+        let skipTwoFA = false;
+        if (sessionData) {
+            try {
+                const decrypted = CryptoJS.AES.decrypt(sessionData, CryptoJS.SHA256(navigator.userAgent + user.uid).toString());
+                const data = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+                // If verified within last 30 minutes and UIDs match, skip 2FA
+                if (data.verified && data.uid === user.uid && (currentTime - data.time) < 30 * 60 * 1000) {
+                    skipTwoFA = true;
+                }
+            } catch (e) {
+                sessionStorage.removeItem('2fa_verified_' + user.uid);
+            }
+        }
+        
+        if (skipTwoFA) {
             console.log('2FA already verified in this session');
         } else {
             const verified = await verify2FA(user);
@@ -626,9 +638,13 @@ async function setupDashboard(user) {
                 }, 3000);
                 return;
             } else {
-                // Store 2FA verification in session
-                sessionStorage.setItem('2fa_verified_' + user.uid, 'true');
-                sessionStorage.setItem('2fa_verified_time_' + user.uid, currentTime.toString());
+                // Store 2FA verification in session with encryption
+                const sessionData = CryptoJS.AES.encrypt(JSON.stringify({
+                    verified: true,
+                    time: currentTime,
+                    uid: user.uid
+                }), CryptoJS.SHA256(navigator.userAgent + user.uid).toString()).toString();
+                sessionStorage.setItem('2fa_verified_' + user.uid, sessionData);
             }
         }
     }
@@ -1594,7 +1610,7 @@ async function setupMasterPassword(masterPassword, confirmPassword) {
         });
         
         authManager.currentEncryptionKey = derivedKey;
-        sessionStorage.setItem('currentEncryptionKeyHex', derivedKey.toString(CryptoJS.enc.Hex));
+        authManager.secureStoreKey('currentEncryptionKeyHex', derivedKey.toString(CryptoJS.enc.Hex));
         
         // Generate recovery key
         const recoveryKey = generateRecoveryKey();
@@ -1670,6 +1686,19 @@ async function recoverWithKey(recoveryKey) {
         return false;
     }
     
+    // Validate recovery key format and entropy
+    if (!/^[A-Za-z0-9]{32}$/.test(recoveryKey)) {
+        showMessageBox('Invalid recovery key format', 'error');
+        return false;
+    }
+    
+    // Check for minimum entropy (no repeated patterns)
+    const uniqueChars = new Set(recoveryKey).size;
+    if (uniqueChars < 16) {
+        showMessageBox('Invalid recovery key - insufficient entropy', 'error');
+        return false;
+    }
+    
     try {
         const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
         const data = playerDoc.data();
@@ -1726,7 +1755,9 @@ async function syncWithNewPassword(recoveredKeyHex) {
             
             // Set the new derived key as the current encryption key
             authManager.currentEncryptionKey = newDerivedKey;
-            sessionStorage.setItem('currentEncryptionKeyHex', newMasterPasswordHash);
+            const sessionKey = CryptoJS.SHA256(navigator.userAgent + window.location.origin).toString();
+            const encrypted = CryptoJS.AES.encrypt(newMasterPasswordHash, sessionKey).toString();
+            sessionStorage.setItem('currentEncryptionKeyHex', encrypted);
             
             sessionStorage.removeItem('tempLoginPassword');
             showRecoveryKey(newRecoveryKey);
@@ -1803,7 +1834,7 @@ async function reencryptUserData(oldKey) {
     
     // Set new key as current
     authManager.currentEncryptionKey = newKey;
-    sessionStorage.setItem('currentEncryptionKeyHex', newMasterPasswordHash);
+    authManager.secureStoreKey('currentEncryptionKeyHex', newMasterPasswordHash);
     sessionStorage.removeItem('tempLoginPassword');
     
     showRecoveryKey(newRecoveryKey);
@@ -1837,7 +1868,7 @@ async function syncWithCurrentPassword(currentPassword) {
         
         // Set the correct encryption key
         authManager.currentEncryptionKey = CryptoJS.enc.Hex.parse(window.tempRecoveredKey);
-        sessionStorage.setItem('currentEncryptionKeyHex', window.tempRecoveredKey);
+        authManager.secureStoreKey('currentEncryptionKeyHex', window.tempRecoveredKey);
         
         // Clean up
         delete window.tempRecoveredKey;
