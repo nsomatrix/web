@@ -359,27 +359,49 @@ export class MessagingManager {
             return;
         }
         
-        const memberNames = {};
+        const memberData = {};
         for (const memberId of members) {
             try {
-                const memberDoc = await this.db.collection('players').doc(memberId).get();
+                const [memberDoc, presenceDoc] = await Promise.all([
+                    this.db.collection('players').doc(memberId).get(),
+                    this.db.collection('presence').doc(memberId).get()
+                ]);
+                
                 if (memberDoc.exists) {
-                    memberNames[memberId] = memberDoc.data().usernameTag || 'Unknown';
+                    const userData = memberDoc.data();
+                    const presenceData = presenceDoc.exists ? presenceDoc.data() : {};
+                    
+                    memberData[memberId] = {
+                        usernameTag: userData.usernameTag || 'Unknown',
+                        avatar: userData.avatar || 'default.gif',
+                        isOnline: presenceData.isOnline || false
+                    };
+                } else {
+                    memberData[memberId] = {
+                        usernameTag: 'Unknown',
+                        avatar: 'default.gif',
+                        isOnline: false
+                    };
                 }
             } catch (error) {
-                memberNames[memberId] = 'Unknown';
+                memberData[memberId] = {
+                    usernameTag: 'Unknown',
+                    avatar: 'default.gif',
+                    isOnline: false
+                };
             }
         }
         
         messages.forEach((message) => {
             const isSent = message.senderId === this.authManager.currentUser.uid;
-            const senderName = memberNames[message.senderId] || 'Unknown';
+            const senderData = memberData[message.senderId] || { usernameTag: 'Unknown', avatar: 'default.gif', isOnline: false };
             
             const messageDiv = document.createElement('div');
             messageDiv.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
             messageDiv.style.cssText = `
                 display: flex;
                 margin: 8px 16px;
+                gap: 8px;
                 ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
             `;
             
@@ -398,6 +420,11 @@ export class MessagingManager {
             }
             
             messageDiv.innerHTML = `
+                ${!isSent ? `
+                    <div style="flex-shrink: 0;">
+                        <img src="avatars/${senderData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                    </div>
+                ` : ''}
                 <div style="
                     max-width: 70%;
                     background: ${isSent ? '#e74c3c' : '#3d3d3d'};
@@ -409,7 +436,7 @@ export class MessagingManager {
                     position: relative;
                     border: 1px solid ${isSent ? '#c0392b' : '#555'};
                 ">
-                    ${!isSent ? `<div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px;">@${sanitizeInput(senderName)}</div>` : ''}
+                    ${!isSent ? `<div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">@${sanitizeInput(senderData.usernameTag)} <span style="width: 6px; height: 6px; border-radius: 50%; background: ${senderData.isOnline ? '#28a745' : '#6c757d'};"></span></div>` : ''}
                     ${message.replyTo ? 
                     `<div style="
                         background: rgba(255,255,255,0.1);
