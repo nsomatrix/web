@@ -38,6 +38,15 @@ export class MessagingManager {
             
             const friendDoc = await this.db.collection('players').doc(friendId).get();
             const friendData = friendDoc.data();
+            const presenceDoc = await this.db.collection('presence').doc(friendId).get();
+            const presenceData = presenceDoc.exists ? presenceDoc.data() : {};
+            
+            this.friendData = {
+                usernameTag: friendData.usernameTag || 'Unknown',
+                avatar: friendData.avatar || 'default.gif',
+                isOnline: presenceData.isOnline || false
+            };
+            
             document.getElementById('messageModalTitle').textContent = `Chat with @${sanitizeInput(friendData.usernameTag)}`;
             
             const messageInputContainer = document.querySelector('.message-input-container');
@@ -244,6 +253,7 @@ export class MessagingManager {
         messageDiv.style.cssText = `
             display: flex;
             margin: 8px 16px;
+            gap: 8px;
             ${isSent ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
         `;
         
@@ -262,6 +272,11 @@ export class MessagingManager {
         }
             
         messageDiv.innerHTML = `
+            ${!isSent && this.friendData ? `
+                <div style="flex-shrink: 0;">
+                    <img src="avatars/${this.friendData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                </div>
+            ` : ''}
             <div style="
                 max-width: 70%;
                 background: ${isSent ? '#e74c3c' : '#3d3d3d'};
@@ -273,6 +288,7 @@ export class MessagingManager {
                 position: relative;
                 border: 1px solid ${isSent ? '#c0392b' : '#555'};
             ">
+                ${!isSent && this.friendData ? `<div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">@${sanitizeInput(this.friendData.usernameTag)} <span style="width: 6px; height: 6px; border-radius: 50%; background: ${this.friendData.isOnline ? '#28a745' : '#6c757d'};"></span></div>` : ''}
                 ${message.replyTo ? 
                 `<div style="
                     background: rgba(255,255,255,0.1);
