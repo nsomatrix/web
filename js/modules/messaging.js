@@ -67,16 +67,27 @@ export class MessagingManager {
                 });
             
             this.typingListener = this.db.collection('typing').doc(`${friendId}_${this.authManager.currentUser.uid}`)
-                .onSnapshot(doc => {
+                .onSnapshot(async doc => {
                     const typingDiv = document.getElementById('typing-indicator');
                     if (doc.exists && doc.data().isTyping) {
+                        let displayText = '💬 ';
+                        try {
+                            const userDoc = await this.db.collection('players').doc(friendId).get();
+                            const username = userDoc.exists ? userDoc.data().usernameTag : 'User';
+                            displayText += `@${username} is typing...`;
+                        } catch {
+                            displayText += 'Typing...';
+                        }
+                        
                         if (!typingDiv) {
                             const indicator = document.createElement('div');
                             indicator.id = 'typing-indicator';
                             indicator.style.cssText = 'padding:8px 16px;color:#888;font-style:italic;font-size:14px;animation:pulse 1.5s infinite;';
-                            indicator.innerHTML = '💬 Typing...';
+                            indicator.innerHTML = displayText;
                             document.getElementById('messagesList').appendChild(indicator);
                             document.getElementById('messagesList').scrollTop = document.getElementById('messagesList').scrollHeight;
+                        } else {
+                            typingDiv.innerHTML = displayText;
                         }
                     } else {
                         if (typingDiv) typingDiv.remove();
@@ -131,7 +142,7 @@ export class MessagingManager {
             this.typingListener = this.db.collection('typing')
                 .where(firebase.firestore.FieldPath.documentId(), '>=', `${groupId}_`)
                 .where(firebase.firestore.FieldPath.documentId(), '<', `${groupId}_\uf8ff`)
-                .onSnapshot(snapshot => {
+                .onSnapshot(async snapshot => {
                     const typingUsers = [];
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -142,19 +153,29 @@ export class MessagingManager {
                     
                     const typingDiv = document.getElementById('typing-indicator');
                     if (typingUsers.length > 0) {
+                        let displayText = '💬 ';
+                        
+                        if (typingUsers.length === 1) {
+                            try {
+                                const userDoc = await this.db.collection('players').doc(typingUsers[0]).get();
+                                const username = userDoc.exists ? userDoc.data().usernameTag : 'Someone';
+                                displayText += `@${username} is typing...`;
+                            } catch {
+                                displayText += 'Someone is typing...';
+                            }
+                        } else {
+                            displayText += `${typingUsers.length} people are typing...`;
+                        }
+                        
                         if (!typingDiv) {
                             const indicator = document.createElement('div');
                             indicator.id = 'typing-indicator';
                             indicator.style.cssText = 'padding:8px 16px;color:#888;font-style:italic;font-size:14px;animation:pulse 1.5s infinite;';
-                            
-                            if (typingUsers.length === 1) {
-                                indicator.innerHTML = '💬 Someone is typing...';
-                            } else {
-                                indicator.innerHTML = `💬 ${typingUsers.length} people are typing...`;
-                            }
-                            
+                            indicator.innerHTML = displayText;
                             document.getElementById('messagesList').appendChild(indicator);
                             document.getElementById('messagesList').scrollTop = document.getElementById('messagesList').scrollHeight;
+                        } else {
+                            typingDiv.innerHTML = displayText;
                         }
                     } else {
                         if (typingDiv) typingDiv.remove();
