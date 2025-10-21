@@ -1076,7 +1076,7 @@ function setupDeleteHandlers() {
                 const deletePromises = [];
 
                 // Delete all subcollections
-                const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications'];
+                const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications', 'sessions', 'loginHistory', 'securityEvents', 'backupCodes'];
                 for (const collectionName of collections) {
                     const snapshot = await db.collection('players').doc(uid).collection(collectionName).get();
                     snapshot.forEach(doc => {
@@ -1091,8 +1091,41 @@ function setupDeleteHandlers() {
                     deletePromises.push(doc.ref.delete());
                 });
 
+                // Delete email verifications
+                deletePromises.push(db.collection('emailVerifications').doc(uid).delete());
+
                 // Delete presence
                 deletePromises.push(db.collection('presence').doc(uid).delete());
+
+                // Delete typing indicators
+                const typingSnapshot = await db.collection('typing')
+                    .where(firebase.firestore.FieldPath.documentId(), '>=', uid)
+                    .where(firebase.firestore.FieldPath.documentId(), '<', uid + '\uf8ff').get();
+                typingSnapshot.forEach(doc => {
+                    if (doc.id.includes(uid)) {
+                        deletePromises.push(doc.ref.delete());
+                    }
+                });
+
+                // Remove user from group chats
+                const groupChatsSnapshot = await db.collection('groupChats')
+                    .where('members', 'array-contains', uid).get();
+                groupChatsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const updatedMembers = data.members.filter(member => member !== uid);
+                    const updatedAdmins = (data.admins || []).filter(admin => admin !== uid);
+                    
+                    if (updatedMembers.length === 0) {
+                        // Delete group if no members left
+                        deletePromises.push(doc.ref.delete());
+                    } else {
+                        // Remove user from group
+                        deletePromises.push(doc.ref.update({
+                            members: updatedMembers,
+                            admins: updatedAdmins
+                        }));
+                    }
+                });
 
                 // Execute all deletions
                 await Promise.all(deletePromises);
