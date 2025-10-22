@@ -19,6 +19,11 @@ export class MessagingManager {
         this.currentGroupChat = null;
         this.lastMessageCount = 0;
         document.getElementById('messagesList').innerHTML = '';
+        
+        // Hide create group button in private chats
+        const createGroupBtn = document.getElementById('createGroupBtn');
+        if (createGroupBtn) createGroupBtn.style.display = 'none';
+        
         window.openModal(document.getElementById('messagesModal'));
         this.loadMessages(friendId);
     }
@@ -28,6 +33,11 @@ export class MessagingManager {
         this.currentChatFriend = null;
         this.lastMessageCount = 0;
         document.getElementById('messagesList').innerHTML = '';
+        
+        // Hide create group button in group chats
+        const createGroupBtn = document.getElementById('createGroupBtn');
+        if (createGroupBtn) createGroupBtn.style.display = 'none';
+        
         window.openModal(document.getElementById('messagesModal'));
         this.loadGroupMessages(groupId);
     }

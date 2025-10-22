@@ -1358,6 +1358,10 @@ async function loadRecentChats() {
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '';
         
+        // Show create group button in main chat list
+        const createGroupBtn = document.getElementById('createGroupBtn');
+        if (createGroupBtn) createGroupBtn.style.display = 'block';
+        
         // Load group chats
         const groupChatsSnapshot = await db.collection('groupChats')
             .where('members', 'array-contains', authManager.currentUser.uid).get();
