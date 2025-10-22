@@ -204,21 +204,10 @@
   <script src="js/download-handler.js"></script>
   <script src="components/navbar.js"></script>
   <script>
-    fetch('components/navbar.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('navbar').innerHTML = html;
-        setTimeout(() => { new RetroNavbar(); new NavbarAuth(); }, 200);
-        new NavbarAuth();
-      });
     
-    fetch('components/footer.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById("footer").innerHTML = html;
-      });
   </script>
 
     <footer id="footer"></footer>
+    <script src="js/component-loader.js"></script>
 </body>
 </html>

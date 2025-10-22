@@ -90,28 +90,6 @@
     <script src="components/loader.js"></script>
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
-    <script>
-        fetch('components/navbar.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('navbar').innerHTML = html;
-                // Initialize navbar after HTML is loaded
-                const initNavbar = () => {
-                    if (window.firebaseReady && typeof RetroNavbar !== 'undefined' && typeof NavbarAuth !== 'undefined') {
-                        new RetroNavbar();
-                        new NavbarAuth();
-                    } else {
-                        setTimeout(initNavbar, 100);
-                    }
-                };
-                setTimeout(initNavbar, 200);
-            });
-        
-        fetch('components/footer.html')
-            .then(response => response.text())
-            .then(html => {
-                document.body.insertAdjacentHTML('beforeend', '<footer id="footer">' + html + '</footer>');
-            });
-    </script>
+    <script src="js/component-loader.js"></script>
 </body>
 </html>

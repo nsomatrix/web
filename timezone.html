@@ -162,21 +162,10 @@
     <script src="js/timezone.js"></script>
     <script>
         // Load navbar component
-        fetch('components/navbar.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('navbar').innerHTML = html;
-                setTimeout(() => { new RetroNavbar(); new NavbarAuth(); }, 200);
-                new NavbarAuth();
-            });
         
         // Load footer component
-        fetch('components/footer.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('footer').innerHTML = html;
-            });
     </script>
     <script src="components/loader.js"></script>
+    <script src="js/component-loader.js"></script>
 </body>
 </html>
