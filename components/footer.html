@@ -1,3 +1,46 @@
 <footer class="matrix-footer">
   <p>Matrix&trade; 2019</p>
+  <button id="supportBtn" class="support-btn" onclick="document.getElementById('supportModal').style.display='block'">
+    <i class="fas fa-headset"></i> Support
+  </button>
 </footer>
+
+<!-- Support Modal -->
+<div id="supportModal" class="support-modal">
+  <div class="modal-content">
+    <span class="close" onclick="document.getElementById('supportModal').style.display='none'">&times;</span>
+    <h3>Contact Support</h3>
+    <form id="supportForm" onsubmit="return false;">
+      <input type="text" id="userName" placeholder="Your name" required>
+      <textarea id="message" placeholder="Your message or feedback" required></textarea>
+      <button type="button" onclick="
+        const name = document.getElementById('userName').value;
+        const msg = document.getElementById('message').value;
+        if (!name || !msg) { alert('Please fill in all fields'); return; }
+        this.innerHTML = '⏳ Sending...';
+        this.disabled = true;
+        fetch('https://support-proxy.nsomtx.workers.dev', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, message: msg })
+        }).then(r => {
+          if (r.ok) {
+            this.innerHTML = '✓ Sent!';
+            setTimeout(() => {
+              document.getElementById('supportForm').reset();
+              document.getElementById('supportModal').style.display = 'none';
+              this.innerHTML = 'Send Message';
+              this.disabled = false;
+            }, 2000);
+          } else throw new Error();
+        }).catch(() => {
+          this.innerHTML = '❌ Failed';
+          setTimeout(() => {
+            this.innerHTML = 'Send Message';
+            this.disabled = false;
+          }, 2000);
+        });">Send Message</button>
+    </form>
+  </div>
+</div>
+

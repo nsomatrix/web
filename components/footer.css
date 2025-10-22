@@ -10,6 +10,9 @@
   left: 0;
   width: 100%;
   z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .matrix-footer p {
@@ -17,6 +20,82 @@
   margin: 0;
   font-size: 0.9rem;
   text-shadow: 0 0 5px #ff0000;
+}
+
+.support-btn {
+  background: #ff0000;
+  color: #000;
+  border: none;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 3px;
+  font-family: inherit;
+}
+
+.support-btn:hover {
+  background: #cc0000;
+}
+
+.support-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+  background: #1a1a1a;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #ff0000;
+  width: 300px;
+  border-radius: 5px;
+  color: #ff0000;
+  font-family: inherit;
+}
+
+.close {
+  color: #ff0000;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #cc0000;
+}
+
+#supportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#supportForm input, #supportForm textarea {
+  background: #0a0a0a;
+  border: 1px solid #ff0000;
+  color: #ff0000;
+  padding: 8px;
+  font-family: inherit;
+}
+
+#supportForm button {
+  background: #ff0000;
+  color: #000;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+#supportForm button:hover {
+  background: #cc0000;
 }
 
 /* Add bottom padding to body to prevent content overlap */
