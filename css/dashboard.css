@@ -840,8 +840,7 @@ body {
 #pmEntryList,
 #friendsList,
 #searchResults,
-#notificationsList,
-#messagesList {
+#notificationsList {
   max-height: 250px !important;
   overflow-y: auto !important;
   background: rgba(15, 15, 15, 0.5) !important;
@@ -849,6 +848,10 @@ body {
   border: 1px solid rgba(255, 0, 0, 0.2) !important;
   padding: 1rem !important;
   margin-top: 1rem !important;
+}
+
+#messagesList {
+  overflow-y: auto !important;
 }
 
 /* Custom Scrollbars */
