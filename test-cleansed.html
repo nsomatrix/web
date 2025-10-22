@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleansed Files Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 5px; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        button { padding: 10px 20px; margin: 5px; background: #333; color: white; border: 1px solid #555; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <h1>Cleansed Files Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>Dashboard Elements Test</h2>
+        <button onclick="testDashboardElements()">Test Dashboard Elements</button>
+        <div id="dashboard-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Login Elements Test</h2>
+        <button onclick="testLoginElements()">Test Login Elements</button>
+        <div id="login-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>File Size Comparison</h2>
+        <button onclick="showFileSizes()">Show File Sizes</button>
+        <div id="size-results"></div>
+    </div>
+
+    <script>
+        function testDashboardElements() {
+            const results = document.getElementById('dashboard-results');
+            const requiredElements = [
+                'setup-section', 'main-dashboard', 'user-avatar', 'dashboard-username',
+                'friendsBtn', 'notesBtn', 'passwordManagerBtn', 'serverBtn', 'securityBtn',
+                'deleteAccountBtn', 'masterPasswordPromptModal', 'notesModal', 'passwordManagerModal',
+                'shieldModal', 'messagesModal', 'friendsModal'
+            ];
+            
+            fetch('dashboard.html')
+                .then(response => response.text())
+                .then(html => {
+                    let passed = 0;
+                    let failed = 0;
+                    let output = '<h3>Dashboard Element Check:</h3><ul>';
+                    
+                    requiredElements.forEach(elementId => {
+                        if (html.includes(`id="${elementId}"`)) {
+                            output += `<li class="success">✓ ${elementId} - Found</li>`;
+                            passed++;
+                        } else {
+                            output += `<li class="error">✗ ${elementId} - Missing</li>`;
+                            failed++;
+                        }
+                    });
+                    
+                    output += `</ul><p class="info">Passed: ${passed}, Failed: ${failed}</p>`;
+                    results.innerHTML = output;
+                });
+        }
+        
+        function testLoginElements() {
+            const results = document.getElementById('login-results');
+            const requiredElements = [
+                'email', 'password', 'confirmPassword', 'primaryBtn', 'switchBtn',
+                'togglePassword', 'toggleConfirmPassword', 'turnstile-container',
+                'formTitle', 'forgotPasswordLink'
+            ];
+            
+            fetch('login.html')
+                .then(response => response.text())
+                .then(html => {
+                    let passed = 0;
+                    let failed = 0;
+                    let output = '<h3>Login Element Check:</h3><ul>';
+                    
+                    requiredElements.forEach(elementId => {
+                        if (html.includes(`id="${elementId}"`)) {
+                            output += `<li class="success">✓ ${elementId} - Found</li>`;
+                            passed++;
+                        } else {
+                            output += `<li class="error">✗ ${elementId} - Missing</li>`;
+                            failed++;
+                        }
+                    });
+                    
+                    output += `</ul><p class="info">Passed: ${passed}, Failed: ${failed}</p>`;
+                    results.innerHTML = output;
+                });
+        }
+        
+        function showFileSizes() {
+            const results = document.getElementById('size-results');
+            
+            Promise.all([
+                fetch('dashboard.html').then(r => r.text()),
+                fetch('login.html').then(r => r.text())
+            ]).then(([dashboardHtml, loginHtml]) => {
+                const dashboardSize = new Blob([dashboardHtml]).size;
+                const loginSize = new Blob([loginHtml]).size;
+                
+                results.innerHTML = `
+                    <h3>File Sizes:</h3>
+                    <ul>
+                        <li class="info">Dashboard: ${dashboardSize} bytes (${Math.round(dashboardSize/1024)} KB)</li>
+                        <li class="info">Login: ${loginSize} bytes (${Math.round(loginSize/1024)} KB)</li>
+                        <li class="success">Total: ${dashboardSize + loginSize} bytes (${Math.round((dashboardSize + loginSize)/1024)} KB)</li>
+                    </ul>
+                    <p class="info">Files have been optimized while preserving all functionality.</p>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

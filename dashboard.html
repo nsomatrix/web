@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/dashboard.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
     <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
-    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
-
     <link rel="stylesheet" href="components/navbar.css">
     <link rel="stylesheet" href="components/footer.css">
     <link rel="stylesheet" href="css/shield.css">
@@ -21,36 +17,26 @@
 <body>
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
 
-
-
+    <!-- Setup Section -->
     <div id="setup-section" class="gaming-setup" style="display:none;">
         <div class="setup-container">
             <div class="setup-header">
                 <h1 class="setup-title">Welcome, Ninja!</h1>
                 <p class="setup-subtitle">Let's setup your gaming profile</p>
             </div>
-
             <div class="setup-progress">
                 <div class="progress-step active" id="step1">1</div>
                 <div class="progress-step" id="step2">2</div>
             </div>
-
             <div class="username-section">
-                <h2 class="section-title">
-                    <i class="fas fa-user"></i>
-                    Choose Your Username
-                </h2>
+                <h2 class="section-title"><i class="fas fa-user"></i> Choose Your Username</h2>
                 <div class="username-input-container">
                     <input id="usernameInput" type="text" class="username-input" placeholder="Enter Username" maxlength="20" />
                     <div id="usernameFeedback" class="username-feedback"></div>
                 </div>
             </div>
-
             <div class="avatar-section">
-                <h2 class="section-title">
-                    <i class="fas fa-image"></i>
-                    Select Your Avatar
-                </h2>
+                <h2 class="section-title"><i class="fas fa-image"></i> Select Your Avatar</h2>
                 <div class="avatar-navigator">
                     <button id="prevAvatarBtn" class="nav-arrow">&lt;</button>
                     <div class="avatar-preview-container">
@@ -59,40 +45,35 @@
                     <button id="nextAvatarBtn" class="nav-arrow">&gt;</button>
                 </div>
             </div>
-
             <div class="setup-actions">
                 <button id="saveProfileBtn" class="btn-setup btn-primary">
-                    <i class="fas fa-rocket"></i>
-                    Start Gaming
+                    <i class="fas fa-rocket"></i> Start Gaming
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Navbar Component -->
+    <!-- Navbar -->
     <div id="navbar-container"></div>
 
+    <!-- Main Dashboard -->
     <div id="main-dashboard" style="display:none;">
-        <!-- Header -->
         <header class="dashboard-header">
             <div class="user-profile">
                 <img id="user-avatar" src="" alt="Avatar" class="user-avatar-display" />
                 <div class="user-info">
                     <h1 class="header-title">
-                        <span>Welcome,</span> 
-                        <span id="dashboard-username"></span>
+                        <span>Welcome,</span> <span id="dashboard-username"></span>
                     </h1>
                     <div id="username-tag" class="username-tag">@username</div>
                     <p id="lastLoginDisplay" class="last-login-display">Last Login:</p>
                 </div>
             </div>
-            
             <div class="header-actions">
                 <div class="search-container">
                     <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
                     <i class="fas fa-search" id="searchIcon"></i>
                 </div>
-                
                 <div class="notification-icons">
                     <div class="icon-container">
                         <i class="fas fa-envelope" id="messageIcon" title="Messages"></i>
@@ -106,85 +87,60 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="dashboard-main">
             <div id="overview-section">
                 <div class="welcome-section" style="text-align: center;">
                     <h2 class="welcome-message">Dashboard</h2>
                 </div>
-
-
-
                 <div class="dashboard-grid">
                     <div class="dashboard-card" id="friendsBtn">
                         <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
+                            <div class="card-icon"><i class="fas fa-users"></i></div>
                             <h3 class="card-title">Friends</h3>
                         </div>
                         <p class="card-description">Connect with friends and manage your social network.</p>
                     </div>
-
                     <div class="dashboard-card" id="notesBtn">
                         <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-sticky-note"></i>
-                            </div>
+                            <div class="card-icon"><i class="fas fa-sticky-note"></i></div>
                             <h3 class="card-title">Notes</h3>
                         </div>
                         <p class="card-description">Create, edit, and organize your personal notes securely.</p>
                     </div>
-
                     <div class="dashboard-card" id="passwordManagerBtn">
                         <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-key"></i>
-                            </div>
+                            <div class="card-icon"><i class="fas fa-key"></i></div>
                             <h3 class="card-title">Password Manager</h3>
                         </div>
                         <p class="card-description">Store and manage your passwords with military-grade encryption.</p>
                     </div>
-
-
-
                     <div class="dashboard-card" id="serverBtn">
                         <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-server"></i>
-                            </div>
+                            <div class="card-icon"><i class="fas fa-server"></i></div>
                             <h3 class="card-title">Server</h3>
                         </div>
                         <p class="card-description">Connect to the game server page.</p>
                     </div>
-
                     <div class="dashboard-card" id="securityBtn">
                         <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
+                            <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
                             <h3 class="card-title">Shield</h3>
                         </div>
                         <p class="card-description">Manage your account security and encryption settings.</p>
                     </div>
-
                     <div class="dashboard-card danger" id="deleteAccountBtn">
                         <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-trash"></i>
-                            </div>
+                            <div class="card-icon"><i class="fas fa-trash"></i></div>
                             <h3 class="card-title">Delete Account</h3>
                         </div>
                         <p class="card-description">Permanently delete your account and all associated data.</p>
                     </div>
-
-
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- All existing modals remain the same -->
+    <!-- Modals -->
     <div id="masterPasswordPromptModal" class="modal" style="display:none;">
         <div class="modal-content" style="background:#1a1a1a;color:white;border:1px solid #333;">
             <span class="close-button" data-modal="masterPasswordPromptModal" style="color:white;">&times;</span>
@@ -237,10 +193,6 @@
             <div id="pmEntryList" class="file-list-display"></div>
         </div>
     </div>
-
-
-
-
 
     <div id="deleteNoteConfirmModal" class="modal" style="display:none;">
         <div class="modal-content">
@@ -305,33 +257,8 @@
             <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
             <div class="message-input-container" style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">
                 <div style="display: flex; gap: 8px; align-items: flex-end;">
-                    <textarea id="messageInput" placeholder="Type a message..." style="
-                        flex: 1;
-                        border: 1px solid #555;
-                        border-radius: 20px;
-                        padding: 12px 16px;
-                        resize: none;
-                        min-height: 20px;
-                        max-height: 120px;
-                        font-family: inherit;
-                        font-size: 14px;
-                        outline: none;
-                        background: #3d3d3d;
-                        color: white;
-                    " rows="1"></textarea>
-                    <button id="sendMessageBtn" style="
-                        background: #e74c3c;
-                        color: white;
-                        border: none;
-                        border-radius: 50%;
-                        width: 44px;
-                        height: 44px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        cursor: pointer;
-                        font-size: 16px;
-                    ">➤</button>
+                    <textarea id="messageInput" placeholder="Type a message..." style="flex: 1; border: 1px solid #555; border-radius: 20px; padding: 12px 16px; resize: none; min-height: 20px; max-height: 120px; font-family: inherit; font-size: 14px; outline: none; background: #3d3d3d; color: white;" rows="1"></textarea>
+                    <button id="sendMessageBtn" style="background: #e74c3c; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px;">➤</button>
                 </div>
             </div>
         </div>
@@ -369,7 +296,6 @@
                     <span class="score-label">Security Score</span>
                 </div>
             </div>
-            
             <div class="shield-sections">
                 <div class="shield-section">
                     <div class="section-header">
@@ -382,7 +308,6 @@
                         <button class="btn btn-danger btn-sm" onclick="shieldManager.revokeAllSessionsUI()">Sign Out All Other Sessions</button>
                     </div>
                 </div>
-                
                 <div class="shield-section">
                     <div class="section-header" onclick="shieldManager.toggleSection('recent-activity')">
                         <i class="fas fa-history"></i>
@@ -396,7 +321,6 @@
                         <div id="loginHistoryList"></div>
                     </div>
                 </div>
-                
                 <div class="shield-section">
                     <div class="section-header">
                         <i class="fas fa-fingerprint"></i>
@@ -404,7 +328,6 @@
                     </div>
                     <div class="section-content">
                         <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">⚠️ Once enabled, these methods will be required for dashboard access after login.</p>
-
                         <div class="auth-method">
                             <div class="method-info">
                                 <span class="method-name">Authenticator App</span>
@@ -427,7 +350,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="shield-section">
                     <div class="section-header">
                         <i class="fas fa-key"></i>
@@ -439,9 +361,6 @@
                         </div>
                     </div>
                 </div>
-                
-
-                
                 <div class="shield-section">
                     <div class="section-header" onclick="shieldManager.toggleSection('security-events')">
                         <i class="fas fa-shield-alt"></i>
@@ -460,6 +379,7 @@
         <p id="messageBoxText"></p>
     </div>
 
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -468,13 +388,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    
-    <!-- Suppress Cloudflare console errors -->
     <script>
         const originalError = console.error;
         console.error = function(...args) {
             const message = args.join(' ');
-            // Only filter very specific Cloudflare beacon errors
             if (message.includes('static.cloudflareinsights.com/beacon.min.js') && 
                 (message.includes('CORS') || message.includes('integrity'))) {
                 return;
@@ -482,7 +399,6 @@
             originalError.apply(console, args);
         };
     </script>
-
     <script src="js/sound.js"></script>
     <script src="js/essentials.js"></script>
     <script src="js/fileChooser.js"></script>
@@ -491,20 +407,14 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="components/loader.js"></script>
     <script type="module" src="js/dashboard.js"></script>
-    
     <script>
-        // Desktop dashboard card functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Make cards clickable
             const cards = document.querySelectorAll('.dashboard-card');
             cards.forEach(card => {
                 card.addEventListener('click', function(e) {
-                    // Don't trigger if click came from inside the card (button clicks)
                     if (e.target !== this) return;
-                    
                     const buttonId = this.id;
                     if (buttonId) {
-                        // Trigger the existing button functionality
                         const existingButton = document.getElementById(buttonId);
                         if (existingButton && existingButton.onclick) {
                             existingButton.onclick();
@@ -514,7 +424,6 @@
             });
         });
         
-        // Initialize Firebase first
         window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
@@ -523,7 +432,6 @@
             window.firebaseDb = firebase.firestore();
         });
         
-        // Then load navbar
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
@@ -533,7 +441,6 @@
             .then(response => response.text())
             .then(jsCode => {
                 eval(jsCode);
-                // Initialize navbar after Firebase is ready
                 setTimeout(() => {
                     if (typeof RetroNavbar !== 'undefined' && typeof NavbarAuth !== 'undefined') {
                         new RetroNavbar();
