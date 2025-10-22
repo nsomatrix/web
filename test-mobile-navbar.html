@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Navbar Test</title>
+    <link rel="stylesheet" href="components/navbar.css">
+    <style>
+        body { margin: 0; padding: 20px; background: #1a1a1a; color: white; }
+        .test-info { padding: 20px; margin: 20px 0; background: #333; border-radius: 5px; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <header id="navbar"></header>
+    
+    <div class="test-info">
+        <h2>Mobile Navbar Test</h2>
+        <p>On mobile devices, you should see a hamburger menu (☰) in the top right.</p>
+        <p>Tap it to open/close the navigation menu.</p>
+        <div id="test-results"></div>
+    </div>
+
+    <script src="components/navbar.js"></script>
+    <script>
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                
+                setTimeout(() => {
+                    // Test if navbar elements exist
+                    const toggle = document.getElementById('navToggle');
+                    const menu = document.getElementById('navMenu');
+                    const results = document.getElementById('test-results');
+                    
+                    let status = '';
+                    if (toggle && menu) {
+                        status += '<p class="success">✓ Navbar elements loaded successfully</p>';
+                        
+                        // Test if toggle is visible on mobile
+                        const toggleStyle = window.getComputedStyle(toggle);
+                        if (window.innerWidth <= 768) {
+                            if (toggleStyle.display === 'flex') {
+                                status += '<p class="success">✓ Mobile toggle is visible</p>';
+                            } else {
+                                status += '<p class="error">✗ Mobile toggle not visible</p>';
+                            }
+                        } else {
+                            status += '<p>Desktop view - resize to mobile to test</p>';
+                        }
+                        
+                        // Initialize navbar
+                        new RetroNavbar();
+                        new NavbarAuth();
+                        status += '<p class="success">✓ Navbar initialized</p>';
+                        
+                    } else {
+                        status += '<p class="error">✗ Navbar elements not found</p>';
+                    }
+                    
+                    results.innerHTML = status;
+                }, 300);
+            })
+            .catch(error => {
+                document.getElementById('test-results').innerHTML = 
+                    '<p class="error">✗ Failed to load navbar: ' + error.message + '</p>';
+            });
+    </script>
+</body>
+</html>

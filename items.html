@@ -85,7 +85,7 @@
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
                 setTimeout(() => {
-                    new RetroNavbar();
+                    setTimeout(() => { new RetroNavbar(); new NavbarAuth(); }, 200);
                 }, 100);
             });
         

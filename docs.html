@@ -164,7 +164,7 @@ All mods are hosted on GitHub repositories to ensure redundancy and availability
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
                 setTimeout(() => {
-                    new RetroNavbar();
+                    setTimeout(() => { new RetroNavbar(); new NavbarAuth(); }, 200);
                     new NavbarAuth();
                 }, 100);
             });

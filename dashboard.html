@@ -438,12 +438,13 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
+                // Initialize navbar after HTML is loaded
                 setTimeout(() => {
                     if (typeof RetroNavbar !== 'undefined' && typeof NavbarAuth !== 'undefined') {
                         new RetroNavbar();
                         new NavbarAuth();
                     }
-                }, 500);
+                }, 200);
             });
         
         fetch('components/footer.html')

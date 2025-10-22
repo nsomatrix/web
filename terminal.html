@@ -62,7 +62,7 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
-                new RetroNavbar();
+                setTimeout(() => { new RetroNavbar(); new NavbarAuth(); }, 200);
                 new NavbarAuth();
             });
         

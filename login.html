@@ -95,15 +95,16 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
+                // Initialize navbar after HTML is loaded
                 const initNavbar = () => {
-                    if (window.firebaseReady) {
+                    if (window.firebaseReady && typeof RetroNavbar !== 'undefined' && typeof NavbarAuth !== 'undefined') {
                         new RetroNavbar();
                         new NavbarAuth();
                     } else {
                         setTimeout(initNavbar, 100);
                     }
                 };
-                initNavbar();
+                setTimeout(initNavbar, 200);
             });
         
         fetch('components/footer.html')

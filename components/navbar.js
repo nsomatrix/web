@@ -1,105 +1,88 @@
 class RetroNavbar {
   constructor() {
-    this.init();
+    // Delay initialization to ensure DOM is ready
+    setTimeout(() => this.init(), 100);
   }
 
   init() {
     const toggle = document.getElementById('navToggle');
     const menu = document.getElementById('navMenu');
     
-    if (toggle && menu) {
-      // Handle both click and touch events for mobile
-      const toggleMenu = (e) => {
+    if (!toggle || !menu) {
+      console.warn('Navbar elements not found, retrying...');
+      setTimeout(() => this.init(), 200);
+      return;
+    }
+    
+    // Remove any existing listeners
+    toggle.replaceWith(toggle.cloneNode(true));
+    const newToggle = document.getElementById('navToggle');
+    
+    // Handle mobile menu toggle
+    const toggleMenu = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      newToggle.classList.toggle('active');
+      menu.classList.toggle('active');
+    };
+    
+    // Add multiple event listeners for better mobile support
+    newToggle.addEventListener('click', toggleMenu, { passive: false });
+    newToggle.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      toggleMenu(e);
+    }, { passive: false });
+
+    // Handle dropdown toggles
+    const dropdowns = document.querySelectorAll('.dropdown-toggle');
+    dropdowns.forEach(dropdown => {
+      const handleDropdown = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        toggle.classList.toggle('active');
-        menu.classList.toggle('active');
-      };
-      
-      toggle.addEventListener('click', toggleMenu);
-      toggle.addEventListener('touchend', toggleMenu);
-
-      // Handle dropdown toggles
-      const dropdowns = document.querySelectorAll('.dropdown-toggle');
-      dropdowns.forEach(dropdown => {
-        let touchStarted = false;
+        const parent = dropdown.parentElement;
+        parent.classList.toggle('active');
         
-        const handleDropdown = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const parent = dropdown.parentElement;
-          parent.classList.toggle('active');
-          
-          // Close other dropdowns
-          dropdowns.forEach(other => {
-            if (other !== dropdown) {
-              other.parentElement.classList.remove('active');
-            }
-          });
-        };
-        
-        // Handle touch events properly
-        dropdown.addEventListener('touchstart', (e) => {
-          touchStarted = true;
-        });
-        
-        dropdown.addEventListener('touchend', (e) => {
-          if (touchStarted) {
-            handleDropdown(e);
-            touchStarted = false;
+        // Close other dropdowns
+        dropdowns.forEach(other => {
+          if (other !== dropdown) {
+            other.parentElement.classList.remove('active');
           }
         });
-        
-        dropdown.addEventListener('click', (e) => {
-          if (!touchStarted) {
-            handleDropdown(e);
-          }
-        });
-      });
-
-      // Close menu when clicking on a non-dropdown link
-      const closeMenu = (e) => {
-        if (e.target.tagName === 'A' && !e.target.classList.contains('dropdown-toggle')) {
-          toggle.classList.remove('active');
-          menu.classList.remove('active');
-          // Close all dropdowns
-          document.querySelectorAll('.dropdown').forEach(dropdown => {
-            dropdown.classList.remove('active');
-          });
-        }
       };
       
-      menu.addEventListener('click', closeMenu);
-      menu.addEventListener('touchend', (e) => {
-        // Small delay to ensure touch events are processed correctly
-        setTimeout(() => closeMenu(e), 10);
-      });
+      dropdown.addEventListener('click', handleDropdown, { passive: false });
+      dropdown.addEventListener('touchstart', handleDropdown, { passive: false });
+    });
 
-      // Close menu and dropdowns when clicking outside
-      const closeOnOutsideClick = (e) => {
-        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-          toggle.classList.remove('active');
-          menu.classList.remove('active');
-          document.querySelectorAll('.dropdown').forEach(dropdown => {
-            dropdown.classList.remove('active');
-          });
-        }
-      };
-      
-      document.addEventListener('click', closeOnOutsideClick);
-      document.addEventListener('touchend', closeOnOutsideClick);
-      
-      // Close menu on escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && menu.classList.contains('active')) {
-          toggle.classList.remove('active');
-          menu.classList.remove('active');
-          document.querySelectorAll('.dropdown').forEach(dropdown => {
-            dropdown.classList.remove('active');
-          });
-        }
+    // Close menu when clicking on links
+    const closeMenu = () => {
+      newToggle.classList.remove('active');
+      menu.classList.remove('active');
+      document.querySelectorAll('.dropdown').forEach(dropdown => {
+        dropdown.classList.remove('active');
       });
-    }
+    };
+    
+    // Close menu on link clicks
+    menu.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A' && !e.target.classList.contains('dropdown-toggle')) {
+        closeMenu();
+      }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!newToggle.contains(e.target) && !menu.contains(e.target)) {
+        closeMenu();
+      }
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    });
   }
 }
 
@@ -230,13 +213,22 @@ class NavbarAuth {
 }
 
 // Initialize navbar when DOM is loaded
+function initializeNavbar() {
+  // Wait for navbar HTML to be loaded
+  const checkNavbar = () => {
+    const toggle = document.getElementById('navToggle');
+    if (toggle) {
+      new RetroNavbar();
+      new NavbarAuth();
+    } else {
+      setTimeout(checkNavbar, 100);
+    }
+  };
+  checkNavbar();
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    new RetroNavbar();
-    new NavbarAuth();
-  });
+  document.addEventListener('DOMContentLoaded', initializeNavbar);
 } else {
-  // DOM is already loaded
-  new RetroNavbar();
-  new NavbarAuth();
+  initializeNavbar();
 }
