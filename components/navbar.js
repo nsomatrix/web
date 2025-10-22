@@ -1,6 +1,5 @@
 class RetroNavbar {
   constructor() {
-    // Delay initialization to ensure DOM is ready
     setTimeout(() => this.init(), 100);
   }
 
@@ -9,7 +8,6 @@ class RetroNavbar {
     const menu = document.getElementById('navMenu');
     
     if (!toggle || !menu) {
-      console.warn('Navbar elements not found, retrying...');
       setTimeout(() => this.init(), 200);
       return;
     }
@@ -36,7 +34,6 @@ class RetroNavbar {
     // Handle dropdown toggles - wait for DOM to be ready
     setTimeout(() => {
       const dropdowns = document.querySelectorAll('.dropdown-toggle');
-      console.log('Found dropdowns:', dropdowns.length);
       
       dropdowns.forEach(dropdown => {
         // Remove existing listeners
@@ -97,7 +94,6 @@ class RetroNavbar {
   }
 }
 
-// Firebase auth state management
 class NavbarAuth {
   constructor() {
     this.authLink = document.getElementById('authLink');
@@ -106,11 +102,8 @@ class NavbarAuth {
   }
 
   initFirebaseAuth() {
-    // Check localStorage first for login state
     const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
     this.updateAuthLinks(isLoggedIn ? { uid: 'user' } : null);
-    
-    // Setup Firebase listener with multiple attempts
     this.setupFirebaseListener();
   }
 
@@ -121,7 +114,6 @@ class NavbarAuth {
     const trySetupListener = () => {
       attempts++;
       
-      // Try different Firebase auth instances
       let auth = null;
       if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
         auth = window.firebase.auth();
@@ -130,9 +122,7 @@ class NavbarAuth {
       }
       
       if (auth) {
-        console.log('Firebase auth found, setting up listener');
         auth.onAuthStateChanged((user) => {
-          console.log('Auth state changed:', user ? 'logged in' : 'logged out');
           this.updateAuthLinks(user);
           if (user) {
             localStorage.setItem('userLoggedIn', 'true');
@@ -145,8 +135,6 @@ class NavbarAuth {
       
       if (attempts < maxAttempts) {
         setTimeout(trySetupListener, 200);
-      } else {
-        console.warn('Firebase auth not found after maximum attempts');
       }
     };
     
@@ -158,7 +146,6 @@ class NavbarAuth {
     const logoutSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.08 15.59L16.67 13H7v-2h9.67l-2.59-2.59L15.5 7l5 5-5 5-1.42-1.41M19 3a2 2 0 0 1 2 2v4.67l-2-2V5H5v14h14v-2.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z"/></svg>';
     
     if (user) {
-      // User is logged in - show LOGOUT
       if (this.authLink) {
         this.authLink.innerHTML = logoutSvg + ' LOGOUT';
         this.authLink.href = '#';
@@ -176,7 +163,6 @@ class NavbarAuth {
         };
       }
     } else {
-      // User is not logged in - show LOGIN
       if (this.authLink) {
         this.authLink.innerHTML = loginSvg + ' LOGIN';
         this.authLink.href = 'login.html';
@@ -192,9 +178,6 @@ class NavbarAuth {
 
   async logout() {
     try {
-      console.log('Logout initiated');
-      
-      // Find and use the appropriate Firebase auth instance
       let auth = null;
       if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
         auth = window.firebase.auth();
@@ -204,18 +187,12 @@ class NavbarAuth {
       
       if (auth) {
         await auth.signOut();
-        console.log('Firebase signOut completed');
       }
       
-      // Clear all session data
       localStorage.removeItem('userLoggedIn');
       sessionStorage.clear();
-      
-      // Redirect to home page
       window.location.href = 'index.html';
     } catch (error) {
-      console.error('Logout error:', error);
-      // Even if Firebase logout fails, clear local data and redirect
       localStorage.removeItem('userLoggedIn');
       sessionStorage.clear();
       window.location.href = 'index.html';
@@ -223,9 +200,7 @@ class NavbarAuth {
   }
 }
 
-// Initialize navbar when DOM is loaded
 function initializeNavbar() {
-  // Wait for navbar HTML to be loaded
   const checkNavbar = () => {
     const toggle = document.getElementById('navToggle');
     if (toggle) {
