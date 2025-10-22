@@ -93,24 +93,32 @@ export class MessagingManager {
                 .onSnapshot(async doc => {
                     const typingDiv = document.getElementById('typing-indicator');
                     if (doc.exists && doc.data().isTyping) {
-                        let displayText = '💬 ';
+                        let displayText = '';
                         try {
                             const userDoc = await this.db.collection('players').doc(friendId).get();
                             const username = userDoc.exists ? userDoc.data().usernameTag : 'User';
-                            displayText += `@${username} is typing...`;
+                            displayText += `@${username} is typing`;
                         } catch {
-                            displayText += 'Typing...';
+                            displayText += 'Typing';
                         }
                         
                         if (!typingDiv) {
                             const indicator = document.createElement('div');
                             indicator.id = 'typing-indicator';
-                            indicator.style.cssText = 'padding:8px 16px;color:#888;font-style:italic;font-size:14px;animation:pulse 1.5s infinite;';
-                            indicator.innerHTML = displayText;
+                            indicator.style.cssText = 'padding:12px 16px;color:#888;font-size:14px;display:flex;align-items:center;gap:8px;';
+                            indicator.innerHTML = `${displayText}<div style="display:flex;gap:2px;"><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.2s;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.4s;"></span></div>`;
+                            
+                            if (!document.getElementById('typing-animation')) {
+                                const style = document.createElement('style');
+                                style.id = 'typing-animation';
+                                style.textContent = '@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-8px); opacity: 1; } }';
+                                document.head.appendChild(style);
+                            }
+                            
                             document.getElementById('messagesList').appendChild(indicator);
                             document.getElementById('messagesList').scrollTop = document.getElementById('messagesList').scrollHeight;
                         } else {
-                            typingDiv.innerHTML = displayText;
+                            typingDiv.innerHTML = `${displayText}<div style="display:flex;gap:2px;"><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.2s;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.4s;"></span></div>`;
                         }
                     } else {
                         if (typingDiv) typingDiv.remove();
@@ -194,12 +202,12 @@ export class MessagingManager {
                         if (!typingDiv) {
                             const indicator = document.createElement('div');
                             indicator.id = 'typing-indicator';
-                            indicator.style.cssText = 'padding:8px 16px;color:#888;font-style:italic;font-size:14px;animation:pulse 1.5s infinite;';
-                            indicator.innerHTML = displayText;
+                            indicator.style.cssText = 'padding:12px 16px;color:#888;font-size:14px;display:flex;align-items:center;gap:8px;';
+                            indicator.innerHTML = `${displayText}<div style="display:flex;gap:2px;"><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.2s;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.4s;"></span></div>`;
                             document.getElementById('messagesList').appendChild(indicator);
                             document.getElementById('messagesList').scrollTop = document.getElementById('messagesList').scrollHeight;
                         } else {
-                            typingDiv.innerHTML = displayText;
+                            typingDiv.innerHTML = `${displayText}<div style="display:flex;gap:2px;"><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.2s;"></span><span style="width:4px;height:4px;background:#888;border-radius:50%;animation:typing 1.4s infinite ease-in-out 0.4s;"></span></div>`;
                         }
                     } else {
                         if (typingDiv) typingDiv.remove();
