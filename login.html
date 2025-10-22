@@ -45,7 +45,7 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-    <div id="navbar-container"></div>
+    <header id="navbar"></header>
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
 
     <div id="main-content">
@@ -88,31 +88,28 @@
     <script src="js/bootstrap.min.js"></script>
     <script type="module" src="js/login.js"></script>
     <script src="components/loader.js"></script>
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
     <script>
-        const script = document.createElement('script');
-        script.src = 'components/navbar.js';
-        script.onload = () => {
-            fetch('components/navbar.html')
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('navbar-container').innerHTML = html;
-                    const initNavbar = () => {
-                        if (window.firebaseReady) {
-                            new RetroNavbar();
-                            new NavbarAuth();
-                        } else {
-                            setTimeout(initNavbar, 100);
-                        }
-                    };
-                    initNavbar();
-                });
-        };
-        document.head.appendChild(script);
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const initNavbar = () => {
+                    if (window.firebaseReady) {
+                        new RetroNavbar();
+                        new NavbarAuth();
+                    } else {
+                        setTimeout(initNavbar, 100);
+                    }
+                };
+                initNavbar();
+            });
         
         fetch('components/footer.html')
             .then(response => response.text())
             .then(html => {
-                document.body.insertAdjacentHTML('beforeend', html);
+                document.body.insertAdjacentHTML('beforeend', '<footer id="footer">' + html + '</footer>');
             });
     </script>
 </body>

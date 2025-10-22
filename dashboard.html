@@ -54,7 +54,7 @@
     </div>
 
     <!-- Navbar -->
-    <div id="navbar-container"></div>
+    <header id="navbar"></header>
 
     <!-- Main Dashboard -->
     <div id="main-dashboard" style="display:none;">
@@ -407,6 +407,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="components/loader.js"></script>
     <script type="module" src="js/dashboard.js"></script>
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.dashboard-card');
@@ -435,12 +437,7 @@
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('navbar-container').innerHTML = html;
-                return fetch('components/navbar.js');
-            })
-            .then(response => response.text())
-            .then(jsCode => {
-                eval(jsCode);
+                document.getElementById('navbar').innerHTML = html;
                 setTimeout(() => {
                     if (typeof RetroNavbar !== 'undefined' && typeof NavbarAuth !== 'undefined') {
                         new RetroNavbar();
@@ -452,7 +449,7 @@
         fetch('components/footer.html')
             .then(response => response.text())
             .then(html => {
-                document.body.insertAdjacentHTML('beforeend', html);
+                document.body.insertAdjacentHTML('beforeend', '<footer id="footer">' + html + '</footer>');
             });
     </script>
 </body>

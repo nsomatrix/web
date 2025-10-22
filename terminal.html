@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="components/navbar.css">
+    <link rel="stylesheet" href="components/footer.css">
     <link rel="stylesheet" href="css/terminal.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="js/error-suppression.js"></script>
     <script src="js/firebase-config.js"></script>
 </head>
 <body>
-    <div id="navbar-container"></div>
+    <header id="navbar"></header>
     
     <div class="terminal-container">
         <div class="terminal-header">
@@ -50,17 +51,25 @@
         window.firebaseAuth = firebase.auth();
         window.firebaseDb = firebase.firestore();
     </script>
+    <footer id="footer"></footer>
+    
     <script src="js/terminal.js"></script>
     <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
     <script>
         // Load navbar
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('navbar-container').innerHTML = html;
+                document.getElementById('navbar').innerHTML = html;
                 new RetroNavbar();
                 new NavbarAuth();
             });
+        
+        // Load footer
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => document.getElementById('footer').innerHTML = html);
     </script>
     <script src="components/loader.js"></script>
 </body>

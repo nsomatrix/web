@@ -65,7 +65,7 @@
     </style>
 </head>
 <body>
-    <div id="navbar-container"></div>
+    <header id="navbar"></header>
 
     <div class="main-content-wrapper">
         <h3>Game Items Database</h3>
@@ -83,7 +83,7 @@
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('navbar-container').innerHTML = html;
+                document.getElementById('navbar').innerHTML = html;
                 setTimeout(() => {
                     new RetroNavbar();
                 }, 100);
@@ -92,7 +92,7 @@
         fetch('components/footer.html')
             .then(response => response.text())
             .then(html => {
-                document.body.insertAdjacentHTML('beforeend', html);
+                document.getElementById("footer").innerHTML = html;
             });
         
         let allItems = [];
@@ -128,5 +128,6 @@
                 });
             });
     </script>
+    <footer id="footer"></footer>
 </body>
 </html>

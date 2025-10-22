@@ -40,7 +40,7 @@
 </head>
 <body>
     <!-- Navbar Component -->
-    <div id="navbar-container"></div>
+    <header id="navbar"></header>
 
 
 
@@ -131,7 +131,7 @@
     </div>
 
     <!-- Footer Component -->
-    <div id="footer-container"></div>
+    <footer id="footer"></footer>
 
     <script src="js/bootstrap.min.js"></script>
     <script src="js/boot.js"></script>
@@ -141,12 +141,13 @@
 
 
     <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
     <script>
         // Load navbar component
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('navbar-container').innerHTML = html;
+                document.getElementById('navbar').innerHTML = html;
                 new RetroNavbar();
                 new NavbarAuth();
             });
@@ -155,11 +156,10 @@
         fetch('components/footer.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('footer-container').innerHTML = html;
+                document.getElementById('footer').innerHTML = html;
             });
     </script>
 
     <script src="components/loader.js"></script>
-    <script src="components/footer.js"></script>
 </body>
 </html>

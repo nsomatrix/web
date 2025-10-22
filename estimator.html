@@ -38,7 +38,7 @@
     </script>
 </head>
 <body>
-    <div id="navbar-container"></div>
+    <header id="navbar"></header>
 
     <div class="container">
         <div class="header-section">
@@ -155,7 +155,7 @@
         </div>
     </div>
 
-    <div id="footer-container"></div>
+    <footer id="footer"></footer>
 
     <script src="js/firebase-config.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -165,7 +165,7 @@
         fetch('components/navbar.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('navbar-container').innerHTML = html;
+                document.getElementById('navbar').innerHTML = html;
                 new RetroNavbar();
                 new NavbarAuth();
             });
@@ -173,7 +173,7 @@
         fetch('components/footer.html')
             .then(response => response.text())
             .then(html => {
-                document.getElementById('footer-container').innerHTML = html;
+                document.getElementById('footer').innerHTML = html;
             });
     </script>
     <script src="components/loader.js"></script>

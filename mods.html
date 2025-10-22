@@ -42,7 +42,7 @@
 </head>
 <body>
   <!-- Navbar Component -->
-  <div id="navbar-container"></div>
+  <header id="navbar"></header>
 
   <div class="container">
     <div class="text-center header-section">
@@ -76,7 +76,7 @@
     fetch('components/navbar.html')
       .then(response => response.text())
       .then(html => {
-        document.getElementById('navbar-container').innerHTML = html;
+        document.getElementById('navbar').innerHTML = html;
         new RetroNavbar();
         new NavbarAuth();
       });
@@ -84,10 +84,11 @@
     fetch('components/footer.html')
       .then(response => response.text())
       .then(html => {
-        document.body.insertAdjacentHTML('beforeend', html);
+        document.getElementById("footer").innerHTML = html;
       });
   </script>
   <script src="components/loader.js"></script>
 
+    <footer id="footer"></footer>
 </body>
 </html>
