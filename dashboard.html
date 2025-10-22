@@ -298,12 +298,9 @@
 
     <div id="messagesModal" class="modal" style="display:none;">
         <div class="modal-content" style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
-            <div style="padding: 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; background: #2d2d2d;">
+            <div style="padding: 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; background: #2d2d2d; position: relative;">
                 <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="createGroupBtn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">+ Group</button>
-                    <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc;">&times;</span>
-                </div>
+                <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="position: absolute; top: 12px; right: 16px; cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
             </div>
             <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
             <div class="message-input-container" style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">

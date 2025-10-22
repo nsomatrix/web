@@ -1356,11 +1356,7 @@ async function loadRecentChats() {
     try {
         document.getElementById('messageModalTitle').textContent = 'Recent Chats';
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = '';
-        
-        // Show create group button in main chat list
-        const createGroupBtn = document.getElementById('createGroupBtn');
-        if (createGroupBtn) createGroupBtn.style.display = 'block';
+        messagesList.innerHTML = '<button id="createGroupBtn" style="position: absolute; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; color: white; border: none; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100;"><i class="fas fa-users"></i></button>';
         
         // Load group chats
         const groupChatsSnapshot = await db.collection('groupChats')
@@ -1487,6 +1483,8 @@ function setupNotificationHandlers() {
                 e.stopPropagation();
                 const messageInputContainer = document.querySelector('.message-input-container');
                 if (messageInputContainer) messageInputContainer.style.display = 'none';
+                
+                
                 openModal(document.getElementById('messagesModal'));
                 loadRecentChats();
             });
