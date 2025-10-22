@@ -668,67 +668,234 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1100; /* Higher than navbar */
+  z-index: 1100;
   padding: 1rem;
 }
 
 .modal-content {
-  background: var(--bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
+  background: rgba(26, 26, 26, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
   max-width: 500px;
   width: 100%;
-  max-height: calc(100vh - 120px); /* Account for navbar + footer + padding */
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   position: relative;
-  color: white;
-  margin: 60px 0 40px 0; /* Top margin for navbar, bottom for footer */
+  color: white !important;
+  margin: 60px 0 40px 0;
+  transform: scale(0.95);
+  animation: modalSlideIn 0.3s ease-out forwards;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modal-content h3 {
-  color: white;
+  color: white !important;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+  margin-bottom: 1.5rem;
 }
 
 .modal-content p {
-  color: white;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  background: rgba(45, 45, 45, 0.8) !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(10px);
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  border-color: rgba(255, 0, 0, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1) !important;
+  outline: none;
 }
 
 .close-button {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: none;
-  border: none;
+  background: rgba(255, 0, 0, 0.1) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.8) !important;
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius);
+  border-radius: 12px !important;
   pointer-events: auto;
   z-index: 9999;
   touch-action: manipulation;
+  transition: all 0.3s ease;
 }
 
 .close-button:hover {
-  background: var(--bg-secondary);
-  color: var(--text);
+  background: rgba(255, 0, 0, 0.2) !important;
+  border-color: rgba(255, 0, 0, 0.4) !important;
+  color: white !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
 }
 
-/* Lists */
-.friends-list, .search-results, .notifications-list, .messages-list {
-  max-height: 400px;
-  overflow-y: auto;
+/* Enhanced Modal Styles */
+.shield-modal {
+  max-width: 800px !important;
+  background: rgba(26, 26, 26, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Messages Modal Special Styling */
+#messagesModal .modal-content {
+  height: 80vh !important;
+  max-height: 600px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  background: rgba(26, 26, 26, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Modal Content Sections */
+.modal-content .section-header {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 0, 0, 0.2) !important;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Form Controls in Modals */
+.modal .form-control {
+  background: rgba(45, 45, 45, 0.8) !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.modal .form-control:focus {
+  border-color: rgba(255, 0, 0, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1) !important;
+  background: rgba(45, 45, 45, 0.9) !important;
+}
+
+.modal .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Buttons in Modals */
+.modal .btn {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.modal .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal Scrollable Elements */
+#savedNotesDisplay,
+#pmEntryList,
+#friendsList,
+#searchResults,
+#notificationsList,
+#messagesList {
+  max-height: 250px !important;
+  overflow-y: auto !important;
+  background: rgba(15, 15, 15, 0.5) !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  padding: 1rem !important;
+  margin-top: 1rem !important;
+}
+
+/* Custom Scrollbars */
+#savedNotesDisplay::-webkit-scrollbar,
+#pmEntryList::-webkit-scrollbar,
+#friendsList::-webkit-scrollbar,
+#searchResults::-webkit-scrollbar,
+#notificationsList::-webkit-scrollbar,
+#messagesList::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+#savedNotesDisplay::-webkit-scrollbar-track,
+#pmEntryList::-webkit-scrollbar-track,
+#friendsList::-webkit-scrollbar-track,
+#searchResults::-webkit-scrollbar-track,
+#notificationsList::-webkit-scrollbar-track,
+#messagesList::-webkit-scrollbar-track {
+  background: rgba(255, 0, 0, 0.2) !important;
+  border-radius: 5px !important;
+}
+
+#savedNotesDisplay::-webkit-scrollbar-thumb,
+#pmEntryList::-webkit-scrollbar-thumb,
+#friendsList::-webkit-scrollbar-thumb,
+#searchResults::-webkit-scrollbar-thumb,
+#notificationsList::-webkit-scrollbar-thumb,
+#messagesList::-webkit-scrollbar-thumb {
+  background: #ff0000 !important;
+  border-radius: 5px !important;
+}
+
+.modal .friend-item,
+.modal .search-item,
+.modal .notification-item {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.modal .friend-item:hover,
+.modal .search-item:hover,
+.modal .notification-item:hover {
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-color: rgba(255, 0, 0, 0.3);
+  transform: translateY(-1px);
 }
 
 .friend-item, .search-item, .notification-item {
@@ -961,15 +1128,26 @@ body {
   }
   
   .modal-content {
-    padding: 1.5rem;
-    margin: 60px 0.5rem 40px 0.5rem; /* Maintain navbar/footer spacing on mobile */
-    max-height: calc(100vh - 140px); /* Adjusted for mobile spacing */
+    padding: 1.5rem !important;
+    margin: 60px 0.5rem 40px 0.5rem !important;
+    max-height: calc(100vh - 140px) !important;
+    border-radius: 12px !important;
+    background: rgba(26, 26, 26, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 0, 0, 0.3) !important;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   }
   
   .friend-item, .search-item, .notification-item {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+    background: rgba(45, 45, 45, 0.6) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 0, 0, 0.1);
   }
   
   .friend-actions, .search-actions, .notification-actions {
@@ -996,9 +1174,17 @@ body {
   }
   
   .modal-content {
-    padding: 1rem;
-    margin: 60px 0.25rem 40px 0.25rem;
-    max-height: calc(100vh - 120px);
+    padding: 1rem !important;
+    margin: 60px 0.25rem 40px 0.25rem !important;
+    max-height: calc(100vh - 120px) !important;
+    border-radius: 12px !important;
+    background: rgba(26, 26, 26, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 0, 0, 0.3) !important;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   }
   
   .shield-tabs {
@@ -1351,3 +1537,177 @@ body {
   }
 }
 
+
+/* Additional Modal Enhancements */
+.modal .backup-codes-grid .backup-code {
+  background: rgba(45, 45, 45, 0.8) !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  backdrop-filter: blur(10px);
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.modal .backup-codes-grid .backup-code:hover {
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-color: rgba(255, 0, 0, 0.4) !important;
+}
+
+.modal .biometric-section {
+  background: rgba(45, 45, 45, 0.6) !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  backdrop-filter: blur(15px);
+}
+
+.modal .key-section,
+.modal .privacy-section {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+}
+
+.modal .security-score-card {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+}
+
+.modal .shield-card {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.1) !important;
+  transition: all 0.3s ease;
+}
+
+.modal .shield-card:hover {
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-color: rgba(255, 0, 0, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal .session-item,
+.modal .history-item,
+.modal .event-item {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.modal .session-item:hover,
+.modal .history-item:hover,
+.modal .event-item:hover {
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-color: rgba(255, 0, 0, 0.3);
+}
+
+.modal .file-item {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.modal .file-item:hover {
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-color: rgba(255, 0, 0, 0.3);
+}
+
+.modal .message-item.message-sent {
+  background: rgba(255, 0, 0, 0.3) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.4);
+}
+
+.modal .message-item.message-received {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+}
+
+.modal .message-input-container {
+  background: rgba(45, 45, 45, 0.6) !important;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+}
+
+/* Override any inline styles that might interfere */
+.modal[style*="display: none"] {
+  display: none !important;
+}
+
+.modal[style*="display: flex"],
+.modal[style*="display: block"] {
+  display: flex !important;
+}
+/* Custom Scrollbars for Modals */
+.modal-content::-webkit-scrollbar,
+#friendsList::-webkit-scrollbar,
+#searchResults::-webkit-scrollbar,
+#notificationsList::-webkit-scrollbar,
+#messagesList::-webkit-scrollbar,
+.friends-list::-webkit-scrollbar,
+.search-results::-webkit-scrollbar,
+.notifications-list::-webkit-scrollbar,
+.messages-list::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.modal-content::-webkit-scrollbar-track,
+#friendsList::-webkit-scrollbar-track,
+#searchResults::-webkit-scrollbar-track,
+#notificationsList::-webkit-scrollbar-track,
+#messagesList::-webkit-scrollbar-track,
+.friends-list::-webkit-scrollbar-track,
+.search-results::-webkit-scrollbar-track,
+.notifications-list::-webkit-scrollbar-track,
+.messages-list::-webkit-scrollbar-track {
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+.modal-content::-webkit-scrollbar-thumb,
+#friendsList::-webkit-scrollbar-thumb,
+#searchResults::-webkit-scrollbar-thumb,
+#notificationsList::-webkit-scrollbar-thumb,
+#messagesList::-webkit-scrollbar-thumb,
+.friends-list::-webkit-scrollbar-thumb,
+.search-results::-webkit-scrollbar-thumb,
+.notifications-list::-webkit-scrollbar-thumb,
+.messages-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 0, 0, 0.4) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover,
+#friendsList::-webkit-scrollbar-thumb:hover,
+#searchResults::-webkit-scrollbar-thumb:hover,
+#notificationsList::-webkit-scrollbar-thumb:hover,
+#messagesList::-webkit-scrollbar-thumb:hover,
+.friends-list::-webkit-scrollbar-thumb:hover,
+.search-results::-webkit-scrollbar-thumb:hover,
+.notifications-list::-webkit-scrollbar-thumb:hover,
+.messages-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 0, 0, 0.6) !important;
+}
+
+/* Fix Text Blur */
+.modal-content {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+.modal-content h3,
+.modal-content p,
+.modal-content input,
+.modal-content textarea,
+.modal-content button,
+.modal-content label,
+.modal-content span,
+.modal-content div {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
