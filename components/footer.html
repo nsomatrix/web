@@ -1,46 +1,57 @@
 <footer class="matrix-footer">
   <p>Matrix&trade; 2019</p>
-  <button id="supportBtn" class="support-btn" onclick="document.getElementById('supportModal').style.display='block'">
+  <button id="supportBtn" class="support-btn" aria-label="Open support form">
     <i class="fas fa-headset"></i> Support
   </button>
 </footer>
 
 <!-- Support Modal -->
-<div id="supportModal" class="support-modal">
+<div id="supportModal" class="support-modal" role="dialog" aria-labelledby="supportTitle" aria-hidden="true">
   <div class="modal-content">
-    <span class="close" onclick="document.getElementById('supportModal').style.display='none'">&times;</span>
-    <h3>Contact Support</h3>
-    <form id="supportForm" onsubmit="return false;">
-      <input type="text" id="userName" placeholder="Your name" required>
-      <textarea id="message" placeholder="Your message or feedback" required></textarea>
-      <button type="button" onclick="
-        const name = document.getElementById('userName').value;
-        const msg = document.getElementById('message').value;
-        if (!name || !msg) { alert('Please fill in all fields'); return; }
-        this.innerHTML = '⏳ Sending...';
-        this.disabled = true;
-        fetch('https://support-proxy.nsomtx.workers.dev', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, message: msg })
-        }).then(r => {
-          if (r.ok) {
-            this.innerHTML = '✓ Sent!';
-            setTimeout(() => {
-              document.getElementById('supportForm').reset();
-              document.getElementById('supportModal').style.display = 'none';
-              this.innerHTML = 'Send Message';
-              this.disabled = false;
-            }, 2000);
-          } else throw new Error();
-        }).catch(() => {
-          this.innerHTML = '❌ Failed';
-          setTimeout(() => {
-            this.innerHTML = 'Send Message';
-            this.disabled = false;
-          }, 2000);
-        });">Send Message</button>
-    </form>
+    <div class="modal-header">
+      <h3 id="supportTitle"><i class="fas fa-headset"></i> Contact Support</h3>
+      <button class="close" onclick="document.getElementById('supportModal').style.display='none';document.body.style.overflow='auto'" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="support-intro">We're here to help! Please provide your details and we'll get back to you within 24 hours.</p>
+      <form id="supportForm" onsubmit="return false;">
+        <div class="form-group">
+          <label for="userName">Username *</label>
+          <input type="text" id="userName" required aria-describedby="nameHelp">
+          <small id="nameHelp" class="form-text">Enter your username</small>
+        </div>
+        <div class="form-group">
+          <label for="userEmail">Email Address *</label>
+          <input type="email" id="userEmail" required aria-describedby="emailHelp">
+          <small id="emailHelp" class="form-text">We'll use this to respond to you</small>
+        </div>
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <div class="custom-select">
+            <select id="category" required>
+              <option value="">Select a category</option>
+              <option value="bug">Bug Report</option>
+              <option value="feature">Feature Request</option>
+              <option value="question">General Question</option>
+              <option value="account">Account Issue</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" required rows="4" aria-describedby="messageHelp"></textarea>
+          <small id="messageHelp" class="form-text">Please describe your issue in detail</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('supportModal').style.display='none';document.body.style.overflow='auto'">Cancel</button>
+          <button type="button" class="btn-primary" id="submitBtn" onclick="submitSupport()">Send Message</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
+
+
 
