@@ -254,6 +254,11 @@
 @media (max-width: 768px) {
   .dropdown > a {
     position: relative;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   
   .dropdown > a:after {
@@ -292,9 +297,12 @@
     background: #333333;
     text-decoration: none;
     transition: background 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   
-  .dropdown-menu li a:hover {
+  .dropdown-menu li a:hover,
+  .dropdown-menu li a:active {
     background: #ff0000;
     color: #ffffff;
   }

@@ -33,26 +33,37 @@ class RetroNavbar {
       toggleMenu(e);
     }, { passive: false });
 
-    // Handle dropdown toggles
-    const dropdowns = document.querySelectorAll('.dropdown-toggle');
-    dropdowns.forEach(dropdown => {
-      const handleDropdown = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const parent = dropdown.parentElement;
-        parent.classList.toggle('active');
-        
-        // Close other dropdowns
-        dropdowns.forEach(other => {
-          if (other !== dropdown) {
-            other.parentElement.classList.remove('active');
-          }
-        });
-      };
+    // Handle dropdown toggles - wait for DOM to be ready
+    setTimeout(() => {
+      const dropdowns = document.querySelectorAll('.dropdown-toggle');
+      console.log('Found dropdowns:', dropdowns.length);
       
-      dropdown.addEventListener('click', handleDropdown, { passive: false });
-      dropdown.addEventListener('touchstart', handleDropdown, { passive: false });
-    });
+      dropdowns.forEach(dropdown => {
+        // Remove existing listeners
+        dropdown.replaceWith(dropdown.cloneNode(true));
+      });
+      
+      // Re-query after replacing elements
+      const newDropdowns = document.querySelectorAll('.dropdown-toggle');
+      newDropdowns.forEach(dropdown => {
+        const handleDropdown = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const parent = dropdown.parentElement;
+          parent.classList.toggle('active');
+          
+          // Close other dropdowns
+          newDropdowns.forEach(other => {
+            if (other !== dropdown) {
+              other.parentElement.classList.remove('active');
+            }
+          });
+        };
+        
+        dropdown.addEventListener('click', handleDropdown, { passive: false });
+        dropdown.addEventListener('touchstart', handleDropdown, { passive: false });
+      });
+    }, 100);
 
     // Close menu when clicking on links
     const closeMenu = () => {
