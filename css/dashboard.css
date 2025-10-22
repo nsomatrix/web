@@ -683,8 +683,8 @@ body {
   border: 1px solid rgba(255, 0, 0, 0.3) !important;
   border-radius: 16px !important;
   padding: 2rem !important;
-  max-width: 500px;
-  width: 100%;
+  max-width: 700px;
+  width: 95%;
   max-height: calc(100vh - 120px);
   overflow-y: auto;
   box-shadow: 
@@ -767,16 +767,16 @@ body {
   box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
 }
 
-/* Enhanced Modal Styles */
+/* Shield Modal - Force Same Positioning */
 .shield-modal {
-  max-width: 800px !important;
-  background: rgba(26, 26, 26, 0.95) !important;
-  backdrop-filter: blur(25px) !important;
-  border: 1px solid rgba(255, 0, 0, 0.3) !important;
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  max-width: 900px !important;
+  width: 95% !important;
+  position: relative !important;
+  margin: 60px 0 40px 0 !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
 }
 
 /* Messages Modal Special Styling */
