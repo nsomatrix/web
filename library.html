@@ -23,16 +23,6 @@
     <footer id="footer"></footer>
     
     <script src="js/bootstrap.min.js"></script>
-    <script src="components/navbar.js"></script>
-    <script src="components/footer.js"></script>
-    <script>
-        fetch('components/navbar.html')
-            .then(response => response.text())
-            .then(html => document.getElementById('navbar').innerHTML = html);
-        
-        fetch('components/footer.html')
-            .then(response => response.text())
-            .then(html => document.getElementById('footer').innerHTML = html);
-    </script>
+    <script src="js/component-loader.js"></script>
 </body>
 </html>
