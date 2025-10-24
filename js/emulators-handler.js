@@ -373,6 +373,10 @@ class EmulatorsManager {
           if (seenTags.has(release.tag_name)) {
             return false;
           }
+          // Skip continuous releases (releases without proper version tags)
+          if (release.tag_name.toLowerCase().includes('continuous')) {
+            return false;
+          }
           seenTags.add(release.tag_name);
           return true;
         });

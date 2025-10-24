@@ -143,30 +143,33 @@
 }
 
 .version-dropdown {
-  background: linear-gradient(145deg, var(--secondary-bg), var(--tertiary-bg));
+  background: var(--tertiary-bg);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 500;
   width: 100%;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ctext x='0' y='7' fill='%23b33c3c' font-size='8' font-family='monospace'%3E▼%3C/text%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 12px;
-  padding-right: 2.5rem;
+  background-position: right 0.5rem center;
+  background-size: 8px;
+  font-family: var(--font-family);
+  min-height: 36px;
+  box-sizing: border-box;
 }
 
 .version-dropdown option {
-  background: var(--primary-bg);
+  background: var(--tertiary-bg);
   color: var(--text-primary);
   padding: 0.5rem;
+  font-family: var(--font-family);
 }
 
 .version-dropdown option:disabled {
@@ -175,19 +178,20 @@
 }
 
 .version-dropdown option:checked {
-  background: linear-gradient(135deg, var(--accent-color), #990000);
+  background: var(--accent-color);
+  color: var(--text-primary);
 }
 
-.version-dropdown:hover {
+.version-dropdown:hover:not(:disabled) {
   border-color: var(--border-hover);
 }
 
 .version-dropdown:focus {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--accent-color);
 }
 
-.version-loading {
+.version-dropdown:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -223,29 +227,129 @@
   }
   
   .platform-filters {
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
   
   .filter-tab {
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .emulator-icon {
     width: 28px;
     height: 28px;
   }
+
+  .file-table th,
+  .file-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .file-table th {
+    font-size: 0.7rem;
+  }
+
+  .emulator-name {
+    font-size: 0.85rem;
+  }
+
+  .emulator-version {
+    font-size: 0.7rem;
+  }
+
+  .version-dropdown {
+    font-size: 0.7rem;
+    padding: 0.35rem 1.5rem 0.35rem 0.5rem;
+    min-height: 30px;
+  }
+
+  .download-actions {
+    min-width: 110px;
+  }
+
+  .btn-download {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+    min-width: 65px;
+  }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 70px 10px 60px;
+  }
+
+  .header-section {
+    margin-bottom: 2rem;
+  }
+
   .platform-filters {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    gap: 0.5rem;
   }
   
   .filter-tab {
     width: 100%;
-    max-width: 200px;
     justify-content: center;
+  }
+
+  .file-table-container {
+    border-radius: 8px;
+  }
+
+  .file-table th:nth-child(3),
+  .file-table td:nth-child(3) {
+    display: none;
+  }
+
+  .file-table th,
+  .file-table td {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.75rem;
+  }
+
+  .emulator-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .emulator-name-cell {
+    gap: 0.4rem;
+  }
+
+  .emulator-name {
+    font-size: 0.8rem;
+  }
+
+  .emulator-version {
+    font-size: 0.65rem;
+  }
+
+  .version-dropdown {
+    font-size: 0.65rem;
+    padding: 0.3rem 1.3rem 0.3rem 0.4rem;
+    min-height: 28px;
+  }
+
+  .download-actions {
+    min-width: 95px;
+  }
+
+  .btn-download {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.65rem;
+    min-width: 55px;
+  }
+
+  .platform-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .platform-badge svg {
+    width: 10px;
+    height: 10px;
   }
 }
