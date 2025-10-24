@@ -250,14 +250,14 @@
 
     <div id="messagesModal" class="modal" style="display:none;">
         <div class="modal-content" style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
-            <div style="padding: 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; background: #2d2d2d; position: relative;">
-                <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <button id="manageGroupBtn" style="display: none; background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;" onclick="window.messagingManager.openGroupManagement()">
-                        <i class="fas fa-cog"></i> Manage
-                    </button>
+            <div style="padding: 16px; border-bottom: 1px solid #333; background: #2d2d2d; position: relative;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
                     <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
                 </div>
+                <button id="manageGroupBtn" style="display: none; background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-top: 4px;" onclick="window.messagingManager.openGroupManagement()">
+                    <i class="fas fa-cog"></i> Manage Group
+                </button>
             </div>
             <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
             <div class="message-input-container" style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">
@@ -290,29 +290,43 @@
     </div>
 
     <div id="manageGroupModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 90vw; width: 500px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="manageGroupModal">&times;</span>
-            <h3 id="manageGroupTitle">Manage Group</h3>
+            <h3 id="manageGroupTitle" style="margin-bottom: 20px;">Manage Group</h3>
             
-            <div style="margin-bottom: 20px;">
-                <label style="color: white; font-weight: bold; margin-bottom: 8px; display: block;">Group Name</label>
-                <input type="text" id="editGroupNameInput" class="form-control" placeholder="Group name" maxlength="50" />
-                <button id="updateGroupNameBtn" class="btn btn-primary" style="margin-top: 8px;">Update Name</button>
+            <!-- Group Name Section -->
+            <div style="margin-bottom: 16px; padding: 12px; background: #2d2d2d; border-radius: 8px;">
+                <label style="color: white; font-weight: bold; margin-bottom: 6px; display: block; font-size: 14px;">Group Name</label>
+                <div style="display: flex; gap: 8px; align-items: flex-end;">
+                    <input type="text" id="editGroupNameInput" class="form-control" placeholder="Group name" maxlength="50" style="flex: 1; margin-bottom: 0;" />
+                    <button id="updateGroupNameBtn" class="btn btn-primary" style="padding: 8px 12px; font-size: 12px;">Update</button>
+                </div>
             </div>
             
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: white; margin-bottom: 12px;">Current Members (<span id="memberCount">0</span>)</h4>
-                <div id="currentMembersList" style="max-height: 200px; overflow-y: auto; border: 1px solid #555; border-radius: 8px; padding: 8px; background: #2d2d2d;"></div>
+            <!-- Current Members Section -->
+            <div style="margin-bottom: 16px;">
+                <h4 style="color: white; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-users"></i> Members (<span id="memberCount">0</span>)
+                </h4>
+                <div id="currentMembersList" style="max-height: 150px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 4px; background: #2d2d2d;"></div>
             </div>
             
+            <!-- Add Members Section -->
             <div style="margin-bottom: 20px;">
-                <h4 style="color: white; margin-bottom: 12px;">Add Members</h4>
-                <div id="availableFriendsList" style="max-height: 200px; overflow-y: auto; border: 1px solid #555; border-radius: 8px; padding: 8px; background: #2d2d2d;"></div>
+                <h4 style="color: white; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-plus"></i> Add Friends
+                </h4>
+                <div id="availableFriendsList" style="max-height: 150px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 4px; background: #2d2d2d;"></div>
             </div>
             
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button id="deleteGroupBtn" class="btn btn-danger">Delete Group</button>
-                <button class="btn btn-secondary" onclick="window.closeModal(document.getElementById('manageGroupModal'))">Close</button>
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 8px; justify-content: flex-end; padding-top: 12px; border-top: 1px solid #555;">
+                <button id="deleteGroupBtn" class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;">
+                    <i class="fas fa-trash"></i> Delete Group
+                </button>
+                <button class="btn btn-secondary" onclick="window.closeModal(document.getElementById('manageGroupModal'))" style="padding: 8px 16px; font-size: 12px;">
+                    Close
+                </button>
             </div>
         </div>
     </div>
