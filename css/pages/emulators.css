@@ -94,7 +94,8 @@
   color: #6495ed;
 }
 
-.platform-badge.mobile {
+.platform-badge.mobile,
+.platform-badge.phone {
   background: rgba(50, 205, 50, 0.1);
   color: #32cd32;
 }

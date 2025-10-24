@@ -215,7 +215,7 @@ class EmulatorsManager {
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="${this.getPlatformIcon(emu.platform)}"/>
                   </svg>
-                  ${emu.platform === 'desktop' ? 'Desktop' : 'Mobile'}
+                  ${emu.platform === 'desktop' ? 'Desktop' : 'Phone'}
                 </span>
               </td>
               <td class="file-actions">
