@@ -949,7 +949,11 @@ function setupEventListeners() {
 function setupFeatureButtons() {
     const notesBtn = document.getElementById('notesBtn');
     if (notesBtn) {
+        let notesClickTimeout;
         notesBtn.onclick = async () => {
+            if (notesClickTimeout) return;
+            notesClickTimeout = setTimeout(() => { notesClickTimeout = null; }, 500);
+            
             if (!authManager.currentEncryptionKey) {
                 showMasterPasswordPrompt('notesModal');
                 return;
@@ -961,7 +965,11 @@ function setupFeatureButtons() {
 
     const passwordManagerBtn = document.getElementById('passwordManagerBtn');
     if (passwordManagerBtn) {
+        let pmClickTimeout;
         passwordManagerBtn.onclick = async () => {
+            if (pmClickTimeout) return;
+            pmClickTimeout = setTimeout(() => { pmClickTimeout = null; }, 500);
+            
             if (!authManager.currentEncryptionKey) {
                 showMasterPasswordPrompt('passwordManagerModal');
                 return;
@@ -996,7 +1004,11 @@ function setupFeatureButtons() {
 
     const securityBtn = document.getElementById('securityBtn');
     if (securityBtn) {
+        let securityClickTimeout;
         securityBtn.onclick = async () => {
+            if (securityClickTimeout) return;
+            securityClickTimeout = setTimeout(() => { securityClickTimeout = null; }, 500);
+            
             openModal(document.getElementById('shieldModal'));
             await shieldManager.loadShieldData();
         };
@@ -1474,7 +1486,11 @@ function setupNotificationHandlers() {
         const messageIcon = document.getElementById('messageIcon');
         
         if (notificationIcon) {
+            let notificationClickTimeout;
             notificationIcon.addEventListener('click', function(e) {
+                if (notificationClickTimeout) return;
+                notificationClickTimeout = setTimeout(() => { notificationClickTimeout = null; }, 500);
+                
                 e.preventDefault();
                 e.stopPropagation();
                 openModal(document.getElementById('notificationsModal'));
@@ -1484,7 +1500,11 @@ function setupNotificationHandlers() {
         }
         
         if (messageIcon) {
+            let messageClickTimeout;
             messageIcon.addEventListener('click', function(e) {
+                if (messageClickTimeout) return;
+                messageClickTimeout = setTimeout(() => { messageClickTimeout = null; }, 500);
+                
                 e.preventDefault();
                 e.stopPropagation();
                 const messageInputContainer = document.querySelector('.message-input-container');

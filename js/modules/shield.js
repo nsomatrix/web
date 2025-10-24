@@ -5,6 +5,7 @@ export class ShieldManager {
     constructor(authManager, db) {
         this.authManager = authManager;
         this.db = db;
+        this.isLoading = false;
         this.currentSessionId = this.generateSessionId();
     }
 
@@ -507,15 +508,22 @@ export class ShieldManager {
 
     // UI Management Methods
     async loadShieldData() {
-        await this.cleanupDuplicateSessions();
-        await this.loadSecurityScore();
-        await this.loadSessionsData();
-        await this.loadHistoryData();
-        await this.loadSecurityEvents();
-        await this.loadBiometricStatus();
-        this.setupShieldTabs();
-        this.setupModalHandlers();
-        this.setupRealtimeListeners();
+        if (this.isLoading) return;
+        this.isLoading = true;
+        
+        try {
+            await this.cleanupDuplicateSessions();
+            await this.loadSecurityScore();
+            await this.loadSessionsData();
+            await this.loadHistoryData();
+            await this.loadSecurityEvents();
+            await this.loadBiometricStatus();
+            this.setupShieldTabs();
+            this.setupModalHandlers();
+            this.setupRealtimeListeners();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     setupRealtimeListeners() {

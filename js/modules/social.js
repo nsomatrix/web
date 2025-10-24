@@ -4,6 +4,7 @@ export class SocialManager {
     constructor(authManager, db) {
         this.authManager = authManager;
         this.db = db;
+        this.isLoading = false;
     }
 
     async performUserSearch() {
@@ -165,14 +166,17 @@ export class SocialManager {
     }
 
     async loadNotifications() {
+        if (this.isLoading) return;
+        this.isLoading = true;
+        
         try {
+            const notificationsList = document.getElementById('notificationsList');
+            notificationsList.innerHTML = '';
+            
             const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('friendRequests').where('status', '==', 'pending').get();
             const notificationsSnapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('notifications').where('read', '==', false).get();
-
-            const notificationsList = document.getElementById('notificationsList');
-            notificationsList.innerHTML = '';
 
             let hasNotifications = false;
 
@@ -222,6 +226,8 @@ export class SocialManager {
             }
         } catch (error) {
             console.error('Load notifications error:', error);
+        } finally {
+            this.isLoading = false;
         }
     }
 
