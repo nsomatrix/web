@@ -635,73 +635,101 @@ export class ShieldManager {
     async loadSecurityScore() {
         const score = await this.calculateSecurityScore();
         const scoreElement = document.getElementById('securityScoreText');
-        const circleElement = document.getElementById('securityScoreCircle');
         
-        scoreElement.textContent = score;
-        
-        if (score >= 80) {
-            circleElement.className = 'score-circle excellent';
-        } else if (score >= 60) {
-            circleElement.className = 'score-circle good';
-        } else {
-            circleElement.className = 'score-circle poor';
+        if (scoreElement) {
+            scoreElement.textContent = score;
+            
+            // Update color based on score
+            if (score >= 80) {
+                scoreElement.style.color = '#28a745'; // Green
+            } else if (score >= 60) {
+                scoreElement.style.color = '#ffc107'; // Yellow
+            } else {
+                scoreElement.style.color = '#dc3545'; // Red
+            }
         }
     }
 
     async loadSessionsData() {
-        const sessions = await this.getSessions();
-        const sessionsList = document.getElementById('sessionsList');
-        const sessionCount = document.getElementById('sessionCount');
-        
-        if (!sessionsList || !sessionCount) return;
-        
-        sessionCount.textContent = sessions.length;
-        sessionsList.innerHTML = '';
+        try {
+            console.log('Loading sessions data...');
+            const sessions = await this.getSessions();
+            console.log('Sessions retrieved:', sessions);
+            
+            const sessionsList = document.getElementById('sessionsList');
+            const sessionCount = document.getElementById('sessionCount');
+            
+            console.log('Elements found:', { sessionsList: !!sessionsList, sessionCount: !!sessionCount });
+            
+            if (!sessionsList || !sessionCount) {
+                console.error('Required elements not found');
+                return;
+            }
+            
+            sessionCount.textContent = sessions.length;
+            sessionsList.innerHTML = '';
 
-        sessions.forEach(session => {
-            const isCurrentSession = session.id === this.currentSessionId;
-            const item = document.createElement('div');
-            item.className = `session-item ${isCurrentSession ? 'session-current' : ''}`;
-            
-            item.innerHTML = `
-                <div>
-                    <strong>${session.browser || 'Unknown'} on ${session.device || 'Unknown'}</strong>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">
-                        ${session.ip} • ${formatTimestamp(session.lastActivity)}
-                        ${isCurrentSession ? ' • Current Session' : ''}
+            sessions.forEach(session => {
+                const isCurrentSession = session.id === this.currentSessionId;
+                const item = document.createElement('div');
+                item.className = `session-item ${isCurrentSession ? 'session-current' : ''}`;
+                
+                item.innerHTML = `
+                    <div>
+                        <strong>${session.browser || 'Unknown'} on ${session.device || 'Unknown'}</strong>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">
+                            ${session.ip} • ${formatTimestamp(session.lastActivity)}
+                            ${isCurrentSession ? ' • Current Session' : ''}
+                        </div>
                     </div>
-                </div>
-                ${!isCurrentSession ? `<button class="btn btn-danger btn-sm" onclick="shieldManager.revokeSessionUI('${session.id}')">Revoke</button>` : '<span style="color: var(--success);">Active</span>'}
-            `;
-            
-            sessionsList.appendChild(item);
-        });
+                    ${!isCurrentSession ? `<button class="btn btn-danger btn-sm" onclick="shieldManager.revokeSessionUI('${session.id}')">Revoke</button>` : '<span style="color: var(--success);">Active</span>'}
+                `;
+                
+                sessionsList.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Error loading sessions data:', error);
+        }
     }
 
     async loadHistoryData() {
-        const history = await this.getLoginHistory();
-        const historyList = document.getElementById('loginHistoryList');
-        const loginCount = document.getElementById('loginCount');
-        
-        loginCount.textContent = history.length;
-        historyList.innerHTML = '';
+        try {
+            console.log('Loading history data...');
+            const history = await this.getLoginHistory();
+            console.log('History retrieved:', history);
+            
+            const historyList = document.getElementById('loginHistoryList');
+            const loginCount = document.getElementById('loginCount');
+            
+            console.log('Elements found:', { historyList: !!historyList, loginCount: !!loginCount });
+            
+            if (!historyList || !loginCount) {
+                console.error('Required history elements not found');
+                return;
+            }
+            
+            loginCount.textContent = history.length;
+            historyList.innerHTML = '';
 
-        history.forEach(login => {
-            const item = document.createElement('div');
-            item.className = 'history-item';
-            
-            item.innerHTML = `
-                <div>
-                    <strong>${login.location || 'Unknown Location'}</strong>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">
-                        ${login.ip} • ${formatTimestamp(login.timestamp)}
+            history.forEach(login => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                
+                item.innerHTML = `
+                    <div>
+                        <strong>${login.location || 'Unknown Location'}</strong>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">
+                            ${login.ip} • ${formatTimestamp(login.timestamp)}
+                        </div>
                     </div>
-                </div>
-                <span style="color: var(--success);">✓ Success</span>
-            `;
-            
-            historyList.appendChild(item);
-        });
+                    <span style="color: var(--success);">✓ Success</span>
+                `;
+                
+                historyList.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Error loading history data:', error);
+        }
     }
 
     async loadSecurityEvents() {
