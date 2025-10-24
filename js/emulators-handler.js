@@ -301,7 +301,7 @@ class EmulatorsManager {
     }, 500);
   }
 
-  handleSearch(searchTerm) {
+  handleSearch() {
     clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(() => {
       this.applyFilters();
