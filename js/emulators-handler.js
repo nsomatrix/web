@@ -129,11 +129,13 @@ class EmulatorsManager {
 
     // Fallback timeout - if GitHub API takes too long, show error state
     setTimeout(() => {
-      const loadingDropdowns = document.querySelectorAll('.version-dropdown.version-loading');
+      const loadingDropdowns = document.querySelectorAll('.custom-select.loading');
       loadingDropdowns.forEach(dropdown => {
-        dropdown.innerHTML = '<option value="">Failed to load versions</option>';
-        dropdown.disabled = true;
-        dropdown.classList.remove('version-loading');
+        const trigger = dropdown.querySelector('.select-trigger');
+        if (trigger) {
+          trigger.textContent = 'Failed to load versions';
+        }
+        dropdown.classList.remove('loading');
       });
     }, 10000); // 10 second timeout
   }
@@ -220,9 +222,10 @@ class EmulatorsManager {
                 <div class="download-actions">
                   ${emu.hasVersions ? `
                     <div class="version-selector">
-                      <select class="version-dropdown version-loading" data-emulator="${this.escapeHtml(emu.name)}" disabled>
-                        <option value="">Loading versions...</option>
-                      </select>
+                      <div class="custom-select loading" data-emulator="${this.escapeHtml(emu.name)}">
+                        <div class="select-trigger">Loading versions...</div>
+                        <div class="select-options"></div>
+                      </div>
                     </div>
                   ` : ''}
                   <button class="btn-download" data-url="${emu.downloadUrl || ''}" data-name="${this.escapeHtml(emu.name)}" ${emu.hasVersions && !emu.downloadUrl ? 'disabled' : ''}>
@@ -419,30 +422,35 @@ class EmulatorsManager {
   }
 
   setupVersionDropdowns() {
-    const dropdowns = this.emulatorsList.querySelectorAll('.version-dropdown');
+    const customSelects = this.emulatorsList.querySelectorAll('.custom-select');
 
-    dropdowns.forEach(dropdown => {
-      const emulatorName = dropdown.dataset.emulator;
+    customSelects.forEach(customSelect => {
+      const emulatorName = customSelect.dataset.emulator;
       const emulator = this.emulatorsData.find(emu => emu.name === emulatorName);
+      const trigger = customSelect.querySelector('.select-trigger');
+      const optionsContainer = customSelect.querySelector('.select-options');
 
       if (emulator && emulator.githubRepo) {
         const releases = this.githubReleases[emulator.githubRepo];
 
         if (releases && releases.length > 0) {
-          // Clear existing options
-          dropdown.innerHTML = '';
-
           console.log(`Setting up ${releases.length} versions for ${emulatorName}`);
 
-          // Show ALL releases in simple list - no filtering, no grouping
-          releases.forEach((release, index) => {
+          // Clear loading state
+          customSelect.classList.remove('loading');
+          optionsContainer.innerHTML = '';
+
+          // Create options for each release
+          releases.forEach((release) => {
             const downloadUrl = this.getDownloadUrl(release, emulator.platform);
             const fileSize = this.getAssetSize(release, emulator.platform);
 
-            console.log(`Release ${release.tag_name}: ${release.assets?.length || 0} assets, downloadUrl: ${downloadUrl ? 'found' : 'none'}`);
+            const option = document.createElement('div');
+            option.className = 'select-option';
+            option.textContent = release.tag_name;
 
-            const option = document.createElement('option');
-            option.value = JSON.stringify({
+            // Store data in dataset
+            option.dataset.value = JSON.stringify({
               url: downloadUrl,
               name: release.name || release.tag_name,
               size: fileSize,
@@ -450,66 +458,102 @@ class EmulatorsManager {
               hasAssets: release.assets && release.assets.length > 0
             });
 
-            // Simple format: just version
-            option.textContent = release.tag_name;
-
-            // Only disable if absolutely no assets at all
+            // Disable if no assets
             if (!release.assets || release.assets.length === 0) {
-              option.disabled = true;
-              option.style.color = '#666';
+              option.classList.add('disabled');
             }
 
-            dropdown.appendChild(option);
+            optionsContainer.appendChild(option);
           });
 
-          dropdown.disabled = false;
-          dropdown.classList.remove('version-loading');
+          // Auto-select first version
+          const firstOption = optionsContainer.querySelector('.select-option:not(.disabled)');
+          if (firstOption) {
+            firstOption.classList.add('active');
+            const versionData = JSON.parse(firstOption.dataset.value);
+            trigger.textContent = versionData.tag;
 
-          // Auto-select the first (latest) version
-          if (dropdown.options.length > 0) {
-            dropdown.selectedIndex = 0;
-            // Trigger change event to update download button and table cells
-            const changeEvent = new Event('change');
-            dropdown.dispatchEvent(changeEvent);
-          }
-        } else {
-          // No releases loaded - show error state
-          dropdown.innerHTML = '<option value="">No versions available</option>';
-          dropdown.disabled = true;
-          dropdown.classList.remove('version-loading');
-        }
+            // Update download button
+            const row = customSelect.closest('tr');
+            const downloadBtn = row.querySelector('.btn-download');
+            const versionCell = row.querySelector('.version-cell');
+            const sizeCell = row.querySelector('.size-cell');
 
-        // Handle version selection
-        dropdown.addEventListener('change', (e) => {
-          const row = e.target.closest('tr');
-          const downloadBtn = e.target.closest('.download-actions').querySelector('.btn-download');
-          const versionCell = row.querySelector('.version-cell');
-          const sizeCell = row.querySelector('.size-cell');
-
-          if (e.target.value) {
-            const versionData = JSON.parse(e.target.value);
             downloadBtn.dataset.url = versionData.url;
-
-            // Create a clean filename
             const cleanName = emulatorName.replace(/\s+/g, '-');
-            const fileName = `${cleanName}-${versionData.tag}`;
-            downloadBtn.dataset.name = fileName;
-
+            downloadBtn.dataset.name = `${cleanName}-${versionData.tag}`;
             downloadBtn.disabled = !versionData.url;
 
-            // Update version and size cells dynamically
-            if (versionCell) {
-              versionCell.textContent = versionData.tag;
-            }
-            if (sizeCell) {
-              sizeCell.textContent = versionData.size;
-            }
-          } else {
-            downloadBtn.dataset.url = '';
-            downloadBtn.disabled = true;
+            if (versionCell) versionCell.textContent = versionData.tag;
+            if (sizeCell) sizeCell.textContent = versionData.size;
           }
+
+          // Setup click handlers
+          this.setupCustomSelectHandlers(customSelect, emulatorName);
+        } else {
+          // No releases loaded
+          trigger.textContent = 'No versions available';
+          customSelect.classList.remove('loading');
+        }
+      }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.custom-select')) {
+        document.querySelectorAll('.custom-select').forEach(select => {
+          select.classList.remove('open');
         });
       }
+    });
+  }
+
+  setupCustomSelectHandlers(customSelect, emulatorName) {
+    const trigger = customSelect.querySelector('.select-trigger');
+    const options = customSelect.querySelectorAll('.select-option');
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Close other dropdowns
+      document.querySelectorAll('.custom-select').forEach(s => {
+        if (s !== customSelect) s.classList.remove('open');
+      });
+      customSelect.classList.toggle('open');
+    });
+
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        if (option.classList.contains('disabled')) return;
+
+        // Update active state
+        options.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+
+        // Get version data
+        const versionData = JSON.parse(option.dataset.value);
+
+        // Update trigger text
+        trigger.textContent = versionData.tag;
+
+        // Update download button and table cells
+        const row = customSelect.closest('tr');
+        const downloadBtn = row.querySelector('.btn-download');
+        const versionCell = row.querySelector('.version-cell');
+        const sizeCell = row.querySelector('.size-cell');
+
+        downloadBtn.dataset.url = versionData.url;
+        const cleanName = emulatorName.replace(/\s+/g, '-');
+        downloadBtn.dataset.name = `${cleanName}-${versionData.tag}`;
+        downloadBtn.disabled = !versionData.url;
+
+        if (versionCell) versionCell.textContent = versionData.tag;
+        if (sizeCell) sizeCell.textContent = versionData.size;
+
+        // Close dropdown
+        customSelect.classList.remove('open');
+      });
     });
   }
 
