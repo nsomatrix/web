@@ -3,7 +3,7 @@ const API_CONFIG = {
   baseUrl: 'https://archive.org/download/'
 };
 
-class ArchivesManager {
+class DeprecatedManager {
   constructor() {
     this.modsData = [];
     this.filteredMods = [];
@@ -51,7 +51,7 @@ class ArchivesManager {
           name: file.name,
           size: file.size || 0,
           downloadUrl: `${API_CONFIG.baseUrl}${API_CONFIG.itemId}/${file.name}`,
-          isArchived: true
+          isDeprecated: true
         }))
         .sort((a, b) => a.name.localeCompare(b.name));
       
@@ -61,8 +61,8 @@ class ArchivesManager {
       this.updateStats();
       
     } catch (error) {
-      console.error('Error fetching archived MODs:', error);
-      this.showError('Failed to load archived MODs. Please try again later.');
+      console.error('Error fetching deprecated MODs:', error);
+      this.showError('Failed to load deprecated MODs. Please try again later.');
     }
   }
   
@@ -88,11 +88,11 @@ class ArchivesManager {
               <td class="file-name">${this.escapeHtml(mod.name)}</td>
               <td class="file-size">${this.formatFileSize(mod.size)}</td>
               <td>
-                <span class="archive-badge">
+                <span class="deprecated-badge">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3,3H21V7H3V3M4,8H20V21H4V8M9.5,11A0.5,0.5 0 0,0 9,11.5V13H15V11.5A0.5,0.5 0 0,0 14.5,11H9.5Z"/>
                   </svg>
-                  Archived
+                  Deprecated
                 </span>
               </td>
               <td class="file-actions">
@@ -121,7 +121,7 @@ class ArchivesManager {
   
   showEmptyState() {
     const isEmpty = this.modsData.length === 0;
-    const message = isEmpty ? 'No archived MODs available' : 'No archived MODs match your search';
+    const message = isEmpty ? 'No deprecated MODs available' : 'No deprecated MODs match your search';
     const icon = isEmpty ? 'M3,3H21V7H3V3M4,8H20V21H4V8M9.5,11A0.5,0.5 0 0,0 9,11.5V13H15V11.5A0.5,0.5 0 0,0 14.5,11H9.5Z' : 'M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z';
     
     this.fileList.innerHTML = `
@@ -215,5 +215,5 @@ class ArchivesManager {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  new ArchivesManager();
+  new DeprecatedManager();
 });

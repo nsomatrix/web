@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>NSO Matrix - Archives</title>
+  <title>NSO Matrix - Deprecated</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/pages/archives.css" rel="stylesheet">
+  <link href="css/pages/deprecated.css" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -39,14 +39,14 @@
 
   <div class="container">
     <div class="text-center header-section">
-      <h1 class="page-title">MODs Archives</h1>
-      <p class="page-subtitle">Obsolete and legacy MODs are archived here. For active MODs, visit <a href="mods.html" class="archive-link">MODs Repository</a></p>
+      <h1 class="page-title">Deprecated MODs</h1>
+      <p class="page-subtitle">Obsolete and legacy MODs are stored here. For active MODs, visit <a href="mods.html" class="archive-link">MODs Repository</a></p>
     </div>
 
     <div class="stats-section" id="statsSection" style="display: none;">
       <div class="stat-item">
         <span class="stat-number" id="totalMods">0</span>
-        <span class="stat-label">Archived MODs</span>
+        <span class="stat-label">Deprecated MODs</span>
       </div>
       <div class="stat-item">
         <span class="stat-number" id="visibleMods">0</span>
@@ -55,12 +55,12 @@
     </div>
 
     <div class="search">
-      <input type="text" id="searchInput" class="search__input" placeholder="Search archived MODs by name...">
+      <input type="text" id="searchInput" class="search__input" placeholder="Search deprecated MODs by name">
     </div>
 
     <div id="fileList" class="file-table-container">
       <div class="loading-message">
-        Loading archived MODs...
+        Loading deprecated MODs
         <svg class="loader" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
             <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
@@ -75,7 +75,7 @@
 
   <script src="js/firebase-config.js"></script>
     <script src="js/bootstrap.min.js"></script>
-  <script src="js/archives-handler.js"></script>
+  <script src="js/deprecated-handler.js"></script>
   <script src="components/loader.js"></script>
 
     <footer id="footer"></footer>

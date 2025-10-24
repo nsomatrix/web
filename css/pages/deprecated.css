@@ -1,4 +1,4 @@
-/* Archives page specific styles */
+/* Deprecated page specific styles */
 @import url('../base.css');
 @import url('../components/search.css');
 @import url('../components/table.css');
@@ -37,8 +37,8 @@
   margin-top: 0.25rem;
 }
 
-/* Archive-specific styling */
-.archive-badge {
+/* Deprecated-specific styling */
+.deprecated-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -52,7 +52,7 @@
   letter-spacing: 0.5px;
 }
 
-.archive-badge svg {
+.deprecated-badge svg {
   width: 12px;
   height: 12px;
 }
