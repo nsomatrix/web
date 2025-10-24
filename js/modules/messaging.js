@@ -15,6 +15,11 @@ export class MessagingManager {
     }
 
     async openChat(friendId) {
+        // Cancel any ongoing loadRecentChats operation
+        if (typeof loadRecentChatsActive !== 'undefined') {
+            loadRecentChatsActive = false;
+        }
+        
         this.currentChatFriend = friendId;
         this.currentGroupChat = null;
         this.lastMessageCount = 0;
@@ -32,6 +37,11 @@ export class MessagingManager {
     }
 
     async openGroupChat(groupId) {
+        // Cancel any ongoing loadRecentChats operation
+        if (typeof loadRecentChatsActive !== 'undefined') {
+            loadRecentChatsActive = false;
+        }
+        
         this.currentGroupChat = groupId;
         this.currentChatFriend = null;
         this.lastMessageCount = 0;

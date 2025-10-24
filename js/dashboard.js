@@ -1390,11 +1390,20 @@ window.unsendMessage = (messageId) => messagingManager.unsendMessage(messageId);
 
 
 
+// Global variable to track if loadRecentChats should continue
+let loadRecentChatsActive = false;
+
 async function loadRecentChats() {
     try {
+        // Set flag to indicate this function is active
+        loadRecentChatsActive = true;
+        
         document.getElementById('messageModalTitle').textContent = 'Recent Chats';
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '';
+        
+        // Check if we should still continue (user might have clicked something else)
+        if (!loadRecentChatsActive) return;
         
         // Create floating button and add it to the modal (positioned relative to modal)
         const messagesModal = document.getElementById('messagesModal');
@@ -1442,12 +1451,21 @@ async function loadRecentChats() {
         const groupChatsSnapshot = await db.collection('groupChats')
             .where('members', 'array-contains', authManager.currentUser.uid).get();
 
+        // Check if we should still continue
+        if (!loadRecentChatsActive) return;
+
         for (const doc of groupChatsSnapshot.docs) {
+            // Check if we should still continue before each item
+            if (!loadRecentChatsActive) return;
+            
             const group = doc.data();
             const chatItem = document.createElement('div');
             chatItem.className = 'friend-item';
             chatItem.style.cursor = 'pointer';
-            chatItem.onclick = () => messagingManager.openGroupChat(doc.id);
+            chatItem.onclick = () => {
+                loadRecentChatsActive = false; // Cancel any ongoing loadRecentChats
+                messagingManager.openGroupChat(doc.id);
+            };
             chatItem.innerHTML = `
                 <div class="friend-info">
                     <div style="width: 40px; height: 40px; background: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
@@ -1471,16 +1489,32 @@ async function loadRecentChats() {
         const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friends').where('status', '==', 'accepted').get();
 
+        // Check if we should still continue
+        if (!loadRecentChatsActive) return;
+
         for (const doc of friendsSnapshot.docs) {
+            // Check if we should still continue before each item
+            if (!loadRecentChatsActive) return;
+            
             const friend = doc.data();
             const friendProfile = await db.collection('players').doc(friend.friendId).get();
+            
+            // Check again after async operation
+            if (!loadRecentChatsActive) return;
+            
             const friendData = friendProfile.data();
             const onlineStatus = await friendsManager.getOnlineStatus(friend.friendId);
+
+            // Check again after async operation
+            if (!loadRecentChatsActive) return;
 
             const chatItem = document.createElement('div');
             chatItem.className = 'friend-item';
             chatItem.style.cursor = 'pointer';
-            chatItem.onclick = () => messagingManager.openChat(friend.friendId);
+            chatItem.onclick = () => {
+                loadRecentChatsActive = false; // Cancel any ongoing loadRecentChats
+                messagingManager.openChat(friend.friendId);
+            };
             chatItem.innerHTML = `
                 <div class="friend-info">
                     <img src="avatars/${friendData.avatar}" alt="Avatar" class="friend-avatar">
