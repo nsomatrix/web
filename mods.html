@@ -14,19 +14,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script>
       // Initialize Firebase for navbar auth
-        window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            window.firebaseAuth = firebase.auth();
-            window.firebaseDb = firebase.firestore();
-        });
-      
-      if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-      }
-      window.firebaseAuth = firebase.auth();
-      window.firebaseDb = firebase.firestore();
+      window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
+          if (!firebase.apps.length) {
+              firebase.initializeApp(firebaseConfig);
+          }
+          window.firebaseAuth = firebase.auth();
+          window.firebaseDb = firebase.firestore();
+      });
   </script>
   <script src="js/sound.js"></script>
   <script src="js/essentials.js"></script>
@@ -50,12 +44,24 @@
       <p class="page-subtitle">Working MODs are published here. Obsolete MODs will be moved to <a href="archives.html" class="archive-link">Archives</a></p>
     </div>
 
-    <div class="search">
-      <input type="text" id="searchInput" class="search__input" placeholder="Search MODs...">
+    <div class="stats-section" id="statsSection" style="display: none;">
+      <div class="stat-item">
+        <span class="stat-number" id="totalMods">0</span>
+        <span class="stat-label">Total MODs</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="visibleMods">0</span>
+        <span class="stat-label">Showing</span>
+      </div>
     </div>
 
-    <div id="fileList" class="card-grid card-grid--loading">
-      <div class="loading-message">Loading MODs... 
+    <div class="search">
+      <input type="text" id="searchInput" class="search__input" placeholder="Search MODs by name...">
+    </div>
+
+    <div id="fileList" class="file-table-container">
+      <div class="loading-message">
+        Loading MODs...
         <svg class="loader" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
             <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
@@ -71,9 +77,6 @@
   <script src="js/firebase-config.js"></script>
     <script src="js/bootstrap.min.js"></script>
   <script src="js/mods-handler.js"></script>
-  <script>
-    
-  </script>
   <script src="components/loader.js"></script>
 
     <footer id="footer"></footer>

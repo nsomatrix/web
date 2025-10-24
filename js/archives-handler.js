@@ -1,22 +1,34 @@
-const SPINNER_DURATION = 1000;
 const API_CONFIG = {
   itemId: 'nso-archived-mods',
   baseUrl: 'https://archive.org/download/'
 };
 
-document.addEventListener('DOMContentLoaded', function() {
-  const fileList = document.getElementById('fileList');
-  const searchInput = document.getElementById('searchInput');
-  
-  if (!fileList || !searchInput) {
-    console.error('Required DOM elements not found');
-    return;
+class ArchivesManager {
+  constructor() {
+    this.modsData = [];
+    this.filteredMods = [];
+    this.searchTimeout = null;
+    
+    this.fileList = document.getElementById('fileList');
+    this.searchInput = document.getElementById('searchInput');
+    this.statsSection = document.getElementById('statsSection');
+    this.totalModsEl = document.getElementById('totalMods');
+    this.visibleModsEl = document.getElementById('visibleMods');
+    
+    if (!this.fileList || !this.searchInput) {
+      console.error('Required DOM elements not found');
+      return;
+    }
+    
+    this.init();
   }
-
-  let modsData = [];
-
-  // Fetch MODs from Internet Archive API
-  async function fetchMods() {
+  
+  init() {
+    this.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+    this.fetchMods();
+  }
+  
+  async fetchMods() {
     try {
       const apiUrl = `https://archive.org/metadata/${API_CONFIG.itemId}`;
       const response = await fetch(apiUrl);
@@ -27,76 +39,124 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const data = await response.json();
       
-      // Extract files from Internet Archive metadata
       if (!data.files) {
         throw new Error('No files found in archive');
       }
       
-      // Filter for .jar files only
-      const jarFiles = data.files.filter(file => file.name.endsWith('.jar'));
-      const maxItems = Math.min(jarFiles.length, 100);
+      // Filter and process .jar files
+      const jarFiles = data.files
+        .filter(file => file.name.endsWith('.jar'))
+        .slice(0, 100)
+        .map(file => ({
+          name: file.name,
+          size: file.size || 0,
+          downloadUrl: `${API_CONFIG.baseUrl}${API_CONFIG.itemId}/${file.name}`,
+          isArchived: true
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
       
-      // Transform to match expected format
-      modsData = jarFiles.slice(0, maxItems).map(file => ({
-        name: file.name,
-        download_url: `${API_CONFIG.baseUrl}${API_CONFIG.itemId}/${file.name}`
-      }));
-      
-      renderMods(modsData);
+      this.modsData = jarFiles;
+      this.filteredMods = [...jarFiles];
+      this.renderTable();
+      this.updateStats();
       
     } catch (error) {
       console.error('Error fetching archived MODs:', error);
-      showError('Error loading archived MODs. Please try again later.');
+      this.showError('Failed to load archived MODs. Please try again later.');
     }
   }
-
-  // Render MODs grid
-  function renderMods(mods) {
-    fileList.classList.remove('card-grid--loading');
-    fileList.innerHTML = '';
-
-    if (mods.length === 0) {
-      fileList.innerHTML = '<div class="loading-message">No archived MODs found</div>';
+  
+  renderTable() {
+    if (this.filteredMods.length === 0) {
+      this.showEmptyState();
       return;
     }
-
-    mods.forEach(mod => {
-      const modItem = document.createElement('div');
-      modItem.className = 'card';
-      
-      modItem.innerHTML = `
-        <div class="card__name">${mod.name}</div>
-        <button class="btn btn--download" data-url="${mod.download_url}" data-name="${mod.name}">
-          <span class="btn__text">Download</span>
-          <svg class="btn__loader" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-              <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-              <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-            </circle>
-          </svg>
-        </button>
-      `;
-
-      const downloadBtn = modItem.querySelector('.btn--download');
-      downloadBtn.addEventListener('click', handleDownload);
-
-      fileList.appendChild(modItem);
+    
+    const tableHTML = `
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th>File Name</th>
+            <th>Size</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.filteredMods.map(mod => `
+            <tr>
+              <td class="file-name">${this.escapeHtml(mod.name)}</td>
+              <td class="file-size">${this.formatFileSize(mod.size)}</td>
+              <td>
+                <span class="archive-badge">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3,3H21V7H3V3M4,8H20V21H4V8M9.5,11A0.5,0.5 0 0,0 9,11.5V13H15V11.5A0.5,0.5 0 0,0 14.5,11H9.5Z"/>
+                  </svg>
+                  Archived
+                </span>
+              </td>
+              <td class="file-actions">
+                <button class="btn-download" data-url="${mod.downloadUrl}" data-name="${this.escapeHtml(mod.name)}">
+                  <svg class="download-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
+                  </svg>
+                  <svg class="spinner" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                      <animate attributeName="stroke-dasharray" dur="1s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                      <animate attributeName="stroke-dashoffset" dur="1s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                    </circle>
+                  </svg>
+                  Download
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    
+    this.fileList.innerHTML = tableHTML;
+    this.attachDownloadHandlers();
+  }
+  
+  showEmptyState() {
+    const isEmpty = this.modsData.length === 0;
+    const message = isEmpty ? 'No archived MODs available' : 'No archived MODs match your search';
+    const icon = isEmpty ? 'M3,3H21V7H3V3M4,8H20V21H4V8M9.5,11A0.5,0.5 0 0,0 9,11.5V13H15V11.5A0.5,0.5 0 0,0 14.5,11H9.5Z' : 'M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z';
+    
+    this.fileList.innerHTML = `
+      <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="${icon}"/>
+        </svg>
+        <p>${message}</p>
+      </div>
+    `;
+  }
+  
+  showError(message) {
+    this.fileList.innerHTML = `<div class="loading-message">${message}</div>`;
+  }
+  
+  attachDownloadHandlers() {
+    const downloadBtns = this.fileList.querySelectorAll('.btn-download');
+    downloadBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleDownload(e));
     });
   }
-
-  // Handle download with loading state
-  function handleDownload(event) {
+  
+  handleDownload(event) {
     const button = event.currentTarget;
     const url = button.dataset.url;
     const filename = button.dataset.name;
     
     if (!url || !filename) return;
-
+    
     button.disabled = true;
-    button.classList.add('btn--loading');
-
+    button.classList.add('loading');
+    
+    // Simulate brief loading for UX
     setTimeout(() => {
-      // Create and trigger download
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
@@ -104,46 +164,56 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Reset button state
+      
       button.disabled = false;
-      button.classList.remove('btn--loading');
-    }, SPINNER_DURATION);
+      button.classList.remove('loading');
+    }, 500);
   }
-
-  // Show error message
-  function showError(message) {
-    fileList.classList.remove('card-grid--loading');
-    fileList.innerHTML = `<div class="loading-message">${message}</div>`;
-  }
-
-  // Debounced search functionality
-  let searchTimeout;
-  function debounceSearch(callback, delay) {
-    return function(...args) {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => callback.apply(this, args), delay);
-    };
-  }
-
-  const debouncedSearch = debounceSearch(function(searchTerm) {
-    const items = document.querySelectorAll('.card');
-    
-    items.forEach(item => {
-      const modName = item.querySelector('.card__name');
-      if (modName) {
-        const name = modName.textContent.toLowerCase();
-        const isVisible = name.includes(searchTerm.toLowerCase());
-        item.classList.toggle('card--hidden', !isVisible);
+  
+  handleSearch(searchTerm) {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      const term = searchTerm.toLowerCase().trim();
+      
+      if (!term) {
+        this.filteredMods = [...this.modsData];
+      } else {
+        this.filteredMods = this.modsData.filter(mod => 
+          mod.name.toLowerCase().includes(term)
+        );
       }
-    });
-  }, 300);
+      
+      this.renderTable();
+      this.updateStats();
+    }, 300);
+  }
+  
+  updateStats() {
+    if (this.modsData.length > 0) {
+      this.totalModsEl.textContent = this.modsData.length;
+      this.visibleModsEl.textContent = this.filteredMods.length;
+      this.statsSection.style.display = 'flex';
+    }
+  }
+  
+  formatFileSize(bytes) {
+    if (!bytes || bytes === 0) return 'Unknown';
+    
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    const size = (bytes / Math.pow(1024, i)).toFixed(1);
+    
+    return `${size} ${sizes[i]}`;
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+}
 
-  // Search input handler
-  searchInput.addEventListener('input', function() {
-    debouncedSearch(this.value);
-  });
-
-  // Initialize
-  fetchMods();
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new ArchivesManager();
 });
