@@ -1396,38 +1396,44 @@ async function loadRecentChats() {
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '';
         
-        // Create floating button and add it to the body (truly fixed position)
+        // Create floating button and add it to the modal (positioned relative to modal)
+        const messagesModal = document.getElementById('messagesModal');
+        const modalContent = messagesModal.querySelector('.modal-content');
+        
         let createGroupBtn = document.getElementById('createGroupBtn');
-        if (!createGroupBtn) {
-            createGroupBtn = document.createElement('button');
-            createGroupBtn.id = 'createGroupBtn';
-            createGroupBtn.innerHTML = '<i class="fas fa-users"></i>';
-            createGroupBtn.style.position = 'fixed';
-            createGroupBtn.style.bottom = '80px';
-            createGroupBtn.style.right = '30px';
-            createGroupBtn.style.width = '56px';
-            createGroupBtn.style.height = '56px';
-            createGroupBtn.style.borderRadius = '50%';
-            createGroupBtn.style.background = '#e74c3c';
-            createGroupBtn.style.color = 'white';
-            createGroupBtn.style.border = 'none';
-            createGroupBtn.style.fontSize = '18px';
-            createGroupBtn.style.cursor = 'pointer';
-            createGroupBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-            createGroupBtn.style.zIndex = '10001';
-            createGroupBtn.style.display = 'block';
-            document.body.appendChild(createGroupBtn);
-            
-            // Add click event listener
-            createGroupBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openModal(document.getElementById('createGroupModal'));
-                loadFriendsForGroup();
-            });
-        } else {
-            createGroupBtn.style.display = 'block';
+        if (createGroupBtn) {
+            createGroupBtn.remove(); // Remove existing button to recreate it properly
         }
+        
+        createGroupBtn = document.createElement('button');
+        createGroupBtn.id = 'createGroupBtn';
+        createGroupBtn.innerHTML = '<i class="fas fa-users"></i>';
+        createGroupBtn.style.position = 'absolute';
+        createGroupBtn.style.bottom = '20px';
+        createGroupBtn.style.right = '20px';
+        createGroupBtn.style.width = '56px';
+        createGroupBtn.style.height = '56px';
+        createGroupBtn.style.borderRadius = '50%';
+        createGroupBtn.style.background = '#e74c3c';
+        createGroupBtn.style.color = 'white';
+        createGroupBtn.style.border = 'none';
+        createGroupBtn.style.fontSize = '18px';
+        createGroupBtn.style.cursor = 'pointer';
+        createGroupBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        createGroupBtn.style.zIndex = '1000';
+        createGroupBtn.style.display = 'block';
+        
+        // Add to modal content and ensure modal content has relative positioning
+        modalContent.style.position = 'relative';
+        modalContent.appendChild(createGroupBtn);
+        
+        // Add click event listener
+        createGroupBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openModal(document.getElementById('createGroupModal'));
+            loadFriendsForGroup();
+        });
         
         // Debug: Log button creation
         console.log('Create group button created/shown:', createGroupBtn);
