@@ -3,8 +3,8 @@
 <head>
   <title>NSO Matrix - Emulators</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="css/bootstrap.css" rel="stylesheet" media="screen">
-  <link href="css/emu.css" rel="stylesheet" media="screen">
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/pages/emulators.css" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -13,19 +13,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script>
       // Initialize Firebase for navbar auth
-        window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            window.firebaseAuth = firebase.auth();
-            window.firebaseDb = firebase.firestore();
-        });
-      
-      if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-      }
-      window.firebaseAuth = firebase.auth();
-      window.firebaseDb = firebase.firestore();
+      window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
+          if (!firebase.apps.length) {
+              firebase.initializeApp(firebaseConfig);
+          }
+          window.firebaseAuth = firebase.auth();
+          window.firebaseDb = firebase.firestore();
+      });
   </script>
   <script src="js/sound.js"></script>
   <script src="js/essentials.js"></script>
@@ -49,150 +43,59 @@
       <p class="page-subtitle">Download J2ME Emulators below! Some emulators may need Java installed.</p>
     </div>
 
-    <div class="emulators-grid">
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/coffeevm.webp" class="emulator-icon" alt="CoffeeVM">
-          <div class="emulator-content">
-            <h3 class="emulator-title">CoffeeVM</h3>
-            <p class="emulator-version">v1.4.7 | 3.56 MB</p>
-            <button class="btn-download" data-href="data/EMU/Android/CoffeeVM.apk">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
+    <div class="stats-section" id="statsSection" style="display: none;">
+      <div class="stat-item">
+        <span class="stat-number" id="totalEmulators">0</span>
+        <span class="stat-label">Total Emulators</span>
       </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/microemulator.png" class="emulator-icon" alt="Microemulator">
-          <div class="emulator-content">
-            <h3 class="emulator-title">Microemulator</h3>
-            <p class="emulator-version">v2.0.4 | 629 KB</p>
-            <button class="btn-download" data-href="data/EMU/Desktop/microemulator.jar">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
+      <div class="stat-item">
+        <span class="stat-number" id="desktopCount">0</span>
+        <span class="stat-label">Desktop</span>
       </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/j2meloader.png" class="emulator-icon" alt="J2ME Loader">
-          <div class="emulator-content">
-            <h3 class="emulator-title">J2ME Loader</h3>
-            <p class="emulator-version">v1.7.9 | 8.28 MB</p>
-            <button class="btn-download" data-href="data/EMU/Android/J2MELoader.apk">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
+      <div class="stat-item">
+        <span class="stat-number" id="mobileCount">0</span>
+        <span class="stat-label">Mobile</span>
       </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/kemulator.png" class="emulator-icon" alt="KEmulator">
-          <div class="emulator-content">
-            <h3 class="emulator-title">KEmulator</h3>
-            <p class="emulator-version">v0.9.8 | 2.51 MB</p>
-            <button class="btn-download" data-href="data/EMU/Desktop/KEmulatorLite.exe">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
+      <div class="stat-item">
+        <span class="stat-number" id="visibleEmulators">0</span>
+        <span class="stat-label">Showing</span>
       </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/phoneme.png" class="emulator-icon" alt="PhoneME">
-          <div class="emulator-content">
-            <h3 class="emulator-title">PhoneME</h3>
-            <p class="emulator-version">v1.0.0 | 3.7 MB</p>
-            <button class="btn-download" data-href="data/EMU/Android/PhoneME.apk">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/angelchip.png" class="emulator-icon" alt="AngelChip">
-          <div class="emulator-content">
-            <h3 class="emulator-title">AngelChip</h3>
-            <p class="emulator-version">v1.0.0 | 479 KB</p>
-            <button class="btn-download" data-href="data/EMU/Desktop/AngelChipEmulator.jar">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/jlmod.png" class="emulator-icon" alt="JLMod">
-          <div class="emulator-content">
-            <h3 class="emulator-title">JLMod</h3>
-            <p class="emulator-version">v0.86 | 10.2 MB</p>
-            <button class="btn-download" data-href="data/EMU/Android/JLMod.apk">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="emulator-item">
-        <div class="emulator-card">
-          <img src="data/Pictures/netmite.png" class="emulator-icon" alt="NetMite">
-          <div class="emulator-content">
-            <h3 class="emulator-title">NetMite</h3>
-            <p class="emulator-version">v2.0.3.7 | 809 KB</p>
-            <button class="btn-download" data-href="data/EMU/Android/NetMite.apk">
-              <span class="btn-text">Download</span>
-              <svg class="loader" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                  <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                  <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </button>
-          </div>
-        </div>
+    </div>
+
+    <div class="platform-filters" id="platformFilters">
+      <button class="filter-tab active" data-platform="all">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+        </svg>
+        All Platforms
+      </button>
+      <button class="filter-tab" data-platform="desktop">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z"/>
+        </svg>
+        Desktop
+      </button>
+      <button class="filter-tab" data-platform="mobile">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17,19H7V5H17M17,1H7C5.89,1 5,1.89 5,3V21A2,2 0 0,0 7,23H17A2,2 0 0,0 19,21V3C19,1.89 18.1,1 17,1Z"/>
+        </svg>
+        Mobile
+      </button>
+    </div>
+
+    <div class="search">
+      <input type="text" id="searchInput" class="search__input" placeholder="Search emulators by name...">
+    </div>
+
+    <div id="emulatorsList" class="file-table-container">
+      <div class="loading-message">
+        Loading emulators...
+        <svg class="loader" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+          </circle>
+        </svg>
       </div>
     </div>
   </div>
@@ -200,11 +103,8 @@
 
 
   <script src="js/firebase-config.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-  <script src="js/download-handler.js"></script>
-  <script>
-    
-  </script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/emulators-handler.js"></script>
 
     <footer id="footer"></footer>
     <script src="js/component-loader.js"></script>

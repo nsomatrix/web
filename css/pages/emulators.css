@@ -1,0 +1,183 @@
+/* Emulators page specific styles */
+@import url('../base.css');
+@import url('../components/search.css');
+@import url('../components/table.css');
+@import url('../components/loader.css');
+
+/* Stats section */
+.stats-section {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  background: linear-gradient(145deg, var(--secondary-bg), var(--tertiary-bg));
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 120px;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+
+/* Platform filter tabs */
+.platform-filters {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  background: linear-gradient(145deg, var(--secondary-bg), var(--tertiary-bg));
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-tab:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, var(--accent-color), #990000);
+  border-color: var(--accent-hover);
+  color: var(--text-primary);
+}
+
+.filter-tab svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Platform badges */
+.platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.platform-badge.desktop {
+  background: rgba(100, 149, 237, 0.1);
+  color: #6495ed;
+}
+
+.platform-badge.mobile {
+  background: rgba(50, 205, 50, 0.1);
+  color: #32cd32;
+}
+
+.platform-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Emulator icon in table */
+.emulator-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.emulator-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.emulator-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.emulator-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.emulator-version {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Footer spacing */
+#footer-placeholder {
+  height: 40px;
+  background-color: var(--primary-bg);
+}
+
+@media (max-width: 768px) {
+  .stats-section {
+    gap: 1rem;
+  }
+  
+  .stat-item {
+    padding: 0.75rem 1rem;
+    min-width: 100px;
+  }
+  
+  .stat-number {
+    font-size: 1.25rem;
+  }
+  
+  .platform-filters {
+    gap: 0.25rem;
+  }
+  
+  .filter-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .emulator-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .platform-filters {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .filter-tab {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+  }
+}
