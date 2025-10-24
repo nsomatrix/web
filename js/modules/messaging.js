@@ -234,13 +234,11 @@ export class MessagingManager {
 
     renderMessages(messages) {
         const messagesList = document.getElementById('messagesList');
-        
-        const existingMessages = Array.from(messagesList.children).filter(el => el.id !== 'typing-indicator');
-        const newMessages = messages.slice(existingMessages.length);
-        
-        if (newMessages.length === 0) return;
-        
         const wasAtBottom = messagesList.scrollHeight - messagesList.scrollTop <= messagesList.clientHeight + 50;
+        
+        // Preserve typing indicator
+        const typingIndicator = document.getElementById('typing-indicator');
+        const typingHTML = typingIndicator ? typingIndicator.outerHTML : null;
         
         if (messages.length === 0) {
             messagesList.innerHTML = `
@@ -252,10 +250,20 @@ export class MessagingManager {
             return;
         }
         
-        newMessages.forEach((message) => {
+        // Clear and rebuild - this ensures deletions are reflected immediately
+        messagesList.innerHTML = '';
+        
+        // Render all messages
+        messages.forEach((message) => {
             this.renderSingleMessage(message, messagesList);
         });
         
+        // Restore typing indicator if it existed
+        if (typingHTML) {
+            messagesList.insertAdjacentHTML('beforeend', typingHTML);
+        }
+        
+        // Maintain scroll position
         if (wasAtBottom) {
             requestAnimationFrame(() => {
                 messagesList.scrollTop = messagesList.scrollHeight;
@@ -392,13 +400,11 @@ export class MessagingManager {
 
     async renderGroupMessages(messages, members) {
         const messagesList = document.getElementById('messagesList');
-        
-        const existingMessages = Array.from(messagesList.children).filter(el => el.id !== 'typing-indicator');
-        const newMessages = messages.slice(existingMessages.length);
-        
-        if (newMessages.length === 0) return;
-        
         const wasAtBottom = messagesList.scrollHeight - messagesList.scrollTop <= messagesList.clientHeight + 50;
+        
+        // Preserve typing indicator
+        const typingIndicator = document.getElementById('typing-indicator');
+        const typingHTML = typingIndicator ? typingIndicator.outerHTML : null;
         
         if (messages.length === 0) {
             messagesList.innerHTML = `
@@ -445,9 +451,18 @@ export class MessagingManager {
             }
         }
         
-        newMessages.forEach((message) => {
+        // Clear and rebuild - this ensures deletions are reflected immediately
+        messagesList.innerHTML = '';
+        
+        // Render all messages
+        messages.forEach((message) => {
             this.renderSingleGroupMessage(message, messagesList, this.memberDataCache);
         });
+        
+        // Restore typing indicator if it existed
+        if (typingHTML) {
+            messagesList.insertAdjacentHTML('beforeend', typingHTML);
+        }
         
         if (wasAtBottom) {
             requestAnimationFrame(() => {
@@ -803,8 +818,15 @@ export class MessagingManager {
 
     async unsendMessage(messageId) {
         try {
-            document.getElementById(`menu-${messageId}`).style.display = 'none';
+            // Hide the menu immediately
+            const menu = document.getElementById(`menu-${messageId}`);
+            if (menu) menu.style.display = 'none';
+            
+            // Delete from database - the onSnapshot listener will handle UI updates automatically
             await this.db.collection('messages').doc(messageId).delete();
+            
+            window.showMessageBox('Message deleted', 'success', 2000);
+            
         } catch (error) {
             console.error('Error deleting message:', error);
             window.showMessageBox('Failed to delete message', 'error', 2000);

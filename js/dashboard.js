@@ -25,6 +25,10 @@ getFirebaseConfig().then(firebaseConfig => {
     auth = firebase.auth();
     db = firebase.firestore();
     
+    // Make Firebase globally available for debugging and other scripts
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+
     initializeManagers();
     setupAuthStateListener();
 });
@@ -59,13 +63,13 @@ function setupAuthStateListener() {
             if (authManager) {
                 authManager.currentUser = user;
             }
-            
+
             // Don't setup dashboard if recovery key is being shown
             if (sessionStorage.getItem('showingRecoveryKey')) {
                 console.log('Recovery key modal is open, delaying dashboard setup');
                 return;
             }
-            
+
             setTimeout(() => {
                 setupDashboard(user);
             }, 2000);
@@ -74,14 +78,14 @@ function setupAuthStateListener() {
             document.getElementById('setup-section').style.display = 'none';
             document.getElementById('main-dashboard').style.display = 'none';
             authManager?.clearSession();
-            
+
             // Clear 2FA session data on sign out
             Object.keys(sessionStorage).forEach(key => {
                 if (key.startsWith('2fa_verified_')) {
                     sessionStorage.removeItem(key);
                 }
             });
-            
+
             if (window.location.pathname !== '/login.html') {
                 window.location.href = "login.html";
             }
@@ -94,27 +98,27 @@ let sessionValidationPaused = false;
 
 async function validateSession() {
     if (sessionValidationPaused || !authManager.currentUser || !shieldManager.currentSessionId) return true;
-    
+
     try {
         const sessionDoc = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('sessions').doc(shieldManager.currentSessionId).get();
-        
+
         if (!sessionDoc.exists) {
             // Check if this is a new account (no sessions created yet)
             const allSessions = await db.collection('players').doc(authManager.currentUser.uid)
                 .collection('sessions').get();
-            
+
             if (allSessions.empty) {
                 // New account, no sessions exist yet - this is normal
                 console.log('New account detected, no sessions exist yet');
                 return true;
             }
-            
+
             console.log('Session was revoked, signing out');
             // Clear the revoked session ID
             shieldManager.currentSessionId = null;
             sessionStorage.removeItem('nsomatrix_session_id');
-            
+
             // Sign out immediately - don't create new session
             showMessageBox('Session revoked from another device. Signing out...', 'warning', 2000);
             setTimeout(() => {
@@ -144,8 +148,9 @@ function initializeManagers() {
     socialManager = new SocialManager(authManager, db);
     shieldManager = new ShieldManager(authManager, db);
 
-    
+
     // Make managers globally available
+    window.authManager = authManager;
     window.friendsManager = friendsManager;
     window.messagingManager = messagingManager;
     window.socialManager = socialManager;
@@ -169,16 +174,16 @@ async function verify2FA(user) {
     return new Promise(async (resolve) => {
         // Pause session validation during 2FA
         sessionValidationPaused = true;
-        
+
         // Check what 2FA methods are enabled
         const doc = await db.collection('players').doc(user.uid).get();
         const data = doc.data() || {};
         const hasAuthenticator = data.authenticatorEnabled === true && data.totpSecret;
         const hasEmailTwoFactor = data.emailTwoFactorEnabled === true;
-        
+
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10002;display:flex;align-items:center;justify-content:center;';
-        
+
         let methodButtons = '';
         if (hasAuthenticator) {
             methodButtons += `
@@ -192,10 +197,10 @@ async function verify2FA(user) {
                     ✉️ Send Email Code
                 </button>`;
         }
-        
+
         // If only one method is enabled, show it directly
         const showMethodSelection = hasAuthenticator && hasEmailTwoFactor;
-        
+
         modal.innerHTML = `
             <div style="background:#1a1a1a;color:white;padding:40px;border-radius:16px;max-width:400px;text-align:center;border:1px solid #333;">
                 <h3 style="color:#00d4ff;margin-bottom:30px;">🔐 Two-Factor Authentication Required</h3>
@@ -216,9 +221,9 @@ async function verify2FA(user) {
                 <button id="signOutBtn" style="background:#dc3545;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin-top:20px;">Sign Out</button>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         const methodSelection = document.getElementById('authMethodSelection');
         const codeSection = document.getElementById('authCodeSection');
         const codePrompt = document.getElementById('codePrompt');
@@ -226,9 +231,9 @@ async function verify2FA(user) {
         const verifyBtn = document.getElementById('verifyCodeBtn');
         const backBtn = document.getElementById('backBtn');
         const signOutBtn = document.getElementById('signOutBtn');
-        
+
         let currentMethod = null;
-        
+
         // If only one method enabled, set it automatically
         if (hasAuthenticator && !hasEmailTwoFactor) {
             currentMethod = 'authenticator';
@@ -242,7 +247,7 @@ async function verify2FA(user) {
                 codePrompt.textContent = 'Failed to send email code. Please try again.';
             }
         }
-        
+
         // Authenticator app method
         if (hasAuthenticator) {
             document.getElementById('useAuthenticatorBtn')?.addEventListener('click', () => {
@@ -253,7 +258,7 @@ async function verify2FA(user) {
                 codeInput.focus();
             });
         }
-        
+
         // Email code method
         if (hasEmailTwoFactor) {
             document.getElementById('useEmailCodeBtn')?.addEventListener('click', async () => {
@@ -261,7 +266,7 @@ async function verify2FA(user) {
                 methodSelection.style.display = 'none';
                 codeSection.style.display = 'block';
                 codePrompt.textContent = 'Sending email code...';
-                
+
                 try {
                     await sendEmailCode(user.email);
                     codePrompt.textContent = 'Enter the code sent to your email:';
@@ -274,7 +279,7 @@ async function verify2FA(user) {
                 }
             });
         }
-        
+
         // Back button (only if multiple methods)
         if (backBtn) {
             backBtn.onclick = () => {
@@ -284,24 +289,24 @@ async function verify2FA(user) {
                 currentMethod = null;
             };
         }
-        
+
         // Verify code
         const verify = async () => {
             const code = codeInput.value.trim();
             console.log('Verifying code:', code, 'Method:', currentMethod);
-            
+
             if (!/^\d{6}$/.test(code)) {
                 console.log('Invalid code format');
                 showMessageBox('Please enter a valid 6-digit code', 'error', 3000);
                 return;
             }
-            
+
             verifyBtn.disabled = true;
             verifyBtn.textContent = 'Verifying...';
-            
+
             try {
                 let isValid = false;
-                
+
                 if (currentMethod === 'authenticator') {
                     console.log('Verifying with authenticator');
                     isValid = await verifyTOTPCode(data.totpSecret, code);
@@ -311,9 +316,9 @@ async function verify2FA(user) {
                     isValid = await verifyEmailCode(user.uid, code);
                     console.log('Email verification result:', isValid);
                 }
-                
+
                 console.log('Final verification result:', isValid);
-                
+
                 if (isValid) {
                     console.log('Verification successful, resolving');
                     sessionValidationPaused = false; // Resume session validation
@@ -337,21 +342,21 @@ async function verify2FA(user) {
                 }, 100);
             }
         };
-        
+
         // Use touchend for mobile compatibility
         verifyBtn.addEventListener('click', verify);
         verifyBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             verify();
         });
-        
+
         codeInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 verify();
             }
         });
-        
+
         // Mobile-specific input handling
         codeInput.addEventListener('input', (e) => {
             // Only allow numbers
@@ -361,13 +366,13 @@ async function verify2FA(user) {
                 setTimeout(() => verify(), 500);
             }
         });
-        
+
         signOutBtn.onclick = () => {
             sessionValidationPaused = false; // Resume session validation
             modal.remove();
             resolve(false);
         };
-        
+
         // Close on escape key
         const handleEscape = (e) => {
             if (e.key === 'Escape') {
@@ -378,7 +383,7 @@ async function verify2FA(user) {
             }
         };
         document.addEventListener('keydown', handleEscape);
-        
+
         // Close on background click
         modal.onclick = (e) => {
             if (e.target === modal) {
@@ -388,7 +393,7 @@ async function verify2FA(user) {
                 resolve(false);
             }
         };
-        
+
         // Focus input if code section is visible
         if (codeSection.style.display !== 'none') {
             codeInput.focus();
@@ -401,19 +406,19 @@ async function verifyTOTPCode(secret, token) {
         if (!secret || !token || token.length !== 6) {
             return false;
         }
-        
+
         const currentTime = Math.floor(Date.now() / 1000 / 30);
-        
+
         // Check current time and ±3 windows for mobile compatibility
         for (let drift = -3; drift <= 3; drift++) {
             const timeWindow = currentTime + drift;
             const expectedToken = await generateTOTP(secret, timeWindow);
-            
+
             if (expectedToken === token) {
                 return true;
             }
         }
-        
+
         return false;
     } catch (error) {
         console.error('TOTP verification error:', error);
@@ -427,30 +432,30 @@ async function generateTOTP(secret, timeWindow) {
         if (!key || key.length === 0) {
             throw new Error('Invalid secret key');
         }
-        
+
         // Create time buffer
         const timeBytes = new Uint8Array(8);
         const timeView = new DataView(timeBytes.buffer);
         timeView.setUint32(4, timeWindow, false);
-        
+
         // Use CryptoJS for mobile compatibility
         const keyWordArray = CryptoJS.lib.WordArray.create(key);
         const timeWordArray = CryptoJS.lib.WordArray.create(timeBytes);
-        
+
         const hmac = CryptoJS.HmacSHA1(timeWordArray, keyWordArray);
         const hmacBytes = new Uint8Array(hmac.sigBytes);
-        
+
         // Convert WordArray to Uint8Array
         for (let i = 0; i < hmac.sigBytes; i++) {
             hmacBytes[i] = (hmac.words[Math.floor(i / 4)] >>> (24 - (i % 4) * 8)) & 0xff;
         }
-        
+
         const offset = hmacBytes[hmacBytes.length - 1] & 0xf;
-        const code = ((hmacBytes[offset] & 0x7f) << 24) | 
-                    ((hmacBytes[offset + 1] & 0xff) << 16) | 
-                    ((hmacBytes[offset + 2] & 0xff) << 8) | 
-                    (hmacBytes[offset + 3] & 0xff);
-        
+        const code = ((hmacBytes[offset] & 0x7f) << 24) |
+            ((hmacBytes[offset + 1] & 0xff) << 16) |
+            ((hmacBytes[offset + 2] & 0xff) << 8) |
+            (hmacBytes[offset + 3] & 0xff);
+
         const result = (code % 1000000).toString().padStart(6, '0');
         return result;
     } catch (error) {
@@ -464,21 +469,21 @@ function base32ToBytes(base32) {
         if (!base32 || typeof base32 !== 'string') {
             throw new Error('Invalid base32 input');
         }
-        
+
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         const cleanBase32 = base32.toUpperCase().replace(/[^A-Z2-7]/g, '');
-        
+
         if (cleanBase32.length === 0) {
             throw new Error('Empty base32 string after cleaning');
         }
-        
+
         let bits = '';
         for (let char of cleanBase32) {
             const index = alphabet.indexOf(char);
             if (index === -1) continue;
             bits += index.toString(2).padStart(5, '0');
         }
-        
+
         const bytes = [];
         for (let i = 0; i < bits.length; i += 8) {
             const byte = bits.substring(i, i + 8);
@@ -486,7 +491,7 @@ function base32ToBytes(base32) {
                 bytes.push(parseInt(byte, 2));
             }
         }
-        
+
         return new Uint8Array(bytes);
     } catch (error) {
         console.error('Base32 decode error:', error);
@@ -497,21 +502,21 @@ function base32ToBytes(base32) {
 async function sendEmailCode(email) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
-    
+
     await db.collection('emailVerifications').doc(auth.currentUser.uid).set({
         code: verificationCode,
         expiry: expiry,
         used: false,
         email: email
     });
-    
+
     // Send email via EmailJS proxy
     const response = await fetch('https://emailjs-proxy.nsomtx.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: email, code: verificationCode })
     });
-    
+
     if (!response.ok) {
         throw new Error('Failed to send email');
     }
@@ -521,11 +526,11 @@ async function verifyEmailCode(uid, code) {
     try {
         const doc = await db.collection('emailVerifications').doc(uid).get();
         if (!doc.exists) return false;
-        
+
         const data = doc.data();
         if (data.used || Date.now() > data.expiry) return false;
         if (data.code !== code) return false;
-        
+
         // Mark as used
         await doc.ref.update({ used: true });
         return true;
@@ -587,7 +592,7 @@ async function saveProfile(user) {
         document.getElementById('dashboard-username').textContent = username;
         document.getElementById('user-avatar').src = `avatars/${selectedAvatar}`;
         setupUsernameTag(username, username);
-        
+
         setupNotificationHandlers();
         setupOnlinePresence();
         setupNotificationCounters();
@@ -604,14 +609,14 @@ async function saveProfile(user) {
 // Dashboard setup
 async function setupDashboard(user) {
     authManager.currentUser = user;
-    
+
     // Check if 2FA is required and verify it first
     const requires2FA = await check2FARequired(user);
     if (requires2FA) {
         // Check if 2FA was already verified in this session
         const sessionData = sessionStorage.getItem('2fa_verified_' + user.uid);
         const currentTime = Date.now();
-        
+
         let skipTwoFA = false;
         if (sessionData) {
             try {
@@ -625,7 +630,7 @@ async function setupDashboard(user) {
                 sessionStorage.removeItem('2fa_verified_' + user.uid);
             }
         }
-        
+
         if (skipTwoFA) {
             console.log('2FA already verified in this session');
         } else {
@@ -648,7 +653,7 @@ async function setupDashboard(user) {
             }
         }
     }
-    
+
     const playerDocRef = db.collection('players').doc(user.uid);
 
     try {
@@ -661,10 +666,10 @@ async function setupDashboard(user) {
         const lastLoginTimestamp = data.lastLogin;
 
         const keyRestored = await authManager.restoreEncryptionKey();
-        
+
         // Check if account was recovered from password reset
         const wasPasswordReset = await authManager.checkPasswordResetStatus();
-        
+
         // If key restoration failed or password was reset, show recovery key prompt
         if ((!keyRestored && data.encryptedMasterKey) || wasPasswordReset) {
             setTimeout(() => {
@@ -682,7 +687,7 @@ async function setupDashboard(user) {
 
         if (!hasUsername || !hasAvatar) {
             if (allAvatars.length === 0) await loadAvatars();
-            
+
             document.getElementById('setup-section').style.display = 'block';
             document.getElementById('main-dashboard').style.display = 'none';
             closeModal(document.getElementById('masterPasswordPromptModal'));
@@ -691,7 +696,7 @@ async function setupDashboard(user) {
             if (window.initGameSetup) {
                 window.initGameSetup();
             }
-            
+
             return;
         }
 
@@ -701,15 +706,15 @@ async function setupDashboard(user) {
         document.getElementById('setup-section').style.display = 'none';
         document.getElementById('main-dashboard').style.display = 'block';
         closeModal(document.getElementById('masterPasswordPromptModal'));
-        
 
-        
+
+
         setupNotificationHandlers();
         setupOnlinePresence();
         setupNotificationCounters();
-        
 
-        
+
+
         // Initialize Shield features
         if (shieldManager) {
             await shieldManager.createSession();
@@ -739,7 +744,7 @@ function setupEventListeners() {
     // Avatar navigation
     const prevAvatarBtn = document.getElementById('prevAvatarBtn');
     const nextAvatarBtn = document.getElementById('nextAvatarBtn');
-    
+
     if (prevAvatarBtn) {
         prevAvatarBtn.onclick = () => {
             currentAvatarIndex = (currentAvatarIndex - 1 + allAvatars.length) % allAvatars.length;
@@ -773,7 +778,7 @@ function setupEventListeners() {
             const masterPassword = document.getElementById('masterPasswordUnlockInput').value.trim();
             const confirmPassword = document.getElementById('confirmMasterPasswordInput').value.trim();
             const isSetupMode = document.getElementById('confirmMasterPasswordInput').style.display !== 'none';
-            
+
             unlockDashboardBtn.disabled = true;
             unlockDashboardBtn.textContent = isSetupMode ? "Setting up..." : "Unlocking...";
 
@@ -783,17 +788,17 @@ function setupEventListeners() {
             } else {
                 success = await authManager.unlockDashboard(masterPassword);
             }
-            
+
             if (success) {
                 const masterPasswordPromptModal = document.getElementById('masterPasswordPromptModal');
                 closeModal(masterPasswordPromptModal);
                 document.getElementById('masterPasswordUnlockInput').value = '';
                 document.getElementById('confirmMasterPasswordInput').value = '';
-                
+
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
                 const passwordManagerModal = document.getElementById('passwordManagerModal');
-                
+
                 if (notesModal.dataset.pendingOpen === 'true') {
                     openModal(notesModal);
                     notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
@@ -825,18 +830,18 @@ function setupEventListeners() {
             const recoveryKey = document.getElementById('recoveryKeyInput').value.trim();
             recoverBtn.disabled = true;
             recoverBtn.textContent = 'Recovering...';
-            
+
             // Mark recovery in progress
             sessionStorage.setItem('recoveryInProgress', 'true');
-            
+
             if (await recoverWithKey(recoveryKey)) {
                 closeModal(document.getElementById('recoveryKeyModal'));
                 document.getElementById('recoveryKeyInput').value = '';
-                
+
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
                 const passwordManagerModal = document.getElementById('passwordManagerModal');
-                
+
                 if (notesModal.dataset.pendingOpen === 'true') {
                     openModal(notesModal);
                     notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
@@ -847,7 +852,7 @@ function setupEventListeners() {
                     passwordManagerModal.dataset.pendingOpen = 'false';
                 }
             }
-            
+
             // Clean up recovery flag
             sessionStorage.removeItem('recoveryInProgress');
             recoverBtn.disabled = false;
@@ -876,22 +881,22 @@ function setupEventListeners() {
             });
         }
     }, 1000);
-    
+
     const syncPasswordBtn = document.getElementById('syncPasswordBtn');
     if (syncPasswordBtn) {
         syncPasswordBtn.onclick = async () => {
             const currentPassword = document.getElementById('syncPasswordInput').value.trim();
             syncPasswordBtn.disabled = true;
             syncPasswordBtn.textContent = 'Syncing...';
-            
+
             if (await syncWithCurrentPassword(currentPassword)) {
                 document.getElementById('syncPasswordSection').style.display = 'none';
                 closeModal(document.getElementById('masterPasswordPromptModal'));
-                
+
                 // Handle pending modal opens
                 const notesModal = document.getElementById('notesModal');
                 const passwordManagerModal = document.getElementById('passwordManagerModal');
-                
+
                 if (notesModal.dataset.pendingOpen === 'true') {
                     openModal(notesModal);
                     notesManager.loadNotes(document.getElementById('savedNotesDisplay'));
@@ -902,12 +907,12 @@ function setupEventListeners() {
                     passwordManagerModal.dataset.pendingOpen = 'false';
                 }
             }
-            
+
             syncPasswordBtn.disabled = false;
             syncPasswordBtn.textContent = 'Sync Password';
         };
     }
-    
+
     const toggleSyncPassword = document.getElementById('toggleSyncPassword');
     if (toggleSyncPassword) {
         toggleSyncPassword.addEventListener('click', () => {
@@ -953,7 +958,7 @@ function setupFeatureButtons() {
         notesBtn.onclick = async () => {
             if (notesClickTimeout) return;
             notesClickTimeout = setTimeout(() => { notesClickTimeout = null; }, 500);
-            
+
             if (!authManager.currentEncryptionKey) {
                 showMasterPasswordPrompt('notesModal');
                 return;
@@ -969,7 +974,7 @@ function setupFeatureButtons() {
         passwordManagerBtn.onclick = async () => {
             if (pmClickTimeout) return;
             pmClickTimeout = setTimeout(() => { pmClickTimeout = null; }, 500);
-            
+
             if (!authManager.currentEncryptionKey) {
                 showMasterPasswordPrompt('passwordManagerModal');
                 return;
@@ -996,7 +1001,7 @@ function setupFeatureButtons() {
             friendsClickTimeout = setTimeout(() => {
                 friendsClickTimeout = null;
             }, 500);
-            
+
             openModal(document.getElementById('friendsModal'));
             friendsManager.loadFriendsList();
         };
@@ -1008,7 +1013,7 @@ function setupFeatureButtons() {
         securityBtn.onclick = async () => {
             if (securityClickTimeout) return;
             securityClickTimeout = setTimeout(() => { securityClickTimeout = null; }, 500);
-            
+
             openModal(document.getElementById('shieldModal'));
             await shieldManager.loadShieldData();
         };
@@ -1035,7 +1040,7 @@ function setupModalHandlers() {
             const serviceName = document.getElementById('pmServiceName').value.trim();
             const pmUsername = document.getElementById('pmUsername').value.trim();
             const pmPassword = document.getElementById('pmPassword').value.trim();
-            
+
             const success = await passwordManager.savePassword(serviceName, pmUsername, pmPassword);
             if (success) {
                 document.getElementById('pmServiceName').value = '';
@@ -1061,21 +1066,21 @@ function setupModalHandlers() {
                 if (modal) closeModal(modal);
             }
         };
-        
+
         button.addEventListener('click', handleClose);
         button.addEventListener('touchend', (e) => {
             e.preventDefault();
             handleClose(e);
         });
     });
-    
+
     // Close modals when clicking outside
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             closeModal(e.target);
         }
     });
-    
+
     // Close modals on escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -1148,7 +1153,7 @@ function setupDeleteHandlers() {
                     const data = doc.data();
                     const updatedMembers = data.members.filter(member => member !== uid);
                     const updatedAdmins = (data.admins || []).filter(admin => admin !== uid);
-                    
+
                     if (updatedMembers.length === 0) {
                         // Delete group if no members left
                         deletePromises.push(doc.ref.delete());
@@ -1214,7 +1219,7 @@ function setupDeleteHandlers() {
     if (confirmUnfriendBtn) {
         confirmUnfriendBtn.onclick = () => friendsManager.confirmRemoveFriend();
     }
-    
+
     const cancelUnfriendBtn = document.getElementById('cancelUnfriendBtn');
     if (cancelUnfriendBtn) {
         cancelUnfriendBtn.onclick = () => {
@@ -1240,7 +1245,7 @@ function setupSearchAndMessaging() {
     // Search functionality
     const searchIcon = document.getElementById('searchIcon');
     const userSearch = document.getElementById('userSearch');
-    
+
     if (searchIcon) {
         searchIcon.onclick = () => {
             socialManager.performUserSearch();
@@ -1274,20 +1279,20 @@ function setupSearchAndMessaging() {
                 messagingManager.sendMessage();
             }
         };
-        
+
         messageInput.oninput = () => {
             messageInput.style.height = 'auto';
             messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
             messagingManager.handleTyping(messageInput);
         };
-        
+
         messageInput.onfocus = () => {
             setTimeout(() => {
                 const messagesList = document.getElementById('messagesList');
                 messagesList.scrollTop = messagesList.scrollHeight;
             }, 300);
         };
-        
+
         messageInput.onblur = () => {
             messagingManager.stopTyping();
         };
@@ -1301,25 +1306,25 @@ function setupSearchAndMessaging() {
 // Username tag functionality
 function setupUsernameTag(usernameTag, displayName) {
     const usernameTagElement = document.getElementById('username-tag');
-    
+
     if (usernameTag) {
         usernameTagElement.textContent = `@${usernameTag}`;
         usernameTagElement.classList.remove('editable');
     } else {
         usernameTagElement.textContent = 'Set username';
         usernameTagElement.classList.add('editable');
-        
+
         usernameTagElement.onclick = () => {
             const input = document.createElement('input');
             input.type = 'text';
             input.className = 'username-input';
             input.placeholder = 'Enter username';
             input.maxLength = 20;
-            
+
             usernameTagElement.innerHTML = '';
             usernameTagElement.appendChild(input);
             input.focus();
-            
+
             const saveUsername = async () => {
                 const newUsername = input.value.trim().replace(/[^a-zA-Z0-9_]/g, '');
                 if (newUsername && authManager.currentUser) {
@@ -1338,7 +1343,7 @@ function setupUsernameTag(usernameTag, displayName) {
                     usernameTagElement.textContent = 'Set username';
                 }
             };
-            
+
             input.onblur = saveUsername;
             input.onkeydown = (e) => {
                 if (e.key === 'Enter') saveUsername();
@@ -1375,11 +1380,11 @@ async function loadRecentChats() {
         document.getElementById('messageModalTitle').textContent = 'Recent Chats';
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '<button id="createGroupBtn" style="position: absolute; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; color: white; border: none; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100;"><i class="fas fa-users"></i></button>';
-        
+
         // Load group chats
         const groupChatsSnapshot = await db.collection('groupChats')
             .where('members', 'array-contains', authManager.currentUser.uid).get();
-        
+
         for (const doc of groupChatsSnapshot.docs) {
             const group = doc.data();
             const chatItem = document.createElement('div');
@@ -1404,17 +1409,17 @@ async function loadRecentChats() {
             `;
             messagesList.appendChild(chatItem);
         }
-        
+
         // Load friend chats
         const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friends').where('status', '==', 'accepted').get();
-        
+
         for (const doc of friendsSnapshot.docs) {
             const friend = doc.data();
             const friendProfile = await db.collection('players').doc(friend.friendId).get();
             const friendData = friendProfile.data();
             const onlineStatus = await friendsManager.getOnlineStatus(friend.friendId);
-            
+
             const chatItem = document.createElement('div');
             chatItem.className = 'friend-item';
             chatItem.style.cursor = 'pointer';
@@ -1436,7 +1441,7 @@ async function loadRecentChats() {
             `;
             messagesList.appendChild(chatItem);
         }
-        
+
         if (groupChatsSnapshot.empty && friendsSnapshot.empty) {
             messagesList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No chats available</p>';
         }
@@ -1449,20 +1454,20 @@ async function loadFriendsForGroup() {
     try {
         const friendsSelection = document.getElementById('friendsSelection');
         friendsSelection.innerHTML = '';
-        
+
         const friendsSnapshot = await db.collection('players').doc(authManager.currentUser.uid)
             .collection('friends').where('status', '==', 'accepted').get();
-        
+
         if (friendsSnapshot.empty) {
             friendsSelection.innerHTML = '<p style="text-align: center; color: #888;">No friends available</p>';
             return;
         }
-        
+
         for (const doc of friendsSnapshot.docs) {
             const friend = doc.data();
             const friendProfile = await db.collection('players').doc(friend.friendId).get();
             const friendData = friendProfile.data();
-            
+
             const friendItem = document.createElement('div');
             friendItem.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid #333; border-radius: 4px; margin-bottom: 8px;';
             friendItem.innerHTML = `
@@ -1484,13 +1489,13 @@ function setupNotificationHandlers() {
     setTimeout(() => {
         const notificationIcon = document.getElementById('notificationIcon');
         const messageIcon = document.getElementById('messageIcon');
-        
+
         if (notificationIcon) {
             let notificationClickTimeout;
-            notificationIcon.addEventListener('click', function(e) {
+            notificationIcon.addEventListener('click', function (e) {
                 if (notificationClickTimeout) return;
                 notificationClickTimeout = setTimeout(() => { notificationClickTimeout = null; }, 500);
-                
+
                 e.preventDefault();
                 e.stopPropagation();
                 openModal(document.getElementById('notificationsModal'));
@@ -1498,19 +1503,19 @@ function setupNotificationHandlers() {
                 updateNotificationBadge(0);
             });
         }
-        
+
         if (messageIcon) {
             let messageClickTimeout;
-            messageIcon.addEventListener('click', function(e) {
+            messageIcon.addEventListener('click', function (e) {
                 if (messageClickTimeout) return;
                 messageClickTimeout = setTimeout(() => { messageClickTimeout = null; }, 500);
-                
+
                 e.preventDefault();
                 e.stopPropagation();
                 const messageInputContainer = document.querySelector('.message-input-container');
                 if (messageInputContainer) messageInputContainer.style.display = 'none';
-                
-                
+
+
                 openModal(document.getElementById('messagesModal'));
                 loadRecentChats();
             });
@@ -1521,26 +1526,26 @@ function setupNotificationHandlers() {
 // Online presence system
 function setupOnlinePresence() {
     const userStatusRef = db.collection('presence').doc(authManager.currentUser.uid);
-    
+
     userStatusRef.set({
         isOnline: true,
         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
+
     const handleBeforeUnload = () => {
         userStatusRef.set({
             isOnline: false,
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         });
     };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     // Cleanup function
     window.cleanupPresence = () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-    
+
     setInterval(() => {
         userStatusRef.update({
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -1557,7 +1562,7 @@ function setupNotificationCounters() {
         .onSnapshot(snapshot => {
             updateNotificationBadge(snapshot.size);
         });
-    
+
     db.collection('players').doc(authManager.currentUser.uid)
         .collection('notifications').where('read', '==', false)
         .onSnapshot(snapshot => {
@@ -1565,14 +1570,14 @@ function setupNotificationCounters() {
             const friendRequests = parseInt(document.getElementById('notificationBadge').dataset.friendRequests) || 0;
             updateNotificationBadge(friendRequests + snapshot.size);
         });
-    
+
     db.collection('messages')
         .where('participants', 'array-contains', authManager.currentUser.uid)
         .onSnapshot(snapshot => {
             let unreadCount = 0;
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if (data.senderId !== authManager.currentUser.uid && 
+                if (data.senderId !== authManager.currentUser.uid &&
                     (!data.readBy || !data.readBy.includes(authManager.currentUser.uid))) {
                     unreadCount++;
                 }
@@ -1615,39 +1620,39 @@ async function setupMasterPassword(masterPassword, confirmPassword) {
         showMessageBox('Please fill in both fields', 'error');
         return false;
     }
-    
+
     if (masterPassword !== confirmPassword) {
         showMessageBox('Passwords do not match', 'error');
         return false;
     }
-    
+
     if (masterPassword.length < 8) {
         showMessageBox('Master password must be at least 8 characters', 'error');
         return false;
     }
-    
+
     try {
         const userSalt = generateSalt();
         const derivedKey = await deriveKey(masterPassword, userSalt);
         const masterPasswordHash = derivedKey.toString(CryptoJS.enc.Hex);
-        
+
         await db.collection('players').doc(authManager.currentUser.uid).update({
             salt: userSalt,
             masterPasswordHash: masterPasswordHash,
             hasMasterPassword: true
         });
-        
+
         authManager.currentEncryptionKey = derivedKey;
         authManager.secureStoreKey('currentEncryptionKeyHex', derivedKey.toString(CryptoJS.enc.Hex));
-        
+
         // Generate recovery key
         const recoveryKey = generateRecoveryKey();
         const encryptedMasterKey = encryptWithRecoveryKey(derivedKey.toString(CryptoJS.enc.Hex), recoveryKey);
-        
+
         await db.collection('players').doc(authManager.currentUser.uid).update({
             encryptedMasterKey: encryptedMasterKey
         });
-        
+
         showRecoveryKey(recoveryKey);
         showMessageBox('Master password set successfully!', 'success');
         return true;
@@ -1702,7 +1707,7 @@ function showRecoveryKey(recoveryKey) {
         </div>
     `;
     document.body.appendChild(modal);
-    
+
     document.getElementById('recoveryKeySaved').onclick = () => {
         document.body.removeChild(modal);
     };
@@ -1713,41 +1718,41 @@ async function recoverWithKey(recoveryKey) {
         showMessageBox('Please enter a valid 32-character recovery key', 'error');
         return false;
     }
-    
+
     // Validate recovery key format and entropy
     if (!/^[A-Za-z0-9]{32}$/.test(recoveryKey)) {
         showMessageBox('Invalid recovery key format', 'error');
         return false;
     }
-    
+
     // Check for minimum entropy (no repeated patterns)
     const uniqueChars = new Set(recoveryKey).size;
     if (uniqueChars < 16) {
         showMessageBox('Invalid recovery key - insufficient entropy', 'error');
         return false;
     }
-    
+
     try {
         const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
         const data = playerDoc.data();
-        
+
         if (!data.encryptedMasterKey) {
             showMessageBox('No recovery key found for this account', 'error');
             return false;
         }
-        
+
         const oldMasterKeyHex = decryptWithRecoveryKey(data.encryptedMasterKey, recoveryKey);
         if (!oldMasterKeyHex) {
             showMessageBox('Invalid recovery key', 'error');
             return false;
         }
-        
+
         // Temporarily set old key to decrypt existing data
         const oldKey = CryptoJS.enc.Hex.parse(oldMasterKeyHex);
-        
+
         // Re-encrypt all existing data with new password-derived key
         await reencryptUserData(oldKey);
-        
+
         showMessageBox('Access recovered successfully! You can now use your new password.', 'success');
         return true;
     } catch (error) {
@@ -1761,32 +1766,32 @@ async function syncWithNewPassword(recoveredKeyHex) {
     try {
         const user = authManager.currentUser;
         if (!user) return false;
-        
+
         const currentPassword = sessionStorage.getItem('tempLoginPassword');
-        
+
         if (currentPassword) {
             // Use the new password to derive the encryption key
             const newSalt = generateSalt();
             const newDerivedKey = await deriveKey(currentPassword, newSalt);
             const newMasterPasswordHash = newDerivedKey.toString(CryptoJS.enc.Hex);
-            
+
             // Generate new recovery key for the new derived key
             const newRecoveryKey = generateRecoveryKey();
             const newEncryptedMasterKey = encryptWithRecoveryKey(newMasterPasswordHash, newRecoveryKey);
-            
+
             await db.collection('players').doc(user.uid).update({
                 salt: newSalt,
                 masterPasswordHash: newMasterPasswordHash,
                 encryptedMasterKey: newEncryptedMasterKey,
                 recoveredFromKey: false
             });
-            
+
             // Set the new derived key as the current encryption key
             authManager.currentEncryptionKey = newDerivedKey;
             const sessionKey = CryptoJS.SHA256(navigator.userAgent + window.location.origin).toString();
             const encrypted = CryptoJS.AES.encrypt(newMasterPasswordHash, sessionKey).toString();
             sessionStorage.setItem('currentEncryptionKeyHex', encrypted);
-            
+
             sessionStorage.removeItem('tempLoginPassword');
             showRecoveryKey(newRecoveryKey);
         } else {
@@ -1794,7 +1799,7 @@ async function syncWithNewPassword(recoveredKeyHex) {
                 recoveredFromKey: false
             });
         }
-        
+
         return true;
     } catch (error) {
         console.error('Sync error:', error);
@@ -1805,20 +1810,20 @@ async function syncWithNewPassword(recoveredKeyHex) {
 async function reencryptUserData(oldKey) {
     const user = authManager.currentUser;
     const currentPassword = sessionStorage.getItem('tempLoginPassword');
-    
+
     if (!currentPassword) return;
-    
+
     // Generate new encryption setup
     const newSalt = generateSalt();
     const newKey = await deriveKey(currentPassword, newSalt);
     const newMasterPasswordHash = newKey.toString(CryptoJS.enc.Hex);
-    
+
     // Re-encrypt notes
     const notesRef = db.collection('players').doc(user.uid).collection('notes');
     const notesSnapshot = await notesRef.get();
-    
+
     const batch = db.batch();
-    
+
     notesSnapshot.forEach(doc => {
         const data = doc.data();
         if (data.content) {
@@ -1831,11 +1836,11 @@ async function reencryptUserData(oldKey) {
             }
         }
     });
-    
+
     // Re-encrypt passwords
     const passwordsRef = db.collection('players').doc(user.uid).collection('passwords');
     const passwordsSnapshot = await passwordsRef.get();
-    
+
     passwordsSnapshot.forEach(doc => {
         const data = doc.data();
         if (data.password) {
@@ -1846,25 +1851,25 @@ async function reencryptUserData(oldKey) {
             }
         }
     });
-    
+
     // Update player document
     const newRecoveryKey = generateRecoveryKey();
     const newEncryptedMasterKey = encryptWithRecoveryKey(newMasterPasswordHash, newRecoveryKey);
-    
+
     batch.update(db.collection('players').doc(user.uid), {
         salt: newSalt,
         masterPasswordHash: newMasterPasswordHash,
         encryptedMasterKey: newEncryptedMasterKey,
         recoveredFromKey: false
     });
-    
+
     await batch.commit();
-    
+
     // Set new key as current
     authManager.currentEncryptionKey = newKey;
     authManager.secureStoreKey('currentEncryptionKeyHex', newMasterPasswordHash);
     sessionStorage.removeItem('tempLoginPassword');
-    
+
     showRecoveryKey(newRecoveryKey);
 }
 
@@ -1873,34 +1878,34 @@ async function syncWithCurrentPassword(currentPassword) {
         showMessageBox('Please enter your current password', 'error');
         return false;
     }
-    
+
     if (!window.tempRecoveredKey) {
         showMessageBox('No recovery key found. Please try again.', 'error');
         return false;
     }
-    
+
     try {
         const playerDoc = await db.collection('players').doc(authManager.currentUser.uid).get();
         const data = playerDoc.data();
         const newDerivedKey = await deriveKey(currentPassword, data.salt);
         const newMasterPasswordHash = newDerivedKey.toString(CryptoJS.enc.Hex);
-        
+
         // Generate new recovery key for the new password
         const newRecoveryKey = generateRecoveryKey();
         const newEncryptedMasterKey = encryptWithRecoveryKey(newMasterPasswordHash, newRecoveryKey);
-        
+
         await db.collection('players').doc(authManager.currentUser.uid).update({
             masterPasswordHash: newMasterPasswordHash,
             encryptedMasterKey: newEncryptedMasterKey
         });
-        
+
         // Set the correct encryption key
         authManager.currentEncryptionKey = CryptoJS.enc.Hex.parse(window.tempRecoveredKey);
         authManager.secureStoreKey('currentEncryptionKeyHex', window.tempRecoveredKey);
-        
+
         // Clean up
         delete window.tempRecoveredKey;
-        
+
         showMessageBox('Password synced successfully! You can now use your login password.', 'success');
         return true;
     } catch (error) {
@@ -1914,7 +1919,7 @@ async function syncWithCurrentPassword(currentPassword) {
 async function showMasterPasswordPrompt(targetModal) {
     // Check if account was recovered from password reset
     const wasPasswordReset = await authManager.checkPasswordResetStatus();
-    
+
     if (wasPasswordReset) {
         // For password reset accounts, show recovery key modal instead
         document.getElementById(targetModal).dataset.pendingOpen = 'true';
@@ -1932,28 +1937,28 @@ async function showMasterPasswordPrompt(targetModal) {
 }
 
 // Initialize application
-$(document).ready(function() {
+$(document).ready(function () {
     setupEventListeners();
     loadAvatars();
     new DesktopDashboard();
-    
+
     // Group chat handlers
-    $(document).on('click', '#createGroupBtn', function(e) {
+    $(document).on('click', '#createGroupBtn', function (e) {
         e.preventDefault();
         e.stopPropagation();
         openModal(document.getElementById('createGroupModal'));
         loadFriendsForGroup();
     });
-    
-    $(document).on('click', '#createGroupChatBtn', async function() {
+
+    $(document).on('click', '#createGroupChatBtn', async function () {
         const groupName = document.getElementById('groupNameInput').value.trim();
         const selectedFriends = Array.from(document.querySelectorAll('#friendsSelection input:checked')).map(cb => cb.value);
-        
+
         if (!groupName || selectedFriends.length === 0) {
             showMessageBox('Please enter group name and select friends', 'error', 3000);
             return;
         }
-        
+
         try {
             const groupId = await messagingManager.createGroupChat(groupName, selectedFriends);
             closeModal(document.getElementById('createGroupModal'));
