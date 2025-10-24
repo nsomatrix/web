@@ -335,6 +335,15 @@ class EmulatorsManager {
 
     for (const repo of githubRepos) {
       try {
+        // Check cache first
+        const cached = this.getCachedReleases(repo);
+        if (cached) {
+          console.log(`Using cached releases for ${repo} (${cached.releases.length} releases)`);
+          this.githubReleases[repo] = cached.releases;
+          this.updateEmulatorWithLatestRelease(repo, cached.releases);
+          continue;
+        }
+
         console.log(`Fetching releases for ${repo}...`);
 
         // Fetch all pages of releases
@@ -363,7 +372,14 @@ class EmulatorsManager {
           } else {
             console.warn(`GitHub API returned ${response.status} for ${repo}`);
             if (response.status === 403) {
-              console.warn('GitHub API rate limit may be exceeded');
+              console.warn('GitHub API rate limit exceeded - using cached data if available');
+              // Try to use expired cache as fallback
+              const expiredCache = this.getCachedReleases(repo, true);
+              if (expiredCache) {
+                console.log(`Using expired cache for ${repo}`);
+                this.githubReleases[repo] = expiredCache.releases;
+                this.updateEmulatorWithLatestRelease(repo, expiredCache.releases);
+              }
             }
             hasMore = false;
           }
@@ -384,19 +400,105 @@ class EmulatorsManager {
           return true;
         });
 
-        this.githubReleases[repo] = filteredReleases;
-        console.log(`Total loaded: ${filteredReleases.length} unique releases for ${repo}`);
+        if (filteredReleases.length > 0) {
+          this.githubReleases[repo] = filteredReleases;
+          console.log(`Total loaded: ${filteredReleases.length} unique releases for ${repo}`);
 
-        // Update emulator data with latest release info
-        this.updateEmulatorWithLatestRelease(repo, filteredReleases);
+          // Cache the releases
+          this.cacheReleases(repo, filteredReleases);
+
+          // Update emulator data with latest release info
+          this.updateEmulatorWithLatestRelease(repo, filteredReleases);
+        }
 
       } catch (error) {
         console.warn(`Failed to load releases for ${repo}:`, error);
+        // Try to use cached data as fallback
+        const fallbackCache = this.getCachedReleases(repo, true);
+        if (fallbackCache) {
+          console.log(`Using fallback cache for ${repo}`);
+          this.githubReleases[repo] = fallbackCache.releases;
+          this.updateEmulatorWithLatestRelease(repo, fallbackCache.releases);
+        }
       }
     }
 
     // Re-render table after loading releases
     this.renderTable();
+  }
+
+  getCachedReleases(repo, ignoreExpiry = false) {
+    try {
+      const cacheKey = `github_releases_${repo.replace('/', '_')}`;
+      const cached = localStorage.getItem(cacheKey);
+
+      if (!cached) return null;
+
+      const data = JSON.parse(cached);
+      const now = Date.now();
+      const cacheAge = now - data.timestamp;
+      const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+
+      // Return cached data if not expired or if ignoring expiry
+      if (ignoreExpiry || cacheAge < cacheExpiry) {
+        return data;
+      }
+
+      return null;
+    } catch (error) {
+      console.warn(`Failed to read cache for ${repo}:`, error);
+      return null;
+    }
+  }
+
+  cacheReleases(repo, releases) {
+    try {
+      const cacheKey = `github_releases_${repo.replace('/', '_')}`;
+      const data = {
+        timestamp: Date.now(),
+        releases: releases
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      console.log(`Cached ${releases.length} releases for ${repo}`);
+    } catch (error) {
+      console.warn(`Failed to cache releases for ${repo}:`, error);
+      // If localStorage is full, try to clear old caches
+      if (error.name === 'QuotaExceededError') {
+        this.clearOldCaches();
+        // Try again
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+        } catch (e) {
+          console.warn('Still failed to cache after cleanup');
+        }
+      }
+    }
+  }
+
+  clearOldCaches() {
+    try {
+      const keys = Object.keys(localStorage);
+      const githubCacheKeys = keys.filter(key => key.startsWith('github_releases_'));
+
+      // Sort by timestamp and remove oldest
+      const caches = githubCacheKeys.map(key => {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          return { key, timestamp: data.timestamp || 0 };
+        } catch {
+          return { key, timestamp: 0 };
+        }
+      }).sort((a, b) => a.timestamp - b.timestamp);
+
+      // Remove oldest half
+      const toRemove = Math.ceil(caches.length / 2);
+      for (let i = 0; i < toRemove; i++) {
+        localStorage.removeItem(caches[i].key);
+        console.log(`Removed old cache: ${caches[i].key}`);
+      }
+    } catch (error) {
+      console.warn('Failed to clear old caches:', error);
+    }
   }
 
   updateEmulatorWithLatestRelease(repo, releases) {
