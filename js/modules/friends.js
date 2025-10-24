@@ -5,15 +5,19 @@ export class FriendsManager {
         this.authManager = authManager;
         this.db = db;
         this.friendToRemove = null;
+        this.isLoading = false;
     }
 
     async loadFriendsList() {
+        if (this.isLoading) return;
+        this.isLoading = true;
+        
         try {
-            const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
-                .collection('friends').where('status', '==', 'accepted').get();
-
             const friendsList = document.getElementById('friendsList');
             friendsList.innerHTML = '';
+            
+            const snapshot = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('friends').where('status', '==', 'accepted').get();
 
             if (snapshot.empty) {
                 friendsList.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No friends yet</p>';
@@ -54,6 +58,8 @@ export class FriendsManager {
             }
         } catch (error) {
             console.error('Load friends error:', error);
+        } finally {
+            this.isLoading = false;
         }
     }
 

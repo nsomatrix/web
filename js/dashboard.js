@@ -982,7 +982,13 @@ function setupFeatureButtons() {
 
     const friendsBtn = document.getElementById('friendsBtn');
     if (friendsBtn) {
+        let friendsClickTimeout;
         friendsBtn.onclick = () => {
+            if (friendsClickTimeout) return;
+            friendsClickTimeout = setTimeout(() => {
+                friendsClickTimeout = null;
+            }, 500);
+            
             openModal(document.getElementById('friendsModal'));
             friendsManager.loadFriendsList();
         };
