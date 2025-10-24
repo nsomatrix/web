@@ -1394,7 +1394,43 @@ async function loadRecentChats() {
     try {
         document.getElementById('messageModalTitle').textContent = 'Recent Chats';
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = '<button id="createGroupBtn" style="position: absolute; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; color: white; border: none; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100;"><i class="fas fa-users"></i></button>';
+        messagesList.innerHTML = '';
+        
+        // Create floating button and add it to the body (truly fixed position)
+        let createGroupBtn = document.getElementById('createGroupBtn');
+        if (!createGroupBtn) {
+            createGroupBtn = document.createElement('button');
+            createGroupBtn.id = 'createGroupBtn';
+            createGroupBtn.innerHTML = '<i class="fas fa-users"></i>';
+            createGroupBtn.style.position = 'fixed';
+            createGroupBtn.style.bottom = '80px';
+            createGroupBtn.style.right = '30px';
+            createGroupBtn.style.width = '56px';
+            createGroupBtn.style.height = '56px';
+            createGroupBtn.style.borderRadius = '50%';
+            createGroupBtn.style.background = '#e74c3c';
+            createGroupBtn.style.color = 'white';
+            createGroupBtn.style.border = 'none';
+            createGroupBtn.style.fontSize = '18px';
+            createGroupBtn.style.cursor = 'pointer';
+            createGroupBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+            createGroupBtn.style.zIndex = '10001';
+            createGroupBtn.style.display = 'block';
+            document.body.appendChild(createGroupBtn);
+            
+            // Add click event listener
+            createGroupBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openModal(document.getElementById('createGroupModal'));
+                loadFriendsForGroup();
+            });
+        } else {
+            createGroupBtn.style.display = 'block';
+        }
+        
+        // Debug: Log button creation
+        console.log('Create group button created/shown:', createGroupBtn);
 
         // Load group chats
         const groupChatsSnapshot = await db.collection('groupChats')

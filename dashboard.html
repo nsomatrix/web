@@ -320,7 +320,8 @@
             <div style="padding: 16px; border-bottom: 1px solid #333; background: #2d2d2d; position: relative;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                    <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'"
+                    <span class="close-button"
+                        onclick="document.getElementById('messagesModal').style.display='none'; const btn = document.getElementById('createGroupBtn'); if(btn) btn.style.display='none';"
                         style="cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
                 </div>
                 <button id="manageGroupBtn"
@@ -341,6 +342,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <div id="unfriendConfirmModal" class="modal" style="display:none;">
@@ -447,99 +449,101 @@
 
     <div id="shieldModal" class="modal" style="display:none;">
         <div class="modal-content shield-modal"
-            style="max-width: 90vw; width: 700px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;"></div>
-        <span class="close-button" data-modal="shieldModal">&times;</span>
-        <div class="shield-header">
-            <h3><i class="fas fa-shield-alt"></i> Security & Privacy</h3>
-            <div class="security-score">
-                <div class="score-circle" id="securityScoreCircle">
-                    <span id="securityScoreText">--</span>
+            style="max-width: 90vw; width: 700px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
+            <span class="close-button" data-modal="shieldModal">&times;</span>
+            <div class="shield-header">
+                <h3><i class="fas fa-shield-alt"></i> Security & Privacy</h3>
+                <div class="security-score">
+                    <div class="score-circle" id="securityScoreCircle">
+                        <span id="securityScoreText">--</span>
+                    </div>
+                    <span class="score-label">Security Score</span>
                 </div>
-                <span class="score-label">Security Score</span>
+            </div>
+            <div class="shield-sections">
+                <div class="shield-section">
+                    <div class="section-header">
+                        <i class="fas fa-desktop"></i>
+                        <h4>Active Sessions</h4>
+                        <span class="count-badge" id="sessionCount">--</span>
+                    </div>
+                    <div class="section-content">
+                        <div id="sessionsList"></div>
+                        <button class="btn btn-danger btn-sm" onclick="shieldManager.revokeAllSessionsUI()">Sign Out All
+                            Other Sessions</button>
+                    </div>
+                </div>
+                <div class="shield-section">
+                    <div class="section-header" onclick="shieldManager.toggleSection('recent-activity')">
+                        <i class="fas fa-history"></i>
+                        <h4>Recent Activity</h4>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="count-badge" id="loginCount">--</span>
+                            <i class="fas fa-chevron-down section-toggle" id="recent-activity-toggle"></i>
+                        </div>
+                    </div>
+                    <div class="section-content" id="recent-activity-content">
+                        <div id="loginHistoryList"></div>
+                    </div>
+                </div>
+                <div class="shield-section">
+                    <div class="section-header">
+                        <i class="fas fa-fingerprint"></i>
+                        <h4>Two-Factor Authentication</h4>
+                    </div>
+                    <div class="section-content">
+                        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">⚠️ Once enabled,
+                            these
+                            methods will be required for dashboard access after login.</p>
+                        <div class="auth-method">
+                            <div class="method-info">
+                                <span class="method-name">Authenticator App</span>
+                                <span class="method-status" id="authenticatorStatus">❌ Not Set Up</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary btn-sm" id="setupAuthenticator">Set Up</button>
+                                <button class="btn btn-danger btn-sm" id="disableAuthenticator"
+                                    style="display:none;">Disable</button>
+                            </div>
+                        </div>
+                        <div class="auth-method">
+                            <div class="method-info">
+                                <span class="method-name">Email Code</span>
+                                <span class="method-status" id="emailTwoFactorStatus">❌ Disabled</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary btn-sm" id="enableEmailTwoFactor">Enable</button>
+                                <button class="btn btn-danger btn-sm" id="disableEmailTwoFactor"
+                                    style="display:none;">Disable</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="shield-section">
+                    <div class="section-header">
+                        <i class="fas fa-key"></i>
+                        <h4>Account Recovery</h4>
+                    </div>
+                    <div class="section-content">
+                        <div class="key-actions">
+                            <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKeyUI()">Generate
+                                New
+                                Recovery Key</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="shield-section">
+                    <div class="section-header" onclick="shieldManager.toggleSection('security-events')">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Security Events</h4>
+                        <i class="fas fa-chevron-down section-toggle" id="security-events-toggle"></i>
+                    </div>
+                    <div class="section-content" id="security-events-content">
+                        <div id="securityEventsList"></div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="shield-sections">
-            <div class="shield-section">
-                <div class="section-header">
-                    <i class="fas fa-desktop"></i>
-                    <h4>Active Sessions</h4>
-                    <span class="count-badge" id="sessionCount">--</span>
-                </div>
-                <div class="section-content">
-                    <div id="sessionsList"></div>
-                    <button class="btn btn-danger btn-sm" onclick="shieldManager.revokeAllSessionsUI()">Sign Out All
-                        Other Sessions</button>
-                </div>
-            </div>
-            <div class="shield-section">
-                <div class="section-header" onclick="shieldManager.toggleSection('recent-activity')">
-                    <i class="fas fa-history"></i>
-                    <h4>Recent Activity</h4>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="count-badge" id="loginCount">--</span>
-                        <i class="fas fa-chevron-down section-toggle" id="recent-activity-toggle"></i>
-                    </div>
-                </div>
-                <div class="section-content" id="recent-activity-content">
-                    <div id="loginHistoryList"></div>
-                </div>
-            </div>
-            <div class="shield-section">
-                <div class="section-header">
-                    <i class="fas fa-fingerprint"></i>
-                    <h4>Two-Factor Authentication</h4>
-                </div>
-                <div class="section-content">
-                    <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">⚠️ Once enabled, these
-                        methods will be required for dashboard access after login.</p>
-                    <div class="auth-method">
-                        <div class="method-info">
-                            <span class="method-name">Authenticator App</span>
-                            <span class="method-status" id="authenticatorStatus">❌ Not Set Up</span>
-                        </div>
-                        <div>
-                            <button class="btn btn-primary btn-sm" id="setupAuthenticator">Set Up</button>
-                            <button class="btn btn-danger btn-sm" id="disableAuthenticator"
-                                style="display:none;">Disable</button>
-                        </div>
-                    </div>
-                    <div class="auth-method">
-                        <div class="method-info">
-                            <span class="method-name">Email Code</span>
-                            <span class="method-status" id="emailTwoFactorStatus">❌ Disabled</span>
-                        </div>
-                        <div>
-                            <button class="btn btn-primary btn-sm" id="enableEmailTwoFactor">Enable</button>
-                            <button class="btn btn-danger btn-sm" id="disableEmailTwoFactor"
-                                style="display:none;">Disable</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="shield-section">
-                <div class="section-header">
-                    <i class="fas fa-key"></i>
-                    <h4>Account Recovery</h4>
-                </div>
-                <div class="section-content">
-                    <div class="key-actions">
-                        <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKeyUI()">Generate New
-                            Recovery Key</button>
-                    </div>
-                </div>
-            </div>
-            <div class="shield-section">
-                <div class="section-header" onclick="shieldManager.toggleSection('security-events')">
-                    <i class="fas fa-shield-alt"></i>
-                    <h4>Security Events</h4>
-                    <i class="fas fa-chevron-down section-toggle" id="security-events-toggle"></i>
-                </div>
-                <div class="section-content" id="security-events-content">
-                    <div id="securityEventsList"></div>
-                </div>
-            </div>
-        </div>
-    </div>
     </div>
 
     <div id="customMessageBox" class="custom-message-box" style="display:none;">
