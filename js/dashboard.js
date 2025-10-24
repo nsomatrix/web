@@ -1530,6 +1530,9 @@ function setupNotificationHandlers() {
                 const messageInputContainer = document.querySelector('.message-input-container');
                 if (messageInputContainer) messageInputContainer.style.display = 'none';
 
+                // Hide manage button when opening general messages modal
+                const manageGroupBtn = document.getElementById('manageGroupBtn');
+                if (manageGroupBtn) manageGroupBtn.style.display = 'none';
 
                 openModal(document.getElementById('messagesModal'));
                 loadRecentChats();
