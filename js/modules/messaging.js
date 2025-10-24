@@ -1046,7 +1046,12 @@ export class MessagingManager {
     async removeMember(memberId, memberUsername) {
         if (!this.currentGroupChat || !this.isGroupCreator) return;
 
-        const confirmed = confirm(`Remove @${memberUsername} from the group?`);
+        const confirmed = await this.showCustomConfirm(
+            'Remove Member',
+            `Are you sure you want to remove @${memberUsername} from the group?`,
+            'Remove',
+            'Cancel'
+        );
         if (!confirmed) return;
 
         try {
@@ -1107,7 +1112,12 @@ export class MessagingManager {
     async deleteGroupFromManagement() {
         if (!this.currentGroupChat || !this.isGroupCreator) return;
 
-        const confirmed = confirm('Are you sure you want to delete this group? This action cannot be undone and will remove all messages.');
+        const confirmed = await this.showCustomConfirm(
+            'Delete Group',
+            'Are you sure you want to delete this group? This action cannot be undone and will remove all messages.',
+            'Delete Group',
+            'Cancel'
+        );
         if (!confirmed) return;
 
         try {
@@ -1123,4 +1133,66 @@ export class MessagingManager {
             console.error('Error deleting group:', error);
             window.showMessageBox('Failed to delete group', 'error', 3000);
         }
+    }
+
+    // Custom confirmation modal
+    showCustomConfirm(title, message, confirmText = 'Confirm', cancelText = 'Cancel') {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10002; display: flex; align-items: center; justify-content: center;';
+            
+            modal.innerHTML = `
+                <div style="background: #1a1a1a; color: white; padding: 24px; border-radius: 12px; max-width: 400px; width: 90vw; border: 1px solid #555; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                    <h3 style="margin: 0 0 16px 0; color: #e74c3c; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-exclamation-triangle"></i> ${title}
+                    </h3>
+                    <p style="margin: 0 0 20px 0; color: #ccc; line-height: 1.4;">${message}</p>
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button id="cancelBtn" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            ${cancelText}
+                        </button>
+                        <button id="confirmBtn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            ${confirmText}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const confirmBtn = modal.querySelector('#confirmBtn');
+            const cancelBtn = modal.querySelector('#cancelBtn');
+            
+            const cleanup = () => {
+                document.body.removeChild(modal);
+            };
+            
+            confirmBtn.onclick = () => {
+                cleanup();
+                resolve(true);
+            };
+            
+            cancelBtn.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+            
+            // Close on background click
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    cleanup();
+                    resolve(false);
+                }
+            };
+            
+            // Close on escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    document.removeEventListener('keydown', handleEscape);
+                    cleanup();
+                    resolve(false);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+        });
     }}
