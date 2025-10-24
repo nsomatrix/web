@@ -252,7 +252,12 @@
         <div class="modal-content" style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
             <div style="padding: 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; background: #2d2d2d; position: relative;">
                 <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="position: absolute; top: 12px; right: 16px; cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button id="manageGroupBtn" style="display: none; background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;" onclick="window.messagingManager.openGroupManagement()">
+                        <i class="fas fa-cog"></i> Manage
+                    </button>
+                    <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
+                </div>
             </div>
             <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
             <div class="message-input-container" style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">
@@ -281,6 +286,34 @@
             <input type="text" id="groupNameInput" class="form-control" placeholder="Group name" maxlength="50" />
             <div id="friendsSelection" style="max-height: 300px; overflow-y: auto; margin: 1rem 0;"></div>
             <button id="createGroupChatBtn" class="btn btn-success">Create Group</button>
+        </div>
+    </div>
+
+    <div id="manageGroupModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-button" data-modal="manageGroupModal">&times;</span>
+            <h3 id="manageGroupTitle">Manage Group</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="color: white; font-weight: bold; margin-bottom: 8px; display: block;">Group Name</label>
+                <input type="text" id="editGroupNameInput" class="form-control" placeholder="Group name" maxlength="50" />
+                <button id="updateGroupNameBtn" class="btn btn-primary" style="margin-top: 8px;">Update Name</button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: white; margin-bottom: 12px;">Current Members (<span id="memberCount">0</span>)</h4>
+                <div id="currentMembersList" style="max-height: 200px; overflow-y: auto; border: 1px solid #555; border-radius: 8px; padding: 8px; background: #2d2d2d;"></div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: white; margin-bottom: 12px;">Add Members</h4>
+                <div id="availableFriendsList" style="max-height: 200px; overflow-y: auto; border: 1px solid #555; border-radius: 8px; padding: 8px; background: #2d2d2d;"></div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="deleteGroupBtn" class="btn btn-danger">Delete Group</button>
+                <button class="btn btn-secondary" onclick="window.closeModal(document.getElementById('manageGroupModal'))">Close</button>
+            </div>
         </div>
     </div>
 

@@ -20,9 +20,12 @@ export class MessagingManager {
         this.lastMessageCount = 0;
         document.getElementById('messagesList').innerHTML = '';
         
-        // Hide create group button in private chats
+        // Hide create group button and manage button in private chats
         const createGroupBtn = document.getElementById('createGroupBtn');
         if (createGroupBtn) createGroupBtn.style.display = 'none';
+        
+        const manageGroupBtn = document.getElementById('manageGroupBtn');
+        if (manageGroupBtn) manageGroupBtn.style.display = 'none';
         
         window.openModal(document.getElementById('messagesModal'));
         this.loadMessages(friendId);
@@ -141,6 +144,12 @@ export class MessagingManager {
             const groupData = groupDoc.data();
             this.isGroupCreator = groupData.createdBy === this.authManager.currentUser.uid;
             document.getElementById('messageModalTitle').textContent = `${groupData.name} (${groupData.members.length})`;
+            
+            // Show manage button for group creators
+            const manageGroupBtn = document.getElementById('manageGroupBtn');
+            if (manageGroupBtn) {
+                manageGroupBtn.style.display = this.isGroupCreator ? 'block' : 'none';
+            }
             
             const messageInputContainer = document.querySelector('.message-input-container');
             if (messageInputContainer) messageInputContainer.style.display = 'block';
@@ -596,25 +605,7 @@ export class MessagingManager {
             </div>
         `;
         
-        // Add delete group option for group creators
-        if (this.isGroupCreator) {
-            const menuDiv = messageDiv.querySelector(`#menu-${message.id}`);
-            if (menuDiv) {
-                menuDiv.innerHTML += `
-                    <div onclick="window.messagingManager.deleteGroup()" style="
-                        padding: 12px 16px;
-                        cursor: pointer;
-                        color: #e74c3c;
-                        font-size: 14px;
-                        border-top: 1px solid #555;
-                        -webkit-tap-highlight-color: transparent;
-                        touch-action: manipulation;
-                    " onmouseover="this.style.background='#3d3d3d'" onmouseout="this.style.background='transparent'">
-                        🗑️ Delete Group
-                    </div>
-                `;
-            }
-        }
+
         
         container.appendChild(messageDiv);
     }
@@ -853,7 +844,11 @@ export class MessagingManager {
         document.getElementById('confirmDelete').onclick = async () => {
             try {
                 await this.db.collection('groupChats').doc(this.currentGroupChat).delete();
+                
+                // Close both management modal and messages modal
+                window.closeModal(document.getElementById('manageGroupModal'));
                 document.getElementById('messagesModal').style.display = 'none';
+                
                 window.showMessageBox('Group deleted', 'success', 2000);
             } catch (error) {
                 console.error('Delete group error:', error);
@@ -883,4 +878,249 @@ export class MessagingManager {
             throw error;
         }
     }
-}
+
+    // Group Management Functions
+    async openGroupManagement() {
+        if (!this.currentGroupChat || !this.isGroupCreator) {
+            window.showMessageBox('Only group creators can manage groups', 'error', 3000);
+            return;
+        }
+
+        try {
+            const groupDoc = await this.db.collection('groupChats').doc(this.currentGroupChat).get();
+            if (!groupDoc.exists) {
+                window.showMessageBox('Group not found', 'error', 3000);
+                return;
+            }
+
+            const groupData = groupDoc.data();
+            
+            // Set group name in input
+            document.getElementById('editGroupNameInput').value = groupData.name;
+            document.getElementById('manageGroupTitle').textContent = `Manage "${groupData.name}"`;
+            
+            // Load current members
+            await this.loadCurrentMembers(groupData.members);
+            
+            // Load available friends to add
+            await this.loadAvailableFriends(groupData.members);
+            
+            window.openModal(document.getElementById('manageGroupModal'));
+            
+        } catch (error) {
+            console.error('Error opening group management:', error);
+            window.showMessageBox('Failed to load group management', 'error', 3000);
+        }
+    }
+
+    async loadCurrentMembers(memberIds) {
+        const membersList = document.getElementById('currentMembersList');
+        const memberCount = document.getElementById('memberCount');
+        
+        memberCount.textContent = memberIds.length;
+        membersList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">Loading members...</div>';
+
+        try {
+            const members = [];
+            for (const memberId of memberIds) {
+                const memberDoc = await this.db.collection('players').doc(memberId).get();
+                if (memberDoc.exists) {
+                    const memberData = memberDoc.data();
+                    members.push({
+                        id: memberId,
+                        username: memberData.usernameTag || 'Unknown',
+                        avatar: memberData.avatar || 'default.gif'
+                    });
+                }
+            }
+
+            if (members.length === 0) {
+                membersList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">No members found</div>';
+                return;
+            }
+
+            membersList.innerHTML = members.map(member => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #444; background: #3d3d3d; margin-bottom: 4px; border-radius: 6px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="avatars/${member.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                        <div>
+                            <div style="color: white; font-weight: bold;">@${member.username}</div>
+                            ${member.id === this.authManager.currentUser.uid ? '<div style="color: #e74c3c; font-size: 12px;">You (Creator)</div>' : ''}
+                        </div>
+                    </div>
+                    ${member.id !== this.authManager.currentUser.uid ? 
+                        `<button onclick="window.messagingManager.removeMember('${member.id}', '${member.username}')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                            Remove
+                        </button>` : 
+                        ''
+                    }
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error loading members:', error);
+            membersList.innerHTML = '<div style="color: #e74c3c; text-align: center; padding: 20px;">Failed to load members</div>';
+        }
+    }
+
+    async loadAvailableFriends(currentMemberIds) {
+        const friendsList = document.getElementById('availableFriendsList');
+        friendsList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">Loading friends...</div>';
+
+        try {
+            // Get user's friends
+            const friendsSnapshot = await this.db.collection('players')
+                .doc(this.authManager.currentUser.uid)
+                .collection('friends')
+                .get();
+
+            const availableFriends = [];
+            
+            for (const doc of friendsSnapshot.docs) {
+                const friendId = doc.id;
+                
+                // Skip if already in group
+                if (currentMemberIds.includes(friendId)) continue;
+                
+                const friendDoc = await this.db.collection('players').doc(friendId).get();
+                if (friendDoc.exists) {
+                    const friendData = friendDoc.data();
+                    availableFriends.push({
+                        id: friendId,
+                        username: friendData.usernameTag || 'Unknown',
+                        avatar: friendData.avatar || 'default.gif'
+                    });
+                }
+            }
+
+            if (availableFriends.length === 0) {
+                friendsList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">No friends available to add</div>';
+                return;
+            }
+
+            friendsList.innerHTML = availableFriends.map(friend => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #444; background: #3d3d3d; margin-bottom: 4px; border-radius: 6px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="avatars/${friend.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                        <div style="color: white; font-weight: bold;">@${friend.username}</div>
+                    </div>
+                    <button onclick="window.messagingManager.addMember('${friend.id}', '${friend.username}')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Add
+                    </button>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error loading available friends:', error);
+            friendsList.innerHTML = '<div style="color: #e74c3c; text-align: center; padding: 20px;">Failed to load friends</div>';
+        }
+    }
+
+    async addMember(friendId, friendUsername) {
+        if (!this.currentGroupChat || !this.isGroupCreator) return;
+
+        try {
+            const groupRef = this.db.collection('groupChats').doc(this.currentGroupChat);
+            
+            await groupRef.update({
+                members: firebase.firestore.FieldValue.arrayUnion(friendId)
+            });
+
+            window.showMessageBox(`Added @${friendUsername} to the group`, 'success', 3000);
+            
+            // Refresh the management UI
+            const groupDoc = await groupRef.get();
+            const groupData = groupDoc.data();
+            await this.loadCurrentMembers(groupData.members);
+            await this.loadAvailableFriends(groupData.members);
+            
+            // Update the group title in messages modal
+            document.getElementById('messageModalTitle').textContent = `${groupData.name} (${groupData.members.length})`;
+
+        } catch (error) {
+            console.error('Error adding member:', error);
+            window.showMessageBox('Failed to add member', 'error', 3000);
+        }
+    }
+
+    async removeMember(memberId, memberUsername) {
+        if (!this.currentGroupChat || !this.isGroupCreator) return;
+
+        const confirmed = confirm(`Remove @${memberUsername} from the group?`);
+        if (!confirmed) return;
+
+        try {
+            const groupRef = this.db.collection('groupChats').doc(this.currentGroupChat);
+            
+            await groupRef.update({
+                members: firebase.firestore.FieldValue.arrayRemove(memberId)
+            });
+
+            window.showMessageBox(`Removed @${memberUsername} from the group`, 'success', 3000);
+            
+            // Refresh the management UI
+            const groupDoc = await groupRef.get();
+            const groupData = groupDoc.data();
+            await this.loadCurrentMembers(groupData.members);
+            await this.loadAvailableFriends(groupData.members);
+            
+            // Update the group title in messages modal
+            document.getElementById('messageModalTitle').textContent = `${groupData.name} (${groupData.members.length})`;
+
+        } catch (error) {
+            console.error('Error removing member:', error);
+            window.showMessageBox('Failed to remove member', 'error', 3000);
+        }
+    }
+
+    async updateGroupName() {
+        if (!this.currentGroupChat || !this.isGroupCreator) return;
+
+        const newName = document.getElementById('editGroupNameInput').value.trim();
+        if (!newName) {
+            window.showMessageBox('Group name cannot be empty', 'error', 3000);
+            return;
+        }
+
+        if (newName.length > 50) {
+            window.showMessageBox('Group name too long (max 50 characters)', 'error', 3000);
+            return;
+        }
+
+        try {
+            await this.db.collection('groupChats').doc(this.currentGroupChat).update({
+                name: newName
+            });
+
+            window.showMessageBox('Group name updated', 'success', 3000);
+            
+            // Update UI
+            document.getElementById('messageModalTitle').textContent = `${newName} (${document.getElementById('memberCount').textContent})`;
+            document.getElementById('manageGroupTitle').textContent = `Manage "${newName}"`;
+
+        } catch (error) {
+            console.error('Error updating group name:', error);
+            window.showMessageBox('Failed to update group name', 'error', 3000);
+        }
+    }
+
+    async deleteGroupFromManagement() {
+        if (!this.currentGroupChat || !this.isGroupCreator) return;
+
+        const confirmed = confirm('Are you sure you want to delete this group? This action cannot be undone and will remove all messages.');
+        if (!confirmed) return;
+
+        try {
+            await this.db.collection('groupChats').doc(this.currentGroupChat).delete();
+            
+            // Close both management modal and messages modal
+            window.closeModal(document.getElementById('manageGroupModal'));
+            document.getElementById('messagesModal').style.display = 'none';
+            
+            window.showMessageBox('Group deleted successfully', 'success', 3000);
+            
+        } catch (error) {
+            console.error('Error deleting group:', error);
+            window.showMessageBox('Failed to delete group', 'error', 3000);
+        }
+    }}

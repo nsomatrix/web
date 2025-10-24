@@ -1271,6 +1271,21 @@ function setupSearchAndMessaging() {
         };
     }
 
+    // Group management event listeners
+    const updateGroupNameBtn = document.getElementById('updateGroupNameBtn');
+    if (updateGroupNameBtn) {
+        updateGroupNameBtn.onclick = () => {
+            messagingManager.updateGroupName();
+        };
+    }
+
+    const deleteGroupBtn = document.getElementById('deleteGroupBtn');
+    if (deleteGroupBtn) {
+        deleteGroupBtn.onclick = () => {
+            messagingManager.deleteGroupFromManagement();
+        };
+    }
+
     const messageInput = document.getElementById('messageInput');
     if (messageInput) {
         messageInput.onkeydown = (e) => {
