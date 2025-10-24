@@ -410,30 +410,6 @@
     <script src="components/loader.js"></script>
     <script type="module" src="js/dashboard.js"></script>
     <script src="js/component-loader.js"></script>
-        // Load components
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.dashboard-card');
-            cards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    if (e.target !== this) return;
-                    const buttonId = this.id;
-                    if (buttonId) {
-                        const existingButton = document.getElementById(buttonId);
-                        if (existingButton && existingButton.onclick) {
-                            existingButton.onclick();
-                        }
-                    }
-                });
-            });
-        });
-        
-        window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            window.firebaseAuth = firebase.auth();
-            window.firebaseDb = firebase.firestore();
-        });
-    </script>
+</body>
 </body>
 </html>
