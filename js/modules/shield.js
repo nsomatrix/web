@@ -621,12 +621,18 @@ export class ShieldManager {
         const content = document.getElementById(`${sectionId}-content`);
         const toggle = document.getElementById(`${sectionId}-toggle`);
         
-        if (content.classList.contains('collapsed')) {
-            content.classList.remove('collapsed');
-            toggle.classList.remove('rotated');
+        if (!content || !toggle) return;
+        
+        const isHidden = content.style.display === 'none';
+        
+        if (isHidden) {
+            // Show content
+            content.style.display = 'block';
+            toggle.style.transform = 'rotate(0deg)';
         } else {
-            content.classList.add('collapsed');
-            toggle.classList.add('rotated');
+            // Hide content
+            content.style.display = 'none';
+            toggle.style.transform = 'rotate(-90deg)';
         }
     }
 
