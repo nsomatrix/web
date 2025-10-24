@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>NSO Matrix Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
     <link rel="stylesheet" href="components/footer.css">
     <link rel="stylesheet" href="css/shield.css">
 </head>
+
 <body>
     <iframe id="fullScreenPenEffect" src="pen_effect.html" frameborder="0" scrolling="no"></iframe>
 
@@ -31,7 +33,8 @@
             <div class="username-section">
                 <h2 class="section-title"><i class="fas fa-user"></i> Choose Your Username</h2>
                 <div class="username-input-container">
-                    <input id="usernameInput" type="text" class="username-input" placeholder="Enter Username" maxlength="20" />
+                    <input id="usernameInput" type="text" class="username-input" placeholder="Enter Username"
+                        maxlength="20" />
                     <div id="usernameFeedback" class="username-feedback"></div>
                 </div>
             </div>
@@ -145,8 +148,11 @@
         <div class="modal-content" style="background:#1a1a1a;color:white;border:1px solid #333;">
             <span class="close-button" data-modal="masterPasswordPromptModal" style="color:white;">&times;</span>
             <h3 id="masterPasswordModalTitle" style="color:white;">Enter Master Password</h3>
-            <input type="password" id="masterPasswordUnlockInput" class="form-control mb-2" placeholder="Master Password" style="background:#2d2d2d;color:white;border:1px solid #555;" />
-            <input type="password" id="confirmMasterPasswordInput" class="form-control mb-2" placeholder="Confirm Master Password" style="background:#2d2d2d;color:white;border:1px solid #555;display:none;" />
+            <input type="password" id="masterPasswordUnlockInput" class="form-control mb-2"
+                placeholder="Master Password" style="background:#2d2d2d;color:white;border:1px solid #555;" />
+            <input type="password" id="confirmMasterPasswordInput" class="form-control mb-2"
+                placeholder="Confirm Master Password"
+                style="background:#2d2d2d;color:white;border:1px solid #555;display:none;" />
             <div style="display:flex;gap:10px;justify-content:center;">
                 <button id="unlockDashboardBtn" class="btn btn-success">Unlock</button>
                 <button id="forgotPasswordBtn" class="btn btn-danger">Forgot Password?</button>
@@ -159,7 +165,8 @@
             <span class="close-button" data-modal="recoveryKeyModal" style="color:white;">&times;</span>
             <h3 style="color:white;">Enter Recovery Key to Access Data</h3>
             <p style="color:white;"><strong>Enter your 32-character recovery key:</strong></p>
-            <input type="text" id="recoveryKeyInput" class="form-control mb-2" placeholder="Recovery Key" maxlength="32" style="background:#2d2d2d;color:white;border:1px solid #555;" />
+            <input type="text" id="recoveryKeyInput" class="form-control mb-2" placeholder="Recovery Key" maxlength="32"
+                style="background:#2d2d2d;color:white;border:1px solid #555;" />
             <div style="display:flex;gap:10px;justify-content:center;">
                 <button id="recoverBtn" class="btn btn-success">Recover Access</button>
                 <button id="lostKeyBtn" class="btn btn-danger">Lost Key?</button>
@@ -168,29 +175,78 @@
     </div>
 
     <div id="notesModal" class="modal" style="display:none;">
-        <div class="modal-content">
+        <div class="modal-content"
+            style="max-width: 90vw; width: 700px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="notesModal">&times;</span>
-            <h3>Your Notes</h3>
-            <textarea id="noteInput" placeholder="Write your notes here..." class="form-control mb-3"></textarea>
-            <button id="saveNoteBtn" class="btn btn-success">Save Note</button>
-            <div id="savedNotesDisplay" class="saved-notes-display"></div>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-sticky-note"></i> Your Notes
+            </h3>
+
+            <!-- New Note Section -->
+            <div style="margin-bottom: 20px; padding: 16px; background: #2d2d2d; border-radius: 8px;">
+                <label
+                    style="color: white; font-weight: bold; margin-bottom: 8px; display: block; font-size: 14px;">Create
+                    New Note</label>
+                <textarea id="noteInput" placeholder="Write your notes here..." class="form-control"
+                    style="min-height: 120px; margin-bottom: 12px; resize: vertical;"></textarea>
+                <button id="saveNoteBtn" class="btn btn-success" style="padding: 8px 16px; font-size: 14px;">
+                    <i class="fas fa-save"></i> Save Note
+                </button>
+            </div>
+
+            <!-- Saved Notes Section -->
+            <div>
+                <h4
+                    style="color: white; margin-bottom: 12px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-list"></i> Saved Notes
+                </h4>
+                <div id="savedNotesDisplay" class="saved-notes-display" style="max-height: 40vh; overflow-y: auto;">
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="passwordManagerModal" class="modal" style="display:none;">
-        <div class="modal-content">
+        <div class="modal-content"
+            style="max-width: 90vw; width: 650px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="passwordManagerModal">&times;</span>
-            <h3>Password Manager</h3>
-            <input type="text" id="pmServiceName" class="form-control mb-2" placeholder="Service Name (e.g., Google)" />
-            <input type="text" id="pmUsername" class="form-control mb-2" placeholder="Username/Email" />
-            <div style="position:relative;margin-bottom:1rem;">
-                <input type="password" id="pmPassword" class="form-control" placeholder="Password" style="padding-right:45px;margin-bottom:0;" />
-                <span id="togglePmPassword" style="position:absolute;right:15px;top:0;bottom:0;display:flex;align-items:center;cursor:pointer;color:#888;font-size:16px;">
-                    <i class="fa fa-eye"></i>
-                </span>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-key"></i> Password Manager
+            </h3>
+
+            <!-- Add New Password Section -->
+            <div style="margin-bottom: 20px; padding: 16px; background: #2d2d2d; border-radius: 8px;">
+                <label
+                    style="color: white; font-weight: bold; margin-bottom: 12px; display: block; font-size: 14px;">Add
+                    New Password</label>
+                <div style="display: grid; gap: 12px;">
+                    <input type="text" id="pmServiceName" class="form-control" placeholder="Service Name (e.g., Google)"
+                        style="margin-bottom: 0;" />
+                    <input type="text" id="pmUsername" class="form-control" placeholder="Username/Email"
+                        style="margin-bottom: 0;" />
+                    <div style="position:relative;">
+                        <input type="password" id="pmPassword" class="form-control" placeholder="Password"
+                            style="padding-right:45px;margin-bottom:0;" />
+                        <span id="togglePmPassword"
+                            style="position:absolute;right:15px;top:0;bottom:0;display:flex;align-items:center;cursor:pointer;color:#888;font-size:16px;">
+                            <i class="fa fa-eye"></i>
+                        </span>
+                    </div>
+                    <button id="savePmEntryBtn" class="btn btn-success"
+                        style="padding: 8px 16px; font-size: 14px; justify-self: start;">
+                        <i class="fas fa-save"></i> Save Entry
+                    </button>
+                </div>
             </div>
-            <button id="savePmEntryBtn" class="btn btn-success">Save Entry</button>
-            <div id="pmEntryList" class="file-list-display"></div>
+
+            <!-- Saved Passwords Section -->
+            <div>
+                <h4
+                    style="color: white; margin-bottom: 12px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-list"></i> Saved Passwords
+                </h4>
+                <div id="pmEntryList" class="file-list-display" style="max-height: 40vh; overflow-y: auto;"></div>
+            </div>
         </div>
     </div>
 
@@ -225,45 +281,63 @@
     </div>
 
     <div id="friendsModal" class="modal" style="display:none;">
-        <div class="modal-content">
+        <div class="modal-content"
+            style="max-width: 90vw; width: 600px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="friendsModal">&times;</span>
-            <h3>Friends</h3>
-            <div id="friendsList" class="friends-list"></div>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-users"></i> Friends
+            </h3>
+            <div id="friendsList" class="friends-list" style="max-height: 70vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <div id="searchResultsModal" class="modal" style="display:none;">
-        <div class="modal-content">
+        <div class="modal-content"
+            style="max-width: 90vw; width: 500px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="searchResultsModal">&times;</span>
-            <h3>Search Results</h3>
-            <div id="searchResults" class="search-results"></div>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-search"></i> Search Results
+            </h3>
+            <div id="searchResults" class="search-results" style="max-height: 70vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <div id="notificationsModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close-button" onclick="document.getElementById('notificationsModal').style.display='none'">&times;</span>
-            <h3>Notifications</h3>
-            <div id="notificationsList" class="notifications-list"></div>
+        <div class="modal-content"
+            style="max-width: 90vw; width: 550px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
+            <span class="close-button"
+                onclick="document.getElementById('notificationsModal').style.display='none'">&times;</span>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-bell"></i> Notifications
+            </h3>
+            <div id="notificationsList" class="notifications-list" style="max-height: 70vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <div id="messagesModal" class="modal" style="display:none;">
-        <div class="modal-content" style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
+        <div class="modal-content"
+            style="height: 80vh; max-height: 600px; display: flex; flex-direction: column; padding: 0; background: #1a1a1a; border: 1px solid #333;">
             <div style="padding: 16px; border-bottom: 1px solid #333; background: #2d2d2d; position: relative;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                    <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'" style="cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
+                    <span class="close-button" onclick="document.getElementById('messagesModal').style.display='none'"
+                        style="cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
                 </div>
-                <button id="manageGroupBtn" style="display: none; background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-top: 4px;" onclick="window.messagingManager.openGroupManagement()">
+                <button id="manageGroupBtn"
+                    style="display: none; background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-top: 4px;"
+                    onclick="window.messagingManager.openGroupManagement()">
                     <i class="fas fa-cog"></i> Manage Group
                 </button>
             </div>
             <div id="messagesList" style="flex: 1; overflow-y: auto; background: #1a1a1a; padding: 8px 0;"></div>
-            <div class="message-input-container" style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">
+            <div class="message-input-container"
+                style="padding: 16px; border-top: 1px solid #333; background: #2d2d2d; display: none;">
                 <div style="display: flex; gap: 8px; align-items: flex-end;">
-                    <textarea id="messageInput" placeholder="Type a message..." style="flex: 1; border: 1px solid #555; border-radius: 20px; padding: 12px 16px; resize: none; min-height: 20px; max-height: 120px; font-family: inherit; font-size: 14px; outline: none; background: #3d3d3d; color: white;" rows="1"></textarea>
-                    <button id="sendMessageBtn" style="background: #e74c3c; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px;">➤</button>
+                    <textarea id="messageInput" placeholder="Type a message..."
+                        style="flex: 1; border: 1px solid #555; border-radius: 20px; padding: 12px 16px; resize: none; min-height: 20px; max-height: 120px; font-family: inherit; font-size: 14px; outline: none; background: #3d3d3d; color: white;"
+                        rows="1"></textarea>
+                    <button id="sendMessageBtn"
+                        style="background: #e74c3c; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px;">➤</button>
                 </div>
             </div>
         </div>
@@ -280,51 +354,91 @@
     </div>
 
     <div id="createGroupModal" class="modal" style="display:none;">
-        <div class="modal-content">
+        <div class="modal-content"
+            style="max-width: 90vw; width: 550px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="createGroupModal">&times;</span>
-            <h3>Create Group Chat</h3>
-            <input type="text" id="groupNameInput" class="form-control" placeholder="Group name" maxlength="50" />
-            <div id="friendsSelection" style="max-height: 300px; overflow-y: auto; margin: 1rem 0;"></div>
-            <button id="createGroupChatBtn" class="btn btn-success">Create Group</button>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-users"></i> Create Group Chat
+            </h3>
+
+            <!-- Group Name Section -->
+            <div style="margin-bottom: 20px; padding: 16px; background: #2d2d2d; border-radius: 8px;">
+                <label
+                    style="color: white; font-weight: bold; margin-bottom: 8px; display: block; font-size: 14px;">Group
+                    Name</label>
+                <input type="text" id="groupNameInput" class="form-control" placeholder="Enter group name..."
+                    maxlength="50" style="margin-bottom: 0;" />
+            </div>
+
+            <!-- Friends Selection Section -->
+            <div style="margin-bottom: 20px;">
+                <h4
+                    style="color: white; margin-bottom: 12px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-friends"></i> Select Friends
+                </h4>
+                <div id="friendsSelection"
+                    style="max-height: 300px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 8px; background: #2d2d2d;">
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div style="display: flex; justify-content: flex-end;">
+                <button id="createGroupChatBtn" class="btn btn-success" style="padding: 10px 20px; font-size: 14px;">
+                    <i class="fas fa-plus"></i> Create Group
+                </button>
+            </div>
         </div>
     </div>
 
     <div id="manageGroupModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 90vw; width: 500px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
+        <div class="modal-content"
+            style="max-width: 90vw; width: 500px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
             <span class="close-button" data-modal="manageGroupModal">&times;</span>
             <h3 id="manageGroupTitle" style="margin-bottom: 20px;">Manage Group</h3>
-            
+
             <!-- Group Name Section -->
             <div style="margin-bottom: 16px; padding: 12px; background: #2d2d2d; border-radius: 8px;">
-                <label style="color: white; font-weight: bold; margin-bottom: 6px; display: block; font-size: 14px;">Group Name</label>
+                <label
+                    style="color: white; font-weight: bold; margin-bottom: 6px; display: block; font-size: 14px;">Group
+                    Name</label>
                 <div style="display: flex; gap: 8px; align-items: flex-end;">
-                    <input type="text" id="editGroupNameInput" class="form-control" placeholder="Group name" maxlength="50" style="flex: 1; margin-bottom: 0;" />
-                    <button id="updateGroupNameBtn" class="btn btn-primary" style="padding: 8px 12px; font-size: 12px;">Update</button>
+                    <input type="text" id="editGroupNameInput" class="form-control" placeholder="Group name"
+                        maxlength="50" style="flex: 1; margin-bottom: 0;" />
+                    <button id="updateGroupNameBtn" class="btn btn-primary"
+                        style="padding: 8px 12px; font-size: 12px;">Update</button>
                 </div>
             </div>
-            
+
             <!-- Current Members Section -->
             <div style="margin-bottom: 16px;">
-                <h4 style="color: white; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                <h4
+                    style="color: white; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-users"></i> Members (<span id="memberCount">0</span>)
                 </h4>
-                <div id="currentMembersList" style="max-height: 150px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 4px; background: #2d2d2d;"></div>
+                <div id="currentMembersList"
+                    style="max-height: 150px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 4px; background: #2d2d2d;">
+                </div>
             </div>
-            
+
             <!-- Add Members Section -->
             <div style="margin-bottom: 20px;">
-                <h4 style="color: white; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                <h4
+                    style="color: white; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-user-plus"></i> Add Friends
                 </h4>
-                <div id="availableFriendsList" style="max-height: 150px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 4px; background: #2d2d2d;"></div>
+                <div id="availableFriendsList"
+                    style="max-height: 150px; overflow-y: auto; border: 1px solid #555; border-radius: 6px; padding: 4px; background: #2d2d2d;">
+                </div>
             </div>
-            
+
             <!-- Action Buttons -->
             <div style="display: flex; gap: 8px; justify-content: flex-end; padding-top: 12px;">
                 <button id="deleteGroupBtn" class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;">
                     <i class="fas fa-trash"></i> Delete Group
                 </button>
-                <button class="btn btn-secondary" onclick="window.closeModal(document.getElementById('manageGroupModal'))" style="padding: 8px 16px; font-size: 12px;">
+                <button class="btn btn-secondary"
+                    onclick="window.closeModal(document.getElementById('manageGroupModal'))"
+                    style="padding: 8px 16px; font-size: 12px;">
                     Close
                 </button>
             </div>
@@ -332,94 +446,100 @@
     </div>
 
     <div id="shieldModal" class="modal" style="display:none;">
-        <div class="modal-content shield-modal">
-            <span class="close-button" data-modal="shieldModal">&times;</span>
-            <div class="shield-header">
-                <h3><i class="fas fa-shield-alt"></i> Security & Privacy</h3>
-                <div class="security-score">
-                    <div class="score-circle" id="securityScoreCircle">
-                        <span id="securityScoreText">--</span>
-                    </div>
-                    <span class="score-label">Security Score</span>
+        <div class="modal-content shield-modal"
+            style="max-width: 90vw; width: 700px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;"></div>
+        <span class="close-button" data-modal="shieldModal">&times;</span>
+        <div class="shield-header">
+            <h3><i class="fas fa-shield-alt"></i> Security & Privacy</h3>
+            <div class="security-score">
+                <div class="score-circle" id="securityScoreCircle">
+                    <span id="securityScoreText">--</span>
+                </div>
+                <span class="score-label">Security Score</span>
+            </div>
+        </div>
+        <div class="shield-sections">
+            <div class="shield-section">
+                <div class="section-header">
+                    <i class="fas fa-desktop"></i>
+                    <h4>Active Sessions</h4>
+                    <span class="count-badge" id="sessionCount">--</span>
+                </div>
+                <div class="section-content">
+                    <div id="sessionsList"></div>
+                    <button class="btn btn-danger btn-sm" onclick="shieldManager.revokeAllSessionsUI()">Sign Out All
+                        Other Sessions</button>
                 </div>
             </div>
-            <div class="shield-sections">
-                <div class="shield-section">
-                    <div class="section-header">
-                        <i class="fas fa-desktop"></i>
-                        <h4>Active Sessions</h4>
-                        <span class="count-badge" id="sessionCount">--</span>
-                    </div>
-                    <div class="section-content">
-                        <div id="sessionsList"></div>
-                        <button class="btn btn-danger btn-sm" onclick="shieldManager.revokeAllSessionsUI()">Sign Out All Other Sessions</button>
+            <div class="shield-section">
+                <div class="section-header" onclick="shieldManager.toggleSection('recent-activity')">
+                    <i class="fas fa-history"></i>
+                    <h4>Recent Activity</h4>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="count-badge" id="loginCount">--</span>
+                        <i class="fas fa-chevron-down section-toggle" id="recent-activity-toggle"></i>
                     </div>
                 </div>
-                <div class="shield-section">
-                    <div class="section-header" onclick="shieldManager.toggleSection('recent-activity')">
-                        <i class="fas fa-history"></i>
-                        <h4>Recent Activity</h4>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="count-badge" id="loginCount">--</span>
-                            <i class="fas fa-chevron-down section-toggle" id="recent-activity-toggle"></i>
-                        </div>
-                    </div>
-                    <div class="section-content" id="recent-activity-content">
-                        <div id="loginHistoryList"></div>
-                    </div>
+                <div class="section-content" id="recent-activity-content">
+                    <div id="loginHistoryList"></div>
                 </div>
-                <div class="shield-section">
-                    <div class="section-header">
-                        <i class="fas fa-fingerprint"></i>
-                        <h4>Two-Factor Authentication</h4>
-                    </div>
-                    <div class="section-content">
-                        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">⚠️ Once enabled, these methods will be required for dashboard access after login.</p>
-                        <div class="auth-method">
-                            <div class="method-info">
-                                <span class="method-name">Authenticator App</span>
-                                <span class="method-status" id="authenticatorStatus">❌ Not Set Up</span>
-                            </div>
-                            <div>
-                                <button class="btn btn-primary btn-sm" id="setupAuthenticator">Set Up</button>
-                                <button class="btn btn-danger btn-sm" id="disableAuthenticator" style="display:none;">Disable</button>
-                            </div>
+            </div>
+            <div class="shield-section">
+                <div class="section-header">
+                    <i class="fas fa-fingerprint"></i>
+                    <h4>Two-Factor Authentication</h4>
+                </div>
+                <div class="section-content">
+                    <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">⚠️ Once enabled, these
+                        methods will be required for dashboard access after login.</p>
+                    <div class="auth-method">
+                        <div class="method-info">
+                            <span class="method-name">Authenticator App</span>
+                            <span class="method-status" id="authenticatorStatus">❌ Not Set Up</span>
                         </div>
-                        <div class="auth-method">
-                            <div class="method-info">
-                                <span class="method-name">Email Code</span>
-                                <span class="method-status" id="emailTwoFactorStatus">❌ Disabled</span>
-                            </div>
-                            <div>
-                                <button class="btn btn-primary btn-sm" id="enableEmailTwoFactor">Enable</button>
-                                <button class="btn btn-danger btn-sm" id="disableEmailTwoFactor" style="display:none;">Disable</button>
-                            </div>
+                        <div>
+                            <button class="btn btn-primary btn-sm" id="setupAuthenticator">Set Up</button>
+                            <button class="btn btn-danger btn-sm" id="disableAuthenticator"
+                                style="display:none;">Disable</button>
+                        </div>
+                    </div>
+                    <div class="auth-method">
+                        <div class="method-info">
+                            <span class="method-name">Email Code</span>
+                            <span class="method-status" id="emailTwoFactorStatus">❌ Disabled</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary btn-sm" id="enableEmailTwoFactor">Enable</button>
+                            <button class="btn btn-danger btn-sm" id="disableEmailTwoFactor"
+                                style="display:none;">Disable</button>
                         </div>
                     </div>
                 </div>
-                <div class="shield-section">
-                    <div class="section-header">
-                        <i class="fas fa-key"></i>
-                        <h4>Account Recovery</h4>
-                    </div>
-                    <div class="section-content">
-                        <div class="key-actions">
-                            <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKeyUI()">Generate New Recovery Key</button>
-                        </div>
+            </div>
+            <div class="shield-section">
+                <div class="section-header">
+                    <i class="fas fa-key"></i>
+                    <h4>Account Recovery</h4>
+                </div>
+                <div class="section-content">
+                    <div class="key-actions">
+                        <button class="btn btn-warning" onclick="shieldManager.regenerateRecoveryKeyUI()">Generate New
+                            Recovery Key</button>
                     </div>
                 </div>
-                <div class="shield-section">
-                    <div class="section-header" onclick="shieldManager.toggleSection('security-events')">
-                        <i class="fas fa-shield-alt"></i>
-                        <h4>Security Events</h4>
-                        <i class="fas fa-chevron-down section-toggle" id="security-events-toggle"></i>
-                    </div>
-                    <div class="section-content" id="security-events-content">
-                        <div id="securityEventsList"></div>
-                    </div>
+            </div>
+            <div class="shield-section">
+                <div class="section-header" onclick="shieldManager.toggleSection('security-events')">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Security Events</h4>
+                    <i class="fas fa-chevron-down section-toggle" id="security-events-toggle"></i>
+                </div>
+                <div class="section-content" id="security-events-content">
+                    <div id="securityEventsList"></div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <div id="customMessageBox" class="custom-message-box" style="display:none;">
@@ -439,9 +559,9 @@
     <script src="js/bootstrap.min.js"></script>
     <script>
         const originalError = console.error;
-        console.error = function(...args) {
+        console.error = function (...args) {
             const message = args.join(' ');
-            if (message.includes('static.cloudflareinsights.com/beacon.min.js') && 
+            if (message.includes('static.cloudflareinsights.com/beacon.min.js') &&
                 (message.includes('CORS') || message.includes('integrity'))) {
                 return;
             }
@@ -459,4 +579,5 @@
     <script src="js/component-loader.js"></script>
 </body>
 </body>
+
 </html>
