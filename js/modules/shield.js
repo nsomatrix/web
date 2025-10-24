@@ -652,19 +652,11 @@ export class ShieldManager {
 
     async loadSessionsData() {
         try {
-            console.log('Loading sessions data...');
             const sessions = await this.getSessions();
-            console.log('Sessions retrieved:', sessions);
-            
             const sessionsList = document.getElementById('sessionsList');
             const sessionCount = document.getElementById('sessionCount');
             
-            console.log('Elements found:', { sessionsList: !!sessionsList, sessionCount: !!sessionCount });
-            
-            if (!sessionsList || !sessionCount) {
-                console.error('Required elements not found');
-                return;
-            }
+            if (!sessionsList || !sessionCount) return;
             
             sessionCount.textContent = sessions.length;
             sessionsList.innerHTML = '';
@@ -694,19 +686,11 @@ export class ShieldManager {
 
     async loadHistoryData() {
         try {
-            console.log('Loading history data...');
             const history = await this.getLoginHistory();
-            console.log('History retrieved:', history);
-            
             const historyList = document.getElementById('loginHistoryList');
             const loginCount = document.getElementById('loginCount');
             
-            console.log('Elements found:', { historyList: !!historyList, loginCount: !!loginCount });
-            
-            if (!historyList || !loginCount) {
-                console.error('Required history elements not found');
-                return;
-            }
+            if (!historyList || !loginCount) return;
             
             loginCount.textContent = history.length;
             historyList.innerHTML = '';
