@@ -9,6 +9,11 @@ class ModsManager {
     this.filteredMods = [];
     this.searchTimeout = null;
 
+    // Rate limiting configuration
+    this.rateLimitKey = 'mod_downloads_history';
+    this.maxDownloadsPerHour = 10;
+    this.rateLimitWindow = 3600000; // 1 hour in milliseconds
+
     this.fileList = document.getElementById('fileList');
     this.searchInput = document.getElementById('searchInput');
     this.statsSection = document.getElementById('statsSection');
@@ -144,6 +149,13 @@ class ModsManager {
 
     if (!url || !filename) return;
 
+    // Check rate limit before proceeding
+    const rateLimitCheck = this.checkRateLimit();
+    if (!rateLimitCheck.allowed) {
+      this.showRateLimitMessage(rateLimitCheck.remainingTime);
+      return;
+    }
+
     button.disabled = true;
     button.classList.add('loading');
 
@@ -157,9 +169,182 @@ class ModsManager {
       link.click();
       document.body.removeChild(link);
 
+      // Record this download
+      this.recordDownload();
+
       button.disabled = false;
       button.classList.remove('loading');
+
+      // Show remaining downloads
+      this.showDownloadSuccess();
     }, 500);
+  }
+
+  checkRateLimit() {
+    const stored = localStorage.getItem(this.rateLimitKey);
+    const downloads = stored ? JSON.parse(stored) : [];
+    const now = Date.now();
+
+    // Filter out downloads older than the time window
+    const recentDownloads = downloads.filter(
+      timestamp => now - timestamp < this.rateLimitWindow
+    );
+
+    if (recentDownloads.length >= this.maxDownloadsPerHour) {
+      // Calculate time until oldest download expires
+      const oldestDownload = Math.min(...recentDownloads);
+      const timeUntilReset = this.rateLimitWindow - (now - oldestDownload);
+
+      return {
+        allowed: false,
+        remainingTime: timeUntilReset,
+        downloadsUsed: recentDownloads.length
+      };
+    }
+
+    return {
+      allowed: true,
+      downloadsRemaining: this.maxDownloadsPerHour - recentDownloads.length,
+      downloadsUsed: recentDownloads.length
+    };
+  }
+
+  recordDownload() {
+    const stored = localStorage.getItem(this.rateLimitKey);
+    const downloads = stored ? JSON.parse(stored) : [];
+    const now = Date.now();
+
+    // Add current download timestamp
+    downloads.push(now);
+
+    // Clean old entries while we're at it
+    const recentDownloads = downloads.filter(
+      timestamp => now - timestamp < this.rateLimitWindow
+    );
+
+    localStorage.setItem(this.rateLimitKey, JSON.stringify(recentDownloads));
+  }
+
+  showRateLimitMessage(remainingTime) {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'rate-limit-overlay';
+    
+    const rateLimitCheck = this.checkRateLimit();
+    
+    overlay.innerHTML = `
+      <div class="rate-limit-modal">
+        <button class="rate-limit-close" onclick="this.closest('.rate-limit-overlay').remove()">×</button>
+        
+        <div class="rate-limit-modal-header">
+          <div class="rate-limit-modal-title">
+            <h2>Download Limit Reached</h2>
+            <p>Please wait before downloading again</p>
+          </div>
+        </div>
+        
+        <div class="rate-limit-modal-body">
+          <div class="rate-limit-message">
+            You've reached the maximum of <strong>${this.maxDownloadsPerHour} downloads per hour</strong>. 
+            This limit helps ensure fair access for all users.
+          </div>
+          
+          <div class="rate-limit-countdown">
+            <span class="countdown-label">Reset in:</span>
+            <span class="countdown-time" id="countdownTimer">--:--:--</span>
+          </div>
+          
+          <div class="rate-limit-stats">
+            <div class="rate-limit-stat">
+              <span class="rate-limit-stat-value">${rateLimitCheck.downloadsUsed}</span>
+              <span class="rate-limit-stat-label">Downloads Used</span>
+            </div>
+            <div class="rate-limit-stat">
+              <span class="rate-limit-stat-value">${this.maxDownloadsPerHour}</span>
+              <span class="rate-limit-stat-label">Hourly Limit</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="rate-limit-modal-footer">
+          <button class="rate-limit-btn rate-limit-btn-primary" onclick="this.closest('.rate-limit-overlay').remove()">
+            Got It
+          </button>
+          <button class="rate-limit-btn rate-limit-btn-secondary" onclick="window.location.reload()">
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    // Start countdown timer
+    this.startCountdown(remainingTime, overlay);
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    });
+  }
+
+  startCountdown(remainingTime, overlay) {
+    const timerElement = overlay.querySelector('#countdownTimer');
+    const endTime = Date.now() + remainingTime;
+    
+    const updateTimer = () => {
+      const now = Date.now();
+      const timeLeft = endTime - now;
+      
+      if (timeLeft <= 0) {
+        timerElement.textContent = '00:00:00';
+        clearInterval(countdownInterval);
+        
+        // Update modal to show it's ready
+        const modal = overlay.querySelector('.rate-limit-modal');
+        modal.classList.add('ready');
+        overlay.querySelector('.rate-limit-modal-title h2').textContent = 'Ready to Download!';
+        overlay.querySelector('.rate-limit-modal-title p').textContent = 'You can now download files again';
+        overlay.querySelector('.rate-limit-message').innerHTML = 'Your download limit has been reset. Click below to continue.';
+        return;
+      }
+      
+      const hours = Math.floor(timeLeft / 3600000);
+      const minutes = Math.floor((timeLeft % 3600000) / 60000);
+      const seconds = Math.floor((timeLeft % 60000) / 1000);
+      
+      const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      timerElement.textContent = formattedTime;
+    };
+    
+    updateTimer();
+    const countdownInterval = setInterval(updateTimer, 1000);
+    
+    // Store interval ID to clear it when modal is closed
+    overlay.dataset.intervalId = countdownInterval;
+    
+    // Clear interval when modal is removed
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.removedNodes.forEach((node) => {
+          if (node === overlay) {
+            clearInterval(countdownInterval);
+            observer.disconnect();
+          }
+        });
+      });
+    });
+    
+    observer.observe(document.body, { childList: true });
+  }
+
+  showDownloadSuccess() {
+    const rateLimitCheck = this.checkRateLimit();
+    if (rateLimitCheck.allowed && rateLimitCheck.downloadsRemaining <= 3) {
+      console.log(`Downloads remaining: ${rateLimitCheck.downloadsRemaining}/${this.maxDownloadsPerHour}`);
+    }
   }
 
   handleSearch(searchTerm) {
