@@ -13,7 +13,8 @@ class DeprecatedManager {
     this.searchInput = document.getElementById('searchInput');
     this.statsSection = document.getElementById('statsSection');
     this.totalModsEl = document.getElementById('totalMods');
-    this.visibleModsEl = document.getElementById('visibleMods');
+    this.jarCountEl = document.getElementById('jarCount');
+    this.zipCountEl = document.getElementById('zipCount');
     
     if (!this.fileList || !this.searchInput) {
       console.error('Required DOM elements not found');
@@ -43,20 +44,21 @@ class DeprecatedManager {
         throw new Error('No files found in archive');
       }
       
-      // Filter and process .jar files
-      const jarFiles = data.files
-        .filter(file => file.name.endsWith('.jar'))
+      // Filter and process .jar and .zip files
+      const modFiles = data.files
+        .filter(file => file.name.endsWith('.jar') || file.name.endsWith('.zip'))
         .slice(0, 100)
         .map(file => ({
           name: file.name,
           size: file.size || 0,
           downloadUrl: `${API_CONFIG.baseUrl}${API_CONFIG.itemId}/${file.name}`,
+          type: file.name.endsWith('.jar') ? 'jar' : 'zip',
           isDeprecated: true
         }))
         .sort((a, b) => a.name.localeCompare(b.name));
       
-      this.modsData = jarFiles;
-      this.filteredMods = [...jarFiles];
+      this.modsData = modFiles;
+      this.filteredMods = [...modFiles];
       this.renderTable();
       this.updateStats();
       
@@ -190,8 +192,12 @@ class DeprecatedManager {
   
   updateStats() {
     if (this.modsData.length > 0) {
+      const jarCount = this.filteredMods.filter(mod => mod.type === 'jar').length;
+      const zipCount = this.filteredMods.filter(mod => mod.type === 'zip').length;
+
       this.totalModsEl.textContent = this.modsData.length;
-      this.visibleModsEl.textContent = this.filteredMods.length;
+      this.jarCountEl.textContent = jarCount;
+      this.zipCountEl.textContent = zipCount;
       this.statsSection.style.display = 'flex';
     }
   }
