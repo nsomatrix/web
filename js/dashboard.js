@@ -24,7 +24,7 @@ getFirebaseConfig().then(firebaseConfig => {
     }
     auth = firebase.auth();
     db = firebase.firestore();
-    
+
     // Make Firebase globally available for debugging and other scripts
     window.firebaseAuth = auth;
     window.firebaseDb = db;
@@ -1060,6 +1060,11 @@ function setupModalHandlers() {
             const modalId = e.target.dataset.modal;
             const modalElement = document.getElementById(modalId);
             if (modalElement) {
+                // Special handling for messages modal
+                if (modalId === 'messagesModal') {
+                    const btn = document.getElementById('createGroupBtn');
+                    if (btn) btn.style.display = 'none';
+                }
                 closeModal(modalElement);
             } else {
                 const modal = e.target.closest('.modal');
@@ -1222,21 +1227,44 @@ function setupDeleteHandlers() {
 
     const cancelUnfriendBtn = document.getElementById('cancelUnfriendBtn');
     if (cancelUnfriendBtn) {
-        cancelUnfriendBtn.onclick = () => {
+        const handleUnfriendCancel = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Unfriend cancel button clicked, Event type:', e.type);
             friendsManager.friendToRemove = null;
             closeModal(document.getElementById('unfriendConfirmModal'));
         };
+
+        // Add both click and touch events for mobile compatibility
+        cancelUnfriendBtn.addEventListener('click', handleUnfriendCancel);
+        cancelUnfriendBtn.addEventListener('touchend', handleUnfriendCancel);
+
+        // Ensure proper mobile styling
+        cancelUnfriendBtn.style.touchAction = 'manipulation';
+        cancelUnfriendBtn.style.webkitTapHighlightColor = 'transparent';
     }
 
-    // Cancel buttons
+    // Cancel buttons - Enhanced mobile support
     ['cancelDeleteNoteBtn', 'cancelDeletePmEntryBtn', 'cancelDeleteAccountBtn'].forEach(btnId => {
         const btn = document.getElementById(btnId);
         if (btn) {
-            btn.onclick = () => {
+            // Add mobile-friendly touch handling
+            const handleCancel = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Cancel button clicked:', btnId, 'Event type:', e.type);
                 const modalId = btnId.replace('cancelDelete', 'delete').replace('Btn', 'ConfirmModal');
                 closeModal(document.getElementById(modalId));
                 showMessageBox("Cancelled!", "info", 2000);
             };
+
+            // Add both click and touch events for mobile compatibility
+            btn.addEventListener('click', handleCancel);
+            btn.addEventListener('touchend', handleCancel);
+
+            // Ensure proper mobile styling
+            btn.style.touchAction = 'manipulation';
+            btn.style.webkitTapHighlightColor = 'transparent';
         }
     });
 }
@@ -1284,6 +1312,22 @@ function setupSearchAndMessaging() {
         deleteGroupBtn.onclick = () => {
             messagingManager.deleteGroupFromManagement();
         };
+    }
+
+    const closeManageGroupBtn = document.getElementById('closeManageGroupBtn');
+    if (closeManageGroupBtn) {
+        const handleCloseManageGroup = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal(document.getElementById('manageGroupModal'));
+        };
+
+        closeManageGroupBtn.addEventListener('click', handleCloseManageGroup);
+        closeManageGroupBtn.addEventListener('touchend', handleCloseManageGroup);
+
+        // Ensure proper mobile styling
+        closeManageGroupBtn.style.touchAction = 'manipulation';
+        closeManageGroupBtn.style.webkitTapHighlightColor = 'transparent';
     }
 
     const messageInput = document.getElementById('messageInput');
@@ -1397,23 +1441,23 @@ async function loadRecentChats() {
     try {
         // Set flag to indicate this function is active
         loadRecentChatsActive = true;
-        
+
         document.getElementById('messageModalTitle').textContent = 'Recent Chats';
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '';
-        
+
         // Check if we should still continue (user might have clicked something else)
         if (!loadRecentChatsActive) return;
-        
+
         // Create floating button and add it to the modal (positioned relative to modal)
         const messagesModal = document.getElementById('messagesModal');
         const modalContent = messagesModal.querySelector('.modal-content');
-        
+
         let createGroupBtn = document.getElementById('createGroupBtn');
         if (createGroupBtn) {
             createGroupBtn.remove(); // Remove existing button to recreate it properly
         }
-        
+
         createGroupBtn = document.createElement('button');
         createGroupBtn.id = 'createGroupBtn';
         createGroupBtn.innerHTML = '<i class="fas fa-users"></i>';
@@ -1431,19 +1475,19 @@ async function loadRecentChats() {
         createGroupBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
         createGroupBtn.style.zIndex = '1000';
         createGroupBtn.style.display = 'block';
-        
+
         // Add to modal content and ensure modal content has relative positioning
         modalContent.style.position = 'relative';
         modalContent.appendChild(createGroupBtn);
-        
+
         // Add click event listener
-        createGroupBtn.addEventListener('click', function(e) {
+        createGroupBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             openModal(document.getElementById('createGroupModal'));
             loadFriendsForGroup();
         });
-        
+
         // Debug: Log button creation
         console.log('Create group button created/shown:', createGroupBtn);
 
@@ -1457,7 +1501,7 @@ async function loadRecentChats() {
         for (const doc of groupChatsSnapshot.docs) {
             // Check if we should still continue before each item
             if (!loadRecentChatsActive) return;
-            
+
             const group = doc.data();
             const chatItem = document.createElement('div');
             chatItem.className = 'friend-item';
@@ -1495,13 +1539,13 @@ async function loadRecentChats() {
         for (const doc of friendsSnapshot.docs) {
             // Check if we should still continue before each item
             if (!loadRecentChatsActive) return;
-            
+
             const friend = doc.data();
             const friendProfile = await db.collection('players').doc(friend.friendId).get();
-            
+
             // Check again after async operation
             if (!loadRecentChatsActive) return;
-            
+
             const friendData = friendProfile.data();
             const onlineStatus = await friendsManager.getOnlineStatus(friend.friendId);
 

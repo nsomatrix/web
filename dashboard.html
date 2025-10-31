@@ -305,8 +305,7 @@
     <div id="notificationsModal" class="modal" style="display:none;">
         <div class="modal-content"
             style="max-width: 90vw; width: 550px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">
-            <span class="close-button"
-                onclick="document.getElementById('notificationsModal').style.display='none'">&times;</span>
+            <span class="close-button" data-modal="notificationsModal">&times;</span>
             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-bell"></i> Notifications
             </h3>
@@ -320,8 +319,7 @@
             <div style="padding: 16px; border-bottom: 1px solid #333; background: #2d2d2d; position: relative;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <h3 id="messageModalTitle" style="margin: 0; font-size: 18px; color: white;">Messages</h3>
-                    <span class="close-button"
-                        onclick="document.getElementById('messagesModal').style.display='none'; const btn = document.getElementById('createGroupBtn'); if(btn) btn.style.display='none';"
+                    <span class="close-button" data-modal="messagesModal"
                         style="cursor: pointer; font-size: 24px; color: #ccc; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</span>
                 </div>
                 <button id="manageGroupBtn"
@@ -438,8 +436,7 @@
                 <button id="deleteGroupBtn" class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;">
                     <i class="fas fa-trash"></i> Delete Group
                 </button>
-                <button class="btn btn-secondary"
-                    onclick="window.closeModal(document.getElementById('manageGroupModal'))"
+                <button class="btn btn-secondary" id="closeManageGroupBtn"
                     style="padding: 8px 16px; font-size: 12px;">
                     Close
                 </button>

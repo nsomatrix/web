@@ -626,6 +626,13 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  min-height: 44px; /* Minimum touch target size */
 }
 
 .btn:hover {
@@ -756,6 +763,11 @@ body {
   pointer-events: auto;
   z-index: 9999;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   transition: all 0.3s ease;
 }
 
@@ -828,11 +840,51 @@ body {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  min-height: 44px; /* Minimum touch target size for mobile */
+  min-width: 44px;
+  cursor: pointer;
 }
 
 .modal .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced mobile button support */
+.modal .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .modal .btn {
+    min-height: 48px; /* Larger touch targets on mobile */
+    padding: 12px 20px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .close-button {
+    width: 48px;
+    height: 48px;
+    font-size: 1.75rem;
+  }
+  
+  /* Ensure all clickable elements in modals have proper touch targets */
+  .modal button,
+  .modal .btn,
+  .modal [onclick],
+  .modal [data-modal] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 /* Modal Scrollable Elements */
