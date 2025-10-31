@@ -508,11 +508,11 @@ class Ninjadex {
             `<div class="weapon-stats">
                 <div class="stat-item">
                     <span class="stat-label">External:</span>
-                    <span class="stat-value">${equipment.external_strike || 'N/A'}</span>
+                    <span class="stat-value">${equipment.external_strike ? '+' + equipment.external_strike : 'N/A'}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Internal:</span>
-                    <span class="stat-value">${equipment.internal_strike || 'N/A'}</span>
+                    <span class="stat-value">${equipment.internal_strike ? '+' + equipment.internal_strike : 'N/A'}</span>
                 </div>
             </div>` : '';
 
