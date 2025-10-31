@@ -1,28 +1,102 @@
-/* This is your custom CSS file */
+/* Clean Documentation CSS - Simple and Readable */
 
-/* Styles for the main content wrapper */
+/* Main content wrapper - Clean and wide for better readability */
 .main-content-wrapper {
-    padding: 20px;
-    width: calc(100% - 40px); /* Adjusts for 20px padding on each side */
-    max-width: 800px;
+    max-width: 1200px; /* Wider than original 800px but not excessive */
     margin: 0 auto;
-    color: #EEE; /* Keeps text color light for dark background */
-    background-color: #222; /* Dark background */
+    padding: 40px;
+    color: #EEE;
+    background-color: #222;
     border-radius: 8px;
     margin-top: 20px;
     margin-bottom: 80px;
-    box-sizing: border-box; /* Ensures padding is included in the width calculation */
+    box-sizing: border-box;
 }
 
-/* Optional: Responsive adjustments for very small screens if needed */
-@media (max-width: 480px) {
+/* Simple heading styles - keep red color */
+h2, h3, h4 {
+    color: red;
+}
+
+h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+h4 {
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Clean paragraph spacing */
+p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+/* Simple list styling */
+ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Responsive design - Mobile optimization */
+@media (max-width: 1024px) {
     .main-content-wrapper {
-        padding: 10px; /* Reduce padding on very small screens */
-        width: calc(100% - 20px); /* Adjust width for new padding (10px on each side) */
+        max-width: 100%;
+        margin: 20px;
+        padding: 30px;
     }
 }
 
-/* New rule to make headings red */
-h2, h3, h4 {
-    color: red;
+@media (max-width: 768px) {
+    .main-content-wrapper {
+        margin: 15px;
+        padding: 25px;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+    }
+    
+    h4 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content-wrapper {
+        margin: 10px;
+        padding: 20px;
+    }
+    
+    h2 {
+        font-size: 1.4rem;
+    }
+    
+    h3 {
+        font-size: 1.2rem;
+    }
+    
+    h4 {
+        font-size: 1.05rem;
+    }
+    
+    p {
+        font-size: 0.95rem;
+    }
 }

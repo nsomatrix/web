@@ -45,115 +45,226 @@
     <header id="navbar"></header>
 
     <div class="main-content-wrapper">
-        <p>Welcome to the Matrix™ WEB, your personal, secure space built with privacy, convenience and longevity in mind. Encoded by the tactical world of Ninja School Online, our dashboard provides essential tools to manage your digital space with robust security measures.</p>
+        <p>Welcome to the Matrix™ WEB, your comprehensive digital workspace built with privacy, security, and functionality in mind. Inspired by the tactical world of Ninja School Online, our platform provides essential tools for gaming, productivity, and secure data management.</p>
 
-        <h3>Accessibility and Cross-Platform Compatibility</h3>
-<p>
-The emulators integrated into our web application are designed with cross-platform compatibility in mind. We provide support for a range of platforms to ensure users can enjoy modified J2ME MIDlets with ease.
-</p>
-<ul>
-    <li><strong>Desktop:</strong> Emulators are available for both <strong>Windows</strong> and <strong>Linux</strong> systems. Some operating systems may require a pre-installed Java environment for the emulators to function correctly.</li>
-    <li><strong>Mobile:</strong> Compatible with <strong>Android</strong> devices, allowing users to run J2ME MIDlets directly from their smartphones or tablets.</li>
-    <li><strong>Legacy Devices:</strong> J2ME-based phones and older devices can also run many of the available MIDlets, depending on hardware and software limitations.</li>
-</ul>
-
-
-        <h3>Modified J2ME MIDlets</h3>
-<p>
-MODs section features modified J2ME MIDlets specifically for the game <em>Ninja School</em>, with a focus on the Hirosaki server (formerly World). It offers a collection of game mods that are compatible with various cross-platform J2ME emulators.
-</p>
-<p>
-The mods available here are sourced both from in-house development and third-party contributors. Since some modifications are user-uploaded, users are advised to use them at their own discretion.
-</p>
-<p>
-All mods are hosted on GitHub repositories to ensure redundancy and availability, enabling a smoother and more enjoyable in-game grinding experience.
-</p>
-
-
-        <h3>What is the Matrix™ Dashboard?</h3>
-        <p>The Matrix™ Dashboard is the central hub of your web application. It's designed to give you easy access to critical personal tools like:</p>
+        <h2>Platform Overview</h2>
+        <p>The Matrix™ WEB is a multi-featured platform that combines:</p>
         <ul>
-            <li><strong>Secure Notes:</strong> Store important thoughts, reminders, or game strategies.</li>
-            <li><strong>Password Manager:</strong> Safely keep track of your login credentials for various services.</li>
-
-            <li><strong>Profile Management:</strong> Customize your in-app character.</li>
+            <li><strong>Secure Personal Dashboard:</strong> Encrypted notes, password management, and social features</li>
+            <li><strong>Gaming Tools:</strong> Emulators, game databases, modifications, and utilities</li>
+            <li><strong>Productivity Suite:</strong> Terminal access, timezone tools, and calculators</li>
+            <li><strong>Social Network:</strong> Friends system, messaging, and real-time communication</li>
         </ul>
 
-        <h3>Your Data, Your Security: Encryption Explained</h3>
-        <p>At the core of the Matrix™ Dashboard's security is <strong>end-to-end encryption</strong>. This means your sensitive data (notes, passwords, and files) is scrambled and made unreadable *before* it ever leaves your device and is stored on our servers.</p>
-        <p>Here's how we ensure your privacy:</p>
-        <ul>
-            <li><strong>Master Password:</strong> When you first set up your account or access sensitive features, you'll be prompted to create or enter a "Master Password." This password is never stored on our servers.</li>
-            <li><strong>Key Derivation:</strong> Your Master Password is used to derive a unique <strong>encryption key</strong> on your device using a strong, industry-standard algorithm called <strong>PBKDF2 (Password-Based Key Derivation Function 2)</strong> with 200,000 iterations and SHA256 hashing. This process ensures that even if our databases were compromised, your Master Password cannot be reverse-engineered, and your data remains unreadable.</li>
-            <li><strong>Session-Based Key:</strong> For your convenience and continued security, this derived encryption key is stored temporarily in your browser's <code>sessionStorage</code>. This allows you to access your encrypted data throughout your current session without re-entering your Master Password for every action. However, once you log out or close your browser, this session key is automatically cleared.</li>
-            <li><strong>No Server Access:</strong> Because your data is encrypted on your device using a key *only you know*, <strong>no one else, not even the Matrix™ administrators , can access or read your sensitive notes, passwords, or files.</strong> This provides a strong guarantee of confidentiality.</li>
-        </ul>
-        <p><strong>Important:</strong> Due to this robust encryption method, if you forget your Master Password, <strong>there is no way to reset it or recover due to our encryption method , your only option is to delete the existing account and create a new one!</strong> We recommend storing your Master Password in a safe, offline location.</p>
+        <h2>Dashboard Features</h2>
 
-        <h3>Dashboard Features</h3>
-
-        <h4>1. Profile Management</h4>
+        <h3>1. Profile Management</h3>
         <p>Upon logging in, you'll enter the Dashboard setup section if it's your first time or if your profile isn't complete.</p>
         <ul>
-            <li><strong>Username:</strong> Set your unique username that will be displayed on your dashboard.</li>
-            <li><strong>Avatar Selection:</strong> Choose from a selection of avatars to personalize your profile. You can easily browse through available avatars using the "Previous" and "Next" buttons.</li>
-            <li><strong>Save Profile:</strong> Once you've set your username and chosen an avatar, click "Save Profile" to finalize your settings and proceed to the main dashboard.</li>
+            <li><strong>Username:</strong> Set your unique username that will be displayed across the platform</li>
+            <li><strong>Avatar Selection:</strong> Choose from a curated selection of avatars to personalize your profile</li>
+            <li><strong>Profile Completion:</strong> Complete setup to access all dashboard features</li>
         </ul>
 
-        <h4>2. Secure Notes</h4>
-        <p>The Secure Notes feature allows you to jot down any text-based information you want to keep private.</p>
+        <h3>2. Secure Notes</h3>
+        <p>Store private information with military-grade encryption.</p>
         <ul>
-            <li><strong>Accessing Notes:</strong> Click the "Notes" button on your dashboard. If your encryption key isn't active, you will be prompted to enter your Master Password to unlock this feature.</li>
-            <li><strong>Adding a Note:</strong> Type your note into the provided input field and click "Save Note." Your note will be encrypted before being stored securely.</li>
-            <li><strong>Viewing Notes:</strong> All your saved notes are displayed in a list, with the most recent notes appearing first. Each note includes a timestamp indicating when it was saved.</li>
-            <li><strong>Deleting a Note:</strong> To remove a note, click the "Delete" button next to it. You will be asked to confirm your action to prevent accidental deletions.</li>
+            <li><strong>End-to-End Encryption:</strong> All notes are encrypted before leaving your device</li>
+            <li><strong>Rich Text Support:</strong> Create detailed notes with formatting</li>
+            <li><strong>Timestamp Tracking:</strong> Automatic creation and modification timestamps</li>
+            <li><strong>Secure Deletion:</strong> Confirmation prompts prevent accidental data loss</li>
         </ul>
 
-        <h4>3. Password Manager</h4>
-        <p>Securely store your login credentials for various online services.</p>
+        <h3>3. Password Manager</h3>
+        <p>Securely store and manage login credentials for all your online services.</p>
         <ul>
-            <li><strong>Accessing Password Manager:</strong> Click the "Password Manager" button on your dashboard. Similar to notes, you'll need to enter your Master Password if the encryption key is not active.</li>
-            <li><strong>Adding an Entry:</strong> Fill in the "Service Name" (e.g., "Facebook"), "Username," and "Password" fields. The password will be encrypted before storage. Click "Save Entry" to add it to your manager.</li>
-            <li><strong>Viewing Entries:</strong> Your saved password entries are listed, showing the service name, username, and the decrypted password.</li>
-            <li><strong>Deleting an Entry:</strong> Use the "Delete" button next to an entry to remove it. A confirmation prompt will appear before permanent deletion.</li>
+            <li><strong>Service Organization:</strong> Categorize passwords by service name</li>
+            <li><strong>Username/Password Storage:</strong> Encrypted credential storage</li>
+            <li><strong>Password Visibility Toggle:</strong> Show/hide passwords for security</li>
+            <li><strong>Quick Access:</strong> Fast retrieval of stored credentials</li>
         </ul>
 
-
-
-        <h4>4. Language Selection</h4>
-        <p>The Matrix™ Dashboard supports multiple languages for a personalized user experience.</p>
+        <h3>4. Friends & Social Network</h3>
+        <p>Connect with other Matrix™ users through our integrated social system.</p>
         <ul>
-            <li><strong>Change Language:</strong> Use the dropdown selector to choose your preferred language. The dashboard elements will instantly update to the selected language. Your language preference is saved in your browser's local storage for future visits.</li>
+            <li><strong>Friend Requests:</strong> Send and receive friend requests</li>
+            <li><strong>User Search:</strong> Find users by username across the platform</li>
+            <li><strong>Online Status:</strong> Real-time presence indicators</li>
+            <li><strong>Friend Management:</strong> Add, remove, and organize your connections</li>
         </ul>
 
-        <h4>5. Account Management</h4>
+        <h3>5. Messaging System</h3>
+        <p>Communicate securely with friends through our built-in messaging platform.</p>
         <ul>
-            <li><strong>Logout:</strong> Click the "Logout" button to securely sign out of your Matrix™ account. This will clear your encryption key from the session and redirect you to the login page.</li>
-            <li><strong>Delete Account:</strong>
-                <ul>
-                    <li>If you wish to permanently remove your Matrix™ account and all associated data, click the "Delete Account" button.</li>
-                    <li><strong>Confirmation is required:</strong> You will be asked to confirm this irreversible action.</li>
-                    <li><strong>Comprehensive Deletion:</strong> This process ensures the complete removal of:
-                        <ul>
-                            <li>All your uploaded files and their metadata from our cloud storage.</li>
-                            <li>All your notes and password manager entries from our database.</li>
-                            <li>Your user profile document.</li>
-                            <li>Your Firebase authentication account.</li>
-
-                        </ul>
-                    </li>
-                    <li><strong>Recent Login Requirement:</strong> For security, Firebase may require you to have recently logged in to delete your account. If this is the case, you'll be informed and may be logged out to re-authenticate before attempting deletion again.</li>
-                </ul>
-            </li>
+            <li><strong>Direct Messages:</strong> One-on-one private conversations</li>
+            <li><strong>Group Chats:</strong> Create and manage group conversations</li>
+            <li><strong>Real-time Delivery:</strong> Instant message delivery and read receipts</li>
+            <li><strong>Group Management:</strong> Add/remove members, rename groups, delete groups</li>
         </ul>
 
-        <h3>Backend Processing</h3>
-        <p>The Matrix™ application leverages powerful and secure cloud technologies to provide its services:</p>
+        <h3>6. Shield Security Center</h3>
+        <p>Advanced security management and monitoring for your account.</p>
         <ul>
-            <li><strong>Google Firebase:</strong> Used for user authentication (managing your login and user sessions) and for storing your encrypted notes and password manager entries in its Firestore database. Your user profile data (username, avatar, encryption salt, and master password hash) is also stored here.</li>
-
-            <li><strong>Cryptographic Libraries (CryptoJS):</strong> Powers the robust encryption and decryption of your sensitive data using AES encryption and PBKDF2 for key derivation.</li>
+            <li><strong>Security Score:</strong> Real-time assessment of your account security</li>
+            <li><strong>Active Sessions:</strong> Monitor and manage device sessions</li>
+            <li><strong>Login History:</strong> Track recent account access and locations</li>
+            <li><strong>Two-Factor Authentication:</strong> TOTP app and email-based 2FA</li>
+            <li><strong>Recovery Keys:</strong> Generate and manage account recovery options</li>
+            <li><strong>Security Events:</strong> Monitor suspicious activity and security alerts</li>
         </ul>
+
+        <h2>Tools Suite</h2>
+
+        <h3>1. Terminal</h3>
+        <p>Web-based command-line interface for advanced users.</p>
+        <ul>
+            <li><strong>Command Execution:</strong> Run system commands through the web interface</li>
+            <li><strong>File Operations:</strong> Navigate and manage files remotely</li>
+            <li><strong>Script Support:</strong> Execute custom scripts and automation</li>
+        </ul>
+
+        <h3>2. Ninjadex - Game Database</h3>
+        <p>Comprehensive database for Ninja School Online game information.</p>
+        <ul>
+            <li><strong>Monsters Database:</strong> Complete monster stats, locations, and difficulty tiers</li>
+            <li><strong>Equipment Catalog:</strong> Weapons, armor, and accessories with detailed stats</li>
+            <li><strong>Maps & Locations:</strong> Interactive map database with monster spawns</li>
+            <li><strong>Items Reference:</strong> Complete item database with IDs and properties</li>
+            <li><strong>Skillsets Guide:</strong> Skill trees, requirements, and class information</li>
+            <li><strong>Advanced Filtering:</strong> Search by type, level, attribute, and more</li>
+        </ul>
+
+        <h3>3. Emulators</h3>
+        <p>Cross-platform J2ME emulator downloads and management.</p>
+        <ul>
+            <li><strong>Desktop Emulators:</strong> Windows and Linux compatible emulators</li>
+            <li><strong>Mobile Emulators:</strong> Android APK downloads</li>
+            <li><strong>Version Management:</strong> Multiple versions with GitHub integration</li>
+            <li><strong>Platform Detection:</strong> Automatic platform-specific recommendations</li>
+        </ul>
+
+        <h3>4. Mods & MIDlets</h3>
+        <p>Modified J2ME MIDlets for enhanced gaming experience.</p>
+        <ul>
+            <li><strong>Game Modifications:</strong> Enhanced versions of Ninja School Online</li>
+            <li><strong>Server Compatibility:</strong> Mods optimized for different servers</li>
+            <li><strong>Quality Assurance:</strong> Tested modifications for stability</li>
+            <li><strong>GitHub Hosting:</strong> Reliable download sources and version control</li>
+        </ul>
+
+        <h3>5. Estimator</h3>
+        <p>Game calculation and estimation tools.</p>
+        <ul>
+            <li><strong>Damage Calculations:</strong> Estimate combat effectiveness</li>
+            <li><strong>Resource Planning:</strong> Calculate upgrade costs and requirements</li>
+            <li><strong>Optimization Tools:</strong> Min-max character builds</li>
+        </ul>
+
+        <h3>6. Timezone Converter</h3>
+        <p>Global timezone conversion and scheduling tools.</p>
+        <ul>
+            <li><strong>Multi-timezone Display:</strong> Compare times across regions</li>
+            <li><strong>Event Scheduling:</strong> Plan meetings across timezones</li>
+            <li><strong>Real-time Updates:</strong> Live clock displays</li>
+        </ul>
+
+        <h2>Security & Encryption</h2>
+
+        <h3>End-to-End Encryption</h3>
+        <p>Your sensitive data is protected with military-grade encryption before it ever leaves your device.</p>
+        <ul>
+            <li><strong>Master Password:</strong> Your encryption key that never leaves your device</li>
+            <li><strong>PBKDF2 Key Derivation:</strong> 200,000 iterations with SHA256 hashing</li>
+            <li><strong>AES Encryption:</strong> Industry-standard symmetric encryption</li>
+            <li><strong>Session Security:</strong> Temporary key storage with automatic cleanup</li>
+            <li><strong>Zero-Knowledge Architecture:</strong> Even administrators cannot access your data</li>
+        </ul>
+
+        <h3>Two-Factor Authentication</h3>
+        <p>Enhanced account security with multiple verification methods.</p>
+        <ul>
+            <li><strong>TOTP Authenticator:</strong> Compatible with Google Authenticator, Authy, and similar apps</li>
+            <li><strong>Email Verification:</strong> Backup 2FA method via email codes</li>
+            <li><strong>Recovery Codes:</strong> One-time backup codes for emergency access</li>
+            <li><strong>Session Management:</strong> Control active sessions across devices</li>
+        </ul>
+
+        <h3>Account Recovery</h3>
+        <p>Secure recovery options while maintaining encryption integrity.</p>
+        <ul>
+            <li><strong>Recovery Keys:</strong> 32-character keys for data recovery</li>
+            <li><strong>Key Regeneration:</strong> Create new recovery keys when needed</li>
+            <li><strong>Secure Storage:</strong> Offline storage recommendations</li>
+        </ul>
+
+        <h2>Cross-Platform Compatibility</h2>
+
+        <h3>Desktop Support</h3>
+        <ul>
+            <li><strong>Windows:</strong> Full compatibility with modern browsers</li>
+            <li><strong>Linux:</strong> Native support for all distributions</li>
+            <li><strong>macOS:</strong> Optimized for Safari and Chrome</li>
+        </ul>
+
+        <h3>Mobile Optimization</h3>
+        <ul>
+            <li><strong>Responsive Design:</strong> Adaptive layouts for all screen sizes</li>
+            <li><strong>Touch Optimization:</strong> Mobile-friendly interactions</li>
+            <li><strong>Progressive Web App:</strong> App-like experience on mobile devices</li>
+        </ul>
+
+        <h2>Technical Infrastructure</h2>
+
+        <h3>Backend Technologies</h3>
+        <ul>
+            <li><strong>Google Firebase:</strong> Authentication, real-time database, and cloud storage</li>
+            <li><strong>Firestore:</strong> NoSQL document database for user data</li>
+            <li><strong>CryptoJS:</strong> Client-side encryption and cryptographic operations</li>
+            <li><strong>GitHub Integration:</strong> Version control and reliable file hosting</li>
+        </ul>
+
+        <h3>Performance & Reliability</h3>
+        <ul>
+            <li><strong>CDN Distribution:</strong> Global content delivery for fast loading</li>
+            <li><strong>Caching Strategy:</strong> Optimized resource caching</li>
+            <li><strong>Offline Support:</strong> Limited functionality without internet</li>
+            <li><strong>Error Handling:</strong> Graceful degradation and error recovery</li>
+        </ul>
+
+        <h2>Privacy & Data Protection</h2>
+
+        <h3>Data Handling</h3>
+        <ul>
+            <li><strong>Minimal Data Collection:</strong> Only essential information is stored</li>
+            <li><strong>Local Processing:</strong> Encryption happens on your device</li>
+            <li><strong>No Data Mining:</strong> Your information is never analyzed or sold</li>
+            <li><strong>Right to Deletion:</strong> Complete account and data removal</li>
+        </ul>
+
+        <h3>Compliance</h3>
+        <ul>
+            <li><strong>GDPR Compliant:</strong> European data protection standards</li>
+            <li><strong>Transparent Policies:</strong> Clear data usage guidelines</li>
+            <li><strong>User Control:</strong> Full control over your data and privacy settings</li>
+        </ul>
+
+        <h2>Account Management</h2>
+
+        <h3>Account Creation</h3>
+        <ul>
+            <li><strong>Email Registration:</strong> Secure account creation with email verification</li>
+            <li><strong>Profile Setup:</strong> Guided setup process for new users</li>
+            <li><strong>Security Configuration:</strong> Optional 2FA setup during registration</li>
+        </ul>
+
+        <h3>Account Deletion</h3>
+        <ul>
+            <li><strong>Complete Removal:</strong> All data permanently deleted</li>
+            <li><strong>Confirmation Process:</strong> Multiple confirmations prevent accidental deletion</li>
+            <li><strong>Immediate Effect:</strong> Account and data removed within 24 hours</li>
+        </ul>
+
+        <p><strong>Important Security Notice:</strong> Due to our zero-knowledge encryption architecture, if you forget your Master Password, there is no way to recover your encrypted data. Your only option would be to delete your account and create a new one. We strongly recommend storing your Master Password in a secure, offline location.</p>
     </div>
 
 
