@@ -88,7 +88,7 @@ Created `test-mobile-navbar.html` for verification:
 ### HTML Files (13 total):
 - ✅ dashboard.html, login.html - Manual updates
 - ✅ index.html, archives.html, docs.html, emulators.html
-- ✅ estimator.html, items.html, mods.html, ninjadex.html
+- ✅ estimator.html, mods.html, ninjadex.html
 - ✅ terminal.html, timezone.html - Batch updates
 
 ## 🎯 Result

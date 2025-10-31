@@ -36,7 +36,6 @@ All HTML files now follow industry-standard navbar/footer implementation:
 - ✅ emulators.html
 - ✅ estimator.html
 - ✅ index.html
-- ✅ items.html
 - ✅ library.html
 - ✅ login.html
 - ✅ mods.html
