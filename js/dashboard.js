@@ -1230,7 +1230,6 @@ function setupDeleteHandlers() {
         const handleUnfriendCancel = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Unfriend cancel button clicked, Event type:', e.type);
             friendsManager.friendToRemove = null;
             closeModal(document.getElementById('unfriendConfirmModal'));
         };
@@ -1252,7 +1251,6 @@ function setupDeleteHandlers() {
             const handleCancel = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Cancel button clicked:', btnId, 'Event type:', e.type);
                 const modalId = btnId.replace('cancelDelete', 'delete').replace('Btn', 'ConfirmModal');
                 closeModal(document.getElementById(modalId));
                 showMessageBox("Cancelled!", "info", 2000);
