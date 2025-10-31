@@ -106,7 +106,6 @@ class EmulatorsManager {
     this.totalEmulatorsEl = document.getElementById('totalEmulators');
     this.desktopCountEl = document.getElementById('desktopCount');
     this.mobileCountEl = document.getElementById('mobileCount');
-    this.visibleEmulatorsEl = document.getElementById('visibleEmulators');
 
     if (!this.emulatorsList || !this.searchInput) {
       console.error('Required DOM elements not found');
@@ -315,7 +314,6 @@ class EmulatorsManager {
     this.totalEmulatorsEl.textContent = this.emulatorsData.length;
     this.desktopCountEl.textContent = desktopCount;
     this.mobileCountEl.textContent = mobileCount;
-    this.visibleEmulatorsEl.textContent = this.filteredEmulators.length;
 
     this.statsSection.style.display = 'flex';
   }
