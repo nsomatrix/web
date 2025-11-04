@@ -376,12 +376,12 @@ class MatrixTerminal {
     async loadNinjadexData() {
         try {
             // Load monsters
-            const monstersResponse = await fetch('json/monsters_database.json');
+            const monstersResponse = await fetch('data/json/monsters_database.json');
             const monstersData = await monstersResponse.json();
             window.terminalNinjadex.monsters = [...monstersData.monsters.regular, ...monstersData.monsters.cursed];
             
             // Load equipment
-            const equipmentResponse = await fetch('json/structured_equipment_data.json');
+            const equipmentResponse = await fetch('data/json/structured_equipment_data.json');
             const equipmentData = await equipmentResponse.json();
             window.terminalNinjadex.equipments = [];
             
@@ -407,11 +407,11 @@ class MatrixTerminal {
             });
             
             // Load items
-            const itemsResponse = await fetch('data/items.json');
+            const itemsResponse = await fetch('data/json/items.json');
             window.terminalNinjadex.items = await itemsResponse.json();
             
             // Load skillsets
-            const skillsResponse = await fetch('structured_skillsets.json');
+            const skillsResponse = await fetch('data/json/structured_skillsets.json');
             const skillsData = await skillsResponse.json();
             window.terminalNinjadex.skillsets = [];
             
@@ -1555,7 +1555,7 @@ class TerminalKinsEstimator {
 
     async loadLevelRequirements() {
         try {
-            const response = await fetch('json/level_requirements.json');
+            const response = await fetch('data/json/level_requirements.json');
             const data = await response.json();
             this.levelRequirements = data.levels;
         } catch (error) {

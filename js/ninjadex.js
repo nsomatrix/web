@@ -28,7 +28,7 @@ class Ninjadex {
     async loadMonsters() {
         this.showLoading('Loading monsters database');
         try {
-            const response = await fetch('json/monsters_database.json');
+            const response = await fetch('data/json/monsters_database.json');
             const data = await response.json();
             this.monsters = [...data.monsters.regular, ...data.monsters.cursed];
             this.filteredMonsters = [...this.monsters];
@@ -43,10 +43,10 @@ class Ninjadex {
     async loadEquipments() {
         this.showLoading('Loading equipment data');
         try {
-            const response = await fetch('json/structured_equipment_data.json');
+            const response = await fetch('data/json/structured_equipment_data.json');
             const data = await response.json();
             this.equipments = [];
-            
+
             // Flatten all equipment categories into a single array
             Object.keys(data.categories).forEach(category => {
                 if (category === 'weapons') {
@@ -69,7 +69,7 @@ class Ninjadex {
                     });
                 }
             });
-            
+
             this.filteredEquipments = [...this.equipments];
         } catch (error) {
             console.error('Failed to load equipments:', error);
@@ -81,7 +81,7 @@ class Ninjadex {
     async loadItems() {
         this.showLoading('Loading items data');
         try {
-            const response = await fetch('data/items.json');
+            const response = await fetch('data/json/items.json');
             const data = await response.json();
             this.items = data;
             this.filteredItems = [...this.items];
@@ -97,10 +97,10 @@ class Ninjadex {
     async loadSkillsets() {
         this.showLoading('Loading skillsets data');
         try {
-            const response = await fetch('structured_skillsets.json');
+            const response = await fetch('data/json/structured_skillsets.json');
             const data = await response.json();
             this.skillsets = [];
-            
+
             Object.keys(data.classes).forEach(className => {
                 const classData = data.classes[className];
                 classData.skills.forEach(skill => {
@@ -111,7 +111,7 @@ class Ninjadex {
                     });
                 });
             });
-            
+
             this.filteredSkillsets = [...this.skillsets];
         } catch (error) {
             console.error('Failed to load skillsets:', error);
@@ -177,28 +177,28 @@ class Ninjadex {
                     select.classList.remove('open');
                 });
             }
-            
+
             // Handle map image clicks
             if (e.target.classList.contains('map-image')) {
                 const imageUrl = e.target.dataset.imageUrl;
                 const mapName = e.target.dataset.mapName;
                 this.showFullscreenImage(imageUrl, mapName);
             }
-            
+
             // Handle location tag clicks
             if (e.target.classList.contains('location-tag')) {
                 const locationName = e.target.dataset.location;
                 const imageUrl = this.getMapImageUrl(locationName);
                 this.showFullscreenImage(imageUrl, locationName);
             }
-            
+
             // Handle skill image clicks
             if (e.target.classList.contains('skill-image')) {
                 const imageUrl = e.target.dataset.imageUrl;
                 const skillName = e.target.dataset.skillName;
                 this.showFullscreenImage(imageUrl, skillName);
             }
-            
+
             // Handle equipment image clicks
             if (e.target.classList.contains('equipment-image')) {
                 const imageUrl = e.target.dataset.imageUrl;
@@ -220,25 +220,25 @@ class Ninjadex {
             content.classList.remove('active');
         });
         document.getElementById(`${tabName}-tab`).classList.add('active');
-        
+
         // Load maps data when maps tab is opened
         if (tabName === 'maps' && this.maps.length > 0) {
             this.updateMapStats();
             this.renderMaps();
         }
-        
+
         // Load equipment data when equipments tab is opened
         if (tabName === 'equipments' && this.equipments.length > 0) {
             this.updateEquipmentStats();
             this.renderEquipments();
         }
-        
+
         // Load items data when items tab is opened
         if (tabName === 'items' && this.items.length > 0) {
             this.updateItemStats();
             this.renderItems();
         }
-        
+
         // Load skillsets data when skillsets tab is opened
         if (tabName === 'skillsets') {
             if (this.skillsets.length === 0) {
@@ -272,16 +272,16 @@ class Ninjadex {
                 // Update active state
                 options.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
-                
+
                 // Update trigger text
                 trigger.textContent = option.textContent;
-                
+
                 // Store selected value
                 select.dataset.value = option.dataset.value;
-                
+
                 // Close dropdown
                 select.classList.remove('open');
-                
+
                 // Execute callback
                 if (callback) callback();
             });
@@ -296,7 +296,7 @@ class Ninjadex {
         this.filteredMonsters = this.monsters.filter(monster => {
             // Search filter
             const matchesSearch = monster.name.toLowerCase().includes(searchTerm) ||
-                                monster.locations.some(loc => loc.toLowerCase().includes(searchTerm));
+                monster.locations.some(loc => loc.toLowerCase().includes(searchTerm));
 
             // Type filter
             const matchesType = typeFilter === 'all' || monster.type === typeFilter;
@@ -349,10 +349,10 @@ class Ninjadex {
 
         this.filteredSkillsets = this.skillsets.filter(skill => {
             const matchesSearch = skill.name.toLowerCase().includes(searchTerm) ||
-                                skill.description.toLowerCase().includes(searchTerm);
+                skill.description.toLowerCase().includes(searchTerm);
             const matchesSchool = schoolFilter === 'all' || skill.school === schoolFilter;
             const matchesClass = classFilter === 'all' || skill.class === classFilter;
-            
+
             let matchesLevel = true;
             if (levelFilter !== 'all') {
                 const [min, max] = levelFilter.split('-').map(Number);
@@ -403,7 +403,7 @@ class Ninjadex {
 
     filterItems() {
         const searchTerm = document.getElementById('itemSearchInput').value.toLowerCase();
-        
+
         this.filteredItems = this.items.filter(item => {
             return item.name.toLowerCase().includes(searchTerm);
         });
@@ -439,7 +439,7 @@ class Ninjadex {
     updateWeaponTypeFilter() {
         const categoryFilter = document.getElementById('equipmentCategoryFilter').dataset.value || 'all';
         const weaponTypeFilter = document.getElementById('equipmentWeaponTypeFilter');
-        
+
         if (categoryFilter === 'sword') {
             weaponTypeFilter.style.display = 'block';
         } else {
@@ -449,7 +449,7 @@ class Ninjadex {
             weaponTypeFilter.querySelectorAll('.select-option').forEach(opt => opt.classList.remove('active'));
             weaponTypeFilter.querySelector('[data-value="all"]').classList.add('active');
         }
-        
+
         this.filterEquipments();
     }
 
@@ -497,14 +497,14 @@ class Ninjadex {
         card.className = 'equipment-card';
         const imageUrl = this.getEquipmentImageUrl(equipment.name);
 
-        const upgradesHtml = equipment.upgrades.map(upgrade => 
+        const upgradesHtml = equipment.upgrades.map(upgrade =>
             `<div class="upgrade-item">
                 <span class="upgrade-level" data-level="${upgrade.upgrade_level}">+${upgrade.upgrade_level}</span>
                 <span class="upgrade-desc">${upgrade.description.replace(/(\+?\d+%?)/g, '<span class="number">$1</span>')}: <span class="number">${upgrade.value}</span></span>
             </div>`
         ).join('');
 
-        const weaponStats = equipment.type === 'weapon' ? 
+        const weaponStats = equipment.type === 'weapon' ?
             `<div class="weapon-stats">
                 <div class="stat-item">
                     <span class="stat-label">External:</span>
@@ -638,7 +638,7 @@ class Ninjadex {
 
     processMaps() {
         const mapData = new Map();
-        
+
         this.monsters.forEach(monster => {
             monster.locations.forEach(location => {
                 if (!mapData.has(location)) {
@@ -651,7 +651,7 @@ class Ninjadex {
                 mapData.get(location).monsters.push(monster);
             });
         });
-        
+
         // Add additional maps without monsters
         this.additionalMaps.forEach(map => {
             if (!mapData.has(map.name)) {
@@ -662,7 +662,7 @@ class Ninjadex {
                 });
             }
         });
-        
+
         this.maps = Array.from(mapData.values()).sort((a, b) => a.name.localeCompare(b.name));
         this.filteredMaps = [...this.maps];
     }
@@ -766,14 +766,14 @@ class Ninjadex {
             .replace(/\./g, '')   // Remove dots
             .replace(/'/g, '')    // Remove apostrophes
             .replace(/-/g, '');   // Remove hyphens from skill name
-        
+
         // Handle special cases that have hyphens in filenames
         if (skillName === 'Aisu Meiku') filename = 'aisu-meiku';
         if (skillName === 'Enko Bakusatsu') filename = 'enko-bakusatsu';
         if (skillName === 'Choukou Shuriken') filename = 'choukou-shuriken';
         if (skillName === 'X Zangeki') filename = 'x-zangeki';
         if (skillName === 'Kage Bunshin no Jutsu') filename = 'kage-bunshin-no-jutsu';
-        
+
         return `https://archive.org/download/nsomtx-skills/${filename}.png`;
     }
 
@@ -792,7 +792,7 @@ class Ninjadex {
 
     showFullscreenImage(imageUrl, mapName) {
         this.showLoading('Loading map image');
-        
+
         const modal = document.createElement('div');
         modal.className = 'fullscreen-modal';
         modal.innerHTML = `
@@ -802,9 +802,9 @@ class Ninjadex {
                 <div class="image-title">${mapName}</div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         const closeBtn = modal.querySelector('.close-btn');
         closeBtn.onclick = () => document.body.removeChild(modal);
         modal.onclick = (e) => {
