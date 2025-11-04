@@ -40,7 +40,7 @@ export class FriendsManager {
                 item.className = 'friend-item';
                 item.innerHTML = `
                     <div class="friend-info">
-                        <img src="avatars/${sanitizeInput(friendData.avatar)}" alt="Avatar" class="friend-avatar">
+                        <img src="${window.getAssetPath(`avatars/${sanitizeInput(friendData.avatar)}`)}" alt="Avatar" class="friend-avatar">
                         <div class="friend-details">
                             <div class="friend-name">@${sanitizeInput(friend.username)}</div>
                             <div class="friend-status">

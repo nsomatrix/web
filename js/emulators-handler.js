@@ -112,10 +112,10 @@ class EmulatorsManager {
     // Fix asset paths for current location
     this.emulatorsData.forEach(emulator => {
       if (emulator.icon && emulator.icon.startsWith('data/')) {
-        emulator.icon = getAssetPath(emulator.icon);
+        emulator.icon = window.getAssetPath(emulator.icon);
       }
       if (emulator.downloadUrl && emulator.downloadUrl.startsWith('data/')) {
-        emulator.downloadUrl = getAssetPath(emulator.downloadUrl);
+        emulator.downloadUrl = window.getAssetPath(emulator.downloadUrl);
       }
     });
     // Update filtered list as well

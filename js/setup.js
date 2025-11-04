@@ -19,7 +19,7 @@ class GameSetup {
 
     async loadAvatars() {
         try {
-            const response = await fetch(getAssetPath('avatars/avatars.json'));
+            const response = await fetch(window.getAssetPath('avatars/avatars.json'));
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             this.avatars = await response.json();
             
@@ -51,7 +51,7 @@ class GameSetup {
 
     updateAvatarDisplay() {
         const previewImg = document.getElementById('currentAvatarDisplay');
-        previewImg.src = getAssetPath(`avatars/${this.avatars[this.selectedAvatarIndex]}`);
+        previewImg.src = window.getAssetPath(`avatars/${this.avatars[this.selectedAvatarIndex]}`);
         this.validateForm();
     }
 
@@ -275,7 +275,7 @@ class GameSetup {
             document.getElementById('main-dashboard').style.display = 'block';
             
             document.getElementById('dashboard-username').textContent = username;
-            document.getElementById('user-avatar').src = getAssetPath(`avatars/${selectedAvatar}`);
+            document.getElementById('user-avatar').src = window.getAssetPath(`avatars/${selectedAvatar}`);
             document.getElementById('username-tag').textContent = `@${username.toLowerCase()}`;
             
             this.showFeedback("Profile created successfully!", "success");

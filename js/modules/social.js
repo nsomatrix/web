@@ -73,7 +73,7 @@ export class SocialManager {
                 
                 item.innerHTML = `
                     <div class="search-info">
-                        <img src="avatars/${sanitizeInput(user.avatar)}" alt="Avatar" class="search-avatar">
+                        <img src="${window.getAssetPath(`avatars/${sanitizeInput(user.avatar)}`)}" alt="Avatar" class="search-avatar">
                         <span>@${sanitizeInput(user.usernameTag)}</span>
                     </div>
                     <div class="search-actions">
@@ -190,7 +190,7 @@ export class SocialManager {
                 item.className = 'notification-item';
                 item.innerHTML = `
                     <div class="notification-info">
-                        <img src="avatars/${sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
+                        <img src="${window.getAssetPath(`avatars/${sanitizeInput(senderData.avatar)}`)}" alt="Avatar" class="friend-avatar">
                         <span>@${sanitizeInput(request.fromUsername)} sent you a friend request</span>
                     </div>
                     <div class="notification-actions">
@@ -211,7 +211,7 @@ export class SocialManager {
                 item.className = 'notification-item';
                 item.innerHTML = `
                     <div class="notification-info">
-                        <img src="avatars/${sanitizeInput(senderData.avatar)}" alt="Avatar" class="friend-avatar">
+                        <img src="${window.getAssetPath(`avatars/${sanitizeInput(senderData.avatar)}`)}" alt="Avatar" class="friend-avatar">
                         <span>${sanitizeInput(notification.message)}</span>
                     </div>
                     <div class="notification-actions">

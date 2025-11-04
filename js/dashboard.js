@@ -606,11 +606,11 @@ async function verifyEmailCode(uid, code) {
 // Avatar functions
 async function loadAvatars() {
     try {
-        const response = await fetch(getAssetPath('avatars/avatars.json'));
+        const response = await fetch(window.getAssetPath('avatars/avatars.json'));
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         allAvatars = await response.json();
         if (allAvatars.length > 0) {
-            document.getElementById('currentAvatarDisplay').src = getAssetPath(`avatars/${allAvatars[currentAvatarIndex]}`);
+            document.getElementById('currentAvatarDisplay').src = window.getAssetPath(`avatars/${allAvatars[currentAvatarIndex]}`);
         }
     } catch (error) {
         console.error("Error loading avatars:", error);
@@ -620,7 +620,7 @@ async function loadAvatars() {
 
 function updateAvatarDisplay() {
     if (allAvatars.length > 0) {
-        document.getElementById('currentAvatarDisplay').src = getAssetPath(`avatars/${allAvatars[currentAvatarIndex]}`);
+        document.getElementById('currentAvatarDisplay').src = window.getAssetPath(`avatars/${allAvatars[currentAvatarIndex]}`);
     }
 }
 
@@ -654,7 +654,7 @@ async function saveProfile(user) {
         document.getElementById('setup-section').style.display = 'none';
         document.getElementById('main-dashboard').style.display = 'block';
         document.getElementById('dashboard-username').textContent = username;
-        document.getElementById('user-avatar').src = getAssetPath(`avatars/${selectedAvatar}`);
+        document.getElementById('user-avatar').src = window.getAssetPath(`avatars/${selectedAvatar}`);
         setupUsernameTag(username, username);
 
         setupNotificationHandlers();
@@ -765,7 +765,7 @@ async function setupDashboard(user) {
         }
 
         document.getElementById('dashboard-username').textContent = data.username;
-        document.getElementById('user-avatar').src = getAssetPath(`avatars/${data.avatar}`);
+        document.getElementById('user-avatar').src = window.getAssetPath(`avatars/${data.avatar}`);
         setupUsernameTag(data.usernameTag, data.username);
         document.getElementById('setup-section').style.display = 'none';
         document.getElementById('main-dashboard').style.display = 'block';
@@ -1681,7 +1681,7 @@ async function loadRecentChats() {
             };
             chatItem.innerHTML = `
                 <div class="friend-info">
-                    <img src="${getAssetPath(`avatars/${friendData.avatar}`)}" alt="Avatar" class="friend-avatar">
+                    <img src="${window.getAssetPath(`avatars/${friendData.avatar}`)}" alt="Avatar" class="friend-avatar">
                     <div class="friend-details">
                         <div class="friend-name">@${friend.username}</div>
                         <div class="friend-status">
@@ -1727,7 +1727,7 @@ async function loadFriendsForGroup() {
             friendItem.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid #333; border-radius: 4px; margin-bottom: 8px;';
             friendItem.innerHTML = `
                 <input type="checkbox" value="${friend.friendId}" style="margin: 0;">
-                <img src="${getAssetPath(`avatars/${friendData.avatar}`)}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                <img src="${window.getAssetPath(`avatars/${friendData.avatar}`)}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
                 <span style="color: white;">@${friend.username}</span>
             `;
             friendsSelection.appendChild(friendItem);

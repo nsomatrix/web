@@ -319,7 +319,7 @@ export class MessagingManager {
         messageDiv.innerHTML = `
             ${!isSent && this.friendData ? `
                 <div style="flex-shrink: 0;">
-                    <img src="avatars/${this.friendData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <img src="${window.getAssetPath(`avatars/${this.friendData.avatar}`)}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
                 </div>
             ` : ''}
             <div style="
@@ -520,7 +520,7 @@ export class MessagingManager {
         messageDiv.innerHTML = `
             ${!isSent ? `
                 <div style="flex-shrink: 0;">
-                    <img src="avatars/${senderData.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <img src="${window.getAssetPath(`avatars/${senderData.avatar}`)}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
                 </div>
             ` : ''}
             <div style="
@@ -952,7 +952,7 @@ export class MessagingManager {
             membersList.innerHTML = members.map(member => `
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid #444; background: #3d3d3d; margin-bottom: 2px; border-radius: 4px;">
                     <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
-                        <img src="avatars/${member.avatar}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;">
+                        <img src="${window.getAssetPath(`avatars/${member.avatar}`)}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;">
                         <div style="min-width: 0; flex: 1;">
                             <div style="color: white; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@${member.username}</div>
                             ${member.id === this.authManager.currentUser.uid ? '<div style="color: #e74c3c; font-size: 10px;">Creator</div>' : ''}
@@ -1011,7 +1011,7 @@ export class MessagingManager {
             friendsList.innerHTML = availableFriends.map(friend => `
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid #444; background: #3d3d3d; margin-bottom: 2px; border-radius: 4px;">
                     <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
-                        <img src="avatars/${friend.avatar}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;">
+                        <img src="${window.getAssetPath(`avatars/${friend.avatar}`)}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;">
                         <div style="color: white; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@${friend.username}</div>
                     </div>
                     <button onclick="window.messagingManager.addMember('${friend.id}', '${friend.username}')" style="background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; flex-shrink: 0;">

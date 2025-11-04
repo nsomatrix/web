@@ -125,7 +125,7 @@ class YouTubeFeed {
             {
                 id: 'dQw4w9WgXcQ',
                 title: 'NSO Matrix Gaming Highlights',
-                thumbnail: getAssetPath('data/Pictures/matrix.png'),
+                thumbnail: window.getAssetPath('data/Pictures/matrix.png'),
                 channel: 'NSOMatrix™',
                 publishedAt: '2024-01-15T10:00:00Z',
                 description: 'Best NSO gaming moments and highlights'
@@ -133,7 +133,7 @@ class YouTubeFeed {
             {
                 id: 'jNQXAC9IVRw',
                 title: 'NSO Mobile Gaming Guide',
-                thumbnail: getAssetPath('data/Pictures/nso.webp'),
+                thumbnail: window.getAssetPath('data/Pictures/nso.webp'),
                 channel: 'NSOCAN TV',
                 publishedAt: '2024-01-14T15:30:00Z',
                 description: 'Complete NSO mobile gaming setup'
@@ -141,7 +141,7 @@ class YouTubeFeed {
             {
                 id: 'y6120QOlsfU',
                 title: 'Monster Hunter NSO Tips',
-                thumbnail: getAssetPath('data/Pictures/microemulator.png'),
+                thumbnail: window.getAssetPath('data/Pictures/microemulator.png'),
                 channel: 'Hoàng Phong Monster',
                 publishedAt: '2024-01-13T12:00:00Z',
                 description: 'Advanced monster hunting strategies'
@@ -149,7 +149,7 @@ class YouTubeFeed {
             {
                 id: 'kJQP7kiw5Fk',
                 title: 'NSO PvP Battle Compilation',
-                thumbnail: getAssetPath('data/Pictures/char.gif'),
+                thumbnail: window.getAssetPath('data/Pictures/char.gif'),
                 channel: 'Trung Đức TV',
                 publishedAt: '2024-01-12T09:15:00Z',
                 description: 'Epic PvP battles and combat tips'
@@ -157,7 +157,7 @@ class YouTubeFeed {
             {
                 id: 'L_jWHffIx5E',
                 title: 'NSO Equipment Guide',
-                thumbnail: getAssetPath('data/Pictures/youtube.png'),
+                thumbnail: window.getAssetPath('data/Pictures/youtube.png'),
                 channel: 'Kẹo Mút Chơi Bời',
                 publishedAt: '2024-01-11T14:45:00Z',
                 description: 'Best equipment and upgrade strategies'
@@ -190,7 +190,7 @@ class YouTubeFeed {
         feedContainer.innerHTML = videosToShow.map(video => `
             <div class="youtube-video-card" onclick="window.youtubeFeed.playVideo('${video.id}', '${video.title.replace(/'/g, '').replace(/"/g, '')}')">
                 <div class="video-thumbnail">
-                    <img src="${video.thumbnail}" alt="${video.title}" onerror="this.src='${getAssetPath('data/Pictures/matrix.png')}'">
+                    <img src="${video.thumbnail}" alt="${video.title}" onerror="this.src='${window.getAssetPath('data/Pictures/matrix.png')}'">
                     <div class="play-overlay">
                         <i class="fab fa-youtube"></i>
                     </div>
