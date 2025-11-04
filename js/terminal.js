@@ -181,7 +181,7 @@ class MatrixTerminal {
     }
 
     showWelcome() {
-        const imageHtml = '<img src="data/Pictures/matrix.png" alt="Matrix Logo" style="max-width: 300px; height: auto; display: block; margin: 10px 0;">';
+        const imageHtml = `<img src="${getAssetPath('data/Pictures/matrix.png')}" alt="Matrix Logo" style="max-width: 300px; height: auto; display: block; margin: 10px 0;">`;
         this.addOutput(imageHtml, 'ascii-art');
         this.addOutput('Welcome to Matrix Terminal v1.0', 'success-text');
         this.addOutput('Type "help" for available commands\n', 'info-text');
@@ -376,12 +376,12 @@ class MatrixTerminal {
     async loadNinjadexData() {
         try {
             // Load monsters
-            const monstersResponse = await fetch('data/json/monsters_database.json');
+            const monstersResponse = await fetch(getAssetPath('data/json/monsters_database.json'));
             const monstersData = await monstersResponse.json();
             window.terminalNinjadex.monsters = [...monstersData.monsters.regular, ...monstersData.monsters.cursed];
             
             // Load equipment
-            const equipmentResponse = await fetch('data/json/structured_equipment_data.json');
+            const equipmentResponse = await fetch(getAssetPath('data/json/structured_equipment_data.json'));
             const equipmentData = await equipmentResponse.json();
             window.terminalNinjadex.equipments = [];
             
@@ -407,11 +407,11 @@ class MatrixTerminal {
             });
             
             // Load items
-            const itemsResponse = await fetch('data/json/items.json');
+            const itemsResponse = await fetch(getAssetPath('data/json/items.json'));
             window.terminalNinjadex.items = await itemsResponse.json();
             
             // Load skillsets
-            const skillsResponse = await fetch('data/json/structured_skillsets.json');
+            const skillsResponse = await fetch(getAssetPath('data/json/structured_skillsets.json'));
             const skillsData = await skillsResponse.json();
             window.terminalNinjadex.skillsets = [];
             
@@ -1400,7 +1400,7 @@ class MatrixTerminal {
             this.addOutput('Redirecting to login', 'info-text');
             
             setTimeout(() => {
-                window.location.href = 'login.html';
+                window.location.href = getPagePath('login.html');
             }, 3000);
             
         } catch (error) {
@@ -1444,13 +1444,13 @@ class MatrixTerminal {
             
             if (authLink) {
                 authLink.innerHTML = loginSvg + ' LOGIN';
-                authLink.href = 'login.html';
+                authLink.href = getPagePath('login.html');
                 authLink.onclick = null;
             }
             
             if (mobileAuthLink) {
                 mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
-                mobileAuthLink.href = 'login.html';
+                mobileAuthLink.href = getPagePath('login.html');
                 mobileAuthLink.onclick = null;
             }
             
@@ -1555,7 +1555,7 @@ class TerminalKinsEstimator {
 
     async loadLevelRequirements() {
         try {
-            const response = await fetch('data/json/level_requirements.json');
+            const response = await fetch(getAssetPath('data/json/level_requirements.json'));
             const data = await response.json();
             this.levelRequirements = data.levels;
         } catch (error) {

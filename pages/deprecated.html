@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>NSO Matrix - MODs</title>
+  <title>NSO Matrix - Deprecated</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/pages/mods.css" rel="stylesheet">
+  <link href="../css/bootstrap.css" rel="stylesheet">
+  <link href="../css/pages/deprecated.css" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="js/error-suppression.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -22,18 +21,18 @@
           window.firebaseDb = firebase.firestore();
       });
   </script>
-  <script src="js/sound.js"></script>
-  <script src="js/essentials.js"></script>
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
-    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
-    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
+  <script src="../js/essentials.js"></script>
+  <script src="../js/sound.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+    <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="icon" href="../favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="192x192" href="../favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../favicon/android-chrome-512x512.png">
 
-  <link rel="stylesheet" href="components/navbar.css">
-  <link rel="stylesheet" href="components/footer.css">
-  <link rel="stylesheet" href="css/rate-limit-modal.css">
+  <link rel="stylesheet" href="../components/navbar.css">
+  <link rel="stylesheet" href="../components/footer.css">
+  <link rel="stylesheet" href="../css/rate-limit-modal.css">
 </head>
 <body>
   <!-- Navbar Component -->
@@ -41,14 +40,14 @@
 
   <div class="container">
     <div class="text-center header-section">
-      <h1 class="page-title">MODs Repository</h1>
-      <p class="page-subtitle">Working MODs are published here. Obsolete MODs will be moved to <a href="deprecated.html" class="archive-link">Deprecated</a></p>
+      <h1 class="page-title">Deprecated MODs</h1>
+      <p class="page-subtitle">Obsolete and legacy MODs are stored here. For active MODs, visit <a href="mods.html" class="archive-link">MODs Repository</a></p>
     </div>
 
     <div class="stats-section" id="statsSection" style="display: none;">
       <div class="stat-item">
         <span class="stat-number" id="totalMods">0</span>
-        <span class="stat-label">Total MODs</span>
+        <span class="stat-label">Deprecated MODs</span>
       </div>
       <div class="stat-item">
         <span class="stat-number" id="jarCount">0</span>
@@ -61,12 +60,12 @@
     </div>
 
     <div class="search">
-      <input type="text" id="searchInput" class="search__input" placeholder="Search MODs by name">
+      <input type="text" id="searchInput" class="search__input" placeholder="Search deprecated MODs by name">
     </div>
 
     <div id="fileList" class="file-table-container">
       <div class="loading-message">
-        Loading MODs
+        Loading deprecated MODs
         <svg class="loader" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
             <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
@@ -79,12 +78,12 @@
 
 
 
-  <script src="js/firebase-config.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-  <script src="js/mods-handler.js"></script>
-  <script src="components/loader.js"></script>
+  <script src="../js/firebase-config.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+  <script src="../js/deprecated-handler.js"></script>
+  <script src="../components/loader.js"></script>
 
     <footer id="footer"></footer>
-    <script src="js/component-loader.js"></script>
+    <script src="../js/component-loader.js"></script>
 </body>
 </html>

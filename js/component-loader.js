@@ -22,14 +22,61 @@ class ComponentLoader {
     }
   }
   
+  static getBasePath() {
+    // Detect if we're in a subdirectory (like pages/)
+    const path = window.location.pathname;
+    if (path.includes('/pages/')) {
+      return '../';
+    }
+    return '';
+  }
+  
   static async loadNavbar() {
-    return this.loadComponent('#navbar', 'components/navbar.html', () => {
+    const basePath = this.getBasePath();
+    const success = await this.loadComponent('#navbar', `${basePath}components/navbar.html`, () => {
+      this.fixNavbarPaths();
       this.initializeNavbar();
     });
+    return success;
+  }
+  
+  static fixNavbarPaths() {
+    const basePath = this.getBasePath();
+    
+    // Fix logo image path
+    const logo = document.querySelector('.nav-logo');
+    if (logo) {
+      logo.src = getAssetPath('data/Pictures/matrix.png');
+    }
+    
+    // Fix home link
+    const homeLink = document.querySelector('a[href="index.html"]');
+    if (homeLink) {
+      homeLink.href = getAssetPath('index.html');
+    }
+    
+    // Fix all page links using getPagePath
+    const pageLinks = document.querySelectorAll('a[href^="pages/"]');
+    pageLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      const pageName = href.replace('pages/', '');
+      link.href = getPagePath(pageName);
+    });
+    
+    // Fix auth links
+    const authLink = document.getElementById('authLink');
+    const mobileAuthLink = document.getElementById('mobileAuthLink');
+    if (authLink && authLink.href.includes('pages/login.html')) {
+      authLink.href = getPagePath('login.html');
+    }
+    if (mobileAuthLink && mobileAuthLink.href.includes('pages/login.html')) {
+      mobileAuthLink.href = getPagePath('login.html');
+    }
   }
   
   static async loadFooter() {
-    return this.loadComponent('#footer', 'components/footer.html', () => {
+    const basePath = this.getBasePath();
+    return this.loadComponent('#footer', `${basePath}components/footer.html`, () => {
       this.initializeSupport();
     });
   }
@@ -179,12 +226,12 @@ class ComponentLoader {
     } else {
       if (authLink) {
         authLink.innerHTML = loginSvg + ' LOGIN';
-        authLink.href = 'login.html';
+        authLink.href = getPagePath('login.html');
         authLink.onclick = null;
       }
       if (mobileAuthLink) {
         mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
-        mobileAuthLink.href = 'login.html';
+        mobileAuthLink.href = getPagePath('login.html');
         mobileAuthLink.onclick = null;
       }
     }
@@ -205,11 +252,11 @@ class ComponentLoader {
       
       localStorage.removeItem('userLoggedIn');
       sessionStorage.clear();
-      window.location.href = 'index.html';
+      window.location.href = getAssetPath('index.html');
     } catch (error) {
       localStorage.removeItem('userLoggedIn');
       sessionStorage.clear();
-      window.location.href = 'index.html';
+      window.location.href = getAssetPath('index.html');
     }
   }
   

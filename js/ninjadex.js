@@ -28,7 +28,7 @@ class Ninjadex {
     async loadMonsters() {
         this.showLoading('Loading monsters database');
         try {
-            const response = await fetch('data/json/monsters_database.json');
+            const response = await fetch(getAssetPath('data/json/monsters_database.json'));
             const data = await response.json();
             this.monsters = [...data.monsters.regular, ...data.monsters.cursed];
             this.filteredMonsters = [...this.monsters];
@@ -43,7 +43,7 @@ class Ninjadex {
     async loadEquipments() {
         this.showLoading('Loading equipment data');
         try {
-            const response = await fetch('data/json/structured_equipment_data.json');
+            const response = await fetch(getAssetPath('data/json/structured_equipment_data.json'));
             const data = await response.json();
             this.equipments = [];
 
@@ -81,7 +81,7 @@ class Ninjadex {
     async loadItems() {
         this.showLoading('Loading items data');
         try {
-            const response = await fetch('data/json/items.json');
+            const response = await fetch(getAssetPath('data/json/items.json'));
             const data = await response.json();
             this.items = data;
             this.filteredItems = [...this.items];
@@ -97,7 +97,7 @@ class Ninjadex {
     async loadSkillsets() {
         this.showLoading('Loading skillsets data');
         try {
-            const response = await fetch('data/json/structured_skillsets.json');
+            const response = await fetch(getAssetPath('data/json/structured_skillsets.json'));
             const data = await response.json();
             this.skillsets = [];
 

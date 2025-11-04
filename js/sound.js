@@ -1,4 +1,6 @@
-const clickSound = new Audio("assets/click.wav");
+// Use getAssetPath if available, otherwise fallback to relative path
+const getPath = window.getAssetPath || ((path) => path);
+const clickSound = new Audio(getPath("assets/click.wav"));
 clickSound.preload = 'auto';
 
 document.addEventListener("click", () => {

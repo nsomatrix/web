@@ -10,7 +10,7 @@ class KinsEstimator {
 
     async loadLevelRequirements() {
         try {
-            const response = await fetch('data/json/level_requirements.json');
+            const response = await fetch(getAssetPath('data/json/level_requirements.json'));
             const data = await response.json();
             this.levelRequirements = data.levels;
         } catch (error) {

@@ -1,5 +1,6 @@
 class EmulatorsManager {
   constructor() {
+    // Initialize with relative paths, will be fixed after construction
     this.emulatorsData = [
       {
         name: 'CoffeeVM',
@@ -107,7 +108,24 @@ class EmulatorsManager {
     this.init();
   }
 
+  fixAssetPaths() {
+    // Fix asset paths for current location
+    this.emulatorsData.forEach(emulator => {
+      if (emulator.icon && emulator.icon.startsWith('data/')) {
+        emulator.icon = getAssetPath(emulator.icon);
+      }
+      if (emulator.downloadUrl && emulator.downloadUrl.startsWith('data/')) {
+        emulator.downloadUrl = getAssetPath(emulator.downloadUrl);
+      }
+    });
+    // Update filtered list as well
+    this.filteredEmulators = [...this.emulatorsData];
+  }
+
   init() {
+    // Fix asset paths based on current location
+    this.fixAssetPaths();
+    
     this.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
     this.setupPlatformFilters();
     this.renderTable();
