@@ -95,7 +95,7 @@ function setupAuthStateListener() {
             });
 
             if (window.location.pathname !== '/pages/login.html') {
-                window.location.href = getPagePath("login.html");
+                window.location.href = getPagePath("pages/login.html");
             }
         }
     });
@@ -132,7 +132,7 @@ async function validateSession() {
             showMessageBox('Session revoked from another device. Signing out...', 'warning', 2000);
             setTimeout(() => {
                 auth.signOut();
-                window.location.href = getPagePath('login.html');
+                window.location.href = getPagePath('pages/login.html');
             }, 2000);
             return false;
         }
@@ -178,7 +178,7 @@ function setupRealtimeSessionMonitoring() {
                 showMessageBox('Session revoked from another device. Signing out...', 'warning', 2000);
                 setTimeout(() => {
                     auth.signOut();
-                    window.location.href = getPagePath('login.html');
+                    window.location.href = getPagePath('pages/login.html');
                 }, 2000);
             }
         }, (error) => {
@@ -703,7 +703,7 @@ async function setupDashboard(user) {
                 showMessageBox('2FA verification failed. Signing out.', 'error', 3000);
                 setTimeout(() => {
                     auth.signOut();
-                    window.location.href = getPagePath('login.html');
+                    window.location.href = getPagePath('pages/login.html');
                 }, 3000);
                 return;
             } else {
@@ -1248,7 +1248,7 @@ function setupDeleteHandlers() {
 
                 showMessageBox("All account data deleted successfully", "success", 3000);
                 setTimeout(() => {
-                    window.location.href = getPagePath("login.html");
+                    window.location.href = getPagePath("pages/login.html");
                 }, 3000);
 
             } catch (error) {
@@ -1259,7 +1259,7 @@ function setupDeleteHandlers() {
                     showMessageBox("Account deletion requires recent login. Please log in again.", "warning", 5000);
                     setTimeout(() => {
                         auth.signOut().then(() => {
-                            window.location.href = getPagePath("login.html");
+                            window.location.href = getPagePath("pages/login.html");
                         });
                     }, 3000);
                 }

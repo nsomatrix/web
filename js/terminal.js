@@ -1400,7 +1400,7 @@ class MatrixTerminal {
             this.addOutput('Redirecting to login', 'info-text');
             
             setTimeout(() => {
-                window.location.href = getPagePath('login.html');
+                window.location.href = getPagePath('pages/login.html');
             }, 3000);
             
         } catch (error) {
@@ -1444,13 +1444,13 @@ class MatrixTerminal {
             
             if (authLink) {
                 authLink.innerHTML = loginSvg + ' LOGIN';
-                authLink.href = getPagePath('login.html');
+                authLink.href = getPagePath('pages/login.html');
                 authLink.onclick = null;
             }
             
             if (mobileAuthLink) {
                 mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
-                mobileAuthLink.href = getPagePath('login.html');
+                mobileAuthLink.href = getPagePath('pages/login.html');
                 mobileAuthLink.onclick = null;
             }
             

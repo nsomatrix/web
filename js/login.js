@@ -368,9 +368,7 @@ async function handleLogin() {
         }, 10000);
         
         setTimeout(() => {
-            // Use universal page path function
-            const redirectPath = getPagePath('dashboard.html');
-            window.location.href = redirectPath;
+            window.location.href = getPagePath('pages/dashboard.html');
         }, 1000);
     } catch (err) {
         let errorMessage = 'Login failed. Please try again.';
@@ -618,9 +616,7 @@ function showRecoveryKey(recoveryKey) {
         sessionStorage.removeItem('showingRecoveryKey');
         showMessageBox('Redirecting to dashboard...', 'success');
         setTimeout(() => {
-            // Use universal page path function
-            const redirectPath = getPagePath('dashboard.html');
-            window.location.href = redirectPath;
+            window.location.href = getPagePath('pages/dashboard.html');
         }, 1000);
     };
 }

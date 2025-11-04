@@ -41,37 +41,28 @@ class ComponentLoader {
   }
   
   static fixNavbarPaths() {
-    const basePath = this.getBasePath();
-    
-    // Fix logo image path
+    // Fix logo
     const logo = document.querySelector('.nav-logo');
     if (logo) {
       logo.src = getAssetPath('data/Pictures/matrix.png');
     }
     
-    // Fix home link
-    const homeLink = document.querySelector('a[href="index.html"]');
-    if (homeLink) {
-      homeLink.href = getAssetPath('index.html');
-    }
+    // Fix home links
+    document.querySelectorAll('a[href="index.html"]').forEach(link => {
+      link.href = getAssetPath('index.html');
+    });
     
-    // Fix all page links using getPagePath
-    const pageLinks = document.querySelectorAll('a[href^="pages/"]');
-    pageLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      const pageName = href.replace('pages/', '');
-      link.href = getPagePath(pageName);
+    // Fix page links
+    document.querySelectorAll('a[href^="pages/"]').forEach(link => {
+      const page = link.getAttribute('href');
+      link.href = getPagePath(page);
     });
     
     // Fix auth links
     const authLink = document.getElementById('authLink');
     const mobileAuthLink = document.getElementById('mobileAuthLink');
-    if (authLink && authLink.href.includes('pages/login.html')) {
-      authLink.href = getPagePath('login.html');
-    }
-    if (mobileAuthLink && mobileAuthLink.href.includes('pages/login.html')) {
-      mobileAuthLink.href = getPagePath('login.html');
-    }
+    if (authLink) authLink.href = getPagePath('pages/login.html');
+    if (mobileAuthLink) mobileAuthLink.href = getPagePath('pages/login.html');
   }
   
   static async loadFooter() {
@@ -226,12 +217,12 @@ class ComponentLoader {
     } else {
       if (authLink) {
         authLink.innerHTML = loginSvg + ' LOGIN';
-        authLink.href = getPagePath('login.html');
+        authLink.href = getPagePath('pages/login.html');
         authLink.onclick = null;
       }
       if (mobileAuthLink) {
         mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
-        mobileAuthLink.href = getPagePath('login.html');
+        mobileAuthLink.href = getPagePath('pages/login.html');
         mobileAuthLink.onclick = null;
       }
     }
