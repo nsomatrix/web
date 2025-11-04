@@ -11,8 +11,12 @@ const dialogueTextElem = document.getElementById("dialogue-text");
 let dialogueIndex = 0;
 let charIndex = 0;
 
-const typingSpeed = 50; // ms per character
-const pauseBetweenLines = 1500; // ms pause after full text is displayed
+// Natural typing speeds (retro game style)
+const minTypingSpeed = 30; // Minimum speed in ms
+const maxTypingSpeed = 120; // Maximum speed in ms
+const punctuationPause = 300; // Extra pause after punctuation
+const wordPause = 150; // Pause between words
+const pauseBetweenLines = 2500; // ms pause after full text is displayed
 
 // --- Time injection helper ---
 let injectedTime = null;
@@ -257,9 +261,33 @@ function typeDialogue() {
 
   function typeChar() {
     if (charPos < plainText.length) {
-      dialogueTextElem.textContent += plainText.charAt(charPos);
+      const currentChar = plainText.charAt(charPos);
+      dialogueTextElem.textContent += currentChar;
       charPos++;
-      setTimeout(typeChar, typingSpeed);
+      
+      // Highly variable typing delay for uneven feel
+      let delay = minTypingSpeed + Math.random() * (maxTypingSpeed - minTypingSpeed);
+      
+      // Major pauses for punctuation
+      if (currentChar === '.' || currentChar === '!' || currentChar === '?') {
+        delay += punctuationPause + Math.random() * 200;
+      } else if (currentChar === ',' || currentChar === ';' || currentChar === ':') {
+        delay += punctuationPause * 0.7 + Math.random() * 100;
+      } else if (currentChar === ' ') {
+        delay += wordPause + Math.random() * 100;
+      }
+      
+      // Random bursts of fast/slow typing
+      const rand = Math.random();
+      if (rand < 0.15) { // 15% chance for very slow
+        delay += Math.random() * 400 + 200;
+      } else if (rand < 0.25) { // 10% chance for very fast
+        delay = Math.random() * 20 + 10;
+      } else if (rand < 0.35) { // 10% chance for medium fast
+        delay = Math.random() * 40 + 20;
+      }
+      
+      setTimeout(typeChar, delay);
     } else {
       // Replace with full HTML once done typing
       dialogueTextElem.innerHTML = fullHtml;
