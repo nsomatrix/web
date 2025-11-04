@@ -572,17 +572,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="../js/firebase-config.js"></script>
     <script src="../js/bootstrap.min.js"></script>
-    <script>
-        const originalError = console.error;
-        console.error = function (...args) {
-            const message = args.join(' ');
-            if (message.includes('static.cloudflareinsights.com/beacon.min.js') &&
-                (message.includes('CORS') || message.includes('integrity'))) {
-                return;
-            }
-            originalError.apply(console, args);
-        };
-    </script>
+
     <script src="../js/essentials.js"></script>
     <script src="../js/sound.js"></script>
     <script src="../js/fileChooser.js"></script>
