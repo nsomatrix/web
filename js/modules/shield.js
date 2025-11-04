@@ -414,6 +414,10 @@ export class ShieldManager {
     }
 
     showAuthenticatorModal(qrCodeUrl, secret, resolve, reject) {
+        // Remove any existing modals first
+        const existingModals = document.querySelectorAll('div[style*="z-index:10001"]');
+        existingModals.forEach(modal => modal.remove());
+        
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
         modal.innerHTML = `
@@ -446,7 +450,9 @@ export class ShieldManager {
             }
         });
         
-        verifyBtn.onclick = async () => {
+        verifyBtn.onclick = async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const code = codeInput.value.trim();
             
             // Clear previous errors
@@ -487,7 +493,9 @@ export class ShieldManager {
             }
         };
         
-        document.getElementById('cancelTOTPBtn').onclick = () => {
+        document.getElementById('cancelTOTPBtn').onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             modal.remove();
             reject(new Error('Setup cancelled'));
         };
@@ -969,6 +977,10 @@ export class ShieldManager {
 
     showInlineConfirm(message) {
         return new Promise((resolve) => {
+            // Remove any existing modals first
+            const existingModals = document.querySelectorAll('div[style*="z-index:10001"]');
+            existingModals.forEach(modal => modal.remove());
+            
             const modal = document.createElement('div');
             modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10001;display:flex;align-items:center;justify-content:center;';
             modal.innerHTML = `<div style="background:#1a1a1a;color:white;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:1px solid #333;"><div style="color:#ffaa00;font-size:48px;margin-bottom:20px;">⚠</div><p style="margin-bottom:30px;color:#ccc;">${message}</p><div><button class="confirm-btn" style="background:#ff4444;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Yes</button><button class="cancel-btn" style="background:#666;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:5px;">Cancel</button></div></div>`;
@@ -977,36 +989,55 @@ export class ShieldManager {
             const confirmBtn = modal.querySelector('.confirm-btn');
             const cancelBtn = modal.querySelector('.cancel-btn');
             
-            const cleanup = () => {
-                modal.remove();
+            // Close on escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape' && !isProcessing) {
+                    isProcessing = true;
+                    cleanup();
+                    resolve(false);
+                }
             };
             
-            confirmBtn.onclick = () => {
+            const cleanup = () => {
+                // Remove event listeners
+                document.removeEventListener('keydown', handleEscape);
+                // Remove modal
+                if (modal.parentNode) {
+                    modal.remove();
+                }
+            };
+            
+            let isProcessing = false;
+            
+            confirmBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isProcessing) return;
+                isProcessing = true;
                 cleanup();
                 resolve(true);
             };
             
-            cancelBtn.onclick = () => {
+            cancelBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isProcessing) return;
+                isProcessing = true;
                 cleanup();
                 resolve(false);
             };
             
             // Close on background click
             modal.onclick = (e) => {
-                if (e.target === modal) {
+                if (e.target === modal && !isProcessing) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isProcessing = true;
                     cleanup();
                     resolve(false);
                 }
             };
             
-            // Close on escape key
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') {
-                    document.removeEventListener('keydown', handleEscape);
-                    cleanup();
-                    resolve(false);
-                }
-            };
             document.addEventListener('keydown', handleEscape);
         });
     }
