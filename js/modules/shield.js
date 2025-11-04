@@ -10,13 +10,14 @@ export class ShieldManager {
     }
 
     generateSessionId() {
-        // Generate browser fingerprint for consistent session identification
-        const fingerprint = this.generateBrowserFingerprint();
         let sessionId = sessionStorage.getItem('nsomatrix_session_id');
         
-        // If no session ID or it was cleared, generate a new one
+        // Always generate a unique session ID for each browser tab/window
         if (!sessionId) {
-            sessionId = fingerprint + '_' + Date.now().toString(36);
+            // Create truly unique session ID with timestamp and random component
+            const timestamp = Date.now().toString(36);
+            const random = Math.random().toString(36).substring(2, 8);
+            sessionId = `session_${timestamp}_${random}`;
             sessionStorage.setItem('nsomatrix_session_id', sessionId);
         }
         return sessionId;
@@ -53,7 +54,7 @@ export class ShieldManager {
         if (!this.authManager.currentUser) return;
         
         try {
-            // Regenerate session ID if it was cleared
+            // Ensure we have a session ID
             if (!this.currentSessionId) {
                 this.currentSessionId = this.generateSessionId();
             }
@@ -63,38 +64,26 @@ export class ShieldManager {
             const fingerprint = this.generateBrowserFingerprint();
             const ip = await this.getClientIP();
             
-            // Check for existing session with same fingerprint OR same IP
-            const existingSessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
-                .collection('sessions')
-                .where('isActive', '==', true)
-                .get();
+            // Check if this exact session already exists
+            const existingSession = await this.db.collection('players').doc(this.authManager.currentUser.uid)
+                .collection('sessions').doc(this.currentSessionId).get();
             
-            // Find matching session by fingerprint or IP
-            let matchingSession = null;
-            existingSessions.forEach(doc => {
-                const data = doc.data();
-                if (data.fingerprint === fingerprint || data.ip === ip) {
-                    matchingSession = doc;
-                }
-            });
-            
-            if (matchingSession) {
-                // Update existing session
-                this.currentSessionId = matchingSession.id;
-                sessionStorage.setItem('nsomatrix_session_id', this.currentSessionId);
-                
-                await matchingSession.ref.update({
+            if (existingSession.exists && existingSession.data().isActive) {
+                // Session already exists and is active, just update activity
+                await existingSession.ref.update({
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
                     userAgent: navigator.userAgent,
                     browser: getBrowserInfo(),
-                    device: getDeviceInfo()
+                    device: getDeviceInfo(),
+                    ip: ip
                 });
+
                 return;
             }
 
-            // Create new session only if no match found
+            // Create new session with unique ID
             const sessionData = {
-                sessionId: this.currentSessionId,
+                sessionId: this.currentSessionId, // Store session ID in document for reference
                 fingerprint: fingerprint,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
@@ -107,6 +96,8 @@ export class ShieldManager {
 
             await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions').doc(this.currentSessionId).set(sessionData);
+            
+
         } catch (error) {
             console.log('Session creation failed:', error.message);
         }
@@ -161,15 +152,19 @@ export class ShieldManager {
             const sessions = await this.getSessions();
             const batch = this.db.batch();
             
+            let revokedCount = 0;
             sessions.forEach(session => {
                 if (session.id !== this.currentSessionId) {
                     const ref = this.db.collection('players').doc(this.authManager.currentUser.uid)
                         .collection('sessions').doc(session.id);
-                    batch.delete(ref); // Delete instead of marking inactive
+                    batch.delete(ref);
+                    revokedCount++;
                 }
             });
             
-            await batch.commit();
+            if (revokedCount > 0) {
+                await batch.commit();
+            }
         } catch (error) {
             console.error('Error revoking all sessions:', error);
             throw error;
@@ -677,10 +672,10 @@ export class ShieldManager {
                         <strong>${session.browser || 'Unknown'} on ${session.device || 'Unknown'}</strong>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">
                             ${session.ip} • ${formatTimestamp(session.lastActivity)}
-                            ${isCurrentSession ? ' • Current Session' : ''}
+                            ${isCurrentSession ? ' • <span style="color: #28a745; font-weight: bold;">Current Session</span>' : ''}
                         </div>
                     </div>
-                    ${!isCurrentSession ? `<button class="btn btn-danger btn-sm" onclick="shieldManager.revokeSessionUI('${session.id}')">Revoke</button>` : '<span style="color: var(--success);">Active</span>'}
+                    ${!isCurrentSession ? `<button class="btn btn-danger btn-sm" onclick="shieldManager.revokeSessionUI('${session.id}')">Revoke</button>` : '<span style="color: var(--success); font-weight: bold;">✓ Active</span>'}
                 `;
                 
                 sessionsList.appendChild(item);
@@ -765,7 +760,11 @@ export class ShieldManager {
             // Actually delete the session document
             await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions').doc(sessionId).delete();
+            
             window.showMessageBox('Session revoked successfully', 'success', 2000);
+            
+            // Refresh sessions list immediately
+            await this.loadSessionsData();
         } catch (error) {
             console.error('Error revoking session:', error);
             window.showMessageBox('Failed to revoke session', 'error', 3000);
@@ -794,28 +793,27 @@ export class ShieldManager {
             const sessions = await this.db.collection('players').doc(this.authManager.currentUser.uid)
                 .collection('sessions').where('isActive', '==', true).get();
             
-            const seenFingerprints = new Set();
-            const seenIPs = new Set();
+            // Only cleanup truly old/invalid sessions
             const batch = this.db.batch();
+            let deletedCount = 0;
             
             sessions.docs.forEach(doc => {
                 const data = doc.data();
-                const isDuplicate = seenFingerprints.has(data.fingerprint) || seenIPs.has(data.ip);
+                const sessionAge = Date.now() - (data.createdAt?.toMillis() || 0);
+                const isOld = sessionAge > (24 * 60 * 60 * 1000); // Older than 24 hours
                 
-                if (isDuplicate && doc.id !== this.currentSessionId) {
-                    // Delete duplicate session
+                // Only delete sessions that are genuinely old
+                if (isOld && doc.id !== this.currentSessionId) {
                     batch.delete(doc.ref);
-                } else {
-                    seenFingerprints.add(data.fingerprint);
-                    seenIPs.add(data.ip);
+                    deletedCount++;
                 }
             });
             
-            if (!batch._delegate._mutations.length === 0) {
+            if (deletedCount > 0) {
                 await batch.commit();
             }
         } catch (error) {
-            console.log('Duplicate cleanup failed:', error.message);
+            console.log('Session cleanup failed:', error.message);
         }
     }
 
@@ -1012,4 +1010,6 @@ export class ShieldManager {
             document.addEventListener('keydown', handleEscape);
         });
     }
+
+
 }

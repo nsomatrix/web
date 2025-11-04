@@ -79,6 +79,14 @@ function setupAuthStateListener() {
             document.getElementById('main-dashboard').style.display = 'none';
             authManager?.clearSession();
 
+            // Cleanup session monitoring
+            cleanupSessionMonitoring();
+
+            // Cleanup shield manager listeners
+            if (shieldManager) {
+                shieldManager.cleanup();
+            }
+
             // Clear 2FA session data on sign out
             Object.keys(sessionStorage).forEach(key => {
                 if (key.startsWith('2fa_verified_')) {
@@ -93,8 +101,9 @@ function setupAuthStateListener() {
     });
 }
 
-// Session validation - check if current session still exists
+// Session validation - real-time session monitoring
 let sessionValidationPaused = false;
+let sessionListener = null;
 
 async function validateSession() {
     if (sessionValidationPaused || !authManager.currentUser || !shieldManager.currentSessionId) return true;
@@ -134,7 +143,62 @@ async function validateSession() {
     }
 }
 
-// Check session every 30 seconds
+// Setup real-time session monitoring
+function setupRealtimeSessionMonitoring() {
+    if (!authManager.currentUser || !shieldManager.currentSessionId) {
+        return;
+    }
+
+    // Clean up existing listener
+    if (sessionListener) {
+        sessionListener();
+        sessionListener = null;
+    }
+
+    // Listen for changes to the current session document
+    sessionListener = db.collection('players').doc(authManager.currentUser.uid)
+        .collection('sessions').doc(shieldManager.currentSessionId)
+        .onSnapshot((doc) => {
+            if (sessionValidationPaused) {
+                return;
+            }
+
+            if (!doc.exists) {
+                // Clear the revoked session ID
+                shieldManager.currentSessionId = null;
+                sessionStorage.removeItem('nsomatrix_session_id');
+
+                // Clean up listener
+                if (sessionListener) {
+                    sessionListener();
+                    sessionListener = null;
+                }
+
+                // Sign out immediately
+                showMessageBox('Session revoked from another device. Signing out...', 'warning', 2000);
+                setTimeout(() => {
+                    auth.signOut();
+                    window.location.href = 'login.html';
+                }, 2000);
+            }
+        }, (error) => {
+            console.error('Session monitoring error:', error);
+            // Fallback to periodic validation on listener error
+            setTimeout(validateSession, 5000);
+        });
+}
+
+// Cleanup session monitoring
+function cleanupSessionMonitoring() {
+    if (sessionListener) {
+        sessionListener();
+        sessionListener = null;
+    }
+}
+
+
+
+// Fallback: Check session every 30 seconds (in case real-time fails)
 setInterval(validateSession, 30000);
 
 // Initialize managers
@@ -719,6 +783,8 @@ async function setupDashboard(user) {
         if (shieldManager) {
             await shieldManager.createSession();
             await shieldManager.recordLogin();
+            // Setup real-time session monitoring after session creation
+            setupRealtimeSessionMonitoring();
         }
 
         // Update last login
