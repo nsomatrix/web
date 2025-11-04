@@ -1223,15 +1223,14 @@ function setupDeleteHandlers() {
         };
     }
 
-    // Handle cancel re-auth
-    const cancelReauthBtn = document.getElementById('cancelReauthBtn');
-    if (cancelReauthBtn) {
-        cancelReauthBtn.onclick = () => {
+    // Handle cancel re-auth using event delegation
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'cancelReauthBtn') {
             closeModal(document.getElementById('passwordReauthModal'));
             document.getElementById('reauthPassword').value = '';
             document.getElementById('reauthError').style.display = 'none';
-        };
-    }
+        }
+    });
 
     // Handle Enter key in password field
     const reauthPasswordInput = document.getElementById('reauthPassword');
