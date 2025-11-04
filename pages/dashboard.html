@@ -280,6 +280,20 @@
         </div>
     </div>
 
+    <div id="passwordReauthModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" data-modal="passwordReauthModal">&times;</span>
+            <h3>Confirm Your Password</h3>
+            <p>For security, please enter your password to confirm account deletion:</p>
+            <div class="form-group">
+                <input type="password" id="reauthPassword" placeholder="Enter your password" class="form-control">
+            </div>
+            <div id="reauthError" class="error-message" style="display:none;"></div>
+            <button id="confirmReauthBtn" class="btn btn-danger">Confirm Deletion</button>
+            <button id="cancelReauthBtn" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+
     <div id="friendsModal" class="modal" style="display:none;">
         <div class="modal-content"
             style="max-width: 90vw; width: 600px; max-height: 85vh; overflow-y: auto; margin: 2vh auto;">

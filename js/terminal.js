@@ -1216,8 +1216,7 @@ class MatrixTerminal {
                 this.addOutput('Type "dashboard delete confirm" to delete account', 'warning-text');
                 break;
             case 'delete confirm':
-                const deleteSpinner = this.showSpinner('Deleting all account data', 'warning-text');
-                await this.deleteAccount(deleteSpinner);
+                await this.initiateAccountDeletion();
                 break;
             case 'profile':
                 this.addOutput('USER PROFILE:', 'success-text');
@@ -1358,17 +1357,98 @@ class MatrixTerminal {
         }
     }
     
+    async initiateAccountDeletion() {
+        const auth = window.firebaseAuth;
+        
+        if (!auth.currentUser) {
+            this.addOutput('Please login first', 'error-text');
+            return;
+        }
+
+        this.addOutput('For security, please enter your password to confirm deletion:', 'warning-text');
+        this.addOutput('Password: ', 'input-prompt', false);
+        
+        // Set up password input mode
+        this.waitingForPassword = true;
+        this.passwordBuffer = '';
+        this.originalOnKeyDown = this.onKeyDown.bind(this);
+        this.onKeyDown = this.handlePasswordInput.bind(this);
+    }
+
+    handlePasswordInput(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            this.processPasswordInput();
+        } else if (event.key === 'Backspace') {
+            event.preventDefault();
+            if (this.passwordBuffer.length > 0) {
+                this.passwordBuffer = this.passwordBuffer.slice(0, -1);
+                // Update display (remove last asterisk)
+                const currentLine = this.terminal.lastElementChild;
+                if (currentLine && currentLine.textContent.endsWith('*')) {
+                    currentLine.textContent = currentLine.textContent.slice(0, -1);
+                }
+            }
+        } else if (event.key.length === 1) {
+            event.preventDefault();
+            this.passwordBuffer += event.key;
+            // Add asterisk to display
+            const currentLine = this.terminal.lastElementChild;
+            if (currentLine) {
+                currentLine.textContent += '*';
+            }
+        }
+    }
+
+    async processPasswordInput() {
+        const password = this.passwordBuffer;
+        this.passwordBuffer = '';
+        this.waitingForPassword = false;
+        this.onKeyDown = this.originalOnKeyDown;
+        
+        this.addOutput(''); // New line
+        
+        if (!password) {
+            this.addOutput('Password cannot be empty', 'error-text');
+            return;
+        }
+
+        const reauthSpinner = this.showSpinner('Authenticating', 'info-text');
+        
+        try {
+            const auth = window.firebaseAuth;
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                auth.currentUser.email,
+                password
+            );
+            await auth.currentUser.reauthenticateWithCredential(credential);
+            
+            this.hideSpinner(reauthSpinner);
+            this.addOutput('Authentication successful', 'success-text');
+            
+            const deleteSpinner = this.showSpinner('Deleting all account data', 'warning-text');
+            await this.deleteAccount(deleteSpinner);
+            
+        } catch (error) {
+            this.hideSpinner(reauthSpinner);
+            if (error.code === 'auth/wrong-password') {
+                this.addOutput('Incorrect password', 'error-text');
+            } else {
+                this.addOutput(`Authentication failed: ${error.message}`, 'error-text');
+            }
+        }
+    }
+
     async deleteAccount(spinnerId) {
         const auth = window.firebaseAuth;
         const db = window.firebaseDb;
         
         try {
-            
             const uid = auth.currentUser.uid;
             const deletePromises = [];
             
-            // Delete all subcollections
-            const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications'];
+            // Delete all subcollections (expanded to match dashboard version)
+            const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications', 'sessions', 'loginHistory', 'securityEvents', 'backupCodes'];
             for (const collectionName of collections) {
                 const snapshot = await db.collection('players').doc(uid).collection(collectionName).get();
                 snapshot.forEach(doc => {
@@ -1382,9 +1462,40 @@ class MatrixTerminal {
             messagesSnapshot.forEach(doc => {
                 deletePromises.push(doc.ref.delete());
             });
+
+            // Delete email verifications
+            deletePromises.push(db.collection('emailVerifications').doc(uid).delete());
             
             // Delete presence
             deletePromises.push(db.collection('presence').doc(uid).delete());
+
+            // Delete typing indicators
+            const typingSnapshot = await db.collection('typing')
+                .where(firebase.firestore.FieldPath.documentId(), '>=', uid)
+                .where(firebase.firestore.FieldPath.documentId(), '<', uid + '\uf8ff').get();
+            typingSnapshot.forEach(doc => {
+                if (doc.id.includes(uid)) {
+                    deletePromises.push(doc.ref.delete());
+                }
+            });
+
+            // Remove user from group chats
+            const groupChatsSnapshot = await db.collection('groupChats')
+                .where('members', 'array-contains', uid).get();
+            groupChatsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const updatedMembers = data.members.filter(member => member !== uid);
+                const updatedAdmins = (data.admins || []).filter(admin => admin !== uid);
+
+                if (updatedMembers.length === 0) {
+                    deletePromises.push(doc.ref.delete());
+                } else {
+                    deletePromises.push(doc.ref.update({
+                        members: updatedMembers,
+                        admins: updatedAdmins
+                    }));
+                }
+            });
             
             // Execute all deletions
             await Promise.all(deletePromises);
@@ -1392,7 +1503,7 @@ class MatrixTerminal {
             // Delete player document
             await db.collection('players').doc(uid).delete();
             
-            // Delete Firebase user account
+            // Delete Firebase user account (should work now after re-authentication)
             await auth.currentUser.delete();
             
             this.hideSpinner(spinnerId);

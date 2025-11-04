@@ -1174,97 +1174,153 @@ function setupDeleteHandlers() {
     if (confirmDeleteAccountBtn) {
         confirmDeleteAccountBtn.onclick = async () => {
             closeModal(document.getElementById('deleteAccountConfirmModal'));
-            showMessageBox("Initiating complete account deletion...", 'info', 0);
 
             if (!authManager.currentUser) {
                 showMessageBox("Please login first", "error", 3000);
                 return;
             }
 
+            // Show password re-authentication modal
+            openModal(document.getElementById('passwordReauthModal'));
+            document.getElementById('reauthPassword').focus();
+        };
+    }
+
+    // Handle password re-authentication
+    const confirmReauthBtn = document.getElementById('confirmReauthBtn');
+    if (confirmReauthBtn) {
+        confirmReauthBtn.onclick = async () => {
+            const password = document.getElementById('reauthPassword').value;
+            const errorDiv = document.getElementById('reauthError');
+
+            if (!password) {
+                errorDiv.textContent = 'Please enter your password';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
             try {
-                const uid = authManager.currentUser.uid;
-                const deletePromises = [];
+                // Re-authenticate user
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    authManager.currentUser.email,
+                    password
+                );
+                await authManager.currentUser.reauthenticateWithCredential(credential);
 
-                // Delete all subcollections
-                const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications', 'sessions', 'loginHistory', 'securityEvents', 'backupCodes'];
-                for (const collectionName of collections) {
-                    const snapshot = await db.collection('players').doc(uid).collection(collectionName).get();
-                    snapshot.forEach(doc => {
-                        deletePromises.push(doc.ref.delete());
-                    });
-                }
+                // Close modal and proceed with deletion
+                closeModal(document.getElementById('passwordReauthModal'));
+                document.getElementById('reauthPassword').value = '';
+                errorDiv.style.display = 'none';
 
-                // Delete messages where user is participant
-                const messagesSnapshot = await db.collection('messages')
-                    .where('participants', 'array-contains', uid).get();
-                messagesSnapshot.forEach(doc => {
-                    deletePromises.push(doc.ref.delete());
-                });
-
-                // Delete email verifications
-                deletePromises.push(db.collection('emailVerifications').doc(uid).delete());
-
-                // Delete presence
-                deletePromises.push(db.collection('presence').doc(uid).delete());
-
-                // Delete typing indicators
-                const typingSnapshot = await db.collection('typing')
-                    .where(firebase.firestore.FieldPath.documentId(), '>=', uid)
-                    .where(firebase.firestore.FieldPath.documentId(), '<', uid + '\uf8ff').get();
-                typingSnapshot.forEach(doc => {
-                    if (doc.id.includes(uid)) {
-                        deletePromises.push(doc.ref.delete());
-                    }
-                });
-
-                // Remove user from group chats
-                const groupChatsSnapshot = await db.collection('groupChats')
-                    .where('members', 'array-contains', uid).get();
-                groupChatsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const updatedMembers = data.members.filter(member => member !== uid);
-                    const updatedAdmins = (data.admins || []).filter(admin => admin !== uid);
-
-                    if (updatedMembers.length === 0) {
-                        // Delete group if no members left
-                        deletePromises.push(doc.ref.delete());
-                    } else {
-                        // Remove user from group
-                        deletePromises.push(doc.ref.update({
-                            members: updatedMembers,
-                            admins: updatedAdmins
-                        }));
-                    }
-                });
-
-                // Execute all deletions
-                await Promise.all(deletePromises);
-
-                // Delete player document
-                await db.collection('players').doc(uid).delete();
-
-                // Delete Firebase user account
-                await authManager.currentUser.delete();
-
-                showMessageBox("All account data deleted successfully", "success", 3000);
-                setTimeout(() => {
-                    window.location.href = getPagePath("pages/login.html");
-                }, 3000);
+                await performAccountDeletion();
 
             } catch (error) {
-                console.error("Error during account deletion:", error);
-                showMessageBox("Failed to delete account: " + error.message, "error", 5000);
-
-                if (error.code === 'auth/requires-recent-login') {
-                    showMessageBox("Account deletion requires recent login. Please log in again.", "warning", 5000);
-                    setTimeout(() => {
-                        auth.signOut().then(() => {
-                            window.location.href = getPagePath("pages/login.html");
-                        });
-                    }, 3000);
-                }
+                console.error("Re-authentication failed:", error);
+                errorDiv.textContent = error.code === 'auth/wrong-password' ?
+                    'Incorrect password' : 'Authentication failed: ' + error.message;
+                errorDiv.style.display = 'block';
             }
         };
+    }
+
+    // Handle cancel re-auth
+    const cancelReauthBtn = document.getElementById('cancelReauthBtn');
+    if (cancelReauthBtn) {
+        cancelReauthBtn.onclick = () => {
+            closeModal(document.getElementById('passwordReauthModal'));
+            document.getElementById('reauthPassword').value = '';
+            document.getElementById('reauthError').style.display = 'none';
+        };
+    }
+
+    // Handle Enter key in password field
+    const reauthPasswordInput = document.getElementById('reauthPassword');
+    if (reauthPasswordInput) {
+        reauthPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                confirmReauthBtn.click();
+            }
+        });
+    }
+
+    // Account deletion function (called after re-authentication)
+    async function performAccountDeletion() {
+        showMessageBox("Initiating complete account deletion...", 'info', 0);
+
+        try {
+            const uid = authManager.currentUser.uid;
+            const deletePromises = [];
+
+            // Delete all subcollections
+            const collections = ['notes', 'passwords', 'friends', 'friendRequests', 'notifications', 'sessions', 'loginHistory', 'securityEvents', 'backupCodes'];
+            for (const collectionName of collections) {
+                const snapshot = await db.collection('players').doc(uid).collection(collectionName).get();
+                snapshot.forEach(doc => {
+                    deletePromises.push(doc.ref.delete());
+                });
+            }
+
+            // Delete messages where user is participant
+            const messagesSnapshot = await db.collection('messages')
+                .where('participants', 'array-contains', uid).get();
+            messagesSnapshot.forEach(doc => {
+                deletePromises.push(doc.ref.delete());
+            });
+
+            // Delete email verifications
+            deletePromises.push(db.collection('emailVerifications').doc(uid).delete());
+
+            // Delete presence
+            deletePromises.push(db.collection('presence').doc(uid).delete());
+
+            // Delete typing indicators
+            const typingSnapshot = await db.collection('typing')
+                .where(firebase.firestore.FieldPath.documentId(), '>=', uid)
+                .where(firebase.firestore.FieldPath.documentId(), '<', uid + '\uf8ff').get();
+            typingSnapshot.forEach(doc => {
+                if (doc.id.includes(uid)) {
+                    deletePromises.push(doc.ref.delete());
+                }
+            });
+
+            // Remove user from group chats
+            const groupChatsSnapshot = await db.collection('groupChats')
+                .where('members', 'array-contains', uid).get();
+            groupChatsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const updatedMembers = data.members.filter(member => member !== uid);
+                const updatedAdmins = (data.admins || []).filter(admin => admin !== uid);
+
+                if (updatedMembers.length === 0) {
+                    // Delete group if no members left
+                    deletePromises.push(doc.ref.delete());
+                } else {
+                    // Remove user from group
+                    deletePromises.push(doc.ref.update({
+                        members: updatedMembers,
+                        admins: updatedAdmins
+                    }));
+                }
+            });
+
+            // Execute all deletions
+            await Promise.all(deletePromises);
+
+            // Delete player document
+            await db.collection('players').doc(uid).delete();
+
+            // Delete Firebase user account (should work now after re-authentication)
+            await authManager.currentUser.delete();
+
+            showMessageBox("All account data deleted successfully", "success", 3000);
+            setTimeout(() => {
+                window.location.href = getPagePath("pages/login.html");
+            }, 3000);
+
+        } catch (error) {
+            console.error("Error during account deletion:", error);
+            showMessageBox("Failed to delete account: " + error.message, "error", 5000);
+        }
     }
 
     // Note and password deletion confirmations
