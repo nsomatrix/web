@@ -8,7 +8,6 @@ class EmulatorsManager {
         platform: 'mobile',
         icon: 'data/Pictures/coffeevm.webp',
         downloadUrl: 'data/EMU/Android/CoffeeVM.apk',
-        description: 'Modern J2ME emulator for Android',
         githubRepo: null,
         hasVersions: false
       },
@@ -19,7 +18,6 @@ class EmulatorsManager {
         platform: 'mobile',
         icon: 'data/Pictures/j2meloader.png',
         downloadUrl: null,
-        description: 'Popular Android J2ME emulator',
         githubRepo: 'nikita36078/J2ME-Loader',
         hasVersions: true
       },
@@ -30,7 +28,6 @@ class EmulatorsManager {
         platform: 'mobile',
         icon: 'data/Pictures/phoneme.png',
         downloadUrl: 'data/EMU/Android/PhoneME.apk',
-        description: 'Open source J2ME implementation',
         githubRepo: null,
         hasVersions: false
       },
@@ -41,7 +38,6 @@ class EmulatorsManager {
         platform: 'mobile',
         icon: 'data/Pictures/jlmod.png',
         downloadUrl: null,
-        description: 'Modified J2ME Loader with enhancements',
         githubRepo: 'woesss/JL-Mod',
         hasVersions: true
       },
@@ -52,7 +48,6 @@ class EmulatorsManager {
         platform: 'mobile',
         icon: 'data/Pictures/netmite.png',
         downloadUrl: 'data/EMU/Android/NetMite.apk',
-        description: 'Lightweight J2ME emulator',
         githubRepo: null,
         hasVersions: false
       },
@@ -63,7 +58,6 @@ class EmulatorsManager {
         platform: 'desktop',
         icon: 'data/Pictures/microemulator.png',
         downloadUrl: 'data/EMU/Desktop/microemulator.jar',
-        description: 'Cross-platform J2ME emulator',
         githubRepo: null,
         hasVersions: false
       },
@@ -74,7 +68,6 @@ class EmulatorsManager {
         platform: 'desktop',
         icon: 'data/Pictures/kemulator.png',
         downloadUrl: 'data/EMU/Desktop/KEmulatorLite.exe',
-        description: 'Windows J2ME emulator',
         githubRepo: null,
         hasVersions: false
       },
@@ -85,7 +78,6 @@ class EmulatorsManager {
         platform: 'desktop',
         icon: 'data/Pictures/angelchip.png',
         downloadUrl: 'data/EMU/Desktop/AngelChipEmulator.jar',
-        description: 'Java-based J2ME emulator',
         githubRepo: null,
         hasVersions: false
       }
@@ -168,8 +160,7 @@ class EmulatorsManager {
     const searchTerm = this.searchInput.value.toLowerCase().trim();
     if (searchTerm) {
       filtered = filtered.filter(emu =>
-        emu.name.toLowerCase().includes(searchTerm) ||
-        emu.description.toLowerCase().includes(searchTerm)
+        emu.name.toLowerCase().includes(searchTerm)
       );
     }
 
@@ -203,7 +194,6 @@ class EmulatorsManager {
                   <img src="${emu.icon}" alt="${emu.name}" class="emulator-icon">
                   <div class="emulator-details">
                     <div class="emulator-name">${this.escapeHtml(emu.name)}</div>
-                    <div class="emulator-version">${this.escapeHtml(emu.description)}</div>
                   </div>
                 </div>
               </td>
