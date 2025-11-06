@@ -319,11 +319,27 @@ class EmulatorsManager {
     const desktopCount = this.emulatorsData.filter(emu => emu.platform === 'desktop').length;
     const mobileCount = this.emulatorsData.filter(emu => emu.platform === 'mobile').length;
 
-    this.totalEmulatorsEl.textContent = this.emulatorsData.length;
-    this.desktopCountEl.textContent = desktopCount;
-    this.mobileCountEl.textContent = mobileCount;
+    // Animate counters
+    this.animateCounter(this.totalEmulatorsEl, this.emulatorsData.length);
+    this.animateCounter(this.desktopCountEl, desktopCount);
+    this.animateCounter(this.mobileCountEl, mobileCount);
 
     this.statsSection.style.display = 'flex';
+  }
+
+  animateCounter(element, targetValue) {
+    if (!element) return;
+    
+    let currentValue = 0;
+    const increment = Math.ceil(targetValue / 30);
+    const timer = setInterval(() => {
+      currentValue += increment;
+      if (currentValue >= targetValue) {
+        currentValue = targetValue;
+        clearInterval(timer);
+      }
+      element.textContent = currentValue;
+    }, 50);
   }
 
   getPlatformIcon(platform) {

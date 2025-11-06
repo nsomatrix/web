@@ -370,11 +370,28 @@ class ModsManager {
       const jarCount = this.filteredMods.filter(mod => mod.type === 'jar').length;
       const zipCount = this.filteredMods.filter(mod => mod.type === 'zip').length;
 
-      this.totalModsEl.textContent = this.modsData.length;
-      this.jarCountEl.textContent = jarCount;
-      this.zipCountEl.textContent = zipCount;
+      // Animate counters
+      this.animateCounter(this.totalModsEl, this.modsData.length);
+      this.animateCounter(this.jarCountEl, jarCount);
+      this.animateCounter(this.zipCountEl, zipCount);
+      
       this.statsSection.style.display = 'flex';
     }
+  }
+
+  animateCounter(element, targetValue) {
+    if (!element) return;
+    
+    let currentValue = 0;
+    const increment = Math.ceil(targetValue / 30);
+    const timer = setInterval(() => {
+      currentValue += increment;
+      if (currentValue >= targetValue) {
+        currentValue = targetValue;
+        clearInterval(timer);
+      }
+      element.textContent = currentValue;
+    }, 50);
   }
 
   formatFileSize(bytes) {
