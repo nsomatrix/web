@@ -316,29 +316,29 @@ class Ninjadex {
         const regular = this.filteredMonsters.filter(m => m.type === 'regular').length;
         const cursed = this.filteredMonsters.filter(m => m.type === 'cursed').length;
 
-        document.getElementById('totalMonsters').textContent = total;
-        document.getElementById('regularCount').textContent = regular;
-        document.getElementById('cursedCount').textContent = cursed;
+        this.animateCounter(document.getElementById('totalMonsters'), total);
+        this.animateCounter(document.getElementById('regularCount'), regular);
+        this.animateCounter(document.getElementById('cursedCount'), cursed);
     }
 
     updateEquipmentStats() {
         const total = this.filteredEquipments.length;
-        document.getElementById('totalEquipments').textContent = total;
+        this.animateCounter(document.getElementById('totalEquipments'), total);
     }
 
     updateMapStats() {
         const total = this.filteredMaps.length;
-        document.getElementById('totalMaps').textContent = total;
+        this.animateCounter(document.getElementById('totalMaps'), total);
     }
 
     updateItemStats() {
         const total = this.filteredItems.length;
-        document.getElementById('totalItems').textContent = total;
+        this.animateCounter(document.getElementById('totalItems'), total);
     }
 
     updateSkillsetStats() {
         const total = this.filteredSkillsets.length;
-        document.getElementById('totalSkills').textContent = total;
+        this.animateCounter(document.getElementById('totalSkills'), total);
     }
 
     filterSkillsets() {
@@ -385,7 +385,7 @@ class Ninjadex {
             <div class="skill-image" style="background-image: url('${imageUrl}');" data-image-url="${imageUrl}" data-skill-name="${skill.name}"></div>
             <div class="skill-header">
                 <div class="skill-name">${skill.name}</div>
-                <div class="skill-level">Level ${skill.level}</div>
+                <div class="skill-level">Level <span class="animated-number" data-target="${skill.level}">0</span></div>
             </div>
             
             <div class="skill-class-info">
@@ -394,9 +394,14 @@ class Ninjadex {
             </div>
             
             <div class="skill-description">
-                ${skill.description}
+                ${skill.description.replace(/(\d+)/g, '<span class="animated-number" data-target="$1">0</span>')}
             </div>
         `;
+
+        // Animate numbers after a short delay
+        setTimeout(() => {
+            this.animateCardNumbers(card);
+        }, Math.random() * 500); // Random delay for staggered effect
 
         return card;
     }
@@ -499,8 +504,8 @@ class Ninjadex {
 
         const upgradesHtml = equipment.upgrades.map(upgrade =>
             `<div class="upgrade-item">
-                <span class="upgrade-level" data-level="${upgrade.upgrade_level}">+${upgrade.upgrade_level}</span>
-                <span class="upgrade-desc">${upgrade.description.replace(/(\+?\d+%?)/g, '<span class="number">$1</span>')}: <span class="number">${upgrade.value}</span></span>
+                <span class="upgrade-level" data-level="${upgrade.upgrade_level}">+<span class="animated-number" data-target="${upgrade.upgrade_level}">0</span></span>
+                <span class="upgrade-desc">${upgrade.description.replace(/(\+?\d+%?)/g, '<span class="number animated-number" data-target="$1">0</span>')}: <span class="number animated-number" data-target="${upgrade.value}">0</span></span>
             </div>`
         ).join('');
 
@@ -508,11 +513,11 @@ class Ninjadex {
             `<div class="weapon-stats">
                 <div class="stat-item">
                     <span class="stat-label">External:</span>
-                    <span class="stat-value">${equipment.external_strike ? '+' + equipment.external_strike : 'N/A'}</span>
+                    <span class="stat-value">${equipment.external_strike ? '+<span class="animated-number" data-target="' + equipment.external_strike + '">0</span>' : 'N/A'}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Internal:</span>
-                    <span class="stat-value">${equipment.internal_strike ? '+' + equipment.internal_strike : 'N/A'}</span>
+                    <span class="stat-value">${equipment.internal_strike ? '+<span class="animated-number" data-target="' + equipment.internal_strike + '">0</span>' : 'N/A'}</span>
                 </div>
             </div>` : '';
 
@@ -530,7 +535,7 @@ class Ninjadex {
             <div class="equipment-stats">
                 <div class="stat-item">
                     <span class="stat-label">Level:</span>
-                    <span class="stat-value">${equipment.level}</span>
+                    <span class="stat-value animated-number" data-target="${equipment.level}">0</span>
                 </div>
                 ${equipment.attribute ? `
                 <div class="stat-item">
@@ -548,6 +553,11 @@ class Ninjadex {
                 </div>
             </div>
         `;
+
+        // Animate numbers after a short delay
+        setTimeout(() => {
+            this.animateCardNumbers(card);
+        }, Math.random() * 500); // Random delay for staggered effect
 
         return card;
     }
@@ -579,11 +589,11 @@ class Ninjadex {
             <div class="monster-stats">
                 <div class="stat-item">
                     <span class="stat-label">Level:</span>
-                    <span class="stat-value">${monster.level}</span>
+                    <span class="stat-value animated-number" data-target="${monster.level}">0</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">HP:</span>
-                    <span class="stat-value" style="color: #ffa500;">${this.formatNumber(monster.hp)}</span>
+                    <span class="stat-value animated-number" style="color: #ffa500;" data-target="${monster.hp}">0</span>
                 </div>
             </div>
             
@@ -594,6 +604,11 @@ class Ninjadex {
                 </div>
             </div>
         `;
+
+        // Animate numbers after a short delay
+        setTimeout(() => {
+            this.animateCardNumbers(card);
+        }, Math.random() * 500); // Random delay for staggered effect
 
         return card;
     }
@@ -716,11 +731,13 @@ class Ninjadex {
             <div class="map-stats">
                 <div class="stat-item">
                     <span class="stat-label">Monsters:</span>
-                    <span class="stat-value">${monsterCount}</span>
+                    <span class="stat-value animated-number" data-target="${monsterCount}">0</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Level Range:</span>
-                    <span class="stat-value">${levelRange.min}-${levelRange.max}</span>
+                    <span class="stat-value">
+                        <span class="animated-number" data-target="${levelRange.min}">0</span>-<span class="animated-number" data-target="${levelRange.max}">0</span>
+                    </span>
                 </div>
             </div>` : ''}
             
@@ -731,12 +748,17 @@ class Ninjadex {
                     ${map.monsters.map(monster => `
                         <div class="monster-item">
                             <span class="monster-item-name">${monster.name}</span>
-                            <span class="monster-item-stats">Lv.${monster.level} | <span style="color: #ffa500;">${this.formatNumber(monster.hp)} HP</span></span>
+                            <span class="monster-item-stats">Lv.<span class="animated-number" data-target="${monster.level}">0</span> | <span style="color: #ffa500;"><span class="animated-number" data-target="${monster.hp}">0</span> HP</span></span>
                         </div>
                     `).join('')}
                 </div>
             </div>` : ''}
         `;
+
+        // Animate numbers after a short delay
+        setTimeout(() => {
+            this.animateCardNumbers(card);
+        }, Math.random() * 500); // Random delay for staggered effect
 
         return card;
     }
@@ -788,6 +810,43 @@ class Ninjadex {
 
     hideLoading() {
         window.hideLoading();
+    }
+
+    animateCounter(element, targetValue) {
+        if (!element) return;
+        
+        let currentValue = 0;
+        const increment = Math.ceil(targetValue / 30);
+        const timer = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= targetValue) {
+                currentValue = targetValue;
+                clearInterval(timer);
+            }
+            element.textContent = currentValue;
+        }, 50);
+    }
+
+    animateCardNumbers(card) {
+        const animatedNumbers = card.querySelectorAll('.animated-number');
+        animatedNumbers.forEach((element, index) => {
+            const targetValue = parseInt(element.dataset.target);
+            if (isNaN(targetValue)) return;
+            
+            // Add a small delay between each number animation for a cascading effect
+            setTimeout(() => {
+                let currentValue = 0;
+                const increment = Math.max(1, Math.ceil(targetValue / 20)); // Faster animation for card numbers
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= targetValue) {
+                        currentValue = targetValue;
+                        clearInterval(timer);
+                    }
+                    element.textContent = currentValue;
+                }, 30); // Faster interval for smoother animation
+            }, index * 100); // Stagger each number by 100ms
+        });
     }
 
     showFullscreenImage(imageUrl, mapName) {
