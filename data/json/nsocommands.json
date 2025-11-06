@@ -1,0 +1,517 @@
+{
+  "metadata": {
+    "title": "NSO Game Codes",
+    "description": "Categorized command codes for NSO game",
+    "version": "1.0",
+    "categories": [
+      "general",
+      "nsotien",
+      "trungduc"
+    ],
+    "general_count": 64,
+    "nsotien_count": 12,
+    "trungduc_count": 44,
+    "total_codes": 120
+  },
+  "codes": {
+    "general": [
+      {
+        "command": "hsx",
+        "description": "Isolated Revive"
+      },
+      {
+        "command": "bux",
+        "description": "Isolated Buff"
+      },
+      {
+        "command": "cn",
+        "description": "Delete saved party"
+      },
+      {
+        "command": "cy",
+        "description": "Display Kins rate + accumulation/duration"
+      },
+      {
+        "command": "clv",
+        "description": "Display Levels rate + accumulation/duration"
+      },
+      {
+        "command": "gm+(mapID)",
+        "description": "Move to desired MapID",
+        "example": "gm100"
+      },
+      {
+        "command": "die",
+        "description": "Suicide"
+      },
+      {
+        "command": "addn",
+        "description": "Auto-Invite Teammate"
+      },
+      {
+        "command": "tsan",
+        "description": "Leader will auto-kill with team"
+      },
+      {
+        "command": "tsn+(monsterLV)",
+        "description": "Leader will auto-kill a specific level monster with team",
+        "example": "tsn100"
+      },
+      {
+        "command": "attn",
+        "description": "Auto-Kill Beasts with team"
+      },
+      {
+        "command": "buff",
+        "description": "Heal + Auto-Revive"
+      },
+      {
+        "command": "mapup",
+        "description": "(Private Chat) Retrieves current map of the player"
+      },
+      {
+        "command": "view",
+        "description": "Kins Overview + Rate"
+      },
+      {
+        "command": "watchlv",
+        "description": "Levels Overview + Rate"
+      },
+      {
+        "command": "password",
+        "description": "Sending the password in Private Chat will disconnect the account"
+      },
+      {
+        "command": "kts",
+        "description": "Auto-Kill with full radius."
+      },
+      {
+        "command": "kts(X)",
+        "description": "Auto-Kill with desired radius",
+        "example": "kts100"
+      },
+      {
+        "command": "dcvt",
+        "description": "Enable/Disable Positioning"
+      },
+      {
+        "command": "avt",
+        "description": "Save a specific spot for Positioning"
+      },
+      {
+        "command": "dvt",
+        "description": "Delete all the saved spots for Positioning"
+      },
+      {
+        "command": "glv",
+        "description": "Hold Level - Account auto logouts after reaching 98% threshold"
+      },
+      {
+        "command": "ak",
+        "description": "Enable/Disable Auto-Killing"
+      },
+      {
+        "command": "cheth",
+        "description": "Switching pick-up from VP to pick up and vice versa"
+      },
+      {
+        "command": "x(X)",
+        "description": "Set Pickup Radius",
+        "example": "x100"
+      },
+      {
+        "command": "ruong",
+        "description": "Opens luggage"
+      },
+      {
+        "command": "vphnhat",
+        "description": "Opens watch DS VP pick"
+      },
+      {
+        "command": "s(X)",
+        "description": "Accelerate movement speed"
+      },
+      {
+        "command": "rs",
+        "description": "Reset movement speed"
+      },
+      {
+        "command": "bang/fz",
+        "description": "Freeze all the monsters"
+      },
+      {
+        "command": "pbang/wz",
+        "description": "Unfreeze all the monsters"
+      },
+      {
+        "command": "u(X)",
+        "description": "Move Up",
+        "example": "u10"
+      },
+      {
+        "command": "d(X)",
+        "description": "Move Down",
+        "example": "d10"
+      },
+      {
+        "command": "l(X)",
+        "description": "Move Left",
+        "example": "l10"
+      },
+      {
+        "command": "r(X)",
+        "description": "Move Right",
+        "example": "r10"
+      },
+      {
+        "command": "n(X)",
+        "description": "Adjusts horizontal range",
+        "example": "n10"
+      },
+      {
+        "command": "c(X)",
+        "description": "Adjusts high range",
+        "example": "c10"
+      },
+      {
+        "command": "m(X)",
+        "description": "Adjusts the X-ray",
+        "example": "m10"
+      },
+      {
+        "command": "rsk",
+        "description": "Resets range"
+      },
+      {
+        "command": "Ts(X)",
+        "description": "Auto-Kill specific level monster"
+      },
+      {
+        "command": "Tsa",
+        "description": "Auto-Kill all the monsters"
+      },
+      {
+        "command": "anv",
+        "description": "Auto Daily Quests"
+      },
+      {
+        "command": "Att",
+        "description": "Auto Beast"
+      },
+      {
+        "command": "e",
+        "description": "Ends auto"
+      },
+      {
+        "command": "k(X)",
+        "description": "Zone X transfer"
+      },
+      {
+        "command": "ltd",
+        "description": "Saves coordinates when in village or school"
+      },
+      {
+        "command": "nm(X)",
+        "description": "Move to next map",
+        "example": "<< nm0 / nm1 >>"
+      },
+      {
+        "command": "npc(X)",
+        "description": "Move to Desired NPC",
+        "example": "npc1"
+      },
+      {
+        "command": "hs",
+        "description": "Go to Hirosaki"
+      },
+      {
+        "command": "hr",
+        "description": "Go to Haruna"
+      },
+      {
+        "command": "oz",
+        "description": "Go to Oozaka"
+      },
+      {
+        "command": "Kj",
+        "description": "Go to Kojin"
+      },
+      {
+        "command": "Sz",
+        "description": "Go to Sanzu"
+      },
+      {
+        "command": "Tn",
+        "description": "Go to Tone"
+      },
+      {
+        "command": "lc",
+        "description": "Go to Fish Village"
+      },
+      {
+        "command": "ck",
+        "description": "Go to Chakumi"
+      },
+      {
+        "command": "eg",
+        "description": "Go to Echigo"
+      },
+      {
+        "command": "Os",
+        "description": "Go to Oshin"
+      },
+      {
+        "command": "mnv",
+        "description": "To the main Daily map"
+      },
+      {
+        "command": "mnvp",
+        "description": "Teleports to Auto-Daily"
+      },
+      {
+        "command": "add",
+        "description": "Add an item to a bucket"
+      },
+      {
+        "command": "del",
+        "description": "Delete an item from a bucket"
+      },
+      {
+        "command": "ait(X)",
+        "description": "Add an item with desired item ID"
+      },
+      {
+        "command": "dit(X)",
+        "description": "Delete an item with desired item ID"
+      }
+    ],
+    "nsotien": [
+      {
+        "command": "up",
+        "description": "Set Time"
+      },
+      {
+        "command": "a",
+        "description": "To Set Negative PK Coordinates"
+      },
+      {
+        "command": "a",
+        "description": "To Set Auto Hang Game (No Escape Mechanism Without Massacre)"
+      },
+      {
+        "command": "a",
+        "description": "To Turn On/Off Show Up Information"
+      },
+      {
+        "command": "hd",
+        "description": "To Set Auto Cave For ALL Level"
+      },
+      {
+        "command": "cpk,dpk,pk,apk",
+        "description": "PK Bot"
+      },
+      {
+        "command": "b",
+        "description": "To Set Time Nick On/Off"
+      },
+      {
+        "command": "t",
+        "description": "To Add Group + \"f\" To Fan Buff"
+      },
+      {
+        "command": "td",
+        "description": "To Show Coordinates To Install Sound Pk"
+      },
+      {
+        "command": "i",
+        "description": "To Turn On/Off Smart Item Filter"
+      },
+      {
+        "command": "p",
+        "description": "To Turn Off Auto Massacre"
+      },
+      {
+        "command": "nst",
+        "description": "To Check Nick Up (Remember To Make Friends On Both Sides)"
+      }
+    ],
+    "trungduc": [
+      {
+        "command": "e",
+        "description": "Turn off auto"
+      },
+      {
+        "command": "onoff",
+        "description": "Set onl / off"
+      },
+      {
+        "command": "stt",
+        "description": "hide information leaving only the status name auto"
+      },
+      {
+        "command": "lay",
+        "description": "auto get items in chest"
+      },
+      {
+        "command": "cat",
+        "description": "auto put items in chest"
+      },
+      {
+        "command": "Enter",
+        "description": "tele to target (person)"
+      },
+      {
+        "command": "ln",
+        "description": "block spam invite group, trade, competition"
+      },
+      {
+        "command": "gd+idvp",
+        "description": "gd items quickly by item id"
+      },
+      {
+        "command": "gm+idmap",
+        "description": "Move quickly"
+      },
+      {
+        "command": "addn",
+        "description": "Auto invite group"
+      },
+      {
+        "command": "cn",
+        "description": "delete group"
+      },
+      {
+        "command": "ltd",
+        "description": "save coordinates"
+      },
+      {
+        "command": "cy",
+        "description": "watch still"
+      },
+      {
+        "command": "buff​​",
+        "description": "Buff function for sub-fan."
+      },
+      {
+        "command": "ta",
+        "description": "food menu"
+      },
+      {
+        "command": "atpk",
+        "description": "go pk yin immediately"
+      },
+      {
+        "command": "adpk",
+        "description": "acc to play PK yin"
+      },
+      {
+        "command": "acpk",
+        "description": "acc to wait for PK yin"
+      },
+      {
+        "command": "anv",
+        "description": "auto daily quest"
+      },
+      {
+        "command": "att",
+        "description": "auto evil beast"
+      },
+      {
+        "command": "ahd",
+        "description": "auto cave"
+      },
+      {
+        "command": "fz",
+        "description": "Freeze + no skill display"
+      },
+      {
+        "command": "pbang",
+        "description": "Break ice + display skill"
+      },
+      {
+        "command": "ak",
+        "description": "Auto attack"
+      },
+      {
+        "command": "akn",
+        "description": "Auto attack moving people"
+      },
+      {
+        "command": "akn1",
+        "description": "Auto attack people (tele)"
+      },
+      {
+        "command": "akn2",
+        "description": "Attack people according to PK list"
+      },
+      {
+        "command": "akn3",
+        "description": "Attack people according to Pk list + slaughter"
+      },
+      {
+        "command": "cs",
+        "description": "Auto sheep slaughter according to PK list"
+      },
+      {
+        "command": "apk",
+        "description": "Auto PK those igs that turn on PK in the map or sheep slaughter you"
+      },
+      {
+        "command": "hlctX",
+        "description": "X = aggressive"
+      },
+      {
+        "command": "adan",
+        "description": "Auto use dan (when using akn2 , akn3 , apk )"
+      },
+      {
+        "command": "s10,s20",
+        "description": "Hack running speed."
+      },
+      {
+        "command": "cd",
+        "description": "install auto PK"
+      },
+      {
+        "command": "ts",
+        "description": "Slaughter monsters"
+      },
+      {
+        "command": "tsn",
+        "description": "Slaughter in groups"
+      },
+      {
+        "command": "as10,as20",
+        "description": "auto plow from level 1 > 10 and 10 > 20"
+      },
+      {
+        "command": "uppk",
+        "description": "Set negative pk"
+      },
+      {
+        "command": "hsl",
+        "description": "Revive amount"
+      },
+      {
+        "command": "hd",
+        "description": "set cave"
+      },
+      {
+        "command": "avt",
+        "description": "Save location up"
+      },
+      {
+        "command": "dcvt",
+        "description": "Move save location"
+      },
+      {
+        "command": "dvt",
+        "description": "Delete all save locations"
+      },
+      {
+        "command": "dck",
+        "description": "Auto at Desired Areas"
+      }
+    ]
+  }
+}
