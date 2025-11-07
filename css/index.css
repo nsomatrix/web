@@ -484,9 +484,6 @@
   0%, 60% { opacity: 1; }
   61%, 100% { opacity: 0; }
 }
-}
-
-
 
 .video-modal {
   position: fixed;
