@@ -1,7 +1,6 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 import { TwoFactorAuth } from './modules/two-factor.js';
-import { TURNSTILE_CONFIG } from './modules/config.js';
 
 // Wait for Firebase to be ready
 let auth, db, twoFactorAuth;
@@ -35,120 +34,6 @@ const togglePassword = document.getElementById("togglePassword");
 const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
 let isSignupMode = false;
-let turnstileToken = null;
-let turnstileWidgetId = null;
-let turnstileInitialized = false;
-
-// Turnstile callback functions (must be global)
-window.onTurnstileSuccess = function(token) {
-    turnstileToken = token;
-    const btn = document.getElementById('primaryBtn');
-    if (btn) btn.disabled = false;
-};
-
-window.onTurnstileError = function(error) {
-    turnstileToken = null;
-    const btn = document.getElementById('primaryBtn');
-    if (btn) btn.disabled = true;
-    if (typeof showMessageBox === 'function') {
-        showMessageBox('Security verification failed. Please try again.', 'error');
-    }
-    setTimeout(() => renderTurnstile(), 2000);
-};
-
-window.onTurnstileExpired = function() {
-    turnstileToken = null;
-    const btn = document.getElementById('primaryBtn');
-    if (btn) btn.disabled = true;
-    if (typeof showMessageBox === 'function') {
-        showMessageBox('Security verification expired. Please verify again.', 'error');
-    }
-};
-
-// Reset Turnstile when switching modes
-function resetTurnstile() {
-    turnstileToken = null;
-    const btn = document.getElementById('primaryBtn');
-    if (btn) btn.disabled = true;
-    
-    if (window.turnstile && turnstileWidgetId !== null) {
-        try {
-            window.turnstile.reset(turnstileWidgetId);
-        } catch (e) {
-
-            // Force re-render if reset fails
-            setTimeout(renderTurnstile, 100);
-        }
-    } else {
-        // If no widget ID, re-render
-        setTimeout(renderTurnstile, 100);
-    }
-}
-
-// Render Turnstile widget
-function renderTurnstile() {
-    const container = document.getElementById('turnstile-container');
-    if (!container || !window.turnstile) {
-        setTimeout(renderTurnstile, 500);
-        return;
-    }
-    
-    try {
-        container.innerHTML = '';
-        turnstileWidgetId = window.turnstile.render(container, {
-            sitekey: TURNSTILE_CONFIG.SITE_KEY,
-            callback: window.onTurnstileSuccess,
-            'error-callback': window.onTurnstileError,
-            'expired-callback': window.onTurnstileExpired,
-            theme: 'dark',
-            size: 'normal'
-        });
-    } catch (e) {
-        setTimeout(renderTurnstile, 1000);
-    }
-}
-
-// Initialize Turnstile when script loads
-function initTurnstile() {
-    let attempts = 0;
-    const maxAttempts = 50;
-    
-    const checkTurnstile = () => {
-        attempts++;
-        if (window.turnstile && typeof window.turnstile.render === 'function') {
-            turnstileInitialized = true;
-            renderTurnstile();
-        } else if (attempts < maxAttempts) {
-            setTimeout(checkTurnstile, 200);
-        } else {
-            const container = document.getElementById('turnstile-container');
-            if (container) {
-                const errorMsg = document.createElement('p');
-                errorMsg.style.cssText = 'color: red; text-align: center;';
-                errorMsg.textContent = 'Security verification failed to load. Please ';
-                
-                const refreshLink = document.createElement('a');
-                refreshLink.href = '#';
-                refreshLink.textContent = 'refresh the page';
-                refreshLink.onclick = () => location.reload();
-                
-                errorMsg.appendChild(refreshLink);
-                errorMsg.appendChild(document.createTextNode('.'));
-                container.innerHTML = '';
-                container.appendChild(errorMsg);
-            }
-        }
-    };
-    
-    checkTurnstile();
-}
-
-// Start initialization after DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTurnstile);
-} else {
-    initTurnstile();
-}
 
 function setupPasswordToggle(toggleElement, inputElement) {
     if (toggleElement) {
@@ -180,7 +65,6 @@ function switchMode() {
         confirmPasswordContainer.style.display = "none";
         forgotPasswordLink.style.display = "block";
     }
-    resetTurnstile();
 }
 
 switchBtn.addEventListener("click", switchMode);
@@ -286,19 +170,6 @@ async function handleLogin() {
         return;
     }
     
-    if (!turnstileToken) {
-        // Check if Turnstile is completely broken
-        const container = document.getElementById('turnstile-container');
-        const hasWidget = container && container.querySelector('iframe');
-        
-        if (!hasWidget && turnstileInitialized) {
-            renderTurnstile();
-        }
-        
-        showMessageBox('Please complete the security verification', 'error');
-        return;
-    }
-
     if (!email.includes('@')) {
         showMessageBox('Please enter a valid email address', 'error');
         return;
@@ -417,11 +288,6 @@ async function handleSignup() {
         return;
     }
     
-    if (!turnstileToken) {
-        showMessageBox('Please complete the security verification', 'error');
-        return;
-    }
-
     if (password !== confirmPassword) {
         showMessageBox('Passwords do not match', 'error');
         return;
