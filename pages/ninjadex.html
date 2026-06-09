@@ -33,12 +33,6 @@
             window.firebaseAuth = firebase.auth();
             window.firebaseDb = firebase.firestore();
         });
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        window.firebaseAuth = firebase.auth();
-        window.firebaseDb = firebase.firestore();
     </script>
 </head>
 <body>

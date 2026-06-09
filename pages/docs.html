@@ -27,12 +27,6 @@
             window.firebaseAuth = firebase.auth();
             window.firebaseDb = firebase.firestore();
         });
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        window.firebaseAuth = firebase.auth();
-        window.firebaseDb = firebase.firestore();
     </script>
     <script src="../js/essentials.js"></script>
     <script src="../js/sound.js"></script>
