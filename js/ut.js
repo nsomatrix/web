@@ -53,12 +53,9 @@ function calculateUptime() {
     var uptimeElement = document.getElementById('ut');
     if (uptimeElement) {
         uptimeElement.innerText = uptime;
-    } else {
-        console.warn("Uptime element with ID 'ut' not found. Please ensure the HTML element exists.");
+        // Update the counter every second
+        setTimeout(calculateUptime, 1000);
     }
-
-    // Update the counter every second
-    setTimeout(calculateUptime, 1000);
 }
 
 function openTool(url, title) {
