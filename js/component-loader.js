@@ -57,12 +57,6 @@ class ComponentLoader {
       const page = link.getAttribute('href');
       link.href = getPagePath(page);
     });
-    
-    // Fix auth links
-    const authLink = document.getElementById('authLink');
-    const mobileAuthLink = document.getElementById('mobileAuthLink');
-    if (authLink) authLink.href = getPagePath('pages/login.html');
-    if (mobileAuthLink) mobileAuthLink.href = getPagePath('pages/login.html');
   }
   
   static async loadFooter() {
@@ -146,109 +140,6 @@ class ComponentLoader {
         closeMenu();
       }
     });
-    
-    this.initializeNavbarAuth();
-  }
-  
-  static initializeNavbarAuth() {
-    const authLink = document.getElementById('authLink');
-    const mobileAuthLink = document.getElementById('mobileAuthLink');
-    
-    const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-    this.updateAuthLinks(isLoggedIn ? { uid: 'user' } : null, authLink, mobileAuthLink);
-    this.setupFirebaseListener(authLink, mobileAuthLink);
-  }
-
-  static setupFirebaseListener(authLink, mobileAuthLink) {
-    let attempts = 0;
-    const maxAttempts = 50;
-    
-    const trySetupListener = () => {
-      attempts++;
-      
-      let auth = null;
-      if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
-        auth = window.firebase.auth();
-      } else if (window.firebaseAuth) {
-        auth = window.firebaseAuth;
-      }
-      
-      if (auth) {
-        auth.onAuthStateChanged((user) => {
-          this.updateAuthLinks(user, authLink, mobileAuthLink);
-          if (user) {
-            localStorage.setItem('userLoggedIn', 'true');
-          } else {
-            localStorage.removeItem('userLoggedIn');
-          }
-        });
-        return;
-      }
-      
-      if (attempts < maxAttempts) {
-        setTimeout(trySetupListener, 200);
-      }
-    };
-    
-    trySetupListener();
-  }
-
-  static updateAuthLinks(user, authLink, mobileAuthLink) {
-    const loginSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 17v-3H3v-4h7V7l5 5-5 5M10 2h9a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-2h2v2h9V4h-9v2H8V4a2 2 0 0 1 2-2z"/></svg>';
-    const logoutSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.08 15.59L16.67 13H7v-2h9.67l-2.59-2.59L15.5 7l5 5-5 5-1.42-1.41M19 3a2 2 0 0 1 2 2v4.67l-2-2V5H5v14h14v-2.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z"/></svg>';
-    
-    if (user) {
-      if (authLink) {
-        authLink.innerHTML = logoutSvg + ' LOGOUT';
-        authLink.href = '#';
-        authLink.onclick = (e) => {
-          e.preventDefault();
-          this.logout();
-        };
-      }
-      if (mobileAuthLink) {
-        mobileAuthLink.innerHTML = logoutSvg + ' LOGOUT';
-        mobileAuthLink.href = '#';
-        mobileAuthLink.onclick = (e) => {
-          e.preventDefault();
-          this.logout();
-        };
-      }
-    } else {
-      if (authLink) {
-        authLink.innerHTML = loginSvg + ' LOGIN';
-        authLink.href = getPagePath('pages/login.html');
-        authLink.onclick = null;
-      }
-      if (mobileAuthLink) {
-        mobileAuthLink.innerHTML = loginSvg + ' LOGIN';
-        mobileAuthLink.href = getPagePath('pages/login.html');
-        mobileAuthLink.onclick = null;
-      }
-    }
-  }
-
-  static async logout() {
-    try {
-      let auth = null;
-      if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
-        auth = window.firebase.auth();
-      } else if (window.firebaseAuth) {
-        auth = window.firebaseAuth;
-      }
-      
-      if (auth) {
-        await auth.signOut();
-      }
-      
-      localStorage.removeItem('userLoggedIn');
-      sessionStorage.clear();
-      window.location.href = getAssetPath('index.html');
-    } catch (error) {
-      localStorage.removeItem('userLoggedIn');
-      sessionStorage.clear();
-      window.location.href = getAssetPath('index.html');
-    }
   }
   
   static initializeSupport() {

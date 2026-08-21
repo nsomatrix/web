@@ -34,14 +34,12 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script>
         window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
             }
-            window.firebaseAuth = firebase.auth();
             window.firebaseDb = firebase.firestore();
         });
     </script>

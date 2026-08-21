@@ -16,15 +16,13 @@
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script>
-        // Initialize Firebase for navbar auth
+        // Initialize Firebase
         window.firebaseConfigLoader.loadConfig().then(firebaseConfig => {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
             }
-            window.firebaseAuth = firebase.auth();
             window.firebaseDb = firebase.firestore();
         });
     </script>
@@ -44,67 +42,8 @@
         <h2>Platform Overview</h2>
         <p>The Matrix™ WEB is a multi-featured platform that combines:</p>
         <ul>
-            <li><strong>Secure Personal Dashboard:</strong> Encrypted notes, password management, and social features</li>
             <li><strong>Gaming Tools:</strong> Emulators, game databases, modifications, and utilities</li>
             <li><strong>Productivity Suite:</strong> Terminal access, timezone tools, and calculators</li>
-            <li><strong>Social Network:</strong> Friends system, messaging, and real-time communication</li>
-        </ul>
-
-        <h2>Dashboard Features</h2>
-
-        <h3>1. Profile Management</h3>
-        <p>Upon logging in, you'll enter the Dashboard setup section if it's your first time or if your profile isn't complete.</p>
-        <ul>
-            <li><strong>Username:</strong> Set your unique username that will be displayed across the platform</li>
-            <li><strong>Avatar Selection:</strong> Choose from a curated selection of avatars to personalize your profile</li>
-            <li><strong>Profile Completion:</strong> Complete setup to access all dashboard features</li>
-        </ul>
-
-        <h3>2. Secure Notes</h3>
-        <p>Store private information with military-grade encryption.</p>
-        <ul>
-            <li><strong>End-to-End Encryption:</strong> All notes are encrypted before leaving your device</li>
-            <li><strong>Rich Text Support:</strong> Create detailed notes with formatting</li>
-            <li><strong>Timestamp Tracking:</strong> Automatic creation and modification timestamps</li>
-            <li><strong>Secure Deletion:</strong> Confirmation prompts prevent accidental data loss</li>
-        </ul>
-
-        <h3>3. Password Manager</h3>
-        <p>Securely store and manage login credentials for all your online services.</p>
-        <ul>
-            <li><strong>Service Organization:</strong> Categorize passwords by service name</li>
-            <li><strong>Username/Password Storage:</strong> Encrypted credential storage</li>
-            <li><strong>Password Visibility Toggle:</strong> Show/hide passwords for security</li>
-            <li><strong>Quick Access:</strong> Fast retrieval of stored credentials</li>
-        </ul>
-
-        <h3>4. Friends & Social Network</h3>
-        <p>Connect with other Matrix™ users through our integrated social system.</p>
-        <ul>
-            <li><strong>Friend Requests:</strong> Send and receive friend requests</li>
-            <li><strong>User Search:</strong> Find users by username across the platform</li>
-            <li><strong>Online Status:</strong> Real-time presence indicators</li>
-            <li><strong>Friend Management:</strong> Add, remove, and organize your connections</li>
-        </ul>
-
-        <h3>5. Messaging System</h3>
-        <p>Communicate securely with friends through our built-in messaging platform.</p>
-        <ul>
-            <li><strong>Direct Messages:</strong> One-on-one private conversations</li>
-            <li><strong>Group Chats:</strong> Create and manage group conversations</li>
-            <li><strong>Real-time Delivery:</strong> Instant message delivery and read receipts</li>
-            <li><strong>Group Management:</strong> Add/remove members, rename groups, delete groups</li>
-        </ul>
-
-        <h3>6. Shield Security Center</h3>
-        <p>Advanced security management and monitoring for your account.</p>
-        <ul>
-            <li><strong>Security Score:</strong> Real-time assessment of your account security</li>
-            <li><strong>Active Sessions:</strong> Monitor and manage device sessions</li>
-            <li><strong>Login History:</strong> Track recent account access and locations</li>
-            <li><strong>Two-Factor Authentication:</strong> TOTP app and email-based 2FA</li>
-            <li><strong>Recovery Keys:</strong> Generate and manage account recovery options</li>
-            <li><strong>Security Events:</strong> Monitor suspicious activity and security alerts</li>
         </ul>
 
         <h2>Tools Suite</h2>
@@ -162,34 +101,7 @@
             <li><strong>Real-time Updates:</strong> Live clock displays</li>
         </ul>
 
-        <h2>Security & Encryption</h2>
 
-        <h3>End-to-End Encryption</h3>
-        <p>Your sensitive data is protected with military-grade encryption before it ever leaves your device.</p>
-        <ul>
-            <li><strong>Master Password:</strong> Your encryption key that never leaves your device</li>
-            <li><strong>PBKDF2 Key Derivation:</strong> 200,000 iterations with SHA256 hashing</li>
-            <li><strong>AES Encryption:</strong> Industry-standard symmetric encryption</li>
-            <li><strong>Session Security:</strong> Temporary key storage with automatic cleanup</li>
-            <li><strong>Zero-Knowledge Architecture:</strong> Even administrators cannot access your data</li>
-        </ul>
-
-        <h3>Two-Factor Authentication</h3>
-        <p>Enhanced account security with multiple verification methods.</p>
-        <ul>
-            <li><strong>TOTP Authenticator:</strong> Compatible with Google Authenticator, Authy, and similar apps</li>
-            <li><strong>Email Verification:</strong> Backup 2FA method via email codes</li>
-            <li><strong>Recovery Codes:</strong> One-time backup codes for emergency access</li>
-            <li><strong>Session Management:</strong> Control active sessions across devices</li>
-        </ul>
-
-        <h3>Account Recovery</h3>
-        <p>Secure recovery options while maintaining encryption integrity.</p>
-        <ul>
-            <li><strong>Recovery Keys:</strong> 32-character keys for data recovery</li>
-            <li><strong>Key Regeneration:</strong> Create new recovery keys when needed</li>
-            <li><strong>Secure Storage:</strong> Offline storage recommendations</li>
-        </ul>
 
         <h2>Cross-Platform Compatibility</h2>
 
@@ -242,23 +154,7 @@
             <li><strong>User Control:</strong> Full control over your data and privacy settings</li>
         </ul>
 
-        <h2>Account Management</h2>
 
-        <h3>Account Creation</h3>
-        <ul>
-            <li><strong>Email Registration:</strong> Secure account creation with email verification</li>
-            <li><strong>Profile Setup:</strong> Guided setup process for new users</li>
-            <li><strong>Security Configuration:</strong> Optional 2FA setup during registration</li>
-        </ul>
-
-        <h3>Account Deletion</h3>
-        <ul>
-            <li><strong>Complete Removal:</strong> All data permanently deleted</li>
-            <li><strong>Confirmation Process:</strong> Multiple confirmations prevent accidental deletion</li>
-            <li><strong>Immediate Effect:</strong> Account and data removed within 24 hours</li>
-        </ul>
-
-        <p><strong>Important Security Notice:</strong> Due to our zero-knowledge encryption architecture, if you forget your Master Password, there is no way to recover your encrypted data. Your only option would be to delete your account and create a new one. We strongly recommend storing your Master Password in a secure, offline location.</p>
     </div>
 
 

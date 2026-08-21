@@ -1,7 +1,6 @@
 const dialogueTextsStatic = [
   "Welcome to Matrix™",
   "More than 4 accounts per device will result in reduced grind!",
-  "Sign up with Matrix and get access to your personal Dashboard.",
   "Good luck!"
 ];
 
