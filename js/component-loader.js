@@ -155,13 +155,12 @@ class ComponentLoader {
     
     window.submitSupport = () => {
       const form = document.getElementById('supportForm');
-      const name = document.getElementById('userName').value.trim();
       const email = document.getElementById('userEmail').value.trim();
       const category = document.getElementById('category').value;
       const message = document.getElementById('message').value.trim();
       const btn = document.getElementById('submitBtn');
       
-      if (!name || !email || !category || !message) {
+      if (!email || !category || !message) {
         this.showNotification('Please fill in all required fields', 'error');
         return;
       }
@@ -174,7 +173,7 @@ class ComponentLoader {
       fetch('https://support-proxy.nsomtx.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, category, message, ticketId })
+        body: JSON.stringify({ email, category, message, ticketId })
       }).then(r => {
         if (r.ok) {
           this.showSuccessModal(ticketId);
